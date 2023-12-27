@@ -1,0 +1,43 @@
+{
+    "replace_some_characters": {
+        "宿含|看舍": {
+            "correct": "宿舍",
+            "regular": true
+        },
+        "挖制中枢": {
+            "correct": "控制中枢"
+        },
+        "人數": {
+            "correct": "人数"
+        },
+        "利余": {
+            "correct": "剩余"
+        },
+        "球态":{
+            "correct":"状态"
+        },
+        "休意": {
+            "correct": "剩余"
+        },
+        "|": {
+            "correct": ""
+        },
+        "!": {
+            "correct": ""
+        },
+        "堤交": {
+            "correct": "提交"
+        },
+        "反情":{
+            "correct":"反馈"
+        },
+        "禅经":{
+            "correct":"神经"
+        },
+        "cTED": {
+            "correct": "CTED"
+        }
+    },
+    "versionCode": "2",
+    "update_content": ""
+}

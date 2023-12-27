@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<vertical bg="#d3d3d3">
+    <img src="file:///data/data/mrfz.qiao.com/files/project/res/start-up.png" scaleType="fitXY" w="*" h="*" layout_weight="1"/>
+        <horizontal gravity="center" margin="0 10 0 0">
+            <img src="http://114.132.176.62/qiao0314/splashIcon.png" w="80" h="80" circle="true" scaleType="fitXY"/>
+           </horizontal>
+            <horizontal gravity="center" >
+            <text text="qiao by Auto.js"  w="auto" h="*" textSize="24" textColor="#212121"
+                textStyle="bold" layout_gravity="center" margin="0"/>
+        </horizontal>
+</vertical>

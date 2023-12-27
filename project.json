@@ -1,0 +1,93 @@
+{
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a"
+  ],
+  "assets": [],
+  "build": {
+    "build_id": "2676F3B7-1218",
+    "build_number": 1218,
+    "build_time": 1677334779209,
+    "release": false
+  },
+  "encryptLevel": 3,
+  "features": {
+    "activityIntentTasks": false,
+    "nodejs": "auto"
+  },
+  "icon": "images/ic_app_logo.png",
+  "launchConfig": {
+    "displaySplash": true,
+    "hideLogs": false,
+    "splashLayoutXml": "res/splash.xml",
+    "splashText": "",
+    "stableMode": false
+  },
+  "main": "main.js",
+  "name": "明日计划",
+  "optimization": {
+    "obfuscateComponents": true,
+    "removeAccessibilityService": false,
+    "removeOpenCv": false,
+    "unusedResources": false
+  },
+  "packageName": "com.mrfz.qiao",
+  "permissionConfig": {
+    "manifestPermissions": [
+      "android.permission.FOREGROUND_SERVICE",
+      "android.permission.INTERNET",
+      "android.permission.PACKAGE_USAGE_STATS",
+      "android.permission.READ_EXTERNAL_STORAGE",
+      "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+      "android.permission.SYSTEM_ALERT_WINDOW",
+      "android.permission.WRITE_EXTERNAL_STORAGE",
+      "android.permission.KILL_BACKGROUND_PROCESSES",
+      "android.permission.REQUEST_COMPANION_RUN_IN_BACKGROUND",
+      "android.permission.REORDER_TASKS",
+      "android.permission.RESTART_PACKAGES",
+      "android.permission.RUN_IN_BACKGROUND",
+      "android.permission.VIBRATE",
+      "android.permission.WAKE_LOCK",
+      "android.permission.REQUEST_INSTALL_PACKAGES",
+      "android.permission.GET_TASKS",
+      "android.permission.WRITE_SECURE_SETTINGS",
+      "android.permission.WRITE_SETTINGS",
+      "moe.shizuku.manager.permission.API_V23",
+      "android.permission.ACCESS_NETWORK_STATE",
+      "android.permission.RECEIVE_BOOT_COMPLETED",
+      "android.permission.READ_PHONE_STATE",
+      "android.permission.MANAGE_EXTERNAL_STORAGE"
+    ],
+    "requestListOnStartup": [
+      "android.permission.FOREGROUND_SERVICE",
+      "android.permission.INTERNET",
+      "android.permission.PACKAGE_USAGE_STATS",
+      "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+      "android.permission.SYSTEM_ALERT_WINDOW",
+      "android.permission.WRITE_EXTERNAL_STORAGE",
+      "android.permission.READ_EXTERNAL_STORAGE",
+      "android.permission.VIBRATE",
+      "android.permission.RUN_IN_BACKGROUND",
+      "android.permission.RESTART_PACKAGES",
+      "android.permission.REQUEST_COMPANION_RUN_IN_BACKGROUND",
+      "android.permission.REORDER_TASKS",
+      "android.permission.KILL_BACKGROUND_PROCESSES",
+      "android.permission.REQUEST_INSTALL_PACKAGES",
+      "android.permission.GET_TASKS",
+      "android.permission.WRITE_SECURE_SETTINGS",
+      "android.permission.ACCESS_NETWORK_STATE",
+      "android.permission.WRITE_SETTINGS",
+      "moe.shizuku.manager.permission.API_V23",
+      "android.permission.RECEIVE_BOOT_COMPLETED"
+    ]
+  },
+  "scripts": {},
+  "signingConfig": {
+    "alias": "qiao0314",
+    "keystore": "/storage/emulated/0/脚本/.keystore/桥2.jks",
+    "uuid": "3c963c5d-b8e8-40e3-ab74-404fbab8bc9f"
+  },
+  "useFeatures": [],
+  "versionCode": 2023022543,
+  "versionName": "4.3.2"
+}

@@ -1,0 +1,18 @@
+function planning() {
+
+
+
+    
+    window.inputValue = function(dom, st) {
+        var evt = new InputEvent('input', {
+            inputType: 'insertText',
+            data: st,
+            dataTransfer: null,
+            isComposing: false
+        });
+        dom.value = st;
+        dom.dispatchEvent(evt);
+    };
+    window.inputValue(document.getElementById('mdc-input-2'), input);
+    return document.getElementById('btnImport')
+}

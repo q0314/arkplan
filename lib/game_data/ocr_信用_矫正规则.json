@@ -1,0 +1,101 @@
+{
+    "replace_some_characters": {
+        "介绍_用于替换字符中部分错误字符": {
+            "correct": "correct 正确的字符, regular 是否正则匹配",
+            "regular": false
+        },
+        " 320": {
+            "correct": "300",
+            "regular": true
+        },
+        "加忌急|加意|加忌|加怠": {
+            "correct": "加急",
+            "regular": true
+        },
+        "招骋": {
+            "correct": "招聘"
+        },
+        "技枝": {
+            "correct": "技",
+            "regular": true
+        },
+        "初級": {
+            "correct": "初级",
+            "regular": true
+        },
+        "初级級": {
+            "correct": "初级",
+            "regular": true
+        },
+        "家貝": {
+            "correct": "家具",
+            "regular": true
+        },
+        "裝置": {
+            "correct": "装置"
+        },
+        "雯件": {
+            "correct": "零件",
+            "regular": true
+        },
+        "传迷": {
+            "correct": "传递",
+            "regular": true
+        },
+        "自洽": {
+            "correct": "自治",
+            "regular": true
+        },
+        "黑纲": {
+            "correct": "黑钢",
+            "regular": true
+        },
+        "3001|300": {
+            "correct": "",
+            "regular": true
+        },
+        "凉": {
+            "correct": "源"
+        },
+        "/": {
+            "correct": ""
+        },
+        "(": {
+            "correct": ""
+        }
+    },
+    "replace_full_character": {
+        "介绍_用于纠正替换完整字符": {
+            "correct": "correct 正确的字符, regular 是否正则匹配",
+            "regular": false
+        },
+        "未台|赤全": {
+            "correct": "赤金",
+            "regular": true
+        },
+        "异鉄": {
+            "correct": "异铁",
+            "regular": false
+        },
+        "碳秦|碳奏": {
+            "correct": "碳素",
+            "regular": true
+        },
+        "龙门市": {
+            "correct": "龙门币",
+            "regular": false
+        }
+    },
+    "filter_partial_characters": {
+        "交易": false,
+        "推荐": false,
+        "规则": false,
+        "组合": false,
+        "领取": false,
+        "干": false,
+        "时": false,
+        "更": false,
+        "商": false
+    },
+    "versionCode": "2"
+}

@@ -1,0 +1,30 @@
+
+  function getresult() {
+      let reporting_status = document.getElementsByClassName("v-label theme--light")[1];
+      if (reporting_status != undefined && reporting_status != null) {
+          let fight;
+          let aggre = [];
+          switch (reporting_status.innerHTML) {
+              case "异常 (0)":
+                  fight = document.getElementsByClassName("d-flex flex-row align-start flex-wrap")[0];
+                  let goods = fight.getElementsByClassName("item-icon--sprite item-icon--sprite--disable-hover-effect");
+                  for (let i = 0; i < goods.length; i++) {
+                      aggre.push({
+                          goods: goods[i].getAttribute("alt"),
+                          amount: fight.getElementsByClassName("v-badge__badge indigo")[i].innerHTML,
+                      });
+                  };
+                  fight = fight.getElementsByClassName("monospace font-weight-bold")[0].innerHTML;
+                  return ["成功 (1)", fight, aggre];
+              case "异常 (1)":
+                  amount = document.getElementsByClassName("v-alert__content")[2];
+                  amount = amount.innerText;
+                  return [reporting_status.innerHTML, amount];
+              default:
+                  return [reporting_status.innerHTML];
+          };
+      } else {
+          return false;
+      };
+
+  };

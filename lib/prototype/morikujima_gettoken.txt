@@ -1,0 +1,12 @@
+function token() {
+    let usr_token = sessionStorage.getItem("__hg_user_token");
+    let cred = localStorage.getItem("SK_OAUTH_CRED_KEY");
+    if (usr_token != null && cred != null) {
+            window.nativeWebviewBridge.postMessage(JSON.stringify({
+                "cred": cred,
+                "usr_token": JSON.parse(usr_token)
+            }));
+
+        
+    };
+};
