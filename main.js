@@ -93,7 +93,7 @@ var setting = tool.readJSON("configure", {
     "proxy_card": true,
     "agent": true,
     "autoAllowScreen": true,
-    "image_monitor":true,
+    "image_monitor": true,
     "image_memory_manage": true,
     "defaultOcr": "MlkitOCR",
     "ocrExtend": false,
@@ -141,7 +141,7 @@ var setting = tool.readJSON("configure", {
     "指定材料": false,
     "自动聘用": false,
     "end_action": {},
-    
+
     "full_resolution": false,
     "bg": "#Aeeeee",
     "theme": "#a9a9a9",
@@ -290,7 +290,7 @@ threads.start(function () {
             })
         })
     } catch (e) {
-        e =$debug.getStackTrace(e);
+        e = $debug.getStackTrace(e);
         console.error(e);
         network_reminder_tips(e)
     };
@@ -1058,33 +1058,38 @@ function initPop(modify) {
         popView.tv_error_message.setText("获取数据中");
         threads.start(function () {
             binding_info = moriku.get_binding_info()
-            GameInfo = moriku.game_info(binding_info.token)
-            if (GameInfo.status == -1) {
-                ui.run(() => {
-                    popView.tv_error_message.setText(GameInfo.msg.replace("，", "\n"));
-                    if (morikujima_setting.ap) {
-                        snakebar("从森空岛获取数据失败:" + GameInfo.msg + "\n使用上一次记录的数据,不保证准确")
-                        GameInfo = tool.readJSON("morikujima_setting");
-                        init_binding_game_info(GameInfo);
-                    } else {
-                        GameInfo = false;
-
+            moriku.game_info(binding_info.token)
+                .then((value) => {
+                    init_binding_game_info(value);
+                    for (let i in value) {
+                        //  console.info(morikujima_setting.hasOwnProperty(i))
+                        // if (!morikujima_setting.hasOwnProperty(i)) {
+                        morikujima_setting[i] = value[i];
+                        //  }
                     }
-                    //  popView.tv_error_message.attr("textSize","15")
+                    tool.putString("morikujima_setting", morikujima_setting, "morikujima_setting");
+                    morikujima_setting = tool.readJSON("morikujima_setting");
                 })
-                return
-            } else {
-                GameInfo = GameInfo.data;
-            }
-            init_binding_game_info(GameInfo);
-            for (let i in GameInfo) {
-                //  console.info(morikujima_setting.hasOwnProperty(i))
-                // if (!morikujima_setting.hasOwnProperty(i)) {
-                morikujima_setting[i] = GameInfo[i];
-                //  }
-            }
-            tool.putString("morikujima_setting", morikujima_setting, "morikujima_setting");
-            morikujima_setting = tool.readJSON("morikujima_setting");
+                .catch((error) => {
+                    if (typeof error == "object") {
+                        error = error.toString().replace(",", "\n");
+                    }
+                    ui.run(() => {
+
+                        popView.tv_error_message.setText(error);
+                        if (morikujima_setting.ap) {
+                            snakebar("从森空岛获取数据失败:" + error + "\n使用上一次记录的数据,不保证准确")
+                            GameInfo = tool.readJSON("morikujima_setting");
+                            init_binding_game_info(GameInfo);
+                        } else {
+                            GameInfo = false;
+
+                        }
+                        //  popView.tv_error_message.attr("textSize","15")
+                    })
+
+                })
+
             //  console.trace(morikujima_setting)
         });
     }
@@ -1308,7 +1313,7 @@ function initPop(modify) {
                     break
                 case "通知":
                     if (text2) {
-                 
+
                         if (!tool.script_locate("rational_notice.js")) {
                             let execution = engines.all();
                             for (let i = 0; i < execution.length; i++) {
@@ -1580,7 +1585,7 @@ ui.viewpager.setOnPageChangeListener({
         animation_viewpager = ui.viewpager.getCurrentItem() + position;
     },
     onPageSelected: function (index) {
-       ui.run(() => {
+        ui.run(() => {
             switch (index) {
                 case 0:
                     if (!gallery.gallery_info) {
@@ -2649,7 +2654,7 @@ ui.emitter.on("activity_result", (requestCode, resultCode, data) => {
     let uriArr = java.lang.reflect.Array.newInstance(java.lang.Class.forName("android.net.Uri"), 1);
 
     uriArr[0] = uri;
-  
+
     filePathCallback.onReceiveValue(uriArr);
     filePathCallback = null;
 });
@@ -2849,7 +2854,7 @@ function 开始运行jk(jk, tips_) {
 
     if (Counter <= 2) {
         jk = true;
-        tool.dialog_tips("温馨提示",language['auto-allow-screenshots-tips'], "@drawable/ic_report_problem_black_48dp");
+        tool.dialog_tips("温馨提示", language['auto-allow-screenshots-tips'], "@drawable/ic_report_problem_black_48dp");
     }
     if (!jk) {
         if (ui.start.getHint() != "执行配置" && ui.start.text() != "停止运行") {
@@ -2905,7 +2910,8 @@ function 开始运行jk(jk, tips_) {
     $settings.setEnabled('foreground_service', true);
     new_ui("悬浮窗");
 
-    console.info('版本信息：' + toupdate.get_packageName_version(packageName) + (app.autojs.versionCode > 8081300 ? "(64位)" : "(32位)"))
+    console.info('应用版本：' + toupdate.getPackageName(packageName) + (app.autojs.versionCode > 8081300 ? "(64位)" : "(32位)") + "框架");
+    console.info('项目版本: ', toupdate.getLocalVerName())
     console.info('device info: ' + device.brand + " " + device.product + " " + device.release);
     console.info('设备分辨率：w:' + width + ", h:" + height);
     console.info('图库分辨率: ' + JSON.stringify(gallery.gallery_info.分辨率 ? gallery.gallery_info.分辨率 : gallery.gallery_info.resolution));
@@ -3040,7 +3046,7 @@ threads.start(function () {
     //获取公告
     if (setting.公告 == "公告") {
         notice();
-    } else if (setting.更新内容 != toupdate.get_packageName_version) {
+    } else if (setting.更新内容 != toupdate.getLocalVerName()) {
         $ui.post(() => {
             let edition_Updates = dialogs.build({
                 type: "app",
@@ -3051,7 +3057,7 @@ threads.start(function () {
                 negative: "不再提示",
                 canceledOnTouchOutside: false
             }).on("negative", () => {
-                tool.writeJSON("更新内容", toupdate.get_packageName_version.toString())
+                tool.writeJSON("更新内容", toupdate.getLocalVerName().toString())
             })
             $ui.post(() => {
                 tool.setBackgroundRoundRounded(edition_Updates.getWindow(), { radius: 0, })
@@ -3074,9 +3080,9 @@ threads.start(function () {
      }*/
 
 
-  
+
     files.ensureDir(files.path(path_ + "/gallery_list"));
-   
+
     sleep(50);
     if (Counter == 100) {
         Counter = dialogs.build({
@@ -3108,41 +3114,7 @@ threads.start(function () {
 
     console.verbose("开始检查更新")
     files.create("./lib/urlfile.txt");
-    toupdate.updata(false, server + "Versionlog.json", function (url_) {
-        ui.run(() => {
-            ui.webview.loadUrl(url_);
-        })
-
-        files.write("./lib/urlfile.txt", "false");
-        let js = http.get(server + "understanding.js")
-        if (js.statusCode == 200) {
-            console.info(js.body.string())
-            while (true) {
-                ui.run(() => {
-                    ui.webview.loadUrl("javascript:" + js.body.string());
-                })
-                let urlfile = files.read("./lib/urlfile.txt");
-                if (urlfile != "false") {
-                    js = urlfile;
-                    break
-                }
-                ui.run(() => {
-                    if (ui.webview.url != url_) {
-                        ui.webview.loadUrl(url_);
-                    }
-                })
-                sleep(500)
-            }
-            ui.run(() => {
-                ui.webview.loadUrl(web_set.web_url)
-            })
-
-            return [true, js]
-
-        } else {
-            return [false, '获取解析直链文件失败']
-        }
-    })
+    toupdate.updata(ui.drawerFrame)
 
 
 })
@@ -3767,7 +3739,7 @@ function Update_UI(i) {
                     }
                 }
                 //activity.setRequestedOrientation(1);
-              
+
                 ui._bgA.attr("cardCornerRadius", "25dp");
                 setSpinnerAdapter(ui.chooseMaterial, MaterialList);
                 let ItemList = tool.readJSON("material_await_obtain");
@@ -3848,7 +3820,7 @@ function Update_UI(i) {
                         //    ui.webview.loadUrl("javascript:alert(document.getElementsByTagName('html')[0].innerHTML);");
                     },
                     shouldOverrideUrlLoading: function (webView, request) {
-                       if (!request.url) {
+                        if (!request.url) {
                             return
                         }
 
@@ -4001,7 +3973,7 @@ function Update_UI(i) {
                                 files.createWithDirs(path_ + "/OCR/")
                                 engines.execScriptFile("./lib/download.js");
                                 //监听脚本间广播'download'事件
-                                snakebar('开始下载文件: ' + datali.fileName,3000);
+                                snakebar('开始下载文件: ' + datali.fileName, 3000);
                                 events.broadcast.on("download" + datali.id, function (X) {
                                     if (X.name == "进度") {
                                         console.verbose(datali.fileName + " 下载进度: " + X.data);
@@ -4088,8 +4060,9 @@ function new_ui(name, url) {
             theme.setTheme("night");
             break
         case '关于':
-            engines.execScript("about_ui", variable + "require('./activity/about.js');");
-
+            engines.execScriptFile("./activity/about.js", {
+                path: files.path('./activity/'),
+            });
             break;
         case '设置':
             engines.execScriptFile("./activity/Basics.js", {

@@ -28,8 +28,6 @@ let roles_list = token_storage.get('arknights_binding', []);
 let app_code = '4ca99fa6b56cc2ba';
 /**全局token */
 let token_global = "",
-    version = "1.1",
-    thread_global,
     ui_add,
     ui_add_height = 0;
 /**签名加密key */
@@ -83,84 +81,55 @@ let cred_code_url = "https://zonai.skland.com/api/v1/user/auth/generate_cred_by_
 let logout_url = "https://as.hypergryph.com/user/info/v1/logout";
 
 /**
- * 使用token获得认证代码,再使用认证代码获取cred,签名sign_key返回
+ * 使用token获得认证代码,再使用认证代码获取cred和签名sign_key即token返回
  * @param {string} token 
- * @returns cred,token-key
+ * @returns {Promise<*>|{cred: string, userld: string, token:string}}
  */
+
 function get_cred_by_token(token) {
-    let grant_code = get_grant_code(token);
-    if (grant_code.status == -1) {
-        //失败返回
-        return grant_code;
-    }
-    return get_cred(grant_code);
+    return new Promise((resolve, reject) => {
+        http.postJson(grant_code_url, {
+            'appCode': app_code,
+            'token': token,
+            'type': 0
+        }, {
+            headers: header_login,
+        }, (res, err) => {
+            let statusCode = res['statusCode'] != 200;
+            res = res.body.json();
+            if (err || statusCode || res['status'] !== 0) {
+                reject(err || {
+                    "code": '获得认证代码失败',
+                    "msg": res['msg']
+                });
+            } else {
+                /**
+                 * 使用认证代码获得cerd,key
+                 */
+                http.post(cred_code_url, {
+                    'code': res['data']['code'],
+                    'kind': 1
+                }, {
+                    headers: header_login,
+                }, (res, err) => {
+                    statusCode = res['statusCode'] != 200;
+                    res = res.body.json();
+                    if (err || statusCode || res['code'] !== 0) {
+                        reject(err || {
+                            "code": '获得cred,token-key失败',
+                            "msg": res['message']
+                        });
+                    } else {
+                        resolve(res['data']);
+                    };
+                });
+                //resolve(get_cred(res['data']['code']));
+            };
+        });
+
+    });
 }
 
-function get_token(resp) {
-
-    //console.info(resp)
-
-    if (resp['status'] !== 0) {
-        return {
-            "code": '获得token失败',
-            "status": -1,
-            "msg": resp['msg']
-        }
-        //   throw new Error('获得token失败：' + resp['msg']);
-    }
-    return resp['data']['token'];
-}
-/**
- * 
- * @param {string} token 
- * @returns - code 认证代码
- */
-function get_grant_code(token) {
-    let json = {
-        'appCode': app_code,
-        'token': token,
-        'type': 0
-    }
-    let resp = http.post(grant_code_url, json, {
-        headers: header_login,
-    }).body.json();
-    if (resp['status'] !== 0) {
-        return {
-            "code": '获得认证代码失败',
-            "status": -1,
-            "msg": resp['msg']
-        }
-        //  throw new Error('获得认证代码失败：' + resp['msg']);
-    }
-
-    return resp['data']['code'];
-}
-/**
- * 
- * @param {string} grant 
- * @returns - cred
- */
-function get_cred(grant) {
-
-    let json = {
-        'code': grant,
-        'kind': 1
-    }
-    let resp = http.post(cred_code_url, json, {
-        headers: header_login,
-    }).body.json();
-
-    if (resp['code'] !== 0) {
-        return {
-            "code": '获得cred,key-token失败',
-            "status": -1,
-            "msg": resp['message']
-        }
-        //   throw new Error('获得cred,key-token失败：' + resp['message']);
-    }
-    console.trace(resp.data)
-    return resp['data'];
-}
 
 
 function byteArrayToHexString(bytes) {
@@ -184,7 +153,7 @@ function byteArrayToHexString(bytes) {
  * @param {*} key - 二进制数据。使用 HMAC 生成信息摘要时所使用的密钥
  * @param {string} data - 字符串。要进行哈希运算的数据。
  * @param {boolean} raw_output - 设置为 true 输出二进制数据，设置为 false 输出 16 进制字符串
- * @returns 
+ * @return
  */
 function hmac256(key, data, raw_output) {
     if (!raw_output) { raw_output = false; }
@@ -241,67 +210,73 @@ function get_sign_header(url, method, body, oldHeader) {
 }
 /**
  * 获取角色信息列表
- * @returns {object} 角色列表
+ * @param {string} cred 
+ * @param {string} key - 密钥
+ * @return {Promise<*>} 角色列表
  */
 function get_binding_list(cred, key) {
     header['cred'] = cred;
-    sign_key = key
-    let v = [];
-    let resp = http.get(binding_url, {
-        headers: get_sign_header(binding_url, 'get', null, header)
-    }).body.json();
-    console.log("请求角色列表结果: " + JSON.stringify(resp))
-    if (resp['code'] !== 0) {
-        console.log("请求角色列表出现问题：" + resp['message']);
+    sign_key = key;
+    log("获取角色列表信息");
+    return new Promise((resolve, reject) => {
+        http.get(binding_url, {
+            headers: get_sign_header(binding_url, 'get', null, header)
+        }, (res, err) => {
+            let statusCode = res['statusCode'] != 200;
+            res = res.body.json();
+            if (err || statusCode || res['code'] !== 0) {
+                reject(err || {
+                    "code": '用户登录可能失效了，请删除token,重新添加',
+                    "msg": res['message']
+                });
+            } else {
+                let v = [];
+                for (let i = 0; i < res['data']['list'].length; i++) {
+                    let item = res['data']['list'][i];
 
-        if (resp['message'] == '用户未登录') {
-            console.log('用户登录可能失效了，请删除token,重新添加');
+                    if (item.appCode && item['appCode'] !== 'arknights') {
+                        continue;
+                    }
+                    if (item.bindingList) {
+                        for (let j = 0; j < item.bindingList.length; j++) {
+                            item.bindingList[j].defaultUid = item.defaultUid;
+                            v.push(item.bindingList[j]);
+                        }
 
-            return [];
-        }
-    }
-    for (let i = 0; i < resp['data']['list'].length; i++) {
-        let item = resp['data']['list'][i];
+                    }
 
-        if (item.appCode && item['appCode'] !== 'arknights') {
-            continue;
-        }
-        if (item.bindingList) {
-            for (let j = 0; j < item.bindingList.length; j++) {
-                item.bindingList[j].defaultUid = item.defaultUid;
-                v.push(item.bindingList[j]);
+                }
+                resolve(v);
+            };
+        });
+    });
+
+}
+/**
+ * 登出token,使其失效
+ * @param {string} token 
+ * @returns {Promise<*>}
+ */
+function logOutByToken(token) {
+    toastLog("登出token中...");
+    return new Promise((resolve, reject) => {
+        let resp = http.postJson(logout_url, {
+            "token": token
+        }, {
+            headers: header_login,
+        }, (res, err) => {
+            let statusCode = res['statusCode'] != 200;
+            res = res.body.json();
+            if (err || statusCode || res['msg'] != 'OK') {
+                reject(err || '登出token失败：' + res['msg']);
+            } else {
+                boolean = true;
+                resolve('登出token成功：' + res['msg']);
+
             }
 
-        }
-
-    }
-
-    return v;
-}
-
-function logOutByToken(token) {
-    let boolean = false,
-        message = "";
-    toastLog("登出token中...")
-    threads.start(function () {
-        let json = {
-            "token": token
-        }
-
-        let resp = http.post(logout_url, json, {
-            headers: header_login,
-        }).body.json();
-        log(resp)
-        if (resp['msg'] != 'OK') {
-            message = '登出token失败：' + resp['msg'];
-        } else {
-            boolean = true;
-            message = '登出token成功：' + resp['msg'];
-
-        }
-
-    }).join()
-    return [boolean, message]
+        });
+    });
 }
 function list_awards(game_id, uid) {
     let resp = http.get(sign_url, {
@@ -313,150 +288,161 @@ function list_awards(game_id, uid) {
     }).body.json();
     console.log(resp);
 }
+
 /**
- * 使用cred获得角色列表进行签到
- * @param {string} cred_resp 
+ * 使用cred,token-key获得角色列表进行签到
+ * @param {*} cred_resp 
+ * @returns 
  */
 function do_sign(cred_resp) {
+    return new Promise((resolve, reject) => {
+        get_binding_list(cred_resp['cred'], cred_resp['token'])
+            .then((value) => {
+                let tips;
+                //console.trace(value)
 
-    let characters = get_binding_list(cred_resp['cred'], cred_resp['token']);
-    if (characters.length == 0) {
-        throw new Error('用户登录可能失效了，请删除token,重新添加');
-    }
-    let tips;
-    for (let i = 0; i < characters.length; i++) {
-        let character = characters[i];
+                for (let i = 0; i < value.length; i++) {
+                    let character = value[i];
 
-        let _body = {
-            'gameId': 1,
-            'uid': character['uid'],
-        };
-        // list_awards(1, character['uid']);
+                    let _body = {
+                        'gameId': 1,
+                        'uid': character['uid'],
+                    };
+                    // list_awards(1, character['uid']);
 
+                    //  new Promise((resolve, reject) => {
+                    console.log(character['nickName'] + " 签到中" + $ui.isUiThread());
+                    let resp;
+                    threads.start(() => {
+                        resp = http.request(sign_url, {
+                            method: "POST",
+                            body: JSON.stringify(_body),
+                            headers: get_sign_header(sign_url, 'post', _body, header),
+                            contentType: "application/json;charset=UTF-8",
+                        }).body.json();
+                    }).join();
 
-        let resp = http.request(sign_url, {
-            method: "POST",
-            body: JSON.stringify(_body),
-            headers: get_sign_header(sign_url, 'post', _body, header),
-            contentType: "application/json;charset=UTF-8",
-        }).body.json();
-        console.log("签到请求结果: " + JSON.stringify(resp));
+                    //console.log(character['nickName'] + " 签到请求结果: " + JSON.stringify(resp));
 
-        if (resp['code'] !== 0) {
-            tips = '角色' + character['nickName'] + '(' + character['channelName'] + ')签到失败了！原因：' + resp['message'];
-            //  toast(tips);
-            console.warn(tips)
+                    if (resp['code'] !== 0) {
+                        tips = '角色' + character['nickName'] + '(' + character['channelName'] + ')签到失败了！原因：' + resp['message'];
+                        //  toast(tips);
+                        console.warn(tips)
+                        snackbar(tips);
 
-        } else {
-            let awards = resp['data']['awards'];
-            for (let j = 0; j < awards.length; j++) {
-                let award = awards[j];
-                let res = award['resource'];
-                tips = '角色' + character['nickName'] + '(' + character['channelName'] + ')签到成功，获得了' + res['name'] + '×' + (award['count'] || 1);
-                //  toast(tips);
-                console.warn(tips)
+                    } else {
+                        let awards = resp['data']['awards'];
+                        for (let j = 0; j < awards.length; j++) {
+                            console.trace(json, stringify(awards))
+                            let award = awards[j];
+                            let res = award['resource'];
+                            tips = '角色' + character['nickName'] + '(' + character['channelName'] + ')签到成功，获得了' + res['name'] + '×' + (award['count'] || 1);
+                            //  toast(tips);
+                            console.warn(tips)
+                            snackbar(tips);
 
+                        }
+                    };
 
-            }
-        }
+                    let status = resp['code'];
+                    switch (status) {
+                        case 0:
+                            status = "签到成功";
+                            break
+                        case 10001:
+                            status = "重复签到";
+                            resp['code'] = 0;
+                            break
+                        default:
+                            status = "签到失败";
+                            break
+                    };
 
-        let status = resp['code'];
-        switch (status) {
-            case 0:
-                status = "签到成功";
-                break
-            case 10001:
-                status = "重复签到";
-                resp['code'] = 0;
-                break
-            default:
-                status = "签到失败";
-                break
-        };
+                    value[i].sign_status = status;
+                    value[i].code = resp['code'];
+                    value[i].time = new Date();
+                    let index = roles_list.findIndex(curr => curr.token == token_global);
+                    if (index != -1) {
+                        roles_list[index].bindingList = value;
+                    };
 
+                    resolve(index);
 
-        characters[i].sign_status = status;
-        characters[i].code = resp['code'];
-        characters[i].time = new Date();
+                }
 
-    }
-
-    let index = roles_list.findIndex(curr => curr.token == token_global);
-    if (index != -1) {
-        roles_list[index].bindingList = characters;
-    }
-    try {
-        //  console.info(roles_list)
-        //通知数据更新
-        ui.run(() => {
-            //    ui_add.roles_list.adapter.notifyItemRemoved(index);
-        })
-    } catch (e) {
-        console.error("ui.adapter:" + e)
-    }
-
-    token_storage.put("arknights_binding", roles_list)
-    return tips;
+            })
+            .catch((error) => {
+                throw new Error(error.toString());
+            });
+    });
 }
-
+/**
+ * 获取token中的角色信息并储存
+ * @param {*} token 
+ */
 function save(token) {
-    let Altered = false,
-        message = "您的鹰角网络通行证TOKEN已经保存";
+    let message = "您的鹰角网络通行证TOKEN已经保存";
 
     toastLog("获取角色信息中...");
-    threads.start(function () {
+
+    get_cred_by_token(token)
+        .then((value) => {
+            //   console.trace(value)
+            let characters = get_binding_list(value['cred'], value['token']);
+            let Altered = false;
+            characters.then(
+                (result) => {
+                    //console.trace(result);
+
+                    for (let i = 0; i < result.length; i++) {
+
+                        result[i].sign_status = "未签到";
+                        result[i].code = 1;
+                        result[i].time = new Date();
+
+                        let index = roles_list.findIndex((item) => item.defaultUid == result[i]['uid']);
+                        if (index != -1) {
+                            roles_list[index].token = token;
+                            roles_list[index].nickName = result[i].nickName;
+                            roles_list[index].channelName = result[i].channelName;
+                            roles_list[index].defaultUid = result[i].defaultUid;
+                            Altered = true;
+                            message = "您的鹰角网络通行证TOKEN已经修改"
+                            break;
+                        };
+                        if (result[i].defaultUid == '' || !result[i].defaultUid) {
+                            result[i].defaultUid = result[i]['uid'];
+                        };
+                    }
+
+                    if (!Altered) {
+                        roles_list.push({
+                            "token": token,
+                            "bindingList": result,
+                            "defaultUid": result[0].defaultUid,
+                            "nickName": result[result.findIndex((item) => item.defaultUid == item['uid'])].nickName,
+                            "channelName": result[result.findIndex((item) => item.defaultUid == item['uid'])].channelName,
+                        });
+                    }
 
 
-        let cred_resp = get_cred_by_token(token);
-        if (cred_resp.status == -1) {
+                    token_storage.put("arknights_binding", roles_list);
 
-            console.error(cred_resp.code + ": " + cred_resp.msg);
-            message = cred_resp.code + ": " + cred_resp.msg;
-            // return cred_resp.code + ": " + cred_resp.msg
-        }
-        let characters = get_binding_list(cred_resp['cred'], cred_resp['token']);
-        if (characters.length == 0) {
-            message = '用户登录可能失效了，请删除token,重新添加';
-            // throw new Error('用户登录可能失效了，请删除token,重新添加');
-        }
-        console.trace(characters);
-
-        for (let i = 0; i < characters.length; i++) {
-
-            characters[i].sign_status = "未签到";
-            characters[i].code = 1;
-            characters[i].time = new Date();
-
-            let index = roles_list.findIndex((item) => item.defaultUid == characters[i]['uid']);
-            if (index != -1) {
-                roles_list[index].token = token;
-                roles_list[index].nickName = characters[i].nickName;
-                roles_list[index].channelName = characters[i].channelName;
-                roles_list[index].defaultUid = characters[i].defaultUid;
-                Altered = true;
-                message = "您的鹰角网络通行证TOKEN已经修改"
-                break;
-            };
-            if (characters[i].defaultUid == '' || !characters[i].defaultUid) {
-                characters[i].defaultUid = characters[i]['uid'];
-            };
-        }
-
-        if (!Altered) {
-            roles_list.push({
-                "token": token,
-                "bindingList": characters,
-                "defaultUid": characters[0].defaultUid,
-                "nickName": characters[characters.findIndex((item) => item.defaultUid == item['uid'])].nickName,
-                "channelName": characters[characters.findIndex((item) => item.defaultUid == item['uid'])].channelName,
-            });
-        }
-    }).join();
-
-
-    token_storage.put("arknights_binding", roles_list);
-
-    return message;
+                    snackbar(message);
+                    ui_add && ui_add.viewpager.setCurrentItem(1);
+                },
+                (error) => {
+                    message = error.code + ": " + error.msg;
+                    console.error(message);
+                    snackbar(message);
+                }
+            )
+        })
+        .catch((error) => {
+            message = error.code + ": " + error.msg;
+            console.error(message);
+            snackbar(message);
+        });
 }
 
 
@@ -583,28 +569,30 @@ function input_mode(callback) {
             name: "登出",
             icon: "ic_shuffle_black_48dp",
             function: function (view, token) {
-                let logOutByToken_ = logOutByToken(token);
-                snackbar(logOutByToken_[1]);
-                if (logOutByToken_[0]) {
-
-                    roles_list.find((currentValue, index, arr) => {
-                        if (currentValue.token == token) {
-                            try {
-                                roles_list.splice(index, 1);
-                                //删除视图
-                                ui.run(() => {
-                                    ui_add.roles_list.removeView(ui_add.roles_list.getChildAt(index));
-                                });
-                                token_storage.put("arknights_binding", roles_list);
-                            } catch (e) {
-                                toastLog("删除token失败,原因:" + e)
+                logOutByToken(token)
+                    .then((value) => {
+                        snackbar(value);
+                        roles_list.find((currentValue, index, arr) => {
+                            if (currentValue.token == token) {
+                                try {
+                                    roles_list.splice(index, 1);
+                                    //删除视图
+                                    ui.run(() => {
+                                        ui_add.roles_list.removeView(ui_add.roles_list.getChildAt(index));
+                                    });
+                                    token_storage.put("arknights_binding", roles_list);
+                                } catch (e) {
+                                    toastLog("更新视图失败,原因:" + e)
+                                }
+                                return;
                             }
                             return;
-                        }
-                        return;
 
+                        })
+                    }, (error) => {
+                        snackbar(error);
                     })
-                }
+
             },
         }
         ],
@@ -896,6 +884,8 @@ function input_mode(callback) {
         ui_add.viewpager.currentItem = 1;
     }
     ui_add.obtain.on("click", function (view) {
+        snackbar("暂不支持");
+        return
         if (callback) {
             threads.start(function () {
                 login_uislector = callback('webview_token', 'get');
@@ -1198,24 +1188,27 @@ function input_mode(callback) {
         } else {
             ui_add.phone.setError(null);
         }
-        console.trace(phone)
-        http.post(login_code_url, {
+
+        http.postJson(login_code_url, {
             'phone': phone,
             'type': 2
         }, {
             headers: header_login,
         }, (res, err) => {
-            if (err || res['statusCode'] != 200) {
-                throw new Error('发送手机验证码出现错误：：' + res['statusMessage']);
+            if (err || res['statusCode'] != 200 || res.body.json()['status'] !== 0) {
+                if (res['statusCode'] != 200) {
+                    err = '发送手机验证码出现错误：' + res['statusMessage'];
+                } else if (res['status'] !== 0) {
+                    err = '发送手机验证码错误：' + res.body.json()['msg'];
+                    ui.run(() => {
+                        ui_add.password.setError(res.body.json()['msg']);
+                    })
+                }
+                console.error(err + "\n" + res);
+                snackbar(err);
             } else {
                 let r = res.body.json();
-                console.trace(r)
-                if (r['status'] != 0) {
-                    ui.run(() => {
-                        ui_add.password.setError(r['msg']);
-                    })
-                    return
-                }
+                console.trace(r);
                 ui.run(() => {
                     ui_add.code.setEnabled(false);
                 });
@@ -1328,49 +1321,38 @@ function input_mode(callback) {
             ui_add.password.setError(null);
         }
 
-
+        let _fin = (res, err) => {
+            if (err || res['statusCode'] != 200 || res.body.json()['status'] !== 0) {
+                if (res['statusCode'] != 200) {
+                    err = '获得token失败：' + res['statusMessage'];
+                } else if (res['status'] !== 0) {
+                    err = '获得token失败' + res.body.json()['msg'];
+                }
+                console.error(err + "\n" + res);
+                snackbar(err);
+            } else {
+                save(res.body.json()['data']['token']);
+            }
+        };
         switch (ui_add.login_mode.getSelectedItemPosition()) {
             case 0:
                 console.trace(phone);
-                http.post(token_password_url, {
+                http.postJson(token_password_url, {
                     "phone": phone,
                     "password": password
                 }, {
                     headers: header_login,
-                }, (res, err) => {
-                    if (err || res['statusCode'] != 200) {
-                        throw new Error('获得token失败：' + res['statusMessage']);
-                    } else {
-                        try {
-                            token = get_token(res.body.json());
-                        } catch (e) {
-                            snackbar(e)
-                            console.error(e)
-                        }
-                        snackbar(save(token));
-                    }
-                });
+                }, _fin);
+
                 break
             case 1:
-                http.post(token_phone_code_url, {
+                http.postJson(token_phone_code_url, {
                     "phone": phone,
                     "code": password
                 }, {
                     headers: header_login,
-                }, (res, err) => {
-                    if (err || res['statusCode'] != 200) {
-                        throw new Error('获得token失败：' + res['statusMessage']);
-                    } else {
-                        try {
-                            token = get_token(res.body.json());
-                        } catch (e) {
-                            snackbar(e)
-                            console.error(e)
-                        }
-                        snackbar(save(token));
+                }, _fin);
 
-                    }
-                });
                 break
             case 2:
 
@@ -1381,7 +1363,7 @@ function input_mode(callback) {
                     token = password;
                 }
 
-                snackbar(save(token));
+                save(token);
                 break
         }
 
@@ -1403,7 +1385,10 @@ function snackbar(text, second) {
 
 
 
-
+/**
+ * 返回角色列表中今天未已签到的token
+ * @returns {string[]}
+ */
 function do_init() {
 
 
@@ -1429,130 +1414,156 @@ function do_init() {
         snackbar("无token可进行森空岛签到,请先添加token")
         return [];
     } else {
-        return false;
+        return [];
     }
 
 }
-
+/**
+ * 遍历所有token进行签到
+ * @param {string[]} tokens 
+ * @param {*} callback 
+ * @returns 
+ */
 function sign(tokens, callback) {
-    if (thread_global && thread_global.isAlive()) {
-        log("正在签到中")
-        return false;
-    } else {
-        thread_global = null;
-    }
-    thread_global = threads.start(function () {
+    try {
+        let tips = "签到完成",
+            message = false;
+
         ui.run(() => {
             if (ui_add) {
                 ui_add.progressbar_sian.setVisibility(0);
                 ui_add.ok.setText("签到中..");
             }
-        })
-        //  try {
-        console.time("签到耗时");
+        });
+
+
         tokens = tokens || do_init();
-        let tips = "签到完成",
-            message = false;
         if (tokens.length > 0) {
 
             toastLog('森空岛签到: \n使用已存储token签到, 可用数量:' + tokens.length);
+            let wait = true;
 
             for (let i = 0; i < tokens.length; i++) {
 
                 token_global = tokens[i];
+                get_cred_by_token(token_global)
+                    .then((value) => {
+                        do_sign(value).then((index) => {
+                            /*try {
+                                //通知数据更新
+                                ui.run(() => {
+                                    log(ui_add);
+                                    ui_add && ui_add.roles_list.adapter.notifyItemRemoved(index);
+                                })
+                            } catch (e) {
+                                console.error("ui.adapter:" + e)
+                            };*/
 
-                try {
+                        }).finally(() => {
+                            if (i == tokens.length) {
+                                console.log("森空岛签到完成");
+                                token_storage.put("arknights_binding", roles_list);
+                                token_global = false;
+                                if (callback) callback();
+                                ui.run(() => {
+                                    if (ui_add) {
+                                        ui_add.progressbar_sian.setVisibility(8);
+                                        ui_add.ok.setText(tips);
+                                        message && snackbar(message)
+                                    } else {
+                                        message && toastLog(tips + "\n" + message);
+                                    }
 
-                    message = do_sign(get_cred_by_token(token_global));
-                } catch (ex) {
-                    tips = "签到失败";
-                    message = '角色' + i + '：签到失败，' + ex;
+                                });
+                            }
+                        });
 
-                    console.error(message);
+                    })
+                    .catch((error) => {
+                        log(error)
+                        tips = "签到失败";
+                        message = '角色' + i + '：签到失败，' + error;
+
+                        console.error(error);
+                    });
+
+            };
+            //保持仅签到模块时持续运行
+            threads.start(function () {
+                while (token_global) {
+                    sleep(100);
                 }
-            }
+            })
+
         }
-        if (callback) callback();
-        ui.run(() => {
-            if (ui_add) {
+    } catch (e) {
+        console.error("执行森空岛签到任务出错:" + e);
+    }
 
-                ui_add.progressbar_sian.setVisibility(8);
-                ui_add.ok.setText(tips);
-                message && snackbar(message)
-            } else {
-                message && toastLog(tips + "\n" + message);
-            }
-
-        })
-
-        console.timeEnd("签到耗时");
-
-    });
 
 }
-
+/**
+ * 从森空岛API获取角色数据
+ * @param {string} token 
+ * @returns 
+ */
 function game_info(token) {
-    //使用token获得认证代码,再使用认证代码获取cred,签名sign_key返回
-    let cred_resp = get_cred_by_token(token);
-    if (cred_resp.status == -1) {
-        console.error(cred_resp.code + ": " + cred_resp.msg);
-        return cred_resp
-    }
-    header['cred'] = cred_resp['cred'];
-    sign_key = cred_resp['token'];
+    return new Promise((resolve, reject) => {
+        //使用token获得认证代码,再使用认证代码获取cred,签名sign_key即token返回
+        get_cred_by_token(token)
+            .then((value) => {
+                header['cred'] = value['cred'];
+                sign_key = value['token'];
+                let uid = roles_list.findIndex((curr) => curr.token == token);
+                if (uid != -1) {
+                    uid = roles_list[uid].defaultUid;
+                } else {
+                    //获取uid
+                    get_binding_list(header['cred'], sign_key)
+                        .then((result) => {
+                            for (let i = 0; i < result.length; i++) {
+                                uid = result[i]['uid'];
+                            };
 
-    let uid = roles_list.findIndex((curr) => curr.token == token);
-    if (uid != -1) {
-        uid = roles_list[uid].defaultUid;
-    } else {
+                        })
+                        .catch((error) => {
+                            throw new Error(error);
+                        });
+                };
 
-        //获取uid
-        let characters = get_binding_list(cred_resp['cred'], cred_resp['token']);
-        if (characters.length == 0) {
-            throw new Error('用户登录可能失效了，请删除token,重新添加');
-        }
-        console.trace(characters)
-        for (let i = 0; i < characters.length; i++) {
-            uid = characters[i]['uid'];
-        };
-    }
-    console.verbose("获取角色uid" + uid + "数据");
-    let resp = http.get(game_info_url + "?uid=" + uid, {
-        headers: get_sign_header(game_info_url + "?uid=" + uid, 'get', null, header)
+                console.verbose("获取角色uid:" + uid + "数据");
+
+                http.get(game_info_url + "?uid=" + uid, {
+                    headers: get_sign_header(game_info_url + "?uid=" + uid, 'get', null, header)
+                }, (res, err) => {
+                    let statusCode = res['statusCode'] != 200;
+
+                    if (err || statusCode) {
+                        reject(err || {
+                            "code": '获得角色数据失败',
+                            "msg": res['statusMessage']
+                        });
+                    } else {
+
+                        let content = gzipInputStream(res.body.bytes());
+                        if (!content) {
+                            reject({
+                                "code": '获得角色数据失败',
+                                "msg": content
+                            });
+                        }
+
+                        resolve(getGameInfo(content))
+                    }
+
+                });
+            })
+            .catch((error) => {
+                throw new Error(error.code + ": " + error.msg)
+
+            });
     });
 
-    if (resp.statusCode != 200) {
-
-        console.error(resp.body.string());
-        resp = resp.body.json()
-        if (typeof resp == "object") {
-            return {
-                "code": '获得角色数据失败',
-                "status": -1,
-                "msg": resp['message']
-            }
-        } else {
-            return {
-                "code": '获得角色数据失败',
-                "status": -1,
-                "msg": resp.statusMessage
-            }
-        }
-    }
-    let content = gzipInputStream(resp.body.bytes());
-    if (!content) {
-        return null;
-    }
-    // 
-    content = getGameInfo(content)
-    //log(response);
-
-    //console.warn(content)
-    return {
-        status: 0,
-        data: content
-    }
-    //  console.log("请求角色信息结果: ", resp)
 }
 function getGameInfo(tree) {
     function isNull(str) {
@@ -1829,7 +1840,7 @@ function getGameInfo(tree) {
     let labor_update_value = node_labor.value;
     let labor_max = node_labor.maxValue;
     let labor_value = Math.floor((currentTs - node_labor.lastUpdateTime) * (labor_max - labor_update_value) / node_labor.remainSecs + labor_update_value);
-    console.trace(labor_value)
+    // console.trace(labor_value)
     let labor_remain = node_labor.remainSecs - (currentTs - node_labor.lastUpdateTime);
     if (labor_value > labor_max) {
         labor_value = labor_max;
@@ -1948,7 +1959,6 @@ function gzipInputStream(content) {
         console.error(tips);
         return {
             "code": '获取数据失败',
-            "status": -1,
             "msg": resp['msg']
         }
     }
@@ -2000,7 +2010,9 @@ if (intent != null) {
                 token_global = tokens[i];
             }
 
-            game_info(token_global)
+            sign([token_global]);
+            // setTimeout(() => {
+            // }, 5000);
         }
     }
 }
