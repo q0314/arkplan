@@ -1,8 +1,8 @@
 "ui";
 importClass(android.graphics.Color);
 let tool = require("../modules/tool.js");
-var packageName = context.getPackageName();
-
+let packageName = context.getPackageName();
+//importClass(android.content.pm.PackageManager);
 
 let theme = require("../theme.js");
 const language = theme.getLanguage("basics");
@@ -898,12 +898,12 @@ ui.PROJECT_MEDIA.click((view) => {
         sh_[sh_manner] = true;
         if ($shell.checkAccess(sh_manner)) {
             if (shell(cmd, sh_).code == 0) {
-                toastLog((view.checked ? "" : language["cancel"]) + language['grant'].replace("results", language["ok"]) + sh_manner)
-                view.checked = true;
+                toastLog((view.checked ? "" : language["cancel"]) + language['grant'].replace("%results%", language["ok"]) + sh_manner)
+
                 return true;
             } else {
-
-                toastLog((view.checked ? "" : language["cancel"]) + language['grant'].replace("results", language["no"]) + language["identify-grant"] + sh_manner)
+                view.checked = (view.checked ? false : true);
+                toastLog((view.checked ? "" : language["cancel"]) + language['grant'].replace("%results%", language["no"]) + language["identify-grant"] + sh_manner)
             };
         } else {
             toastLog(language['identify-permissions'] + sh_manner)
@@ -1804,8 +1804,14 @@ function update_ui() {
         ui.indxj.setVisibility(setting.企鹅统计 ? 0 : 8)
         ui.jsjt.checked = setting.汇报上传 ? true : false;
         ui.offset.checked = setting.offset ? true : false;
-        ui.proxy_card_check.checked = setting.proxy_card ? true : false;
 
+        try {
+            let appOpsManager = context.getSystemService(context.APP_OPS_SERVICE);
+            ui.PROJECT_MEDIA.checked = (appOpsManager.checkOpNoThrow(appOpsManager.OPSTR_PROJECT_MEDIA, android.os.Process.myUid(), packageName) == appOpsManager.MODE_ALLOWED);
+        } catch (e) {
+            console.error(e);
+            ui.PROJECT_MEDIA.checked = context.getPackageManager().checkPermission("android.permission.PROJECT_MEDIA", packageName) == PackageManager.PERMISSION_GRANTED;
+        }
         if (setting.front_display_list) {
             ui.front_display_list.setDataSource(setting.front_display_list);
             if (setting.front_display) {
