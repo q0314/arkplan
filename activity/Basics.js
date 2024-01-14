@@ -4,7 +4,7 @@ let tool = require("../modules/tool.js");
 var packageName = context.getPackageName();
 
 
-var theme = require("../theme.js");
+let theme = require("../theme.js");
 const language = theme.getLanguage("basics");
 ui.statusBarColor(theme.bar);
 
@@ -80,8 +80,8 @@ ui.layout(
                                     <text text="{{language['auto-allow-screenshots']}}" textColor="black" textSize="18sp" />
                                     <text text="{{language['auto-allow-screenshots-explain']}}" textColor="#95000000" textSize="10sp" marginTop="2" />
                                 </vertical>
-                                <widget-switch-se7en id="auto_allow_screenshots" checked="{{setting.autoAllowScreen}}" layout_gravity="center" 
-                                padding="5 5" textSize="18sp"  margin="10 0" thumbSize='24' radius='24' />
+                                <widget-switch-se7en id="auto_allow_screenshots" checked="{{setting.autoAllowScreen}}" layout_gravity="center"
+                                    padding="5 5" textSize="18sp" margin="10 0" thumbSize='24' radius='24' />
                             </horizontal>
 
 
@@ -404,7 +404,7 @@ ui.layout(
                                     <text text="图片内存资源管理，尽可能防止图片未回收导致内存泄露。应用崩溃" textColor="#95000000" textSize="10sp" marginTop="2" />
                                 </vertical>
                                 <widget-switch-se7en id="image_memory_manage" checked="{{setting.image_memory_manage}}"
-                                layout_gravity="center" padding="5 5" textSize="18sp" margin="10 0" thumbSize='24' radius='24' />
+                                    layout_gravity="center" padding="5 5" textSize="18sp" margin="10 0" thumbSize='24' radius='24' />
                             </horizontal>
 
                             <horizontal margin="10 0" padding="15 5 1 5" id="volume_fixes_" >
@@ -446,6 +446,14 @@ ui.layout(
                                 gravity="center|left" textSize='16sp' textColor='{{theme.bar}}'>
                             </text>
 
+                            <horizontal margin="10 0" padding="15 5 1 5" id="PROJECT_MEDIA_" >
+                                <vertical layout_weight="1" >
+                                    <text text="{{language['PROJECT_MEDIA']}}" textColor="black" textSize="18sp" />
+                                    <text text="{{language['PROJECT_MEDIA-expiain'].replace('%packageName%',packageName)}}" textColor="#95000000" textSize="10sp" marginTop="2" />
+                                </vertical>
+                                <widget-switch-se7en id="PROJECT_MEDIA" layout_gravity="center" padding="5 5" textSize="18sp"
+                                    margin="10 0" thumbSize='24' radius='24' />
+                            </horizontal>
 
                             <horizontal margin="10 0" padding="15 5 1 5" id="front_desk_service_" >
                                 <vertical layout_weight="1" >
@@ -488,7 +496,7 @@ ui.layout(
                                     margin="10 0" textColor="#000000" />
                             </card>
                             <card w="*" id="gljb" h="40" foreground="?selectableItemBackground">
-                                <text text="管理运行脚本"  padding="15 8 15 5" textSize="18sp"
+                                <text text="管理运行脚本" padding="15 8 15 5" textSize="18sp"
                                     margin="10 0" textColor="#000000" />
                             </card>
 
@@ -743,7 +751,7 @@ ui.sysm.click((view) => {
     })
     sysmui.Shizuku.click(() => {
         if ($shell.checkAccess("adb")) {
-            shell("pm grant " + context.getPackageName() + " android.permission.WRITE_SECURE_SETTINGS", {
+            shell("pm grant " + packageName + " android.permission.WRITE_SECURE_SETTINGS", {
                 adb: true,
             });
             toastLog("ADB授权安全系统设置权限成功");
@@ -880,8 +888,34 @@ ui.getutxt.on("click", () => {
     提示(ui.getu)
 })
 
+ui.PROJECT_MEDIA.click((view) => {
 
+    let cmd = "appops set " + packageName + " PROJECT_MEDIA " + (view.checked ? "allow" : "ignore");
+    let sh_manner = "root";
+    let counting = 2;
+    while (counting--) {
+        let sh_ = {};
+        sh_[sh_manner] = true;
+        if ($shell.checkAccess(sh_manner)) {
+            if (shell(cmd, sh_).code == 0) {
+                toastLog((view.checked ? "" : language["cancel"]) + language['grant'].replace("results", language["ok"]) + sh_manner)
+                view.checked = true;
+                return true;
+            } else {
 
+                toastLog((view.checked ? "" : language["cancel"]) + language['grant'].replace("results", language["no"]) + language["identify-grant"] + sh_manner)
+            };
+        } else {
+            toastLog(language['identify-permissions'] + sh_manner)
+        }
+        sh_manner = "adb";
+    }
+
+    view.checked = false;
+})
+ui.PROJECT_MEDIA_.on("click", () => {
+    ui.PROJECT_MEDIA.performClick();
+})
 ui.root.on("click", () => {
     $shell.setDefaultOptions({
         adb: false
@@ -961,11 +995,10 @@ ui.xpyx.on("click", (view) => {
                 files.write(sh_path, sh_content);
 
             }
-            let n = sh_path
 
             setTimeout(function () {
-                files.remove(n);
-            }, 3000)
+                files.remove(sh_pathn);
+            }, 5000);
 
             if (setting.监听键 == "音量下键") {
                 toastLog("请先关闭音量下键停止PRTS辅助")
@@ -983,7 +1016,7 @@ ui.xpyx.on("click", (view) => {
                     if (sh_root_result.code != 0) {
                         toastLog("测试root权限打开屏幕失败,\n错误信息:" + sh_root_result)
                     } else {
-                        toastLog("使用root权限")
+                        toastLog("root权限测试打开屏幕成功")
                         sh_path = true;
                     }
                 } catch (e) {
@@ -1009,7 +1042,7 @@ ui.xpyx.on("click", (view) => {
                             view.checked = false;
                             return
                         } else {
-                            toastLog("使用adb权限")
+                            toastLog("adb权限测试打开屏幕成功")
                         }
                     } catch (e) {
                         toastLog("adb权限错误：\n" + e)
@@ -1772,7 +1805,7 @@ function update_ui() {
         ui.jsjt.checked = setting.汇报上传 ? true : false;
         ui.offset.checked = setting.offset ? true : false;
         ui.proxy_card_check.checked = setting.proxy_card ? true : false;
-      
+
         if (setting.front_display_list) {
             ui.front_display_list.setDataSource(setting.front_display_list);
             if (setting.front_display) {
@@ -1782,7 +1815,7 @@ function update_ui() {
 
         }
         ui.front_display_add.setBackground(createShape(3, 0, 0, [5, "#00ff00"]))
-     
+
 
         tool.checkPermission("android.permission.WRITE_SECURE_SETTINGS") ? ui.sysm.checked = true : ui.sysm.checked = false;
 
