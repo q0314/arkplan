@@ -219,36 +219,42 @@ function get_binding_list(cred, key) {
     sign_key = key;
     log("获取角色列表信息");
     return new Promise((resolve, reject) => {
-        http.get(binding_url, {
-            headers: get_sign_header(binding_url, 'get', null, header)
-        }, (res, err) => {
-            let statusCode = res['statusCode'] != 200;
-            res = res.body.json();
-            if (err || statusCode || res['code'] !== 0) {
-                reject(err || {
-                    "code": '用户登录可能失效了，请删除token,重新添加',
-                    "msg": res['message']
-                });
-            } else {
-                let v = [];
-                for (let i = 0; i < res['data']['list'].length; i++) {
-                    let item = res['data']['list'][i];
+        try {
+            http.get(binding_url, {
+                headers: get_sign_header(binding_url, 'get', null, header)
+            }, (res, err) => {
+                let statusCode = res['statusCode'] != 200;
+                res = res.body.json();
+                if (err || statusCode || res['code'] !== 0) {
+                    reject(err || {
+                        "code": '用户登录可能失效了，请删除token,重新添加',
+                        "msg": res['message']
+                    });
+                } else {
+                    let v = [];
+                    //log("提取角色信息");
+                    for (let i = 0; i < res['data']['list'].length; i++) {
+                        let item = res['data']['list'][i];
 
-                    if (item.appCode && item['appCode'] !== 'arknights') {
-                        continue;
-                    }
-                    if (item.bindingList) {
-                        for (let j = 0; j < item.bindingList.length; j++) {
-                            item.bindingList[j].defaultUid = item.defaultUid;
-                            v.push(item.bindingList[j]);
+                        if (item.appCode && item['appCode'] !== 'arknights') {
+                            continue;
+                        }
+                        if (item.bindingList) {
+                            for (let j = 0; j < item.bindingList.length; j++) {
+                                item.bindingList[j].defaultUid = item.defaultUid;
+                                v.push(item.bindingList[j]);
+                            }
+
                         }
 
                     }
 
-                }
-                resolve(v);
-            };
-        });
+                    resolve(v);
+                };
+            });
+        } catch (e) {
+            reject(e);
+        }
     });
 
 }
@@ -296,8 +302,8 @@ function list_awards(game_id, uid) {
  */
 function do_sign(cred_resp) {
     return new Promise((resolve, reject) => {
-        get_binding_list(cred_resp['cred'], cred_resp['token'])
-            .then((value) => {
+        try {
+            get_binding_list(cred_resp['cred'], cred_resp['token']).then((value) => {
                 let tips;
                 //console.trace(value)
 
@@ -313,7 +319,7 @@ function do_sign(cred_resp) {
                     //  new Promise((resolve, reject) => {
                     console.log(character['nickName'] + " 签到中" + $ui.isUiThread());
                     let resp;
-                    threads.start(() => {
+                    threads.start(function () {
                         resp = http.request(sign_url, {
                             method: "POST",
                             body: JSON.stringify(_body),
@@ -322,7 +328,7 @@ function do_sign(cred_resp) {
                         }).body.json();
                     }).join();
 
-                    //console.log(character['nickName'] + " 签到请求结果: " + JSON.stringify(resp));
+                    console.log(character['nickName'] + " 签到请求结果: " + JSON.stringify(resp));
 
                     if (resp['code'] !== 0) {
                         tips = '角色' + character['nickName'] + '(' + character['channelName'] + ')签到失败了！原因：' + resp['message'];
@@ -370,10 +376,13 @@ function do_sign(cred_resp) {
 
                 }
 
-            })
-            .catch((error) => {
+            }, (error) => {
                 throw new Error(error.toString());
             });
+        } catch (e) {
+            console.error(e);
+            reject(e);
+        }
     });
 }
 /**
@@ -840,7 +849,7 @@ function input_mode(callback) {
     ui_add.tabs.setupWithViewPager(ui_add.viewpager);
     //ui_add.tabs.selectedTabIndicatorColor = colors.parseColor("#000000"); //设置tabs指示器颜色
     ui_add.tabs.setTabTextColors(colors.parseColor("#5003a9f4"), colors.parseColor("#03a9f4")); //设置未选中，选中的字体颜色。
-    log(roles_list)
+    // log(roles_list)
     roles_list.forEach((currentValue, index, arr) => {
         for (let j = 0; j < currentValue.bindingList.length; j++) {
             if (currentValue.bindingList[j].code || new Date(currentValue.bindingList[j].time).getDate() != new Date().getDate()) {
