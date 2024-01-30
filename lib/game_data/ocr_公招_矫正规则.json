@@ -286,6 +286,9 @@
 
         "cTED": {
             "correct": "CTED"
+        },
+        "·":{
+            "correct":""
         }
     
     },
@@ -342,6 +345,7 @@
         "8": false,
         "J": false,
        ":|：|、|,": true,
+       "海|×|0|可|准|TO":true,
        "<":false,
         "每": false,
        "低": false,
@@ -354,6 +358,6 @@
         "C|X|R|g": true,
         "回": false
     },
-    "versionCode":"5",
-    "update_content":"修正'远'识别成'运'"
+    "versionCode":"6",
+    "update_content":"优化xiaoyueOCR识别结果"
 }

@@ -1,37 +1,16 @@
 importClass(android.content.Context);
-importClass(android.graphics.Bitmap);
-try {
-    path = module.id.replace(files.getName(module.id), '');
-} catch (e) {
-    path = engines.myEngine().getSource().toString().replace(files.getName(engines.myEngine().getSource().toString()), "");
-}
 
 
-//for(let i of runtime.getClass().getDeclaredFields()){
-// log(i+"\n");
-//}
-
-let XiaoYueOcrDetector = function (path) {
+let XiaoYueOcrDetector = function (OCR) {
     /**
     * ocr实例
     */
-    this.instance = null;
+    //for(let i of OCR.xiaoyue.getClass().getDeclaredFields()){
+    // log(i+"\n");
+    //}
+    this.instance = OCR.xiaoyue;
     this.initResult = false;
 
-    function buildRegion(region, img) {
-        if (region == undefined) {
-            region = [];
-        }
-        let x = region[0] === undefined ? 0 : region[0];
-        let y = region[1] === undefined ? 0 : region[1];
-        let width = region[2] === undefined ? img.getWidth() - x : region[2];
-        let height = region[3] === undefined ? (img.getHeight() - y) : region[3];
-        let r = new org.opencv.core.Rect(x, y, width, height);
-        if (x < 0 || y < 0 || x + width > img.width || y + height > img.height) {
-            throw new Error("out of region: region = [" + [x, y, width, height] + "], image.size = [" + [img.width, img.height] + "]");
-        }
-        return r;
-    }
 
     function 矫正规则(rectify_json_path, content) {
         if (!rectify_json_path || !files.exists(rectify_json_path)) {
@@ -123,26 +102,27 @@ let XiaoYueOcrDetector = function (path) {
      * @returns 
      */
     this.init = function () {
+        // this.instance.cpuThreadNum = 4; //可以自定义使用CPU的线程数
+        // this.instance.checkModelLoaded =false; // 可以自定义是否需要校验模型是否成功加载 默认开启 使用内置Base64图片进行校验 识别测试文本来校验模型是否加载成功
+
+        // 内置默认 modelPath 为 models/ocr_v3_for_cpu，初始化自定义模型请写绝对路径否则无法获取到
+        // 内置默认 labelPath 为 labels/ppocr_keys_v1.txt
+        // let modelPath = files.path('models/ocr_v3_for_cpu'); // 指定自定义模型目录
+        // let labelPath = files.path('labels/ppocr_keys_v1.txt'); // 指定自定义label路径
+        // 使用自定义模型时det rec cls三个模型文件名称需要手动指定
+        // this.instance.detModelFilename = 'det_opt.nb';
+        // this.instance.recModelFilename ='rec_opt.nb';
+        // this.instance.clsModelFilename ='cls_opt.nb';
+        // this.instance.init(modelPath, labelPath);
         log("初始化OCR模型");
-        let result = this.instance.init(4, "file://" + files.path(path)); //设置模型文件路径
+        let result = this.instance.init();
 
         if (result) {
             result = null;
             return true;
         } else {
-            result = this.instance.getLastError()
+            result = this.instance.getLastError();
             console.error(result);
-            if (result.indexOf("android.permission.READ_PHONE_STATE") > -1) {
-                dialogs.build({
-                    contentColor: "#F44336",
-                    content: "请授权获取手机信息/电话管理权限后\n才能使用该OCR扩展",
-                    canceledOnTouchOutside: false,
-                    positive: "确定",
-                    //  negative: "取消",
-                }).on("positive", () => {
-                    runtime.requestPermissions(["READ_PHONE_STATE"]);
-                }).show();
-            }
             result = null;
             return false; // this.instance.getLastError(); //如果有错误可以用getLastError获取
         }
@@ -156,28 +136,15 @@ let XiaoYueOcrDetector = function (path) {
     this.detect = function (img, options) {
 
         options = options || {};
-        //置信度
-        options.CONFIDENCE = options.CONFIDENCE || 0.3;
         this.resultList = null;
-        let newBmp;
 
         if (this.initResult === true) {
             let start = new Date();
-            //处理图片
-            if (options.region) {
-                try {
-                    let region = buildRegion(options.region, img);
-                    newBmp = Bitmap.createBitmap(img.getBitmap(), region.x, region.y, region.width, region.height);
-                } catch (e) {
-                    console.error("无法使用区域识别，错误：" + e);
-                    newBmp = img.getBitmap();
-                    options.region = false;
-                }
-            } else {
-                newBmp = img.getBitmap()
-            }
-            //开始识别
-            this.resultList = JSON.parse(this.instance.ocr(newBmp, options.CONFIDENCE));
+            //开始识别,有点尴尬
+            //插件OCR实例的detect不支持(懒得)区域识别(裁剪图片),得用插件js的
+            this.resultList = OCR.detect(img, {
+                region: options.region,
+            });
 
             //回收图片
             !img.isRecycled() && img.recycle();
@@ -206,15 +173,6 @@ let XiaoYueOcrDetector = function (path) {
                         return;
                     };
 
-                    r.bounds = new android.graphics.Rect();
-                    let left = r.points[0].x,
-                        top = r.points[0].y,
-                        rigth = r.points[2].x,
-                        bottom = r.points[2].y;
-                    r.bounds.set(left, top, rigth, bottom);
-                    if (options.region) {
-                        r.bounds.offset(options.region[0], options.region[1]);
-                    };
 
                     taglb.push({
                         text: labeltext,
@@ -224,9 +182,6 @@ let XiaoYueOcrDetector = function (path) {
                         bottom: r.bounds.bottom,
                     });
                     labeltext = null;
-                    //delete r.points;
-                    //delete r.wordIndex;
-                    //this.resultList[index] = r;
                 });
 
 
@@ -241,7 +196,6 @@ let XiaoYueOcrDetector = function (path) {
             console.verbose("识别结果数量: " + (this.resultList ? this.resultList.length : 0) + '\n耗时' + (new Date() - start) + 'ms');
 
             start = null;
-            newBmp = null;
             this.resultList = null;
             return taglb;
             //  return this.resultList
@@ -250,10 +204,11 @@ let XiaoYueOcrDetector = function (path) {
         }
     }
     /**
-         * 回收ocr实例,必须释放,否则下次无法init
+         * 释放模型 用于释放native内存, 非必需
          */
     this.destroy = function () {
-        this.instance.destroy();
+        OCR = null;
+        this.instance.releaseModel();
     }
 
     this.矫正规则测试 = function (path, retext) {
@@ -266,13 +221,13 @@ let XiaoYueOcrDetector = function (path) {
         return retext;
     }
 
-    this.instance = new com.plugin.PaddleOCR.XiaoyuePlugin(context);
-    // let isLoad = this.instance.OnLoad();
-    this.initResult = this.init(path);
+    this.initResult = this.init();
     log("XiaoYueOcr init:" + this.initResult)
     events.on('exit', () => {
         console.log("释放XiaoYueOcr实例");
-        this.instance.destroy(); //必须释放,否则下次无法init
+        //延迟释放,在识别时退出容易崩溃
+        sleep(1500);
+        this.destroy();
     });
 }
 
@@ -280,102 +235,60 @@ let XiaoYueOcr = {
     detector: XiaoYueOcrDetector,
     is64: /64$/.test(context.getApplicationInfo().nativeLibraryDir),
     typeName: 'XiaoYueOcr',
-    path: context.getExternalFilesDir(null).getAbsolutePath() + '/OCR/XiaoYueOcr/',
     /**
      * 获取ocr是否安装
      */
     isInstalled() {
-        const toCheckPaths = [
-            this.path + 'libs/' + this.typeName + '.dex',
-            this.path + 'libs/libc++_shared.so',
-            this.path + 'libs/libedge-infer.so',
-            this.path + 'data/conf.json',
-            this.path + 'data/infer_cfg.json',
-            this.path + 'data/label_list.txt',
-            this.path + 'data/model',
-            this.path + 'data/params',
+        try {
+            this.XiaoYueOCR = plugins.load('cn.xiaoyue.ocr');
+        } catch (e) {
+            e = "未安装OCR插件，无法使用\n请打开明日计划-侧边栏-设置-OCR插件扩展:\n" + e;
+            // toast(e);
+            console.error(e)
 
-        ];
-        let flag = true;
-        for (let path of toCheckPaths) {
-            if (!files.exists(path)) {
-                console.error('该文件不存在' + path);
-                flag = false;
-            }
-        }
-        return flag;
+            return false;
+        };
+        return true;
     },
 
     /**
      * 安装
      */
     install(option) {
+        let self = this;
+        if (this.isInstalled()) {
+            option.successCallback();
+            return true;
+        }
+        let con_;
         let url = 'https://flowus.cn/share/2a01a8fc-6013-4d8e-ae69-73a35073dc07';
+        con_ = "请打开链接跳转到浏览器下载安装xiaoyue ocr 文字识别插件，请注意版本架构是否符合明日计划,否则无法使用\n\n" + url +
+            "\n\n当前明日计划架构：" + Build.CPU_ABI + "，\n建议下载安装" + (self.is64 ? "OCR 64位包" : "OCR 32位包") + "，\n\n安装错误的OCR版本会导致OCR无法识别卡住，应用崩溃。关于应用-明日计划32位只能使用32位OCR插件"
+       
 
-        let con_ = "请在明日计划WebView界面中访问以下链接并下载xiaoyueocr扩展包,建议下载安装" + (this.is64 ? "OCR 64位架构包" : "OCR 32位架构包") + "\n" + url;
-        dialogs.build({
-            type: "app",
-            title: "提醒",
-            titleColor: "#000000",
-            contentColor: "#F44336",
-            content: con_,
-            positive: "跳转页面",
-            negative: "取消",
-            cancelable: false,
-            canceledOnTouchOutside: false,
-            // view高度超过对话框时是否可滑动
-            wrapInScrollView: false,
-            // 按下按钮时是否自动结束对话框
-            autoDismiss: true
-        }).on("positive", () => {
-            let web_set = storages.create("configure").get("web_set");
-            web_set.new_url = url;
-            storages.create("configure").put("web_set", web_set);
-            let webdow = {};
-            webdow.await = true;
-            webdow.action = 'download';
-            webdow.nowtime = new Date();
-            //预计完成时间,10分钟
-            webdow.expectedtime = new Date(webdow.nowtime.getTime() + 10 * 60000);
-            webdow.callback = function (list) {
-                let self_path = this.path;
-                console.log('即将解压文件：' + list.filepath + list.filename + '到 ' + self_path);
-                files.ensureDir(self_path + list.filename);
-                $zip.unzip(list.filepath + list.filename, self_path);
-                toastLog('下载解压' + list.filename + '完成');
-                let con = '下载解压' + list.filename + '完成,路径为:\n' + self_path;
-                importClass(android.net.Uri);
-                importClass(android.os.Environment);
-                importClass(android.provider.Settings);
-                //判断是否需要所有文件权限
-                if (device.sdkInt >= 30 && !Environment.isExternalStorageManager()) {
-                    con = con + "\n\n\n此扩展在安卓11+,需授予所有文件访问权限才可使用";
-                };
+        if (con_ != undefined) {
+            dialogs.build({
+                type: "app",
+                title: "提醒",
+                titleColor: "#000000",
+                contentColor: "#F44336",
+                content: con_,
+                positive: "打开链接",
+                negative: "取消",
+                cancelable: false,
+                canceledOnTouchOutside: false,
+                // view高度超过对话框时是否可滑动
+                wrapInScrollView: false,
+                // 按下按钮时是否自动结束对话框
+                autoDismiss: true
+            }).on("positive", () => {
+                app.openUrl(url);
 
-                dialogs.build({
-                    contentColor: "#F44336",
-                    content: con,
-                    canceledOnTouchOutside: false,
-                    positive: "确定",
-                    //  negative: "取消",
-                }).on("positive", () => {
-                    if (device.sdkInt >= 30 && !Environment.isExternalStorageManager()) {
-                        toastLog("请授予所有文件访问权限");
-                        let uri = Uri.parse("package:" + context.getPackageName());
-                        app.startActivity(Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri));
-                    };
-                }).show();
-                files.remove(list.filepath + list.filename);
-            }.toString().replace("this.path", "'" + this.path + "'");
+            }).show();
+            option.failCallback();
+            return false
+        }
 
-            files.write(
-                "../lib/game_data/webdow.json",
-                JSON.stringify(webdow),
-                (encoding = "utf-8")
-            );
-            exit();
-
-        }).show();
         return false
     },
     /**
@@ -384,55 +297,10 @@ let XiaoYueOcr = {
      */
     prepare() {
 
-        runtime.loadDex(this.path + 'libs/' + this.typeName + '.dex');
-        if (!files.exists(runtime.files.join(runtime.libraryDir, 'libc++_shared.so'))) {
-            files.copy(this.path + 'libs/libc++_shared.so', runtime.files.join(runtime.libraryDir, 'libc++_shared.so'));
-        }
-        if (!files.exists(runtime.files.join(runtime.libraryDir, 'libedge-infer.so'))) {
-            files.copy(this.path + 'libs/libedge-infer.so', runtime.files.join(runtime.libraryDir, 'libedge-infer.so'));
-        }
-
-        this.detector = new XiaoYueOcrDetector(this.path + 'data/');
+        this.detector = new XiaoYueOcrDetector(this.XiaoYueOCR);
         return this.detector;
     },
 
-    //ocr : this.detector.detect(bmp),
-
-
 }
-
-
-
 
 module.exports = XiaoYueOcr;
-// new XiaoYueOcrDetector(files.path(module.id.replace(files.getName(module.id), "data")))
-
-//直接引用方法;
-let newocr = function (path) {
-    importClass(android.content.Context);
-    importClass(android.graphics.Bitmap);
-    importClass(android.graphics.BitmapFactory);
-    importClass(android.graphics.Point);
-    importClass(android.widget.TextView);
-    importClass(com.baidu.ai.edge.core.infer.InferConfig);
-    importClass(com.baidu.ai.edge.core.infer.InferManager);
-    importClass(com.baidu.ai.edge.core.ocr.OcrResultModel);
-    importClass(java.io.InputStream);
-    importClass(java.util.List);
-
-    this.manager = null;
-    this.initResult = false;
-    /* 1. 准备配置类，初始化Manager类。可以在onCreate或onResume中触发，请在非UI线程里调用 */
-    this.inferConfig = new InferConfig(context.getAssets(), "file://" + path);
-    this.manager = new InferManager(context, this.inferConfig, "");
-    this.manager.ocr(img.getBitmap(), 0.3);
-
-
-    this.destroy = function () {
-        this.manager.destroy();
-    }
-
-    events.on('exit', () => {
-        this.manager.destroy(); //必须释放,否则下次无法init
-    });
-}
