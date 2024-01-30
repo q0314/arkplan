@@ -338,16 +338,17 @@ function do_sign(cred_resp) {
 
                     } else {
                         let awards = resp['data']['awards'];
+                        tips = '角色' + character['nickName'] + '(' + character['channelName'] + ')签到成功，获得了:';
                         for (let j = 0; j < awards.length; j++) {
-                            console.trace(json, stringify(awards))
+                            console.trace(JSON.stringify(awards))
                             let award = awards[j];
                             let res = award['resource'];
-                            tips = '角色' + character['nickName'] + '(' + character['channelName'] + ')签到成功，获得了' + res['name'] + '×' + (award['count'] || 1);
-                            //  toast(tips);
-                            console.warn(tips)
-                            snackbar(tips);
+                            tips += res['name'] + '×' + (award['count'] || 1);
+
 
                         }
+                        console.warn(tips)
+                        snackbar(tips);
                     };
 
                     let status = resp['code'];
@@ -1453,48 +1454,46 @@ function sign(tokens, callback) {
             let wait = true;
 
             for (let i = 0; i < tokens.length; i++) {
-
                 token_global = tokens[i];
-                get_cred_by_token(token_global)
-                    .then((value) => {
-                        do_sign(value).then((index) => {
-                            /*try {
-                                //通知数据更新
-                                ui.run(() => {
-                                    log(ui_add);
-                                    ui_add && ui_add.roles_list.adapter.notifyItemRemoved(index);
-                                })
-                            } catch (e) {
-                                console.error("ui.adapter:" + e)
-                            };*/
+                get_cred_by_token(token_global).then((value) => {
+                    console.trace(value);
+                    do_sign(value).then((index) => {
+                        /*try {
+                            //通知数据更新
+                            ui.run(() => {
+                                log(ui_add);
+                                ui_add && ui_add.roles_list.adapter.notifyItemRemoved(index);
+                            })
+                        } catch (e) {
+                            console.error("ui.adapter:" + e)
+                        };*/
 
-                        }).finally(() => {
-                            if (i == tokens.length) {
-                                console.log("森空岛签到完成");
-                                token_storage.put("arknights_binding", roles_list);
-                                token_global = false;
-                                if (callback) callback();
-                                ui.run(() => {
-                                    if (ui_add) {
-                                        ui_add.progressbar_sian.setVisibility(8);
-                                        ui_add.ok.setText(tips);
-                                        message && snackbar(message)
-                                    } else {
-                                        message && toastLog(tips + "\n" + message);
-                                    }
+                    }).finally(() => {
+                        if (i == tokens.length) {
+                            console.log("森空岛签到完成");
+                            token_storage.put("arknights_binding", roles_list);
+                            token_global = false;
+                            if (callback) callback();
+                            ui.run(() => {
+                                if (ui_add) {
+                                    ui_add.progressbar_sian.setVisibility(8);
+                                    ui_add.ok.setText(tips);
+                                    message && snackbar(message)
+                                } else {
+                                    message && toastLog(tips + "\n" + message);
+                                }
 
-                                });
-                            }
-                        });
-
-                    })
-                    .catch((error) => {
-                        log(error)
-                        tips = "签到失败";
-                        message = '角色' + i + '：签到失败，' + error;
-
-                        console.error(error);
+                            });
+                        }
                     });
+
+                }).catch((error) => {
+                    log(error)
+                    tips = "签到失败";
+                    message = '角色' + i + '：签到失败，' + error;
+
+                    console.error(error);
+                });
 
             };
             //保持仅签到模块时持续运行
