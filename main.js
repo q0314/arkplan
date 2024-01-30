@@ -3113,7 +3113,6 @@ threads.start(function () {
     Counter = timed_tasks_storage.get("Counter");
 
     console.verbose("开始检查更新")
-    files.create("./lib/urlfile.txt");
     toupdate.updata(ui.drawerFrame)
 
 
