@@ -165,6 +165,7 @@ BottomWheelPicker.prototype.show = function () {
                 if (!this.state && this.ok) {
                     resolve(this.option);
                     this.ok = false;
+                    this.view.tv_agree.setText("确定");
                     this.mBottomSheetDialog.dismiss();
                 }
             },

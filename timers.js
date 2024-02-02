@@ -210,7 +210,7 @@ function 判断() {
     if(Timing_data.reason != false){
     tool.writeJSON("理智", Timing_data.reason);
     }
-    tool.writeJSON("音量",Timing_data.volume)
+    tool.writeJSON("音量",Timing_data.volume);
     sleep(500);
     tool.writeJSON("包名", Timing_data.The_server);
 

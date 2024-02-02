@@ -158,6 +158,7 @@ let MlKitOCRDetector = function (instance) {
         if (!options.rectify_json_path || !files.exists(options.rectify_json_path)) {
             console.error("请确保ocr字符修正规则文件存在: " + options.rectify_json_path);
         };
+
         if (this.resultList != null && this.resultList.length > 0) {
             // console.verbose("过滤识别结果中");
             for (let i = 0; i < this.resultList.length; i++) {
