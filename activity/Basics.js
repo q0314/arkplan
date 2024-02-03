@@ -98,7 +98,7 @@ ui.layout(
                                     <text text="{{language['reset-proxy-frequency']}}" textColor="black" textSize="18sp" />
                                     <text text="{{language['reset-proxy-frequency-explain']}}" textColor="#95000000" textSize="10sp" marginTop="2" />
                                 </vertical>
-                                <widget-switch-se7en id="reset_proxy_frequency" layout_gravity="center" padding="5 5" textSize="18sp"
+                                <widget-switch-se7en id="reset_proxy_frequency" checked="{{setting.重置代理次数}}"layout_gravity="center" padding="5 5" textSize="18sp"
                                     margin="10 0" thumbSize='24' radius='24' />
                             </horizontal>
                             <card w="*" id="indx2" h="40" gravity="center_vertical"  >

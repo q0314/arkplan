@@ -86,7 +86,7 @@ var setting = tool.readJSON("configure", {
     "行动": 666,
     "剿灭": 5,
     "指定关卡": {
-        levelAbbreviation: "当前/上次"
+        levelAbbreviation: "当前"
     },
     //剿灭代理_全权委托
     "proxy_card": true,
@@ -194,8 +194,11 @@ if (setting.start == undefined || setting == null) {
 try {
     setting.重置代理次数.length;
 } catch (err) {
+    setting.指定关卡 = {
+        levelAbbreviation: "当前",
+    };
+    tool.writeJSON("指定关卡", setting.指定关卡);
     tool.writeJSON("重置代理次数", true);
-
     setting = tool.readJSON("configure");
 }
 
@@ -452,9 +455,9 @@ ui.layout(
                             <vertical id="xingdongquyu">
                                 <vertical id="xlkz" visibility="gone">
                                     <horizontal marginLeft="5" gravity="center">
-                                        <text text="关卡选择" textSize="{{px2dp(48)}}" textColor="{{theme.text}}" marginRight="30" />
+                                        <text text="关卡选择" textSize="{{px2dp(48)}}" textColor="{{theme.text}}" marginRight="50" />
                                         <spinner id="level_pick" textSize="{{px2dp(62)}}" entries=""
-                                            gravity="center" layout_weight="2" margin="5 5" padding="4" />
+                                            gravity="center" layout_weight="1" margin="5 5" padding="4" />
                                         {/*  <TextView id="level_pick" textSize="{{px2dp(62)}}"
                                             margin="5 5" textColor="black" w="*" text="当前/上次" gravity="center" />
 */}
@@ -677,7 +680,7 @@ let BottomWheelPicker = require('./subview/BottomWheelPicker.js').build({
     itemCount: 7,
 });
 
-change_list(ui.level_pick, ["当前/上次", "1-7", "龙门币-6/5", "红票", "经验-6/5", "术/狙芯片", "术/狙芯片组", "先/辅芯片", "先/辅芯片组", "近/特芯片", "近/特芯片组"]);
+change_list(ui.level_pick, ["当前", "上次", "1-7", "龙门币-6/5", "红票", "经验-6/5", "术/狙芯片", "术/狙芯片组", "先/辅芯片", "先/辅芯片组", "近/特芯片", "近/特芯片组"]);
 ui.level_pick.setBackground(createShape(5, 0, 0, [2, theme.bar]));
 ui.level_pick.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
     onItemSelected: function (parent, view, position, id) {
