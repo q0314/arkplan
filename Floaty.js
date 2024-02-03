@@ -1598,14 +1598,14 @@ function 暂停(form) {
         window.功能.setDataSource(功能图标);
     });
 
-    progra = tool.script_locate("progra");
+    progra = tool.script_locate("progra.js");
     if (progra) {
         progra.emit("暂停", "结束程序");
     }
  
     tool.writeJSON("侧边", "0");
     setTimeout(function () {
-        progra = tool.script_locate("progra");
+        progra = tool.script_locate("progra.js");
         if (progra) {
             progra.emit("暂停", "结束程序");
         }

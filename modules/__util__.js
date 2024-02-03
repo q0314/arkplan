@@ -11,8 +11,6 @@ importClass(android.graphics.drawable.GradientDrawable);
 
 const _resources_ = context.getResources();
 const scale = _resources_.getDisplayMetrics().density;
-const iStatusBarHeight = _resources_.getDimensionPixelSize(_resources_.getIdentifier("status_bar_height", "dimen", "android"));
-
 
 
 
@@ -20,7 +18,7 @@ const iStatusBarHeight = _resources_.getDimensionPixelSize(_resources_.getIdenti
 module.exports = {
     dp2px:
         /**
-        * dp转px
+        * dp转px , 密度比例
         * @param {Number} dp 
         * @returns 
         */
@@ -82,7 +80,7 @@ module.exports = {
     },
     ColorEvaluator: ColorEvaluator,
     resources: _resources_,
-    iStatusBarHeight: iStatusBarHeight
+    iStatusBarHeight: _resources_.getDimensionPixelSize(_resources_.getIdentifier("status_bar_height", "dimen", "android")),
 };
 
 /**
