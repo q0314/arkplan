@@ -20,7 +20,7 @@ let BottomWheelPicker = require('../subview/BottomWheelPicker.js').build({
     positiveTextColor: "#FFFFFF",
     positiveBgColor: theme.bar,
     positivestrokeColor: theme.bar,
-})
+});
 let ocr_plugin = {
     "MlkitOCR": require('../modules/mlkitocr.js'),
     "XiaoYueOCR": require('../modules/xiaoyueocr.js')
@@ -93,7 +93,14 @@ ui.layout(
                                 <widget-switch-se7en id="identify_unusual_pauses" layout_gravity="center" padding="5 5" textSize="18sp"
                                     margin="10 0" thumbSize='24' radius='24' />
                             </horizontal>
-
+                            <horizontal margin="10 0" padding="15 5 1 5" id="reset_proxy_frequency_" >
+                                <vertical layout_weight="1" >
+                                    <text text="{{language['reset-proxy-frequency']}}" textColor="black" textSize="18sp" />
+                                    <text text="{{language['reset-proxy-frequency-explain']}}" textColor="#95000000" textSize="10sp" marginTop="2" />
+                                </vertical>
+                                <widget-switch-se7en id="reset_proxy_frequency" layout_gravity="center" padding="5 5" textSize="18sp"
+                                    margin="10 0" thumbSize='24' radius='24' />
+                            </horizontal>
                             <card w="*" id="indx2" h="40" gravity="center_vertical"  >
                                 <widget-switch-se7en id="agent" text="代理失误放弃行动" checked="false" padding="15 5 15 5" textSize="18sp"
                                     margin="10 0" thumbSize='24' radius='24' />
@@ -803,8 +810,13 @@ ui.auto_allow_screenshots.on("click", (view) => {
 });
 ui.auto_allow_screenshots_.on("click", () => {
     ui.auto_allow_screenshots.performClick();
-})
-
+});
+ui.reset_proxy_frequency.on("click", (view) => {
+    tool.writeJSON("重置代理次数", view.checked);
+});
+ui.reset_proxy_frequency_.on("click", () => {
+    ui.reset_proxy_frequency.performClick();
+});
 //自动放缩坐标
 ui.setScreenMetrics.on("click", (view) => {
     tool.writeJSON("坐标", view.checked);

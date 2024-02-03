@@ -3,6 +3,7 @@ if (device.sdkInt < 24) {
     engines.execScriptFile("./activity/device_usage.js")
     exit();
 }
+
 runtime.loadDex('./lib/java/webview-bridge.dex');
 importClass(android.webkit.DownloadListener);
 importClass(android.widget.SpinnerAdapter);
@@ -27,16 +28,12 @@ importClass(com.tony.BridgeHandler);
 importClass(com.tony.WebViewBridge);
 
 
-const resources = context.getResources();
-// 四舍五入 转化到px, 最小 1 像素
-const statusBarHeight = resources.getDimensionPixelSize(
-    resources.getIdentifier("status_bar_height", "dimen", "android")
-);
-// 密度比例
-var dp2px = (dp) => {
-    return Math.floor(dp * resources.getDisplayMetrics().density + 0.5);
-};
-
+let {
+    dp2px,
+    px2dp,
+    iStatusBarHeight,
+    createShape
+} = require('./modules/__util__.js');
 require("./modules/ButtonLayout");
 require('./modules/widget-switch-se7en');
 require("./modules/NonSwipeableViewPager");
@@ -68,7 +65,6 @@ let tool = require("./modules/tool.js");
 let gallery = require("./subview/gallery.js");
 let toupdate = require("./lib/to_update.js");
 
-
 //文件回调
 var filePathCallback = null;
 
@@ -89,6 +85,9 @@ var setting = tool.readJSON("configure", {
     "执行": "常规",
     "行动": 666,
     "剿灭": 5,
+    "指定关卡": {
+        levelAbbreviation: "当前/上次"
+    },
     //剿灭代理_全权委托
     "proxy_card": true,
     "agent": true,
@@ -193,14 +192,10 @@ if (setting.start == undefined || setting == null) {
 
 
 try {
-    setting.autoAllowScreen.length;
-    setting.image_memory_manage.length;
-    setting.end_action.length;
+    setting.重置代理次数.length;
 } catch (err) {
-    tool.writeJSON("autoAllowScreen", true);
-    tool.writeJSON("defaultOcr", "MlkitOCR");
-    tool.writeJSON("image_memory_manage", true);
-    tool.writeJSON("end_action", {})
+    tool.writeJSON("重置代理次数", true);
+
     setting = tool.readJSON("configure");
 }
 
@@ -318,7 +313,7 @@ ui.layout(
             {/**drawer侧边栏 */}
 
             <relative w="*" id="drawer_" clickable="true">
-                <relative id="drawerToolbar" margin="0 10 0 10" paddingTop="{{statusBarHeight}}px">
+                <relative id="drawerToolbar" margin="0 10 0 10" paddingTop="{{iStatusBarHeight}}px">
                     <img
                         id="icon"
                         w="40"
@@ -410,7 +405,7 @@ ui.layout(
             {/**界面 */}
             <card id="card" cardElevation="0" cardCornerRadius="0" cardBackgroundColor="{{theme.bg}}">
                 <vertical bg="#00000000">
-                    <toolbar w="*" h="auto" margin="0 10 0 10" paddingTop="{{statusBarHeight}}px">
+                    <toolbar w="*" h="auto" margin="0 10 0 10" paddingTop="{{iStatusBarHeight}}px">
                         <img
                             id="icon_b" w="35dp" h="35dp"
                             scaleType="fitXY" circle="true" layout_gravity="left"
@@ -450,19 +445,26 @@ ui.layout(
                                 cardElevation="3dp" gravity="center_vertical"  >
                                 <linear clipChildren="false" bg="{{theme.bg}}" elevation="0" gravity="center_vertical" >
                                     <text textSize="16" w="auto" h="auto" marginLeft="5" text="程序执行模式: " layout_gravity="center" layout_weight="1" textColor="{{theme.text}}" />
-                                    <spinner id="implement" textSize="16" entries="手动指定关卡+基建|只执行行动刷图|只执行基建收菜|执行剿灭作战+基建|执行上一次作战"
+                                    <spinner id="implement" textSize="16" entries=""
                                         layout_gravity="right|center" layout_weight="2" />
                                 </linear>
                             </card>
                             <vertical id="xingdongquyu">
                                 <vertical id="xlkz" visibility="gone">
-
+                                    <horizontal marginLeft="5" gravity="center">
+                                        <text text="关卡选择" textSize="{{px2dp(48)}}" textColor="{{theme.text}}" marginRight="30" />
+                                        <spinner id="level_pick" textSize="{{px2dp(62)}}" entries=""
+                                            gravity="center" layout_weight="2" margin="5 5" padding="4" />
+                                        {/*  <TextView id="level_pick" textSize="{{px2dp(62)}}"
+                                            margin="5 5" textColor="black" w="*" text="当前/上次" gravity="center" />
+*/}
+                                    </horizontal>
                                     <widget-switch-se7en id="only_medicament" checked="{{setting.only_medicament}}" text="仅使用药剂恢复理智" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
                                     <horizontal gravity="center" marginLeft="5">
-                                        <text id="mr1" text="刷图上限:" textSize="15" textColor="#212121" />
+                                        <text id="mr1" text="刷图上限:" textSize="15" textColor="{{theme.text}}" />
                                         <input id="input_extinguish" inputType="number" hint="{{setting.剿灭}}次" layout_weight="1" visibility="gone" paddingLeft="6" w="auto" textColorHint="{{theme.text3}}" />
                                         <input id="input_ordinary" inputType="number" hint="{{setting.行动}}次" layout_weight="1" paddingLeft="6" w="auto" textColorHint="{{theme.text3}}" />
-                                        <text id="mr2" text="磕药/碎石:" textSize="15" textColor="#212121" />
+                                        <text id="mr2" text="磕药/碎石:" textSize="15" textColor="{{theme.text}}" />
                                         <input id="input_sane" inputType="number" hint="{{setting.理智}}个" layout_weight="1" w="auto" textColorHint="{{theme.text3}}" />
                                     </horizontal>
                                 </vertical>
@@ -601,7 +603,7 @@ ui.layout(
             {/*webview*/}
             <frame id="main_web" bg="{{theme.bg}}">
                 <vertical h="*" marginBottom="-5" bg="#00ffffff">
-                    <vertical h="{{statusBarHeight}}px" bg="{{theme.bg}}" >
+                    <vertical h="{{iStatusBarHeight}}px" bg="{{theme.bg}}" >
 
                         <text
                             w="*"
@@ -668,8 +670,37 @@ ui.layout(
     </frame>
 
 );
+let BottomWheelPicker = require('./subview/BottomWheelPicker.js').build({
+    positiveTextColor: "#FFFFFF",
+    positiveBgColor: theme.bar,
+    positivestrokeColor: theme.bar,
+    itemCount: 7,
+});
 
+change_list(ui.level_pick, ["当前/上次", "1-7", "龙门币-6/5", "红票", "经验-6/5", "术/狙芯片", "术/狙芯片组", "先/辅芯片", "先/辅芯片组", "近/特芯片", "近/特芯片组"]);
+ui.level_pick.setBackground(createShape(5, 0, 0, [2, theme.bar]));
+ui.level_pick.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
+    onItemSelected: function (parent, view, position, id) {
+        setting.指定关卡 ? setting.指定关卡.levelAbbreviation = parent.getSelectedItem() : setting.指定关卡 = {
+            levelAbbreviation: parent.getSelectedItem(),
+        };
+        tool.writeJSON("指定关卡", setting.指定关卡);
+    }
+}));
+/*
+ui.level_pick.click((view) => {
 
+    BottomWheelPicker.setData(["当前/上次", "1-7", "龙门币-6/5", "红票", "经验-6/5", "术/狙芯片", "术/狙芯片组", "先/辅芯片", "先/辅芯片组", "近/特芯片", "近/特芯片组"])
+        .show().then(result => {
+            view.setText(result.text);
+            setting.指定关卡 ? setting.指定关卡.levelAbbreviation = result.text : setting.指定关卡 = {
+                levelAbbreviation: result.text,
+            };
+            tool.writeJSON("指定关卡", setting.指定关卡);
+
+        });
+})
+*/
 let popView,
     popWin,
     pop_textColor = "#ffffff",
@@ -1616,9 +1647,9 @@ ui.viewpager.setOnPageChangeListener({
 
                     if (gallery.gallery_info) {
                         if (setting.custom.length >= 6 && ui.implement.getCount() == 5) {
-                            change_list(ui.implement, Multistage_menu());
+                            change_list(ui.implement, modeGatherText);
                         } else if (setting.custom == false && ui.implement.getCount() == 6) {
-                            change_list(ui.implement, Multistage_menu());
+                            change_list(ui.implement, modeGatherText);
                         }
                     }
                     mod_data = sto_mod.get("modular", []);
@@ -1949,69 +1980,64 @@ ui.indt.on("click", function () {
         ui.down.attr("src", "@drawable/ic_keyboard_arrow_down_black_48dp")
     }
 })
-
+var modeGather = {
+    "指定关卡+基建": "常规",
+    "只执行行动": "行动",
+    "只执行基建": "基建",
+    "执行剿灭作战+基建": "剿灭",
+};
+if (setting.custom != false) {
+    modeGather["执行自定义模块"] = "自定义模块";
+}
+var modeGatherText = Object.keys(modeGather);
 var SE执行 = ui.implement.getSelectedItemPosition();
 ui.implement.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
     onItemSelected: function (parent, view, Executionsettings, id) {
+        // let itext = parent.getSelectedItem()
         if (Executionsettings != SE执行) {
-            if (Executionsettings != 1 && ui.jijianquyu.getVisibility() == 8) {
+            if (Executionsettings != 2 && ui.jijianquyu.getVisibility() == 8) {
                 ui.jijianquyu.setVisibility(0);
-            } else if (Executionsettings != 2 && ui.xingdongquyu.getVisibility() == 8) {
+            } else if (Executionsettings != 3 && ui.xingdongquyu.getVisibility() == 8) {
                 ui.xingdongquyu.setVisibility(0);
             }
             switch (Executionsettings) {
                 case 0:
-                    tool.writeJSON("执行", "常规");
                     toast("你选择的是行动+基建，理智不足以支持下一把时，启动基建程序");
                     break;
                 case 1:
-                    tool.writeJSON("执行", "行动");
                     tool.writeJSON("行动", "999");
                     ui.jijianquyu.setVisibility(8);
                     toast("你选择的是只执行行动，默认为999次，行动完成或理智不足以开下一把时直接暂停程序");
                     break;
                 case 2:
-                    tool.writeJSON("执行", "基建");
                     toast("你选择的是只启动基建");
                     ui.xingdongquyu.setVisibility(8);
                     break;
                 case 3:
-                    tool.writeJSON("执行", "剿灭");
                     toast("你选择的是剿灭行动，默认为5次，360×5=1800合成玉");
                     break;
-                case 4:
-
+                case 5:
 
                     switch (gallery.language) {
                         case "日服":
                         case "美服":
                             toast("当前方舟服务器不支持上一次作战");
-                            ui.implement.setSelection(0);
+                            Executionsettings = 0;
+                            ui.implement.setSelection(Executionsettings);
                             break
                         default:
-                            tool.writeJSON("执行", "上次");
                             toast("你选择的是上一次作战，注意不能是剿灭，否则跳转基建程序");
                             break
                     }
-                    /*
-                                    let r = parent.getSelectedItem();
-                                    if (r != "执行自定义模块") {
-                                        tool.writeJSON("执行", "上次");
-                                        toast("你选择的是上一次作战，注意不能是剿灭，否则跳转基建程序");
-                                    } else {
-                                        tool.writeJSON("执行", "自定义模块");
-                                        toastLog("自定义模式")
-                                    }
-                                    */
                     break;
-                case 5:
-                    tool.writeJSON("执行", "自定义模块");
+                case 4:
 
                     toastLog("自定义模式")
                     break;
             };
+            tool.writeJSON("执行", modeGather[modeGatherText[Executionsettings]]);
             if (setting.行动理智) {
-                if (Executionsettings == 3) {
+                if (Executionsettings == 4) {
                     ui.mr1.setText("剿灭上限:");
                     ui.input_extinguish.attr("visibility", "visible");
                     ui.input_ordinary.attr("visibility", "gone");
@@ -3422,13 +3448,6 @@ function Painting_planning(input, ok) {
 
 }
 
-function Multistage_menu() {
-    if (setting.custom != false) {
-        return ["手动指定关卡+基建", "只执行行动", "只执行基建", "执行剿灭作战+基建", "执行上一次作战", "执行自定义模块"]
-    }
-    return ["手动指定关卡+基建", "只执行行动", "只执行基建", "执行剿灭作战+基建", "执行上一次作战"]
-
-}
 
 function change_list(spinner, mCountries) {
 
@@ -3437,7 +3456,7 @@ function change_list(spinner, mCountries) {
             ui.indt.attr("visibility", "gone");
             ui.timed_tasks_list.attr("visibility", "gone");
         }
-        change_list(ui.implement, Multistage_menu());
+        change_list(ui.implement, modeGatherText);
 
         return true
     } else {
@@ -3654,7 +3673,7 @@ function Update_UI(i) {
 
                 if (gallery.gallery_info) {
 
-                    change_list(ui.implement, Multistage_menu());
+                    change_list(ui.implement, modeGatherText);
                     switch (setting.执行) {
                         case '常规':
                             ui.implement.setSelection(0);
