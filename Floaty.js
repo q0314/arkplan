@@ -25,7 +25,12 @@ size = Number(size);
 if (size == undefined || isNaN(size) == true || size == 0) {
     size = 0.75;
 }
-
+let {
+    dp2px,
+    px2dp,
+    iStatusBarHeight,
+    createShape
+} = require('./modules/__util__.js');
 //设置悬浮窗初始属性{!
 var layoutAttribute = {
     //设置悬浮窗左上角小圆点的尺寸
@@ -133,9 +138,9 @@ function 创建悬浮窗() {
                     </horizontal>
                 </frame>
                 <frame id="xxbj" w="*" h="*">
-                    <text id="tos" text="状态：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="top" />
-                    <text id="tod" text="行动：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="center" />
-                    <text id="tof" text="理智：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="bottom" />
+                    <text id="tos" text="状态：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="top" lines="1" ellipsize="marquee" />
+                    <text id="tod" text="行动：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="center" lines="1" ellipsize="marquee" />
+                    <text id="tof" text="理智：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="bottom" lines="1" ellipsize="marquee" />
                     <horizontal id="Material_Science" w="*" h="20" marginLeft="-3" layout_gravity="bottom">
 
                     </horizontal>
@@ -424,8 +429,8 @@ function 悬浮窗监听(window) {
                 ui.run(() => {
                     window.operation.setVisibility(0);
                     window.operation2.setVisibility(8);
-                    window.disableFocus()
-                    window.webview.loadUrl("")
+                    window.disableFocus();
+                    //window.webview.loadUrl("");
                     layoutAttribute.whole.w = zoom(650)
                     layoutAttribute.whole.h = zoom(240)
                     window.homepage.attr("w", layoutAttribute.whole.w + "px")
@@ -537,7 +542,7 @@ function 悬浮窗监听(window) {
                 if (功能图标[0] == "@drawable/ic_pause_circle_outline_black_48dp") {
                     toast("当前行动中，访问完内容记得关闭浏览器面板，防止悬浮窗阻挡画面");
                 };
-                悬浮浏览器("https://arkn.lolicon.app/#/hr");
+                悬浮浏览器("http://ark.yituliu.cn/");
                 //  tool.writeJSON("侧边", "任务")
                 break;
         };
@@ -553,15 +558,66 @@ function 悬浮窗监听(window) {
 
 function web_initialization() {
     ui.run(() => {
-        myAdapterListener(window.工具, [
-            "待添加..",
-            "PRTS",
-            "明日方舟工具箱",
-            "企鹅物流数据统计",
-            "明日方舟官网",
-            "寻访记录分析",
-            "kokodayo",
-        ])
+        let wiki = [{
+            title: "材料获取一图流",
+            url: "http://ark.yituliu.cn/",
+            icon: "http://ark.yituliu.cn/favicon.ico",
+        }, {
+            title: "明日方舟官网",
+            url: "https://ak.hypergryph.com/",
+            icon: "https://ak.hypergryph.com/favicon.ico",
+        }, {
+            title: "泰拉记事社",
+            url: "https://terra-historicus.hypergryph.com/",
+            icon: "https://terra-historicus.hypergryph.com/favicon.ico",
+        }, {
+            title: "塞壬唱片",
+            url: "https://monster-siren.hypergryph.com/m",
+            icon: "https://monster-siren.hypergryph.com/favicon.ico",
+        }, {
+            title: "企鹅物流",
+            url: "https://penguin-stats.cn/",
+            icon: "https://penguin-stats.cn/favicon.ico",
+        }, {
+            title: "明日方舟工具箱",
+            url: "https://arkn.lolicon.app/#/",
+            icon: "https://arkn.lolicon.app/favicon.ico",
+        }, {
+            title: "寻访记录分析",
+            url: "https://arkgacha.kwer.top/",
+            icon: "https://arkgacha.kwer.top/static/icon.ico",
+        }, {
+            title: "PRTS",
+            url: "https://m.prts.wiki/w/%E9%A6%96%E9%A1%B5",
+            icon: "https://m.prts.wiki/favicon.ico",
+        }, {
+            title: "Kokodayo",
+            url: "https://kokodayo.fun/",
+            icon: "https://kokodayo.fun/favicon.ico",
+        }, {
+            title: "Arknights DPS",
+            url: "https://viktorlab.cn/akdata/dps/",
+            icon: "https://viktorlab.cn/akdata/favicon.ico",
+        }, {
+            title: "干员培养表",
+            url: "https://ark-nights.com/",
+            icon: "https://ark-nights.com/favicon.ico",
+
+        }, {
+            /*
+           title:"夏活攒抽规划",
+           url:"https://xunfang.vercel.app/",
+           icon:"https://pica.zhimg.com/80/v2-cc92c54352f3359e6ce94bfbb88c1fa6_720w.jpg?source=1940ef5c",
+        },{*/
+            title: "少人Wiki",
+            url: "https://arkrec.com/",
+            icon: "https://arkrec.com/favicon/apple-touch-icon.png",
+        }, {
+            title: "ArkStory",
+            url: "https://arkstory.cc/story",
+            icon: "https://arkstory.cc/static/images/favicon.png",
+        }];
+        myAdapterListener(window.工具, wiki.map(item => item.title))
 
 
         function myAdapterListener(spinner, dataList) {
@@ -618,100 +674,15 @@ function web_initialization() {
                             //点击事件
                             // let item = dataList[position];
                             let r = parent.getSelectedItem();
-                            //toast(item)
                             if (Options_menu) {
                                 Options_menu = false;
-                                switch (r) {
-                                    case '待添加..':
-                                        ui.run(() => {
-                                            //web_initialization()
-                                            if (files.exists("/sdcard/penguin")) {
-                                                Penguin_statistics()
-                                            }
-                                            //window.webview.reload();
-                                        });
-
-                                        break
-
-                                    case '全屏打开':
-
-                                        let web_set = storages.create("configure").get("web_set") //.toString()
-                                        web_set.new_url = window.webview.url
-                                        storages.create("configure").put("web_set", web_set)
-                                        engines.execScriptFile("./main.js")
-                                        // engines.execScript("browser_ui", java.lang.String.format("'ui';  var theme = storages.create('configure').get('theme_colors');require('./lib/Builtinbrowser.js');"));
-                                        ui.run(() => {
-                                            window.disableFocus()
-                                            layoutAttribute.whole.w = zoom(650)
-                                            layoutAttribute.whole.h = zoom(240)
-                                            window.homepage.attr("w", layoutAttribute.whole.w + "px")
-                                            window.homepage.attr("h", layoutAttribute.whole.h + "px");
-                                            window.xxbj.setVisibility(0);
-                                            window.xxbr.attr("visibility", "gone");
-                                            window.title.attr("w", layoutAttribute.whole.w - layoutAttribute.windowOperate.w + "px");
-                                            window.cd.attr("visibility", "gone");
-                                            window.工具.attr("visibility", "gone");
-                                            switch (setting.执行) {
-                                                case "常规":
-                                                    window.name.setText("行动基建");
-                                                    break;
-                                                case "行动":
-                                                    window.name.setText("行动作战");
-                                                    break;
-                                                case "基建":
-                                                    window.name.setText("基建收菜");
-                                                    break;
-                                                case "剿灭":
-                                                    window.name.setText("剿灭作战");
-                                                    break;
-                                                case "上次":
-                                                    window.name.setText("上次作战");
-                                                    break;
-                                                case "定时剿灭":
-                                                    window.name.setText("定时剿灭");
-                                                    break;
-                                                case "自定义模块":
-                                                    window.name.setText("明日计划");
-                                                    break;
-                                            };
-                                        });
-                                        blockHandle.setTimeout(() => {
-
-                                            隐藏主界面();
-                                        }, 0);
-                                        break;
-                                    case 'PRTS':
-                                        url = "https://prts.wiki/w/首页";
-                                        window.webview.loadUrl(url);
-                                        toast(r)
-                                        break;
-                                    case '明日方舟工具箱':
-                                        url = "https://arkn.lolicon.app";
-                                        window.webview.loadUrl(url);
-                                        toast(r)
-                                        break;
-                                    case '企鹅物流数据统计':
-                                        url = "https://penguin-stats.cn";
-                                        window.webview.loadUrl(url);
-                                        toast(r)
-                                        break;
-                                    case '明日方舟官网':
-                                        url = "https://ak.hypergryph.com/";
-                                        window.webview.loadUrl(url);
-                                        toast(r);
-                                        break;
-                                    case "kokodayo":
-                                        url = "https://kokodayo.fun/";
-                                        window.webview.loadUrl(url);
-                                        toast(r)
-                                        break
-                                    case '寻访记录分析':
-                                        url = "https://arkgacha.kwer.top/";
-                                        window.webview.loadUrl(url);
-                                        toast(r);
-                                        break;
+                                url = wiki.find(item => item.title === r).url;
+                                if (url) {
+                                    window.webview.loadUrl(url);
                                 };
-                            }
+                                toast(r);
+
+                            };
                             Options_menu = false;
                         })
                         return convertView;
@@ -1103,10 +1074,18 @@ function 执行次数() {
                 cardElevation="3dp" gravity="center_vertical"  >
 
                 <linear clipChildren="false" elevation="0" gravity="center_vertical" >
-                    <spinner id="implement" layout_gravity="center" layout_weight="1" entries="手动指定关卡+基建|只执行行动刷图|只执行基建收菜|执行剿灭作战+基建|执行上一次作战" />
+                    <spinner id="implement" layout_gravity="center" layout_weight="1" entries="指定关卡+基建|只执行行动刷图|只执行基建收菜|执行剿灭作战+基建" />
                 </linear>
             </card>
             <View bg="#000000" h="1" w="auto" />
+            <horizontal marginLeft="5" gravity="center">
+                <text text="关卡选择" textSize="{{px2dp(48)}}" textColor="#212121" marginRight="50" />
+                <spinner id="level_pick" textSize="{{px2dp(62)}}" entries=""
+                    gravity="center" layout_weight="1" margin="5 5" padding="4" />
+                {/*  <TextView id="level_pick" textSize="{{px2dp(62)}}"
+                                            margin="5 5" textColor="black" w="*" text="当前/上次" gravity="center" />
+*/}
+            </horizontal>
             <Switch id="ysrh" checked="{{setting.only_medicament}}" text="仅使用药剂恢复理智" padding="6 6 6 6" textSize="16sp" />
             <horizontal gravity="center" marginLeft="5">
                 <text id="mr1" text="刷图上限:" textSize="15" textColor="#212121" />
@@ -1145,11 +1124,27 @@ function 执行次数() {
     rewriteView.buiok.on("click", () => {
         输入框事件()
     });
+    let level_choices = JSON.parse(
+        files.read("./lib/game_data/level_choices.json", (encoding = "utf-8"))
+    );
+
+    adapter = new android.widget.ArrayAdapter(context, android.R.layout.simple_spinner_item, level_choices);
+    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    rewriteView.level_pick.setAdapter(adapter);
+    rewriteView.level_pick.setBackground(createShape(5, 0, 0, [2, setting.bg]));
+    rewriteView.level_pick.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
+        onItemSelected: function (parent, view, position, id) {
+            setting.指定关卡 ? setting.指定关卡.levelAbbreviation = parent.getSelectedItem() : setting.指定关卡 = {
+                levelAbbreviation: parent.getSelectedItem(),
+            };
+            tool.writeJSON("指定关卡", setting.指定关卡);
+        }
+    }));
 
     rewriteView.WaitForRun.attr("cardCornerRadius", "25dp");
     rewriteView.WaitForRun.on("click", () => {
         tool.writeJSON("已执行动", "0");
-        toastLog("清空已执行动记录")
+        toastLog("清空已执行动记录");
         setting = tool.readJSON("configure");
         ui.run(function () {
             rewriteView.WaitForRun.setVisibility(8)
@@ -1158,7 +1153,7 @@ function 执行次数() {
             } else {
                 window.tod.setText("剿灭：执行" + setting.已执行动 + "次&上限" + setting.剿灭 + "次");
             }
-        })
+        });
 
     });
 
@@ -1180,64 +1175,44 @@ function 执行次数() {
 
     let language = (gallery_info.服务器 ? gallery_info.服务器 : gallery_info.server);
 
-    //if(setting.执行== "自定义模块"){
-    function Multistage_menu() {
-
-        switch (true) {
-            case language == "日服":
-            case language == "美服":
-                language = "禁用服";
-                break;
-        }
-
-        if (setting.custom.length >= 5 && language == "禁用服") {
-            return ["手动指定关卡+基建", "只执行行动", "只执行基建", "执行剿灭作战+基建", "执行自定义模块"]
-        } else if (setting.custom.length >= 5 && language != "禁用服") {
-            return ["手动指定关卡+基建", "只执行行动", "只执行基建", "执行剿灭作战+基建", "执行上一次作战", "执行自定义模块"]
-        } else if (language == "禁用服") {
-            return ["手动指定关卡+基建", "只执行行动", "只执行基建", "执行剿灭作战+基建"]
-
-        } else {
-            return ["手动指定关卡+基建", "只执行行动", "只执行基建", "执行剿灭作战+基建", "执行上一次作战"]
-        }
-
+    switch (true) {
+        case language == "日服":
+        case language == "美服":
+            language = "禁用服";
+            break;
     }
+
+    var modeGather = {
+        "指定关卡+基建": "常规",
+        "只执行行动": "行动",
+        "只执行基建": "基建",
+        "执行剿灭作战+基建": "剿灭",
+    };
+    if (setting.custom != false) {
+        modeGather["执行自定义模块"] = "自定义模块";
+    }
+    var modeGatherText = Object.keys(modeGather);
+
     //   rewriteView.implement.attr("entries",mCountries)
-    adapter = new android.widget.ArrayAdapter(context, android.R.layout.simple_spinner_item, Multistage_menu());
+    adapter = new android.widget.ArrayAdapter(context, android.R.layout.simple_spinner_item, modeGatherText);
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     rewriteView.implement.setAdapter(adapter);
 
-    switch (setting.执行) {
-        case '常规':
-            rewriteView.implement.setSelection(0);
-            break
-        case '行动':
-            rewriteView.implement.setSelection(1);
-            break;
-        case '基建':
-            rewriteView.implement.setSelection(2);
-            break;
-        case '剿灭':
-            rewriteView.implement.setSelection(3);
+    let SE执行 = modeGatherText.indexOf(setting.执行);
+    if (SE执行 != -1) {
+        rewriteView.implement.setSelection(modeGatherText.indexOf(setting.执行));
+        if (SE执行 == 3) {
             rewriteView.wordname.attr("visibility", "gone")
             rewriteView.wordname3.attr("visibility", "visible");
-
-            break;
-        case '上次':
-            rewriteView.implement.setSelection(4, true);
-            break;
-        case '自定义模块':
-            if (language != "禁用服") {
-                rewriteView.implement.setSelection(5, true);
-            } else {
-                rewriteView.implement.setSelection(4, true);
-
-            }
-            break;
+        }
+    } else {
+        SE执行 = 0;
+        rewriteView.implement.setSelection(0);
     };
+    delete SE执行;
 
-    rewriteDialogs.show()
-    var my_Adapter = new android.widget.AdapterView.OnItemSelectedListener({
+    rewriteDialogs.show();
+    rewriteView.implement.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener({
         onItemSelected: function (parent, view, position, id) {
             ui.run(function () {
                 let r = parent.getSelectedItem();
@@ -1253,11 +1228,11 @@ function 执行次数() {
 
             })
         }
-    })
-    rewriteView.implement.setOnItemSelectedListener(my_Adapter);
+    }));
+
 
     function 输入框事件() {
-        var Executionsettingss = rewriteView.implement.getSelectedItemPosition();
+        let Executionsettingss = rewriteView.implement.getSelectedItemPosition();
         switch (Executionsettingss) {
             case 0:
                 tool.writeJSON("执行", "常规");
@@ -1275,19 +1250,11 @@ function 执行次数() {
                 tool.writeJSON("剿灭", "5")
                 break;
             case 4:
-                if (language != "禁用服") {
-                    tool.writeJSON("执行", "上次");
-                } else {
-                    tool.writeJSON("执行", "自定义模块");
-
-                }
-                break;
-            case 5:
                 tool.writeJSON("执行", "自定义模块");
                 break;
         };
 
-        var rwt = rewriteView.wordname.text(),
+        let rwt = rewriteView.wordname.text(),
             rwt2 = rewriteView.wordname2.text(),
             rwt3 = rewriteView.wordname3.text()
 
@@ -1355,21 +1322,22 @@ function 执行次数() {
                 case "剿灭":
                     window.name.setText("剿灭作战");
                     break;
-                case "上次":
-                    window.name.setText("上次作战");
-                    break;
                 case "定时剿灭":
                     window.name.setText("定时剿灭");
                     break;
                 case "自定义模块":
                     window.name.setText("明日计划");
                     break;
+            };
+            if (setting.指定关卡.levelAbbreviation == "上次") {
+                window.name.setText("上次作战");
             }
 
         });
         rewriteDialogs.dismiss();
 
     }
+
 }
 
 function 主页设置() {
@@ -1598,19 +1566,19 @@ function 暂停(form) {
         window.功能.setDataSource(功能图标);
     });
 
-    progra = tool.script_locate("progra");
+    progra = tool.script_locate("progra.js");
     if (progra) {
         progra.emit("暂停", "结束程序");
     }
- 
+
     tool.writeJSON("侧边", "0");
     setTimeout(function () {
-        progra = tool.script_locate("progra");
+        progra = tool.script_locate("progra.js");
         if (progra) {
             progra.emit("暂停", "结束程序");
         }
     }, 500);
-    
+
     //判断不是手动暂停的
 
     if (active_end == false && setting.侧边 != "公招") {
@@ -1626,7 +1594,7 @@ function 暂停(form) {
         }
 
         tool.writeJSON("已兑理智", 0);
-       
+
     }
 
     /*setTimeout(function() {
@@ -1841,7 +1809,7 @@ tool.writeJSON("已兑理智", 0)
 程序(setting.执行);
 
 function 程序(implem) {
-   
+
     ui.run(function () {
         if (setting.执行 != "剿灭") {
             window.tod.setText("行动：已执" + setting.已执行动 + "次，上限" + setting.行动 + "次");
@@ -1892,24 +1860,24 @@ function 程序(implem) {
 
 
         setTimeout(function () {
-            if (!active_end&&!tool.script_locate("progra.js")) {
-                  switch (window.tos.text()) {
-                        case "状态：主程序暂停中":
-                            break
-                        case "状态：识别结束，暂停中":
-                            break;
-                        case "状态：暂停，未安装插件":
-                            break;
-                        default:
-                            toastLog("PRTS辅助启动失败，请尝试重新启动");
-                            暂停();
-                            ui.run(function () {
-                                window.tos.setText("状态：PRTS辅助启动失败");
-                            })
-                            return
-                    }
+            if (!active_end && !tool.script_locate("progra.js")) {
+                switch (window.tos.text()) {
+                    case "状态：主程序暂停中":
+                        break
+                    case "状态：识别结束，暂停中":
+                        break;
+                    case "状态：暂停，未安装插件":
+                        break;
+                    default:
+                        toastLog("PRTS辅助启动失败，请尝试重新启动");
+                        暂停();
+                        ui.run(function () {
+                            window.tos.setText("状态：PRTS辅助启动失败");
+                        })
+                        return
                 }
-            
+            }
+
             return
         }, 5000);
 

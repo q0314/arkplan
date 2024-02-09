@@ -63,7 +63,7 @@ ui.layout(
 
                                         {/* 下载按钮图标 */}
                                         <img id="download" src="@drawable/ic_move_to_inbox_black_48dp" tint="#CCCCCC" bg="{{img_scriptIconColor}}"
-                                            w="30" h="30"  layout_gravity="center|right" />
+                                            w="30" h="30" layout_gravity="center|right" />
 
                                     </horizontal >
 
@@ -74,19 +74,19 @@ ui.layout(
                                             text="开发者：{{this.developer ? this.developer : '佚名'}}"
                                             maxLines="1" ellipsize="end" />
                                         {/* 脚本版本号 */}
-                                        <text id="version"  textSize="10sp"
+                                        <text id="version" textSize="10sp"
                                             textColor="{{textColor}}" text="版本号：{{this.version}}"
                                             marginLeft="15" maxLines="1" ellipsize="end" />
                                         {/* 更新时间 */}
-                                        <text id="update_time"  textSize="10sp" textColor="{{textColor}}"
+                                        <text id="update_time" textSize="10sp" textColor="{{textColor}}"
                                             text="更新时间：{{this.update_time ? this.update_time : '未知'}}"
-                                            marginLeft="10" maxLines="1"  ellipsize="end" />
+                                            marginLeft="10" maxLines="1" ellipsize="end" />
                                     </horizontal>
 
                                     {/* 开发者的话 */}
-                                    <text id="description" textSize="13sp"  textColor="#dcdcdc"
+                                    <text id="description" textSize="13sp" textColor="#dcdcdc"
                                         text="开发者的话：{{this.description ? this.description : '这个人什么也不想说' }}"
-                                        margin="10 2"  ellipsize="end" />
+                                        margin="10 2" ellipsize="end" />
                                     {/* 分割线填充 */}
                                     <View id="fill_line" w="*" h="1" bg="{{color}}">
                                     </View>
@@ -100,7 +100,7 @@ ui.layout(
                     <frame> {/** 第二屏布局*/}
                         <vertical>
                             <list id="files_1" layout_weight="1" >
-                             <vertical w="*">
+                                <vertical w="*">
                                     <horizontal layout_height="wrap_content" margin="10 5"
                                     >
                                         {/* 脚本Icon */}
@@ -122,10 +122,10 @@ ui.layout(
 
                                         {/* 下载按钮图标 */}
                                         <img id="download" src="@drawable/ic_move_to_inbox_black_48dp" tint="#CCCCCC" bg="{{img_scriptIconColor}}"
-                                            w="30" h="30"  layout_gravity="center|right" />
+                                            w="30" h="30" layout_gravity="center|right" />
 
                                     </horizontal >
-                                    
+
                                     {/* 开发者名称 */}
                                     <horizontal layout_width="wrap_content" layout_height="wrap_content" margin="10 -5 5 0">
                                         <text id="developer"
@@ -133,19 +133,19 @@ ui.layout(
                                             text="开发者：{{this.developer ? this.developer : '佚名'}}"
                                             maxLines="1" ellipsize="end" />
                                         {/* 脚本版本号 */}
-                                        <text id="version"  textSize="10sp"
+                                        <text id="version" textSize="10sp"
                                             textColor="{{textColor}}" text="版本号：{{this.version}}"
                                             marginLeft="15" maxLines="1" ellipsize="end" />
                                         {/* 更新时间 */}
-                                        <text id="update_time"  textSize="10sp" textColor="{{textColor}}"
+                                        <text id="update_time" textSize="10sp" textColor="{{textColor}}"
                                             text="更新时间：{{this.update_time ? this.update_time : '未知'}}"
-                                            marginLeft="10" maxLines="1"  ellipsize="end" />
+                                            marginLeft="10" maxLines="1" ellipsize="end" />
                                     </horizontal>
 
                                     {/* 开发者的话 */}
-                                    <text id="description" textSize="13sp"  textColor="#dcdcdc"
+                                    <text id="description" textSize="13sp" textColor="#dcdcdc"
                                         text="开发者的话：{{this.description ? this.description : '这个人什么也不想说' }}"
-                                        margin="10 2"  ellipsize="end" />
+                                        margin="10 2" ellipsize="end" />
                                     {/* 分割线填充 */}
                                     <View id="fill_line" w="*" h="1" bg="{{color}}">
                                     </View>
@@ -158,11 +158,11 @@ ui.layout(
 
                     <frame> {/** 第三屏布局*/}
                         <list id="files_2" layout_weight="1" >
-                        <vertical w="*">
-                                    <horizontal layout_height="wrap_content" margin="10 5"
-                                    >
-                                        {/* 脚本Icon */}
-                                        {/*
+                            <vertical w="*">
+                                <horizontal layout_height="wrap_content" margin="10 5"
+                                >
+                                    {/* 脚本Icon */}
+                                    {/*
                                         <img src="@drawable/ic_cloud_done_black_48dp"
                                         tint="white"
                                         bg ="{{img_scriptIconColor}}"
@@ -170,45 +170,45 @@ ui.layout(
                                         h="35"
                                         margin="10 5 10 2" />
                                         */}
-                                        {/* 脚本名称 */}
-                                        <text id="script_name" textSize="16sp" textColor="#FFFFFF" text="{{this.script_name}}"
-                                            maxLines="1" ellipsize="end" layout_gravity="center|left" />
-                                        {/**把布局左边占满,让剩下的布局靠右*/}
-                                        <linear layout_width="0dp"
-                                            layout_weight="1">
-                                        </linear>
+                                    {/* 脚本名称 */}
+                                    <text id="script_name" textSize="16sp" textColor="#FFFFFF" text="{{this.script_name}}"
+                                        maxLines="1" ellipsize="end" layout_gravity="center|left" />
+                                    {/**把布局左边占满,让剩下的布局靠右*/}
+                                    <linear layout_width="0dp"
+                                        layout_weight="1">
+                                    </linear>
 
-                                        {/* 下载按钮图标 */}
-                                        <img id="download" src="@drawable/ic_move_to_inbox_black_48dp" tint="#CCCCCC" bg="{{img_scriptIconColor}}"
-                                            w="30" h="30"  layout_gravity="center|right" />
+                                    {/* 下载按钮图标 */}
+                                    <img id="download" src="@drawable/ic_move_to_inbox_black_48dp" tint="#CCCCCC" bg="{{img_scriptIconColor}}"
+                                        w="30" h="30" layout_gravity="center|right" />
 
-                                    </horizontal >
-                                    
-                                    {/* 开发者名称 */}
-                                    <horizontal layout_width="wrap_content" layout_height="wrap_content" margin="10 -5 5 0">
-                                        <text id="developer"
-                                            textSize="10sp" textColor="{{textColor}}"
-                                            text="开发者：{{this.developer ? this.developer : '佚名'}}"
-                                            maxLines="1" ellipsize="end" />
-                                        {/* 脚本版本号 */}
-                                        <text id="version"  textSize="10sp"
-                                            textColor="{{textColor}}" text="版本号：{{this.version}}"
-                                            marginLeft="15" maxLines="1" ellipsize="end" />
-                                        {/* 更新时间 */}
-                                        <text id="update_time"  textSize="10sp" textColor="{{textColor}}"
-                                            text="更新时间：{{this.update_time ? this.update_time : '未知'}}"
-                                            marginLeft="10" maxLines="1"  ellipsize="end" />
-                                    </horizontal>
+                                </horizontal >
 
-                                    {/* 开发者的话 */}
-                                    <text id="description" textSize="13sp"  textColor="#dcdcdc"
-                                        text="开发者的话：{{this.description ? this.description : '这个人什么也不想说' }}"
-                                        margin="10 2"  ellipsize="end" />
-                                    {/* 分割线填充 */}
-                                    <View id="fill_line" w="*" h="1" bg="{{color}}">
-                                    </View>
+                                {/* 开发者名称 */}
+                                <horizontal layout_width="wrap_content" layout_height="wrap_content" margin="10 -5 5 0">
+                                    <text id="developer"
+                                        textSize="10sp" textColor="{{textColor}}"
+                                        text="开发者：{{this.developer ? this.developer : '佚名'}}"
+                                        maxLines="1" ellipsize="end" />
+                                    {/* 脚本版本号 */}
+                                    <text id="version" textSize="10sp"
+                                        textColor="{{textColor}}" text="版本号：{{this.version}}"
+                                        marginLeft="15" maxLines="1" ellipsize="end" />
+                                    {/* 更新时间 */}
+                                    <text id="update_time" textSize="10sp" textColor="{{textColor}}"
+                                        text="更新时间：{{this.update_time ? this.update_time : '未知'}}"
+                                        marginLeft="10" maxLines="1" ellipsize="end" />
+                                </horizontal>
 
-                                </vertical>
+                                {/* 开发者的话 */}
+                                <text id="description" textSize="13sp" textColor="#dcdcdc"
+                                    text="开发者的话：{{this.description ? this.description : '这个人什么也不想说' }}"
+                                    margin="10 2" ellipsize="end" />
+                                {/* 分割线填充 */}
+                                <View id="fill_line" w="*" h="1" bg="{{color}}">
+                                </View>
+
+                            </vertical>
                         </list>
 
                     </frame>
@@ -473,8 +473,12 @@ function download(url, name) {
             }
         } else if (X.name == "结果") {
             if (X.data == "下载完成") {
-                datali = events.broadcast.listeners("download" + datali.id)[0];
-                events.broadcast.removeListener("download" + datali.id, datali);
+                try {
+                    datali = events.broadcast.listeners("download" + datali.id)[0];
+                    events.broadcast.removeListener("download" + datali.id, datali);
+                } catch (e) {
+                    console.error(e);
+                }
                 if (progressDialog) {
                     progressDialog.setContent("正在解压中...");
                 }

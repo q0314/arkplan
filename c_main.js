@@ -1290,7 +1290,8 @@ function 开始运行jk(jk, tips_) {
     $settings.setEnabled('foreground_service', true);
     new_ui("悬浮窗");
     //engines.execScriptFile("./Floaty.js");
-    console.info('版本信息：c_' + toupdate.get_packageName_version(packageName))
+    console.info('应用版本信息：' + toupdate.getPackageName(packageName))
+    console.info('项目版本信息: ',toupdate.getLocalVerName())
     console.info('device info: ' + device.brand + " " + device.product + " " + device.release);
     console.info('设备分辨率：' + device.height + "×" + device.width);
     console.info('图库分辨率: ' + JSON.stringify(gallery_info.分辨率 ? gallery_info.分辨率 : gallery_info.resolution));
@@ -1410,8 +1411,8 @@ threads.start(function () {
         }
     })
     console.verbose("开始检查更新")
-
-    toupdate.updata(false, server + "Versionlog.json");
+    toupdate.updata(ui.drawerFrame)
+   // toupdate.updata(false, server + "Versionlog.json");
 
 })
 

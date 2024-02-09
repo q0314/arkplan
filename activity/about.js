@@ -1,6 +1,8 @@
 "ui";
 importClass(android.graphics.Color);
 importClass(android.graphics.drawable.GradientDrawable);
+let theme = require("../theme.js");
+const language = theme.getLanguage("about");
 
 let toupdate;
 
@@ -12,7 +14,9 @@ server = $crypto.decrypt(server, key, "AES", {
     "input": "base64",
     "output": "string"
 });
-if (!jlink_mian) {
+try {
+    jlink_mian
+} catch (e) {
     threads.start(function () {
 
         http.get(server + "about_link.json", {}, (res, err) => {
@@ -30,13 +34,8 @@ if (!jlink_mian) {
         })
     })
 }
-//Drawable工具
-let mUtil = require('../lib/prototype/drawable.js');
-try {
-    var theme = require("../theme.js")
-} catch (err) {
 
-}
+
 toupdate = require('../lib/to_update.js');
 ui.statusBarColor(theme.bar);
 ui.layout(
@@ -53,14 +52,16 @@ ui.layout(
                                 cardElevation="5dp" gravity="center_vertical" foreground="?android:attr/selectableItemBackgroundBorderless">
 
                                 <vertical paddingBottom="15" bg="#f8ebe6">
-                                    <img src="file://./res/icon.png" margin="0 25 0 10" borderWidth="0dp" w="90" h="90"
+                                    <img src="file://../res/icon.png" margin="0 25 0 10" borderWidth="0dp" w="90" h="90"
                                         layout_gravity="center_horizontal" circle="true" />
                                     <text id="name" textColor="#000000" textStyle="bold" textSize="18sp"
-                                        text="明日计划" gravity="center" />
-                                    <text id="apply_version" text="" margin="0" gravity="center" >
-                                    </text>
-                                    <text id="engine_version" text="引擎版本: Auto.js {{(app.autojs.versionCode > 8082200 ? 'Pro 9.3.11 (64/32位)':'Pro 8.8.13 (32位)')}}" margin="0" gravity="center" >
-                                    </text>
+                                        text="{{language['arkplan']}}" gravity="center" />
+
+                                    <text id="localVerName" text="" margin="0" gravity="center" />
+
+                                    <text id="apply_version" text="" margin="0" gravity="center" />
+                                    <text id="engine_version" text="引擎版本: Auto.js {{(app.autojs.versionCode > 8082200 ? 'Pro 9.3.11 (64/32位)':'Pro 8.8.13 (32位)')}}" margin="0" gravity="center" />
+
 
                                 </vertical>
 
@@ -123,17 +124,10 @@ ui.layout(
                                         </horizontal>
                                     </card>
 
-                                    <card w="*" id="indx2" h="40" >
-                                        <horizontal id="developer" gravity="center_vertical" foreground="?android:attr/selectableItemBackgroundBorderless">
-                                            <text textSize="15" text="应用图标作者:Rosalindlo" textColor="#080808" margin="25 0 0 0" gravity="center_vertical" />
-                                            <text layout_weight="1" />
-                                        </horizontal>
-                                    </card>
-
-
 
                                 </vertical>
                             </card>
+
                             <card w="*" id="indx2" margin="10 3 10 3" h="auto" cardCornerRadius="10"
                                 cardElevation="5dp" gravity="center_vertical"  >
                                 <vertical>
@@ -141,6 +135,36 @@ ui.layout(
                                         gravity="center|left" textSize='16sp' textColor='{{theme.bar}}'>
                                     </text>
                                     <card w="*" id="indx2" h="240" >
+                                        <list id="app_Help_list">
+                                            <horizontal foreground="?android:attr/selectableItemBackgroundBorderless" w="*" h="40">
+                                                <text textSize="15" text="{{this.title}}" textColor="#080808" margin="25 10 0 10" gravity="center_vertical" layout_weight="1" />
+                                            </horizontal>
+                                        </list>
+                                    </card>
+                                </vertical>
+                            </card>
+                            <card w="*" id="indx2" margin="10 3 10 3" h="auto" cardCornerRadius="10"
+                                cardElevation="5dp" gravity="center_vertical"  >
+                                <vertical>
+                                    <text text='源代码' margin="10 5 10 0" h="35dp" id="text_bg"
+                                        gravity="center|left" textSize='16sp' textColor='{{theme.bar}}'>
+                                    </text>
+                                    <card w="*" id="indx2" h="40" >
+                                        <horizontal id="github" gravity="center_vertical" foreground="?android:attr/selectableItemBackgroundBorderless">
+                                            <text textSize="15" text="GitHub:qiao34653/arkplan" textColor="#080808" margin="25 0 0 0" gravity="center_vertical" />
+                                            <text layout_weight="1" />
+                                        </horizontal>
+                                    </card>
+                                </vertical>
+                            </card>
+
+                            <card w="*" id="indx2" margin="10 3 10 3" h="auto" cardCornerRadius="10"
+                                cardElevation="5dp" gravity="center_vertical"  >
+                                <vertical>
+                                    <text text='特别感谢' margin="10 5 10 0" h="35dp" id="text_bg"
+                                        gravity="center|left" textSize='16sp' textColor='{{theme.bar}}'>
+                                    </text>
+                                    <card w="*" id="indx2" h="auto" >
                                         <list id="Help_list">
                                             <horizontal foreground="?android:attr/selectableItemBackgroundBorderless" w="*" h="40">
                                                 <text textSize="15" text="{{this.title}}" textColor="#080808" margin="25 10 0 10" gravity="center_vertical" layout_weight="1" />
@@ -169,6 +193,8 @@ ui.toolbar.setNavigationOnClickListener({
     },
 });
 
+//Drawable工具
+let mUtil = require('../lib/prototype/drawable.js');
 //创建指定大小的Drawable
 let mDrawable = mUtil.create("返回", 25);
 
@@ -178,12 +204,13 @@ mDrawable.setTint(colors.parseColor('#000000'));
 
 //更改返回键图标
 activity.getSupportActionBar().setHomeAsUpIndicator(mDrawable);
+delete mUtil;
+delete mDrawable;
 
-ui.ai.on("click", () => toast("你喜欢我吗"));
+ui.ai.on("click", () => toast(language['like']));
 let edition = jiance()
-
+ui.localVerName.setText(language['localVerName'] + toupdate.getLocalVerName())
 ui.apply_version.setText("应用版本：" + edition.replace("main.js", "") + app.versionName);
-var age = storages.create("Doolu_download");
 
 ui.menu.setDataSource([{
     title: "QQ：梦月時謌",
@@ -226,66 +253,97 @@ ui.menu.on("item_click", item => {
     }
 })
 
-ui.Help_list.setDataSource([{
+ui.app_Help_list.setDataSource([{
     title: "问题帮助",
-    icon: "@drawable/ic_settings_black_48dp"
+    icon: "@drawable/ic_settings_black_48dp",
+    action() {
+        new_ui(jlink_mian.疑惑解答)
+    }
 },
 {
     title: "官方频道",
-    icon: "@drawable/ic_assessment_black_48dp"
+    icon: "@drawable/ic_assessment_black_48dp",
+    action() {
+         try {
+            app.startActivity({
+                packageName: "com.tencent.mobileqq",
+                data:
+                    "mqqapi://forward/url?src_type=web&style=default&plg_auth=1&version=1&url_prefix=" + $base64.encode(jlink_mian.频道url),
+            });
+
+        } catch (err) {
+            toastLog("请先安装QQ或升级QQ");
+        }
+    }
 }, {
     title: "加入群聊",
     icon: "",
+    action() {
+        try {
+            $app.startActivity({
+                data: "mqqapi://card/show_pslcard?card_type=group&uin=" + jlink_mian.群号,
+            })
+        } catch (err) {
+            toastLog("请先安装QQ或升级QQ\n群号：" + jlink_mian.群号)
+        }
+    }
 },
 {
     title: "使用说明",
-    icon: "@drawable/ic_settings_black_48dp"
+    icon: "@drawable/ic_settings_black_48dp",
+    action() {
+        new_ui(jlink_mian.使用说明)
+    }
 }, {
     title: "视频教程",
-    icon: "@drawable/ic_settings_black_48dp"
+    icon: "@drawable/ic_settings_black_48dp",
+    action() {
+        new_ui(jlink_mian.视频教程);
+    }
 }, {
     title: "关于应用",
     icon: "",
+    action() {
+        new_ui(jlink_mian.关于应用);
+    }
 }
 
 ]);
 
-ui.Help_list.on("item_click", item => {
-    switch (item.title) {
-        case "官方频道":
-            qq跳转频道(jlink_mian.频道url);
-            break;
-        case "加入群聊":
-            try {
-                $app.startActivity({
-                    data: "mqqapi://card/show_pslcard?card_type=group&uin=" + jlink_mian.群号,
-                })
-            } catch (err) {
-                toastLog("请先安装QQ或升级QQ\n群号：" + jlink_mian.群号)
-            }
-            break
-        case "问题帮助":
-            new_ui(jlink_mian.疑惑解答)
-            // age.put("url", jlink_mian.疑惑解答);
-            //  engines.execScript("browser_ui", java.lang.String.format("'ui';  var theme = storages.create('configure').get('theme_colors');require('./lib/Builtinbrowser.js');"));
-            break;
-        case "使用说明":
-            new_ui(jlink_mian.使用说明)
-            /*
-            age.put("url", jlink_mian.使用说明);
-            engines.execScript("browser_ui", java.lang.String.format("'ui';  var theme = storages.create('configure').get('theme_colors');require('./lib/Builtinbrowser.js');"));
-          */
-            break;
-        case "视频教程":
-            new_ui(jlink_mian.视频教程);
-            break;
-        case "关于应用":
-            new_ui(jlink_mian.关于应用)
-            break
+ui.app_Help_list.on("item_click", item => {
+    eval(item.action())
+});
+
+
+ui.Help_list.setDataSource([
+    {
+        title: "应用图标作者:Rosalindlo",
+        action() {
+            app.openUrl("https://space.bilibili.com/352372683");
+        }
+    },
+    {
+        title: "Gitee:xxyz30/skyland-auto-sign",
+        action() {
+            app.openUrl("https://gitee.com/FancyCabbage/skyland-auto-sign");
+        },
+    },
+    {
+        title: "GitHub:blueskybone/ArkScreen",
+        action() {
+            app.openUrl("https://github.com/blueskybone/ArkScreen");
+        }
+    }, {
+        title: "GitHub:SuperMonster003/Ant-Forest/",
+        action() {
+            app.openUrl("https://github.com/SuperMonster003/Ant-Forest");
+        }
     }
-})
+]);
 
-
+ui.Help_list.on("item_click", (item, i, itemView) => {
+    eval(item.action());
+});
 ui.pasle.click(() => {
     let pasle_ui = ui.inflate(
         <vertical id="parent">
@@ -293,7 +351,7 @@ ui.pasle.click(() => {
                 <ScrollView>
                     <vertical>
                         <horizontal margin="0" bg="#00000000">
-                            <img src="file://res/icon.png" w="50" h="30" margin="0 5" />
+                            <img src="file://../res/icon.png" w="50" h="30" margin="0 5" />
                             <text text="版本分支管理" layout_gravity="left|center_vertical" textColor="#000000" />
                             <horizontal w="*" h="*" gravity="right" clickable="true" >
                                 <img id="exit" src="@drawable/ic_clear_black_48dp" layout_gravity="center" w="35" height="35" padding="5" marginRight="5" foreground="?selectableItemBackground" />
@@ -378,8 +436,8 @@ ui.pasle.click(() => {
             toastLog("已是" + dangqian + "版")
             return
         }
-        files.rename("./main.js", dangqian);
-        files.rename("./" + banben, "main.js");
+        files.rename("../main.js", dangqian);
+        files.rename("../" + banben, "main.js");
 
         let execution = engines.all();
         for (let i = 0; i < execution.length; i++) {
@@ -390,7 +448,7 @@ ui.pasle.click(() => {
                 execution[i].forceStop()
             }
         }
-        engines.execScriptFile("./main.js");
+        engines.execScriptFile("../main.js");
         console.info("切换" + banben + "版成功")
         exit();
 
@@ -423,12 +481,12 @@ function setBackgroundRoundedRectangle(view, w, bg) {
 
 function jiance(banben) {
     switch (true) {
-        case files.exists("./f_main.js") && files.exists("./c_main.js"):
+        case files.exists("../f_main.js") && files.exists("../c_main.js"):
             return "w_main.js"
-        case files.exists("./c_main.js") && files.exists("./w_main.js"):
+        case files.exists("../c_main.js") && files.exists("../w_main.js"):
 
             return "f_main.js";
-        case files.exists("./w_main.js") && files.exists("./f_main.js"):
+        case files.exists("../w_main.js") && files.exists("../f_main.js"):
             return "c_main.js";
         case true:
             return "null";
@@ -452,25 +510,15 @@ ui.juanzeng.on("click", () => {
 ui.banben.on("click", () => {
     threads.start(function () {
         toupdate.showProgress();
-        toupdate.updata(true, server + "Versionlog.json", undefined)
+        toupdate.updata(ui.frame)
     });
 });
 
-ui.developer.on("click", () => {
-    new_ui("https://space.bilibili.com/352372683");
-});
-/*
-ui.Module_developer.on("click", () => {
-    try {
-        app.startActivity({
-            action: "android.intent.action.VIEW",
-            data: "mqqapi://card/show_pslcard?card_group&uin=" + "421184543",
-            packageName: "com.tencent.mobileqq",
-        });
-    } catch (err) {
-        toastLog("请先安装QQ或升级QQ\nQQ号：421184543")
-    }
-})*/
+
+ui.github.click((view) => {
+    app.openUrl("https://github.com/qiao34653/arkplan");
+})
+
 
 function Historicalupdate() {
     var dialog;
@@ -498,19 +546,7 @@ function Historicalupdate() {
     }
 };
 
-function qq跳转频道(频道分享链接) {
-    try {
 
-        app.startActivity({
-            packageName: "com.tencent.mobileqq",
-            data:
-                "mqqapi://forward/url?src_type=web&style=default&plg_auth=1&version=1&url_prefix=" + $base64.encode(频道分享链接),
-        });
-
-    } catch (err) {
-        toastLog("请先安装QQ或升级QQ")
-    }
-}
 
 function new_ui(url) {
     if (edition == "c_main.js") {

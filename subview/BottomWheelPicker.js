@@ -17,18 +17,22 @@ importClass(com.google.android.material.bottomsheet.BottomSheetBehavior);
 
 importClass(android.view.ContextThemeWrapper);
 importClass(android.content.res.Resources);
+
 var apk_path = "../lib/java/WheelPicker.apk";
+if (!files.exists(apk_path)) {
+    apk_path = "./lib/java/WheelPicker.apk";
+};
 var assetManagerCls = java.lang.Class.forName("android.content.res.AssetManager", true, context.getClass().getClassLoader());
 assetManagerObj = assetManagerCls.newInstance();
 addAssetPathMethod = assetManagerCls.getDeclaredMethod("addAssetPath", java.lang.String);
 addAssetPathMethod.setAccessible(true);
 addAssetPathMethod.invoke(assetManagerObj, files.path(apk_path));
-resources = activity.getResources();
-resources = new Resources(assetManagerObj, resources.getDisplayMetrics(), resources.getConfiguration());
+__resources__ = activity.getResources();
+__resources__ = new Resources(assetManagerObj, __resources__.getDisplayMetrics(), __resources__.getConfiguration());
 mContext = new ContextThemeWrapper(activity, 0);
 mResourcesField = mContext.getClass().getDeclaredField("mResources");
 mResourcesField.setAccessible(true);
-mResourcesField.set(mContext, resources);
+mResourcesField.set(mContext, __resources__);
 
 runtime.loadDex(apk_path);
 importClass(com.aigestudio.wheelpicker.WheelPicker)
@@ -99,7 +103,6 @@ BottomWheelPicker.prototype.build = function (item) {
         }
     }));
 
-
     this.wheelPicker = new WheelPicker(mContext);
     let flParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
     flParams.gravity = Gravity.CENTER;
@@ -126,6 +129,11 @@ BottomWheelPicker.prototype.build = function (item) {
 }
 BottomWheelPicker.prototype.setData = function (data) {
     this.wheelPicker.setData(data);
+    return this;
+}
+BottomWheelPicker.prototype.setTitle = function (data) {
+     this.view.title.setVisibility(0);
+    this.view.title.setText(data);
     return this;
 }
 BottomWheelPicker.prototype.show = function () {
@@ -165,6 +173,7 @@ BottomWheelPicker.prototype.show = function () {
                 if (!this.state && this.ok) {
                     resolve(this.option);
                     this.ok = false;
+                    this.view.tv_agree.setText("确定");
                     this.mBottomSheetDialog.dismiss();
                 }
             },

@@ -159,8 +159,12 @@ function 申请截图() {
                     } else {
                         console.verbose("HUAWEI")
                     }
-                    if (beginBtn = classNameContains("Button").textMatches(/(.*立即开始.*|.*允许.*|.*Start now.*|.*立即開始.*|.*允許.*)/).findOne(20000)) {
+                    if (beginBtn = classNameContains("Button").textMatches(/(.*立即开始.*|.*允许.*|.*Start now.*|.*立即開始.*|.*允許.*)/).findOne(10000)) {
                         //log(beginBtn)
+                        beginBtn.click();
+                    } else if (beginBtn = classNameContains("Button").textMatches(/(.*立即开始.*|.*允许.*|.*Start now.*|.*立即開始.*|.*允許.*)/).findOne(10000)) {
+                        console.info("允许请求截图权限控件信息:")
+                        console.info(beginBtn)
                         beginBtn.click();
                     };
                 })
@@ -358,7 +362,7 @@ function scaleSet(splitScreen, tuku_de, value) {
  * @param {object} list 
  * @param {number} [list.action = undefined] - 找图识别到后立即进行的操作
  * @param {number} [list.timing = 0] - 找图识别到→action操作后等待时间
- * @param {string | number | ObjectArray} [list.area = "全屏"] - 找图识别区域
+ * @param {string | number | ObjectArray} [list.area = "全屏"] - 找图识别区域, 全屏从中划分四角, 1:左上角,2:右上角,3左下角,4:右下角, 可组合
  * @param {number} [list.nods = 0] - 找不到后等待时间
  * @param {object} [list.picture = ITimg.captureScreen_()] - 在指定大图中识别
  * @param {boolean} [list.grayscale = undefined] - 灰度化图片
@@ -563,14 +567,14 @@ function 图像匹配(picture, list) {
  * @param {object} list 
  * @param {number} [list.action = undefined] - ocr识别到后立即进行的操作
  * @param {number} [list.timing = 0]  - ocr识别到后等待时间
- * @param {string | number | ObjectArray} [list.area = "全屏"] - ocr识别区域
+ * @param {string | number | ObjectArray} [list.area = "全屏"] - 找图识别区域, 全屏从中划分四角, 1:左上角,2:右上角,3左下角,4:右下角, 可组合
  * @param {object} [list.picture = ITimg.captureScreen_()] - 在指定大图中识别
  * @param {number} [list.nods = 0] - 没有匹配到相关的文字后等待时间
  * @param {boolean} [list.part = fasle] - text需要包含字符串words的筛选条件
- * @param {boolean} [list.refresh = true] - 是否重新截图界面,在新图片中识别
+ * @param {boolean} [list.refresh = true] - 是否重新截图界面,在新图片中识别, false:不刷新
  * @param {boolean|object} [list.resolution = false] - 使用多分辨率兼容(缩放大图)识别文字
  * @param {object} [list.gather] - 仅在该数据集{text,left,top,right,bottom}中匹配words文字
- * @param {boolean|string} [list.log_policy = false] - 识别结果日志打印策略. '简短' / true:不显示
+ * @param {boolean|string} [list.log_policy = false] - 识别结果日志打印策略. brief:'简短' / true:不显示
  * @param {string} [list.ocr_type = "MlkitOCR"] - ocr扩展类型
  * @param {boolean | object} [list.resolution = false] - 使用多分辨率兼容(调整大图片大小)识别文字,可使用{w:w,h:h}指定大小
  * @param {string} [list.correction_path = false] - ocr识别字符纠正规则json文件路径
@@ -658,17 +662,17 @@ function ocr文字识别(words, list) {
         }
 
 
-        if (!list.gather) result = ITimg[list.ocr_type + "_module"].detect((list.picture || captureScreen_()), {
+        if (!list.gather) ITimg.results = ITimg[list.ocr_type + "_module"].detect((list.picture || captureScreen_()), {
             "region": list.area,
             "rectify_json_path": list.correction_path,
         });
         if (list.action == 6) {
-            return result;
+            return ITimg.results;
         }
     }
     query_ = undefined;
     //true=匹配部分文字
-    list.part ? query_ = (list.gather || result).find(ele => ele.text.indexOf(words) != -1) : query_ = (list.gather || result).find(ele => ele.text == words);
+    list.part ? query_ = (list.gather || ITimg.results).find(ele => ele.text.indexOf(words) != -1) : query_ = (list.gather || ITimg.results).find(ele => ele.text == words);
 
     if (query_ != undefined) {
         if (ITimg.elements.content == words) {
@@ -687,8 +691,7 @@ function ocr文字识别(words, list) {
                 break
             case "brief":
             case "简短":
-                list.gather ? list.gather = "隐藏" : '';
-                console.info("-" + words + " 匹配成功\n--ocr配置：" + JSON.stringify(list) + "\n---内容：" + JSON.stringify(query_));
+                console.info("-" + words + " 匹配成功");
 
                 break
         }
@@ -716,7 +719,7 @@ function ocr文字识别(words, list) {
             case 5:
                 return query_;
             case 6:
-                return result;
+                return ITimg.results;
         }
         sleep(list.timing)
         return true;
@@ -725,7 +728,7 @@ function ocr文字识别(words, list) {
         switch (list.log_policy) {
             case undefined:
             case false:
-                console.error("-" + words + " 未匹配到\n--ocr配置：" + JSON.stringify(list) + "\n---识别结果：" + JSON.stringify(result));
+                console.error("-" + words + " 未匹配到\n--ocr配置：" + JSON.stringify(list) + "\n---识别结果：" + JSON.stringify(ITimg.results));
                 break
             case true:
                 break

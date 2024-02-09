@@ -2,8 +2,12 @@ importClass(android.content.ComponentName);
 let tool = require("./modules/tool.js");
 let setting = tool.readJSON("configure");
 let path_ = context.getExternalFilesDir(null).getAbsolutePath();
+
 //保存对比图后的返回值,保存当前线程
 let agent = 0,
+    /**
+     * 在线程中运行重要逻辑可以避免events无法监听通知
+     */
     threadMain,
     temporary_xy,
     Material_data,
@@ -18,7 +22,15 @@ if (setting.模拟器) {
     if (setting.坐标) {
         setScreenMetrics(width, height);
     };
-}
+};
+let zox = (value) => {
+    return Math.floor((height / 2340) * value);
+}, zoy = (value) => {
+    return Math.floor((width / 1080) * value);
+};
+var displayText = JSON.parse(
+    files.read("./lib/game_data/displayText.json", (encoding = "utf-8"))
+);
 if (setting.企鹅统计 && setting.指定材料) {
     Material_data = tool.readJSON("material_await_obtain");
     try {
@@ -30,18 +42,17 @@ if (setting.企鹅统计 && setting.指定材料) {
     }
 }
 
-threads.start(function () {
-    events.on("暂停", function (words) {
-        log(words);
-        if (words == "继续") {
-            Material_await = "允许";
-            return
-        }
-        device.cancelKeepingAwake()
-        threads.shutDownAll();
-        exit();
-    });
+events.on("暂停", function (words) {
+    log(words);
+    if (words == "继续") {
+        Material_await = "允许";
+        return
+    }
+    device.cancelKeepingAwake()
+    threads.shutDownAll();
+    exit();
 });
+
 let Combat_report = require("./subview/Combat_report.js");
 if (setting.image_memory_manage) {
     // 用于代理图片资源，请勿移除 否则需要手动添加recycle代码
@@ -54,7 +65,6 @@ log("加载图片识别程序");
 let ITimg = require("./ITimg.js"); //读取识图库
 
 new ITimg.Prepare();
-
 
 
 var taglb;
@@ -87,23 +97,8 @@ if (setting.监听键 != "关闭") {
 if (ITimg.exit) {
     sleep(3000);
 }
-switch (setting.侧边) {
-    case "基建":
-        auto();
-        Combat_report.record("开始运行PRTS辅助，执行模式：基建收菜");
-        threadMain = threads.start(基建);
-        break;
-    case "公招":
-        Combat_report.record("开始运行PRTS辅助，执行模式：公招识别");
-        threadMain = threads.start(公招);
-        break;
-    default:
-        auto();
-        Combat_report.record("开始运行PRTS辅助，执行模式：" + setting.执行);
 
-        程序(setting.执行);
-        break;
-};
+程序(setting.执行);
 
 
 function 启动应用(package_) {
@@ -145,7 +140,7 @@ function 启动应用(package_) {
 
     tool.launchPackage(setting.包名);
 
-    sleep(5000);
+    sleep(3000);
     getpackage = tool.currentPackage();
     switch (getpackage) {
         case setting.包名:
@@ -166,6 +161,11 @@ function 启动应用(package_) {
             uiLaunchApp(setting.包名);
             break
     }
+    let start_request = (text("启动应用").findOne(500) || id("permission_group_title").findOne(500));
+    if (start_request) {
+        log("自动允许启动应用");
+        className("android.widget.Button").text("允许").findOne().click();
+    }
     if (setting.音量) {
         tool.writeJSON("当前音量", gmvp);
     }
@@ -183,44 +183,71 @@ function 启动应用(package_) {
 
 
 function 程序(implem) {
-    if (ITimg.exit) {
-        return;
-    }
-    sleep(600);
-    try {
-        if (threadMain) {
-            try {
-                threadMain.interrupt();
-            } catch (e) {
-
-            }
+    threadMain = threads.start(function () {
+        if (ITimg.exit) {
+            return;
         }
+        switch (setting.侧边) {
+            case "基建":
+                auto();
+                Combat_report.record("开始运行PRTS辅助，执行模式：基建收菜");
+                threadMain = threads.start(基建);
+                return;
+            case "公招":
+                Combat_report.record("开始运行PRTS辅助，执行模式：公招识别");
+                threadMain = threads.start(公招);
+                return;
+        }
+        auto();
+        Combat_report.record("开始运行PRTS辅助，执行模式：" + setting.执行);
+        sleep(600);
+
         ITimg.重置计时器(true);
         if (setting.start) {
             启动应用(true);
         };
-        switch (implem) {
+        switch (setting.执行) {
             case "常规":
-                threadMain = threads.start(行动);
-                implem = "行动+基建";
-                break;
             case "行动":
-                threadMain = threads.start(行动);
+                if (setting.指定关卡.levelAbbreviation == "当前") {
+                    Combat_report.record("关卡选择:当前");
+                    threadMain.interrupt();
+                    threadMain = threads.start(行动);
+                } else if (setting.指定关卡.levelAbbreviation == "上次") {
+                    if (ITimg.language == "日服" || ITimg.language == "美服") {
+                        toastLog("上次作战程序已知并不适用于日服/美服，已为您跳转行动");
+                        threadMain.interrupt();
+                        threadMain = threads.start(行动);
+                        break
+                    };
+                    Combat_report.record("关卡选择:上次");
+                    唤醒.main();
+                    if (上次作战()) {
+                        threadMain.interrupt();
+                        threadMain = threads.start(行动);
+                    } else {
+                        toastLog("上一次作战是每周剿灭委托，已为你跳过行动程序，执行基建程序");
+                        if (setting.震动) device.vibrate(1000);
+                        threadMain.interrupt();
+                        threadMain = threads.start(基建);
+                    }
+
+                } else {
+                    唤醒.main();
+                    if (collection.mian(setting.指定关卡)) {
+                        threadMain.interrupt();
+                        threadMain = threads.start(行动);
+                    } else {
+                        console.error("自动选择关卡失败");
+                    }
+                }
+
                 break;
             case "基建":
                 threadMain = threads.start(上次);
                 break;
             case "剿灭":
                 threadMain = threads.start(剿灭);
-                break;
-            case "上次":
-                if (ITimg.language == "日服" || ITimg.language == "美服") {
-                    toastLog("上次作战程序已知并不适用于日服/美服，已为您跳转行动");
-                    threadMain = threads.start(行动);
-                } else {
-                    threadMain = threads.start(上次);
-                }
-                implem = "上一次作战";
                 break;
             case "定时剿灭":
                 threadMain = threads.start(上次);
@@ -233,16 +260,150 @@ function 程序(implem) {
                 break;
         };
         //throw new java.lang.RuntimeException("这是exception")
-    } catch (e) {
-        console.error($debug(e))
-    }
 
 
-    // Combat_report.record("开始运行PRTS辅助，执行模式：" + implem);
+        // Combat_report.record("开始运行PRTS辅助，执行模式：" + implem);
+    });
 };
 
+/**
+ * 进入终端,并检验上一次作战类型,选中非剿灭关卡
+ * @returns 
+ */
+function 上次作战() {
 
+    while (true) {
 
+        tool.Floaty_emit("展示文本", "状态", "状态：判断界面中");
+        ITimg.picture("终端", {
+            action: 0,
+            timing: 1500,
+            area: 2
+        });
+        if (ITimg.picture("上一次作战", {
+            timing: 500,
+            area: "右下半屏",
+            nods: 500,
+        }) && (ITimg.picture("返回", {
+            timing: 200,
+            area: "左上半屏",
+        }) || ITimg.picture("导航", {
+            timing: 200,
+            area: "左上半屏",
+        }) || ITimg.picture("导航2", {
+            timing: 200,
+            area: "左上半屏",
+        }))) {
+            log("验证通过")
+            break;
+        } else {
+            if (ITimg.picture("导航", {
+                action: 0,
+                timing: 1000,
+                area: "上半屏",
+            }) || ITimg.picture("导航2", {
+                action: 0,
+                timing: 1000,
+                area: "上半屏",
+            })) {
+                ITimg.picture("导航_终端", {
+                    action: 0,
+                    timing: 2000,
+                    area: "上半屏",
+                });
+                ITimg.picture("基建_离开", {
+                    action: 0,
+                    timing: 5000,
+                    area: "右半屏",
+                });
+            }
+        };
+
+    }
+    tool.Floaty_emit("展示文本", "状态", "状态：判断上次作战类型中");
+    if (ITimg.picture("上次部署", {
+        area: 4,
+    })) {
+        return false;
+    };
+
+    if (!ITimg.picture("上一次作战", {
+        action: 0,
+        timing: 2000,
+        area: 4,
+    }) && !ITimg.picture("上一次作战", {
+        action: 0,
+        timing: 2000,
+        area: 4,
+        threshold: 0.75,
+    })) {
+        let tips = "上次作战无法确认当前界面,重试";
+        toast(tips);
+        console.error(tips);
+        return false
+    } else {
+        if (ITimg.picture("行动_普通", {
+            area: "右半屏",
+        }) || ITimg.picture("行动_磨难", {
+            threshold: 0.75,
+            area: "右半屏",
+        }) || ITimg.picture("行动_愚人号", {
+            area: "右半屏",
+        }) || ITimg.picture("行动_活动", {
+            area: "右半屏",
+        })) {
+            return true;
+        } else {
+            sleep(1500);
+            return true;
+        }
+    }
+
+}
+
+function 检验是否已选中关卡() {
+    //有开始行动界面才能判断
+    if (ITimg.picture("行动_普通", {
+        action: 5,
+        threshold: 0.75,
+        area: 4,
+    }) || ITimg.picture("行动_磨难", {
+        action: 5,
+        threshold: 0.75,
+        area: 4,
+    }) || ITimg.picture("行动_愚人号", {
+        action: 5,
+        area: 4,
+    }) || ITimg.picture("行动_活动", {
+        action: 5,
+        area: 4,
+        threshold: 0.75,
+    })) {
+
+        if (ITimg.picture("代理_未勾", {
+            action: 0,
+            timing: 1000,
+            area: "右下半屏",
+        }) || ITimg.picture("代理_未勾_愚人号", {
+            action: 0,
+            timing: 1000,
+            area: "右下半屏",
+        }) || ITimg.picture("代理_未勾_活动", {
+            action: 0,
+            timing: 1000,
+            area: "右下半屏",
+        })) { //有开始行动界面才能判断
+            toastlog("自动勾选代理指挥");
+            return true;
+        } else {
+            toast("当前关卡未解锁代理指挥，请选择已勾选可代理的关卡");
+            return false;
+        };
+
+    } else {
+        return false;
+    }
+}
 function 自定义() {
     tool.Floaty_emit("展示文本", "状态", "状态：开始执行自定义模块")
     ITimg.重置计时器(false);
@@ -354,63 +515,208 @@ function 基建换班(fatigue_state) {
 function 上次() {
     sleep(50)
     threadMain.setName("上次作战");
-    let reception = true;
+    唤醒.main();
+
+
     switch (setting.执行) {
-        case '上次':
-            toastLog("两秒后启动上次作战程序");
+        case "定时基建":
+        case "基建":
+            toastLog("两秒后启动基建收菜程序");
+
+            tool.Floaty_emit("展示文本", "状态", "状态：查找基建/导航等");
+            threadMain.interrupt();
+            threadMain = threads.start(基建);
+
             break;
-        case '定时剿灭':
-            toastLog("两秒后启动定时剿灭程序")
+        case "定时剿灭":
+            toastLog("两秒后启动定时剿灭程序");
+            tool.Floaty_emit("展示文本", "状态", "状态：执行定时剿灭中");
+            sleep(500);
+            ITimg.picture("终端", {
+                timing: 1000,
+                area: 2,
+                nods: 1000,
+            });
+            if (!ITimg.picture("上次_剿灭", {
+                action: 0,
+                timing: 2000,
+                nods: 1000,
+                area: "右上半屏",
+            }) && !ITimg.picture("上次_剿灭", {
+                action: 0,
+                timing: 2000,
+                area: "右上半屏",
+                threshold: 0.75,
+            })) {
+
+                toast("没有在终端页面找到待办_剿灭,无法执行上次-剿灭");
+                console.error("没有在终端页面找到待办_剿灭,无法执行上次-剿灭");
+                tool.Floaty_emit("展示文本", "状态", "状态：暂停，找不到待办_剿灭");
+                tool.Floaty_emit("暂停", "结束程序");
+                return false
+
+            }
+            click(height / 2, 25);
+            sleep(1000);
+            click(height, width - 30);
+            sleep(1000);
+            if (!ITimg.picture("上次_龙门外环", {
+                action: 0,
+                timing: 2000,
+                area: "右半屏",
+            })) {
+                click(height - 60, width - 30);
+                sleep(1000);
+                if (!ITimg.picture("上次_龙门外环", {
+                    action: 0,
+                    timing: 2000,
+                    area: "右半屏",
+                })) {
+                    click(height - 120, width - 30);
+                    sleep(1000);
+
+                    if (!ITimg.picture("上次_龙门外环", {
+                        action: 0,
+                        timing: 2000,
+                        area: "右半屏",
+                    })) {
+                        click(height - 180, width - 30);
+                        sleep(1000);
+                        if (!ITimg.picture("上次_龙门外环", {
+                            action: 0,
+                            timing: 2000,
+                            area: "右半屏",
+                        })) {
+                            toast("没有在剿灭页面找到上次_龙门外环,无法执行上次-剿灭");
+                            console.error("没有在剿灭页面找到上次_龙门外环,无法执行上次-剿灭");
+                            tool.Floaty_emit("展示文本", "状态", "状态：暂停，找不到龙门外环");
+                            tool.Floaty_emit("暂停", "结束程序");
+                            return false;
+                        }
+
+                    }
+                }
+
+                //  tool.writeJSON("剿灭", "6");
+                // tool.writeJSON("理智", "3");
+                threadMain.interrupt();
+                threadMain = threads.start(剿灭);
+
+            }
             break;
-        case '定时基建':
-            toastLog("两秒后启动定时基建收菜程序");
-            break;
-        case '基建':
-            // toastLog("两秒后启动基建收菜程序");
-            break;
+
     }
-    tool.Floaty_emit("展示文本", "状态", "状态：唤醒程序运行中...");
 
-    sleep(1000)
+}; //线程
+/**
+     * 负责启动游戏进入到主页
+     */
+let 唤醒 = {
+    main() {
+        tool.Floaty_emit("展示文本", "状态", "状态：唤醒程序运行中...");
 
-    if (!ITimg.picture("终端", {
-        timing: 2000,
-        area: "右半屏"
-    }) && !ITimg.picture("导航", {
-        timing: 1500,
-        area: "左半屏",
-        nods: 2000,
-    }) && !ITimg.picture("终端", {
-        timing: 2000,
-        area: "右半屏"
-    }) && !ITimg.picture("导航", {
-        timing: 1500,
-        area: "左半屏",
-    }) && !ITimg.picture("导航2", {
-        timing: 1500,
-        area: "左半屏",
-    })) {
+        sleep(1500);
+        if (this.确认返回主页()) {
+            return true;
+        }
         启动应用(true);
-        click(height / 2, width / 2);
+        click(height / 2, width - 100);
 
+        sleep(2000);
+        this.开始唤醒();
+        this.取消公告();
+
+
+        return true;
+
+    },
+    确认返回主页() {
+        tool.Floaty_emit("展示文本", "状态", "状态：确认主界面并重连");
+        if (ITimg.picture("终端", {
+            timing: 2000,
+            area: "右半屏"
+        }) || ITimg.picture("基建", {
+            timing: 2000,
+            area: 24,
+        })) {
+            //防止此次需要重连
+            if (ITimg.picture("终端", {
+                timing: 1000,
+                area: "右半屏",
+                action: 0,
+            })) {
+
+                ITimg.picture("返回", {
+                    action: 4,
+                    timing: 3000,
+                    area: "上半屏"
+                });
+            }
+            if (setting.调试) {
+                images.save(ITimg.captureScreen_(), path_ + "/captureScreen/唤醒主页.png");
+                console.verbose("已进入主页,无需重复.");
+            }
+            return true;
+        };
+        //返回到主页
+        if (ITimg.picture("导航", {
+            timing: 1500,
+            area: "左半屏",
+        }) || ITimg.picture("导航2", {
+            timing: 1500,
+            area: "左半屏",
+        })) {
+            while (ITimg.picture("返回", {
+                timing: 1000,
+                action: 0,
+                area: 1,
+            })) {
+                ITimg.picture("基建_离开", {
+                    timing: 5000,
+                    action: 0,
+                    nods: 200,
+                    area: "右半屏",
+                });
+            };
+            if (setting.调试) {
+                images.save(ITimg.captureScreen_(), path_ + "/captureScreen/唤醒主页.png");
+                console.verbose("已进入主页,无需重复..");
+            }
+            return true;
+        };
+    },
+    开始唤醒() {
         tool.Floaty_emit("展示文本", "状态", "状态：等待开始游戏");
         toastLog("等待加载登录");
-        reception = false;
-        sleep(2000);
+        //开始唤醒
         while (true) {
             sleep(1000);
             if (!ITimg.picture("开始唤醒", {
                 action: 0,
                 area: "下半屏",
             })) {
-                //用于确认方舟热更新
-                ITimg.picture("基建_离开", {
-                    timing: 5000,
-                    action: 0,
-                    area: "右半屏",
-                });
-                click(height / 2, width / 2);
-                sleep(1000)
+                //用于确认方舟流量热更新
+                ITimg.picture("基建_离开", { timing: 5000, action: 0, area: "右半屏", });
+                click(height / 2, width - 100);
+                sleep(1000);
+                getpackage = tool.currentPackage();
+                log("前台包名：" + getpackage);
+                if (getpackage == "com.hypergryph.arknights.bilibili") {
+                    tool.Floaty_emit("展示文本", "状态", "状态：当前渠道为B服，等待");
+                    toastLog("当前渠道为B服，请等待")
+                    sleep(3000);
+                    click(height / 2, width - 100);
+                    sleep(3000);
+                    click(height / 2, width - 100);
+                    sleep(2000)
+                    click(height / 2, width - 100);
+                    sleep(2000);
+                    click(height / 2, width - 100);
+                    break;
+                }
+                if (this.确认返回主页()) {
+                    break
+                };
             } else {
                 sleep(2000);
                 if (!ITimg.picture("开始唤醒", {
@@ -421,18 +727,14 @@ function 上次() {
                     break
                 }
             }
-            if (ITimg.picture("终端", {
-                timing: 2000,
-                area: "右半屏"
-            }) || ITimg.picture("导航", {
-                timing: 1500,
-                area: "左半屏",
-            }) || ITimg.picture("导航2", {
-                timing: 1500,
-                area: "左半屏",
-            })) {
-                break
-            };
+
+        }
+    },
+    取消公告() {
+        this.frequency = 0;
+        tool.Floaty_emit("展示文本", "状态", "状态：取消公告签到通知");
+        while (true) {
+
             if (ITimg.picture("关闭公告", {
                 timing: 3000,
                 action: 0,
@@ -441,326 +743,284 @@ function 上次() {
                 timing: 2000,
                 action: 1,
             })) {
-                break
-            };
-            getpackage = tool.currentPackage();
-            log("前台包名：" + getpackage)
-            if (getpackage == "com.hypergryph.arknights.bilibili") {
-                tool.Floaty_emit("展示文本", "状态", "状态：当前渠道为B服，等待");
-                toastLog("当前渠道为B服，请等待")
-                sleep(3000);
-                click(height / 2, width / 2);
-                sleep(3000);
-                click(height / 2, width / 2);
-                sleep(2000)
-                click(height / 2, width / 2);
-                sleep(2000);
-                click(height / 2, width / 2);
-                break;
-            }
-        } //循环
-    } //找不到终端执行开始游戏部分
-
-    while (true) {
-
-        sleep(100);
-        tool.Floaty_emit("展示文本", "状态", "状态：查找公告签到等");
-        let gbdc = ITimg.picture("关闭公告", {
-            timing: 3000,
-            action: 5,
-            area: "上半屏",
-        });
-        if (gbdc) {
-            click(gbdc.x, gbdc.y)
-            sleep(3000)
-        }
-        sleep(100);
-        ITimg.picture("获得物资", {
-            timing: 2000,
-            action: 0,
-            area: "上半屏",
-            nods: 3000
-        });
-        sleep(100);
-        if (!ITimg.picture("终端", {
-            action: 5,
-            area: "右半屏",
-        }) && !ITimg.picture("基建", {
-            action: 5,
-            area: "右半屏",
-        })) {
-
-            ITimg.picture("获得物资", {
-                timing: 500,
-                action: 0,
-                area: "上半屏",
-                nods: 1000
-            });
-            if (gbdc) {
-
-                click(gbdc.x, gbdc.y)
-                sleep(1000)
-            } else {
-                click(height / 2, 100);
-            }
-        }
-        if (setting.执行 != "定时基建" && setting.执行 != "基建") {
-            tool.Floaty_emit("展示文本", "状态", "状态：查找终端导航等");
-            if (!ITimg.picture("终端", {
-                timing: 2000,
-                action: 0,
-                area: "右半屏",
-            })) {
-                sleep(100)
-                if (ITimg.picture("导航", {
+                if (ITimg.picture("终端", {
                     timing: 1500,
-                    action: 0,
-                    area: "左半屏",
-                }) || ITimg.picture("导航2", {
+                    area: "右半屏"
+                }) || ITimg.picture("基建", {
                     timing: 1500,
-                    action: 0,
-                    area: "左半屏",
+                    area: 24,
                 })) {
-                    ITimg.picture("导航_终端", {
-                        timing: 1500,
-                        action: 0,
-                        area: "上半屏",
-                    });
-                    ITimg.picture("基建_离开", {
-                        timing: 3000,
-                        action: 0,
-                        area: "右半屏",
-                    });
-                } else {
-                    sleep(100)
-                    if (ITimg.picture("导航2", {
+                    if (ITimg.picture("终端", {
                         timing: 2000,
-                        action: 0,
-                        area: "上半屏",
+                        area: "右半屏"
+                    }) || ITimg.picture("基建", {
+                        timing: 1500,
+                        area: 24,
                     })) {
-                        ITimg.picture("导航_终端", {
-                            timing: 1500,
-                            action: 0,
-                            area: "上半屏",
-                        });
-                        ITimg.picture("基建_离开", {
-                            timing: 5000,
-                            action: 0,
-                            area: "右半屏",
-                        });
+                        break;
                     };
                 };
             } else {
-                //防止此次需要重连
-                if (reception) {
-                    reception = false;
-                    if (ITimg.picture("返回", {
-                        action: 4,
-                        timing: 3000,
-                        area: "上半屏"
-                    })) {
-                        ITimg.picture("终端", {
-                            action: 0,
-                            timing: 1500,
-                            area: "上半屏"
-                        });
+                //点击边缘位置来取消取消按钮不一样的公告
+                click(height / 2, width - zoy(100));
+                if (ITimg.picture("终端", {
+                    area: 2
+                }) || ITimg.picture("基建", {
+                    area: 24,
+                })) {
+                    if (this.frequency >= 3) {
+                        break;
                     }
-                }
-            }
+                    this.frequency++;
+                };
+                sleep(500);
 
-            sleep(500);
-            tool.Floaty_emit("展示文本", "状态", "状态：判断界面中");
-            if (ITimg.picture("上一次作战", {
-                timing: 500,
-                area: "右下半屏",
-                nods: 3000,
-            }) && (ITimg.picture("返回", {
-                timing: 200,
-                area: "左上半屏",
-            }) || ITimg.picture("导航", {
-                timing: 200,
-                area: "左上半屏",
-            }) || ITimg.picture("导航2", {
-                timing: 200,
-                area: "左上半屏",
-            }))) {
-                log("验证通过")
-                break;
-            } else {
-                if (ITimg.picture("导航", {
-                    action: 0,
-                    timing: 1000,
-                    area: "上半屏",
-                }) || ITimg.picture("导航2", {
-                    action: 0,
-                    timing: 1000,
-                    area: "上半屏",
-                })) {
-                    ITimg.picture("导航_终端", {
-                        action: 0,
-                        timing: 2000,
-                        area: "上半屏",
-                    });
-                    ITimg.picture("基建_离开", {
-                        action: 0,
-                        timing: 5000,
-                        area: "右半屏",
-                    });
-                }
             }
-
-        } else {
-            tool.Floaty_emit("展示文本", "状态", "状态：查找基建/导航等");
-            if (!ITimg.picture("基建", {
-                timing: 500,
-                area: "右半屏",
-            })) {
-                sleep(100)
-                if (ITimg.picture("导航", {
-                    timing: 500,
-                    area: "上半屏",
-                }) || ITimg.picture("导航2", {
-                    timing: 500,
-                    area: "上半屏",
-                })) {
-                    threadMain.interrupt();
-                    threadMain = threads.start(基建);
-                }
-            } else {
-                threadMain.interrupt();
-                threadMain = threads.start(基建);
-            }
-
 
         }
-    } //循环
+    },
 
-    if (setting.执行 != "定时剿灭") {
-        tool.Floaty_emit("展示文本", "状态", "状态：判断上次作战类型中");
-        if (ITimg.picture("上次部署", {
-            timing: 2000,
-            area: "右下半屏",
-        })) {
-            toastLog("上一次作战是每周剿灭委托，已为你跳过行动程序，执行基建程序");
-            if (setting.震动) {
-                device.vibrate(1000);
-            };
-            threadMain.interrupt();
-            threadMain = threads.start(基建);
+}
+let collection = {
+    main(list) {
+        let selectResult;
+        switch (list.levelAbbreviation) {
+            case activity_level:
+            case '1-7':
+
+                selectResult = this.固源岩();
+
+                break;
+
+            case '龙门币-6/5':
+                if (week) {
+                    selectResult = this.资源本(displayText["货物运送"],["CE-6", "CE-5"]);
+                    break
+                } else {
+                    tool.Floaty_emit("展示文本", "状态", "警告：钱本非开放日，跳转经验本...");
+                    //钱_经验本(false);
+                }
+
+            case '经验-6/5':
+
+                selectResult = this.资源本(displayText["战术演习"], ["LS-6", "LS-5"]);
+                break;
+            case '奶/盾芯片':
+            case '奶/盾芯片组':
+                selectResult = this.资源本(displayText["固若金汤"], (this.levelAbbreviation == "奶/盾芯片组") ? "PR-A-2" : "PR-A-1");
+                break;
+            case '术/狙芯片':
+            case '术/狙芯片组':
+                selectResult = this.资源本(displayText["摧枯拉朽"], (this.levelAbbreviation == "术/狙芯片组") ? "PR-B-2" : "PR-B-1");
+                break;
+            case '先/辅芯片':
+            case '先辅狙芯片组':
+                selectResult = this.资源本(displayText["势不可挡"], (this.levelAbbreviation == "先/辅芯片组") ? "PR-C-2" : "PR-C-1");
+                break;
+            case '近/特芯片':
+            case '近/特芯片组':
+                selectResult = this.资源本(displayText["身先士卒"], (this.levelAbbreviation == "近/特芯片组") ? "PR-D-2" : "PR-D-1");
+                break;
+
+        }
+        if (selectResult) {
+            return true;
+            //threadMain.interrupt();
+            //threadMain = threads.start(行动);
+
+        } else {
+            return false;
+        }
+    },
+    /**
+     * 进入终端界面并选择事务
+     * @param {string} affairs - 选择终端事务
+     */
+    终端事务(affairs) {
+        while (true) {
+            tool.Floaty_emit("展示文本", "状态", "状态:进入终端");
+            if (ITimg.ocr(displayText["终端"], {
+                action: 0,
+                timing: 1000,
+                area: 2,
+            }) || ITimg.ocr(displayText["当前"], {
+                action: 0,
+                timing: 1000,
+                area: 2,
+                log_policy: true,
+                refresh: false,
+            })) {
+                tool.Floaty_emit("展示文本", "状态", "状态:切换事务");
+                //以左下角的终端做坐标点击
+                if (this.staging = ITimg.ocr(displayText["终端"], {
+                    action: 5,
+                    area: 34,
+                })) {
+                    switch (affairs) {
+                        case displayText["主题曲"]:
+                            click(this.staging.right + zox(170), this.staging.y);
+                            click(this.staging.right + zox(170) * 2, this.staging.y);
+                            break;
+                        case "插曲":
+                            click(this.staging.right + zox(170) * 3, this.staging.y);
+                            click(this.staging.right + zox(170) * 4, this.staging.y);
+                            break;
+                        case displayText["资源收集"]:
+                            click(this.staging.right + zox(170) * 7, this.staging.y);
+                            click(this.staging.right + zox(170) * 8, this.staging.y);
+                            break;
+                        case displayText["常态事务"]:
+                            click(this.staging.right + zox(170) * 9, this.staging.y);
+                            click(this.staging.right + zox(170) * 10, this.staging.y);
+                            break;
+                        case displayText["长期探索"]:
+                            click(this.staging.right + zox(170) * 11, this.staging.y);
+                            click(this.staging.right + zox(170) * 12, this.staging.y);
+                            break;
+                    }
+                } else {
+                    switch (affairs) {
+                        case displayText["主题曲"]:
+                            click(zox(505), width - zoy(80));
+                            break;
+                        case displayText["资源收集"]:
+                            click(zox(1520), width - zoy(80));
+                            break;
+                        case "长期探索":
+                            click(zox(2200), width - zoy(80));
+                            break;
+                    }
+                };
+                if (ITimg.ocr(affairs, {
+                    area: 34,
+                })) {
+                    break
+                }
+            }
+        }
+    },
+    固源岩() {
+        this.终端事务(displayText["主题曲"]);
+
+        tool.Floaty_emit("展示文本", "状态", "状态:正在进入固源岩关卡");
+
+        sleep(200);
+        if (this.staging = (ITimg.ocr(displayText["残阳"], {
+            action: 5,
+            area: 13,
+        }) || ITimg.ocr(displayText["EPISODE"], {
+            action: 5,
+            area: 13,
+            log_policy: true,
+            refresh: false,
+        }))) {
+            swipe(this.staging.left, this.staging.bottom, this.staging.right, width, 500);
+
         };
 
-        if (!ITimg.picture("上一次作战", {
-            action: 0,
-            timing: 3000,
-            area: "右下半屏",
-        }) && !ITimg.picture("上一次作战", {
-            action: 0,
-            timing: 3000,
-            area: "右下半屏",
-            threshold: 0.75,
+        if (this.staging = ITimg.ocr(displayText["黑暗时代"], {
+            action: 6,
+            area: 34,
+            part: true
         })) {
-            let tips = "上次作战无法确认当前界面,重试";
-            toast(tips);
-            console.error(tips);
-            上次();
-            return
-        } else {
-            sleep(1000);
-            if (ITimg.picture("行动_普通", {
-                timing: 1000,
-                area: "右半屏",
-            }) || ITimg.picture("行动_磨难", {
-                threshold: 0.75,
-                timing: 1000,
-                area: "右半屏",
-            }) || ITimg.picture("行动_愚人号", {
-                timing: 1000,
-                area: "右半屏",
-            }) || ITimg.picture("行动_活动", {
-                timing: 1000,
-                area: "右半屏",
-            })) {
-                threadMain.interrupt();
-                threadMain = threads.start(行动);
-            } else {
-                sleep(1500);
-                threadMain.interrupt();
-                threadMain = threads.start(行动);
-
+            for (let i of this.staging) {
+                click(i.x, i.y);
+                sleep(200);
 
             }
-        }
-    } else {
-        tool.Floaty_emit("展示文本", "状态", "状态：执行定时剿灭中");
-
-        if (!ITimg.picture("上次_剿灭", {
-            action: 0,
-            timing: 2000,
-            nods: 1000,
-            area: "右上半屏",
-        }) && !ITimg.picture("上次_剿灭", {
-            action: 0,
-            timing: 2000,
-            area: "右上半屏",
-            threshold: 0.75,
-        })) {
-
-            toast("没有在终端页面找到待办_剿灭,无法执行上次-剿灭");
-            console.error("没有在终端页面找到待办_剿灭,无法执行上次-剿灭");
-            tool.Floaty_emit("展示文本", "状态", "状态：暂停，找不到待办_剿灭");
-            tool.Floaty_emit("暂停", "结束程序");
-            return
-
-        }
-        click(height / 2, 25);
-        sleep(1000);
-        click(height, width - 30);
-        sleep(1000);
-        if (!ITimg.picture("上次_龙门外环", {
-            action: 0,
-            timing: 2000,
-            area: "右半屏",
-        })) {
-            click(height - 60, width - 30);
             sleep(1000);
-            if (!ITimg.picture("上次_龙门外环", {
+        }
+        (ITimg.ocr("O1", {
+            action: 0,
+            timing: 1000,
+            area: 4,
+        }) || ITimg.ocr("01", {
+            action: 0,
+            timing: 1000,
+            area: 4,
+            refresh: false,
+            log_policy: "brief",
+        }));
+
+        if (ITimg.ocr("1-7", {
+            action: 0,
+            timing: 1000,
+            area: 12,
+        })) {
+            return true;
+        }
+
+
+    },
+    /**
+     * 跳转到资源收集,点击资源入口,选中关卡
+     * @param {string} levelEntrance - 资源关卡入口名
+     * @param {string|Array} levelName - 准确关卡名
+     * @returns 
+     */
+    资源本(levelEntrance, levelName) {
+        this.终端事务(displayText["资源收集"]);
+        while (true) {
+            if (ITimg.ocr(levelEntrance, {
+                timing: 300,
                 action: 0,
-                timing: 2000,
-                area: "右半屏",
+                area: 34,
+                nods: 500,
             })) {
-                click(height - 120, width - 30);
-                sleep(1000);
 
-                if (!ITimg.picture("上次_龙门外环", {
-                    action: 0,
-                    timing: 2000,
-                    area: "右半屏",
+                if (ITimg.ocr(displayText["关卡"], {
+                    timing: 200,
+                    area: 2,
+                    part: true,
                 })) {
-                    click(height - 180, width - 30);
-                    sleep(1000);
-                    if (!ITimg.picture("上次_龙门外环", {
-                        action: 0,
-                        timing: 2000,
-                        area: "右半屏",
-                    })) {
-                        toast("没有在剿灭页面找到上次_龙门外环,无法执行上次-剿灭");
-                        console.error("没有在剿灭页面找到上次_龙门外环,无法执行上次-剿灭");
-                        tool.Floaty_emit("展示文本", "状态", "状态：暂停，找不到龙门外环");
-                        tool.Floaty_emit("暂停", "结束程序");
-                        return
-                    }
+                    console.error(levelEntrance + " 不在开放时间");
+                    return false;
+                };
+                break
 
+            } else {
+                switch (levelEntrance) {
+                    case displayText["粉碎防御"]:
+                    case displayText["货物运送"]:
+                        swipe(height / 2, width / 2, height - 50, width / 2, 500);
+
+                        break;
+                    case displayText["势不可挡"]:
+                    case displayText["身先士卒"]:
+                        swipe(height / 2, width / 2, 50, width / 2, 500);
+
+                        break;
                 }
             }
         }
-        tool.writeJSON("剿灭", "6");
-        tool.writeJSON("理智", "3");
-        threadMain.interrupt();
-        threadMain = threads.start(剿灭);
+        sleep(1000);
+        if (typeof levelName == "object") {
+            if (ITimg.ocr(levelName[1], {
+                action: 0,
+                timing: 1000,
+                area: levelName[1].indexOf("1") ? 13 : 24,
+            }) || ITimg.ocr(levelName[0], {
+                action: 0,
+                timing: 1000,
+                area: levelName[0].indexOf("1") ? 13 : 24,
+                refresh: false,
+                log_policy: "brief"
+            })) {
+                return true;
+            }
+        } else {
+            if (ITimg.ocr(levelName, {
+                action: 0,
+                timing: 1000,
+                area: levelName.indexOf("1") ? 13 : 24,
+            })) {
+                return true;
+            }
+        }
+
 
     }
-}; //线程
-
+}
 function 行动() {
     sleep(1500);
 
@@ -773,7 +1033,7 @@ function 行动() {
     } catch (e) {
         toast(e)
         console.error(e);
-        threads.shutDownAll()
+        threads.shutDownAll();
         exit();
     }
 
@@ -829,36 +1089,41 @@ function 行动() {
                 if (ITimg.picture("行动_普通", {
                     action: 5,
                     threshold: 0.75,
-                    timing: 1000,
                     area: "右半屏",
 
                 }) || ITimg.picture("行动_磨难", {
                     action: 5,
                     threshold: 0.75,
-                    timing: 1000,
                     area: "右半屏",
                 }) || ITimg.picture("行动_愚人号", {
                     action: 5,
-                    timing: 1000,
                     area: "右半屏",
                 }) || ITimg.picture("行动_活动", {
                     action: 5,
-                    timing: 1000,
                     area: "右半屏",
                     threshold: 0.75,
                 })) {
                     tool.Floaty_emit("展示文本", "状态", "状态：校验关卡中");
-                    sleep(10)
-                    if (ITimg.picture("代理_勾", {
-                        timing: 1000,
-                        area: "右下半屏",
+                    sleep(10);
+                    let staging;
+                    if (staging = (ITimg.picture("代理_勾", {
+                        action: 5,
+                        area: 4,
                     }) || ITimg.picture("代理_勾_愚人号", {
-                        timing: 1000,
-                        area: "右下半屏",
+                        action: 5,
+                        area: 4,
                     }) || ITimg.picture("代理_勾_活动", {
-                        timing: 1000,
-                        area: "右下半屏",
-                    })) {
+                        action: 5,
+                        area: 4,
+                    }))) {
+                        if (setting.重置代理次数) {
+
+                            click(staging.left - zox(70), staging.y + staging.h / 2);
+                            sleep(500);
+                            click(staging.left - zox(70), staging.y + staging.h / 2 - zoy(80));
+                            sleep(200);
+                            delete staging;
+                        }
                         tool.Floaty_emit("展示文本", "状态", "状态：正在代理中");
                         if (ITimg.picture("行动_普通", {
                             action: 0,
@@ -993,7 +1258,6 @@ function 行动() {
                 }) || ITimg.picture("理智_确认", {
                     timing: 500,
                     area: "右半屏",
-                    nods: 1500,
                 }) || ITimg.picture("理智_确认", {
                     timing: 500,
                     area: "右半屏",
@@ -1840,7 +2104,7 @@ function 剿灭() {
         tool.Floaty_emit("展示文本", "状态", "状态：等待加载关卡中");
 
     }, 1000); //总循环
-}; //线程
+};
 
 function 基建() {
     /**
@@ -3389,6 +3653,36 @@ function 等待提交反馈至神经() {
 
     return false
 }
+
+function 指定关卡(Manual) {
+    tool.Floaty_emit("面板", "复位");
+
+    try {
+        threadMain.setName("指定关卡");
+    } catch (err) { };
+
+
+    if (ITimg.language != "简中服") {
+        toastLog("非常抱歉，自动指定关卡目前仅简中服可使用");
+        tool.Floaty_emit("面板", "展开");
+        threadMain.interrupt();
+        threadMain = threads.start(任务);
+        return;
+    }
+
+    setting = tool.readJSON("configure");
+    if (!ITimg.initocr()) {
+        tool.Floaty_emit("面板", "展开");
+        return false;
+    }
+
+    collection.choice(setting.指定关卡);
+}
+
+
+
+
+
 function 公招(Manual) {
     Manual = Manual || false;
     let position = 0;
@@ -4074,7 +4368,7 @@ function 公招(Manual) {
     随机招募();
     /**
     if (!检测tag()) {
-
+ 
         if (ITimg.ocr("点击刷新标签", {
             action: 0,
             part: true,
@@ -4113,12 +4407,12 @@ function 公招(Manual) {
                 }
             }
             公招(false);
-
+ 
            return
         } else {
             if (setting.无tag招募) {
                 toastLog("无4星以上tag，执行8小时无tag招募。")
-
+ 
                 随机招募();
                 tool.Floaty_emit("面板", "隐藏");
                 for (let k = 1; k <= 4; k++) {
@@ -4129,15 +4423,15 @@ function 公招(Manual) {
                 log("当前网络似乎略有卡顿")
                 sleep(2000)
                 选择位置(5);
-
+ 
             } else {
                 log("8小时无tag招募：" + setting.无tag招募)
                 选择位置(5);
                 return
             }
         }
-
-
+ 
+ 
     } else {
         */
 

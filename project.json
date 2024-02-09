@@ -5,9 +5,9 @@
   ],
   "assets": [],
   "build": {
-    "build_id": "2676F3B7-1218",
-    "build_number": 1218,
-    "build_time": 1677334779209,
+    "build_id": "F0BEF4D1-1225",
+    "build_number": 1225,
+    "build_time": 1705072038424,
     "release": false
   },
   "encryptLevel": 3,
@@ -85,9 +85,9 @@
   "signingConfig": {
     "alias": "qiao0314",
     "keystore": "/storage/emulated/0/脚本/.keystore/桥2.jks",
-    "uuid": "3c963c5d-b8e8-40e3-ab74-404fbab8bc9f"
+    "uuid": "0d9d596d-ce42-49e6-99d2-d7387fb33d87"
   },
   "useFeatures": [],
-  "versionCode": 2023022543,
-  "versionName": "4.3.2"
+  "versionCode": 2024013044,
+  "versionName": "4.4.7"
 }
