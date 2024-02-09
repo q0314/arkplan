@@ -159,8 +159,12 @@ function 申请截图() {
                     } else {
                         console.verbose("HUAWEI")
                     }
-                    if (beginBtn = classNameContains("Button").textMatches(/(.*立即开始.*|.*允许.*|.*Start now.*|.*立即開始.*|.*允許.*)/).findOne(20000)) {
+                    if (beginBtn = classNameContains("Button").textMatches(/(.*立即开始.*|.*允许.*|.*Start now.*|.*立即開始.*|.*允許.*)/).findOne(10000)) {
                         //log(beginBtn)
+                        beginBtn.click();
+                    } else if (beginBtn = classNameContains("Button").textMatches(/(.*立即开始.*|.*允许.*|.*Start now.*|.*立即開始.*|.*允許.*)/).findOne(10000)) {
+                        console.info("允许请求截图权限控件信息:")
+                        console.info(beginBtn)
                         beginBtn.click();
                     };
                 })
@@ -658,17 +662,17 @@ function ocr文字识别(words, list) {
         }
 
 
-        if (!list.gather) result = ITimg[list.ocr_type + "_module"].detect((list.picture || captureScreen_()), {
+        if (!list.gather) ITimg.results = ITimg[list.ocr_type + "_module"].detect((list.picture || captureScreen_()), {
             "region": list.area,
             "rectify_json_path": list.correction_path,
         });
         if (list.action == 6) {
-            return result;
+            return ITimg.results;
         }
     }
     query_ = undefined;
     //true=匹配部分文字
-    list.part ? query_ = (list.gather || result).find(ele => ele.text.indexOf(words) != -1) : query_ = (list.gather || result).find(ele => ele.text == words);
+    list.part ? query_ = (list.gather || ITimg.results).find(ele => ele.text.indexOf(words) != -1) : query_ = (list.gather || ITimg.results).find(ele => ele.text == words);
 
     if (query_ != undefined) {
         if (ITimg.elements.content == words) {
@@ -687,7 +691,7 @@ function ocr文字识别(words, list) {
                 break
             case "brief":
             case "简短":
-               console.info("-" + words + " 匹配成功");
+                console.info("-" + words + " 匹配成功");
 
                 break
         }
@@ -715,7 +719,7 @@ function ocr文字识别(words, list) {
             case 5:
                 return query_;
             case 6:
-                return result;
+                return ITimg.results;
         }
         sleep(list.timing)
         return true;
@@ -724,7 +728,7 @@ function ocr文字识别(words, list) {
         switch (list.log_policy) {
             case undefined:
             case false:
-                console.error("-" + words + " 未匹配到\n--ocr配置：" + JSON.stringify(list) + "\n---识别结果：" + JSON.stringify(result));
+                console.error("-" + words + " 未匹配到\n--ocr配置：" + JSON.stringify(list) + "\n---识别结果：" + JSON.stringify(ITimg.results));
                 break
             case true:
                 break
