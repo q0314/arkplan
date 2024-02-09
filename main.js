@@ -673,14 +673,16 @@ ui.layout(
     </frame>
 
 );
-let BottomWheelPicker = require('./subview/BottomWheelPicker.js').build({
+/*let BottomWheelPicker = require('./subview/BottomWheelPicker.js').build({
     positiveTextColor: "#FFFFFF",
     positiveBgColor: theme.bar,
     positivestrokeColor: theme.bar,
     itemCount: 7,
-});
-
-change_list(ui.level_pick, ["当前", "上次", "1-7", "龙门币-6/5", "红票", "经验-6/5", "术/狙芯片", "术/狙芯片组", "先/辅芯片", "先/辅芯片组", "近/特芯片", "近/特芯片组"]);
+});*/
+let level_choices = JSON.parse(
+    files.read("./lib/game_data/level_choices.json", (encoding = "utf-8"))
+);
+change_list(ui.level_pick, level_choices);
 ui.level_pick.setBackground(createShape(5, 0, 0, [2, theme.bar]));
 ui.level_pick.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
     onItemSelected: function (parent, view, position, id) {
@@ -1649,9 +1651,7 @@ ui.viewpager.setOnPageChangeListener({
                     }
 
                     if (gallery.gallery_info) {
-                        if (setting.custom.length >= 6 && ui.implement.getCount() == 5) {
-                            change_list(ui.implement, modeGatherText);
-                        } else if (setting.custom == false && ui.implement.getCount() == 6) {
+                        if ((setting.custom.length >= 6 && ui.implement.getCount() == 5) || (setting.custom == false && ui.implement.getCount() == 6)) {
                             change_list(ui.implement, modeGatherText);
                         }
                     }
@@ -1993,65 +1993,68 @@ if (setting.custom != false) {
     modeGather["执行自定义模块"] = "自定义模块";
 }
 var modeGatherText = Object.keys(modeGather);
+
 var SE执行 = ui.implement.getSelectedItemPosition();
 ui.implement.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
     onItemSelected: function (parent, view, Executionsettings, id) {
         // let itext = parent.getSelectedItem()
-        if (Executionsettings != SE执行) {
-            if (Executionsettings != 2 && ui.jijianquyu.getVisibility() == 8) {
-                ui.jijianquyu.setVisibility(0);
-            } else if (Executionsettings != 3 && ui.xingdongquyu.getVisibility() == 8) {
-                ui.xingdongquyu.setVisibility(0);
-            }
-            switch (Executionsettings) {
-                case 0:
-                    toast("你选择的是行动+基建，理智不足以支持下一把时，启动基建程序");
-                    break;
-                case 1:
-                    tool.writeJSON("行动", "999");
-                    ui.jijianquyu.setVisibility(8);
-                    toast("你选择的是只执行行动，默认为999次，行动完成或理智不足以开下一把时直接暂停程序");
-                    break;
-                case 2:
-                    toast("你选择的是只启动基建");
-                    ui.xingdongquyu.setVisibility(8);
-                    break;
-                case 3:
-                    toast("你选择的是剿灭行动，默认为5次，360×5=1800合成玉");
-                    break;
-                case 5:
-
-                    switch (gallery.language) {
-                        case "日服":
-                        case "美服":
-                            toast("当前方舟服务器不支持上一次作战");
-                            Executionsettings = 0;
-                            ui.implement.setSelection(Executionsettings);
-                            break
-                        default:
-                            toast("你选择的是上一次作战，注意不能是剿灭，否则跳转基建程序");
-                            break
-                    }
-                    break;
-                case 4:
-
-                    toastLog("自定义模式")
-                    break;
-            };
-            tool.writeJSON("执行", modeGather[modeGatherText[Executionsettings]]);
-            if (setting.行动理智) {
-                if (Executionsettings == 4) {
-                    ui.mr1.setText("剿灭上限:");
-                    ui.input_extinguish.attr("visibility", "visible");
-                    ui.input_ordinary.attr("visibility", "gone");
-                } else {
-                    ui.mr1.setText("刷图上限:");
-                    ui.input_ordinary.attr("visibility", "visible");
-                    ui.input_extinguish.attr("visibility", "gone");
-                }
-            }
-            SE执行 = ui.implement.getSelectedItemPosition();
+        if (Executionsettings == SE执行) {
+            return false
+        };
+        if (Executionsettings != 2 && ui.jijianquyu.getVisibility() == 8) {
+            ui.jijianquyu.setVisibility(0);
+        } else if (Executionsettings != 3 && ui.xingdongquyu.getVisibility() == 8) {
+            ui.xingdongquyu.setVisibility(0);
         }
+        switch (Executionsettings) {
+            case 0:
+                toast("你选择的是行动+基建，理智不足以支持下一把时，启动基建程序");
+                break;
+            case 1:
+                tool.writeJSON("行动", "999");
+                ui.jijianquyu.setVisibility(8);
+                toast("你选择的是只执行行动，默认为999次，行动完成或理智不足以开下一把时直接暂停程序");
+                break;
+            case 2:
+                toast("你选择的是只启动基建");
+                ui.xingdongquyu.setVisibility(8);
+                break;
+            case 3:
+                toast("你选择的是剿灭行动，默认为5次，360×5=1800合成玉");
+                break;
+            case 4:
+                toastLog("自定义模式");
+                break;
+            case 5:
+
+                switch (gallery.language) {
+                    case "日服":
+                    case "美服":
+                        toast("当前方舟服务器不支持上一次作战");
+                        Executionsettings = 0;
+                        ui.implement.setSelection(Executionsettings);
+                        break
+                    default:
+                        toast("你选择的是上一次作战，注意不能是剿灭，否则跳转基建程序");
+                        break
+                }
+                break;
+
+        };
+        tool.writeJSON("执行", modeGather[modeGatherText[Executionsettings]]);
+        if (setting.行动理智) {
+            if (Executionsettings == 3) {
+                ui.mr1.setText("剿灭上限:");
+                ui.input_extinguish.attr("visibility", "visible");
+                ui.input_ordinary.attr("visibility", "gone");
+            } else {
+                ui.mr1.setText("刷图上限:");
+                ui.input_ordinary.attr("visibility", "visible");
+                ui.input_extinguish.attr("visibility", "gone");
+            }
+        }
+        SE执行 = ui.implement.getSelectedItemPosition();
+
     }
 }));
 
@@ -2963,6 +2966,7 @@ function 开始运行jk(jk, tips_) {
 
 
 threads.start(function () {
+    sleep(500);
     switch (web_set.homepage) {
         case 1:
             Update_UI(1)
@@ -3628,102 +3632,62 @@ function notice() {
 
 
 function Update_UI(i) {
-    switch (i) {
-        case 1:
-            ui.run(() => {
-                SystemUiVisibility(false);
+    if (i == 1) {
+        ui.run(function () {
+            SystemUiVisibility(false);
 
-                //输入法
-                activity.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+            //输入法
+            activity.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-                // if (morikujima_setting != undefined && morikujima_setting.理智数 != false) {
-                initPop()
-                /*   } else {
-                       ui.text_ap.setText("未启用");
-                       ui.selectTime.click(() => {
-                           if (ui.text_ap.getText() != "未启用") {
-                               return
-                           }
-                           dialogs.build({
-                               type: "app-or-overlay",
-                               title: "实时便笺",
-                               content: "是否启用实时便笺功能？\n实时显示当前剩余理智数量，公招完成时间。建议启用(OCR)自动识别。每次脚本刷完关卡后，自动识别剩余理智数量",
-                               checkBoxPrompt: "(OCR)自动识别",
-                               positive: "确认",
-                               negative: "取消",
-                               positiveColor: "#FF8C00",
-                               canceledOnTouchOutside: false
-                           }).on("positive", (dialog) => {
-                               if (dialog.checkBoxPrompt.checked) {
-                                   if (!检测ocr(true)) {
-                                       return;
-                                   }
+            // if (morikujima_setting != undefined && morikujima_setting.理智数 != false) {
+            initPop()
+            /*   } else {
+                   ui.text_ap.setText("未启用");
+                   ui.selectTime.click(() => {
+                       if (ui.text_ap.getText() != "未启用") {
+                           return
+                       }
+                       dialogs.build({
+                           type: "app-or-overlay",
+                           title: "实时便笺",
+                           content: "是否启用实时便笺功能？\n实时显示当前剩余理智数量，公招完成时间。建议启用(OCR)自动识别。每次脚本刷完关卡后，自动识别剩余理智数量",
+                           checkBoxPrompt: "(OCR)自动识别",
+                           positive: "确认",
+                           negative: "取消",
+                           positiveColor: "#FF8C00",
+                           canceledOnTouchOutside: false
+                       }).on("positive", (dialog) => {
+                           if (dialog.checkBoxPrompt.checked) {
+                               if (!检测ocr(true)) {
+                                   return;
                                }
-                               tool.writeJSON("理智数", "0/135", "morikujima_setting")
-                               tool.writeJSON("理智时间", new Date(), "morikujima_setting")
-                               tool.writeJSON("自动识别", dialog.checkBoxPrompt.checked, "morikujima_setting")
-   
-                               morikujima_setting = tool.readJSON("morikujima_setting");
-                               initPop()
-                               ui.text_ap.setText(morikujima_setting.理智数);
-                               ui.selectTime.performClick();
-                           }).show()
-                       })
-                   }
-   */
+                           }
+                           tool.writeJSON("理智数", "0/135", "morikujima_setting")
+                           tool.writeJSON("理智时间", new Date(), "morikujima_setting")
+                           tool.writeJSON("自动识别", dialog.checkBoxPrompt.checked, "morikujima_setting")
+ 
+                           morikujima_setting = tool.readJSON("morikujima_setting");
+                           initPop()
+                           ui.text_ap.setText(morikujima_setting.理智数);
+                           ui.selectTime.performClick();
+                       }).show()
+                   })
+               }
+*/
 
-                ui.module_config_txt.setText("模块\n配置")
+            ui.module_config_txt.setText("模块\n配置")
 
-                if (gallery.gallery_info) {
+            if (gallery.gallery_info) {
 
-                    change_list(ui.implement, modeGatherText);
-                    switch (setting.执行) {
-                        case '常规':
-                            ui.implement.setSelection(0);
-                            break
-                        case '行动':
-                            ui.implement.setSelection(1);
-                            break;
-                        case '基建':
-                            ui.implement.setSelection(2);
-                            break;
-                        case '剿灭':
-                            ui.implement.setSelection(3);
-                            break;
-                        case '上次':
-                            ui.implement.setSelection(4);
-                            break;
-                        case '自定义模块':
-                            //日服美服还不支持上一次作战,没有上次的选项
-                            switch (gallery.language) {
-                                case "日服":
-                                case "美服":
-                                    ui.implement.setSelection(4, true);
-                                    break
-                                default:
-                                    ui.implement.setSelection(5, true);
-                                    break
-                            }
-                            break;
-                    };
-                    SE执行 = ui.implement.getSelectedItemPosition();
+                change_list(ui.implement, modeGatherText);
+
+                SE执行 = modeGatherText.indexOf(setting.执行);
+                if (SE执行 != -1) {
+                    ui.implement.setSelection(modeGatherText.indexOf(setting.执行));
+                } else {
+                    SE执行 = 0;
+                    ui.implement.setSelection(0);
                 }
-                floaty.checkPermission() ? ui.floatyCheckPermission.setVisibility(8) : ui.floatyCheckPermission.setVisibility(0);
-
-                try {
-                    if (setting.换班路径.length >= 5) {
-                        ui.jjhb.attr("visibility", "visible");
-                    } else {
-                        ui.jjhb.attr("visibility", "gone");
-                    }
-                } catch (err) {
-
-                }
-                //判断是否显示无人机加速、加速那个
-                if (!setting.无人机加速) ui.uav_acceleration_list.attr("visibility", "gone");
-                setting.加速生产 ? ui.manufacturing.checked = true : ui.trade.checked = true;
-
-                setting.信用处理.信用购买 ? ui.credit_buy.checked = true : "";
                 if (setting.行动理智) {
                     ui.xlkz.attr("visibility", "visible");
                     if (SE执行 == 3) {
@@ -3732,46 +3696,7 @@ function Update_UI(i) {
                     }
                 } else {
                     ui.xlkz.attr("visibility", "gone");
-                }
-                ui.start.setText(tool.script_locate("Floaty.js") ? "停止运行" : "开始运行");
-
-
-                switch (gallery.language) {
-                    case "日服":
-                    case "美服":
-                        ui.indt.attr("visibility", "gone");
-                        ui.timed_tasks_list.attr("visibility", "gone");
-
-                        return
-                    default:
-                        break
-                }
-                if (mod_data[0] == undefined) {
-                    ui.module_config.attr("visibility", "gone")
-                } else {
-                    ui.module_config.attr("cardCornerRadius", "25dp");
-                }
-                if (setting.音量修复) {
-                    try {
-                        let gmvp = device.getMusicVolume()
-                        device.setMusicVolume(gmvp)
-                    } catch (err) {
-                        tool.dialog_tips("温馨提示", "没有修改系统设置权限！\n仅用于修复部分机型启动游戏后音量异常")
-                    }
-                }
-                //activity.setRequestedOrientation(1);
-
-                ui._bgA.attr("cardCornerRadius", "25dp");
-                setSpinnerAdapter(ui.chooseMaterial, MaterialList);
-                let ItemList = tool.readJSON("material_await_obtain");
-                if (ItemList) {
-                    for (let i = 0; i < ItemList.name.length; i++) {
-                        // let delta = ItemList.number[i] - ItemList.done[i];
-                        if ((ItemList.number - ItemList.done[i]) > 0) {
-                            AddMaterial(ItemList.name[i], ItemList.number[i]);
-                        }
-                    }
-                }
+                };
                 switch (SE执行) {
                     case 1:
                         ui.jijianquyu.setVisibility(8);
@@ -3779,203 +3704,310 @@ function Update_UI(i) {
                     case 2:
                         ui.xingdongquyu.setVisibility(8);
                         break;
+                };
+            }
+            floaty.checkPermission() ? ui.floatyCheckPermission.setVisibility(8) : ui.floatyCheckPermission.setVisibility(0);
+
+            try {
+                if (setting.换班路径.length >= 5) {
+                    ui.jjhb.attr("visibility", "visible");
+                } else {
+                    ui.jjhb.attr("visibility", "gone");
                 }
-                if (!setting.企鹅统计) {
-                    ui.limitMaterial.setVisibility(8)
-                    ui.materialList.setVisibility(8)
+            } catch (err) {
+
+            }
+            //判断是否显示无人机加速、加速那个
+            if (!setting.无人机加速) ui.uav_acceleration_list.attr("visibility", "gone");
+            setting.加速生产 ? ui.manufacturing.checked = true : ui.trade.checked = true;
+
+            setting.信用处理.信用购买 ? ui.credit_buy.checked = true : "";
+
+            ui.start.setText(tool.script_locate("Floaty.js") ? "停止运行" : "开始运行");
+
+
+            switch (gallery.language) {
+                case "日服":
+                case "美服":
+                    ui.indt.attr("visibility", "gone");
+                    ui.timed_tasks_list.attr("visibility", "gone");
+
+                    return
+                default:
+                    break
+            }
+            if (mod_data[0] == undefined) {
+                ui.module_config.attr("visibility", "gone")
+            } else {
+                ui.module_config.attr("cardCornerRadius", "25dp");
+            }
+            if (setting.音量修复) {
+                try {
+                    let gmvp = device.getMusicVolume()
+                    device.setMusicVolume(gmvp)
+                } catch (err) {
+                    tool.dialog_tips("温馨提示", "没有修改系统设置权限！\n仅用于修复部分机型启动游戏后音量异常")
                 }
-                console.verbose("初始化PRTS配置完成")
-            })
-            break
-        case 2:
-            ui.run(() => {
-                let webview = ui.webview
-                let settings = webview.getSettings();
-                if (web_set.computer == true && web_set.web_ua.indexOf("Windows") == -1) {
-                    web_set.web_ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36";
+            }
+            //activity.setRequestedOrientation(1);
+
+            ui._bgA.attr("cardCornerRadius", "25dp");
+            setSpinnerAdapter(ui.chooseMaterial, MaterialList);
+            let ItemList = tool.readJSON("material_await_obtain");
+            if (ItemList) {
+                for (let i = 0; i < ItemList.name.length; i++) {
+                    // let delta = ItemList.number[i] - ItemList.done[i];
+                    if ((ItemList.number - ItemList.done[i]) > 0) {
+                        AddMaterial(ItemList.name[i], ItemList.number[i]);
+                    }
                 }
-                /*  webview.addJavascriptInterface({
-                      showSource:function(html){
-                      log(html)
-                  },
-                  showDescription:function(html){
-                      log(html)
-                  }},"java_obj");
-                  */
-                settings.setUserAgentString(web_set.web_ua);
-                settings.setLoadsImagesAutomatically(true); // 是否自动加载图片
-                settings.setDefaultTextEncodingName("UTF-8"); // 设置默认的文本编码 UTF-8 GBK
-                settings.setJavaScriptEnabled(true); // 设置是否支持js
-                settings.setJavaScriptCanOpenWindowsAutomatically(true); // 设置是否允许js自动打开新窗口, window.open
+            }
 
-                settings.setSupportZoom(true); // 是否支持页面缩放
-                settings.setBuiltInZoomControls(true); // 是否出现缩放工具
-                settings.setUseWideViewPort(true); // 设置webview是否支持viewport
-                settings.setLoadWithOverviewMode(true); // 页面超过容器大小时, 是否将页面缩小到容器能够装下的尺寸
+            if (!setting.企鹅统计) {
+                ui.limitMaterial.setVisibility(8)
+                ui.materialList.setVisibility(8)
+            }
+            console.verbose("初始化PRTS配置完成")
+        })
+    } else {
+        ui.run(() => {
+            let webview = ui.webview
+            let settings = webview.getSettings();
+            if (web_set.computer == true && web_set.web_ua.indexOf("Windows") == -1) {
+                web_set.web_ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36";
+            }
+            /*  webview.addJavascriptInterface({
+                  showSource:function(html){
+                  log(html)
+              },
+              showDescription:function(html){
+                  log(html)
+              }},"java_obj");
+              */
+            settings.setUserAgentString(web_set.web_ua);
+            settings.setLoadsImagesAutomatically(true); // 是否自动加载图片
+            settings.setDefaultTextEncodingName("UTF-8"); // 设置默认的文本编码 UTF-8 GBK
+            settings.setJavaScriptEnabled(true); // 设置是否支持js
+            settings.setJavaScriptCanOpenWindowsAutomatically(true); // 设置是否允许js自动打开新窗口, window.open
+
+            settings.setSupportZoom(true); // 是否支持页面缩放
+            settings.setBuiltInZoomControls(true); // 是否出现缩放工具
+            settings.setUseWideViewPort(true); // 设置webview是否支持viewport
+            settings.setLoadWithOverviewMode(true); // 页面超过容器大小时, 是否将页面缩小到容器能够装下的尺寸
 
 
-                settings.setAppCachePath(context.getExternalFilesDir(null).getAbsolutePath() + "/cache/Webpage/"); // app缓存文件路径
-                settings.setAllowFileAccess(true); // 是否允许访问文件
-                settings.setAppCacheEnabled(true); // 是否启用app缓存
-                settings.setDatabaseEnabled(true); // 是否启用数据库
-                settings.setDomStorageEnabled(true); // 是否本地存储
-                //设置 缓存模式
-                //settings.setCacheMode(WebSettings.LOAD_DEFAULT); // 开启 DOM storage API 功能 
-                //settings.setDomStorageEnabled(true);
-                /* -------------------------WebChromeClient----------------------------------------------- */
+            settings.setAppCachePath(context.getExternalFilesDir(null).getAbsolutePath() + "/cache/Webpage/"); // app缓存文件路径
+            settings.setAllowFileAccess(true); // 是否允许访问文件
+            settings.setAppCacheEnabled(true); // 是否启用app缓存
+            settings.setDatabaseEnabled(true); // 是否启用数据库
+            settings.setDomStorageEnabled(true); // 是否本地存储
+            //设置 缓存模式
+            settings.setCacheMode(WebSettings.LOAD_DEFAULT); // 开启 DOM storage API 功能 
+            settings.setDomStorageEnabled(true);
+            /* -------------------------WebChromeClient----------------------------------------------- */
 
-                let WebViewClient = android.webkit.WebViewClient;
-                let webViewClient = new JavaAdapter(WebViewClient, {
-                    onPageStarted: function (webView, url, bitmap) {
-                        // console.log('页面正在加载');
-                        //  ui.webview.loadUrl("javascript:(function(){if("+web_set.night_mode+" == false){return};const blackList=[\'example.com\'];const hostname=window.location.hostname;const key=encodeURIComponent(\'谷花泰:野径云俱黑，江船火独明:执行判断\');const isBlack=blackList.some(keyword=>{if(hostname.match(keyword)){return true};return false});if(isBlack||window[key]){return};window[key]=true;class ChangeBackground{constructor(){this.init()};init(){this.addStyle(`html,body{background-color:#000!important}*{color:#CCD1D9!important;box-shadow:none!important}*:after,*:before{border-color:#1e1e1e!important;color:#CCD1D9!important;box-shadow:none!important;background-color:transparent!important}a,a>*{color:#409B9B!important}[data-change-border-color][data-change-border-color-important]{border-color:#1e1e1e!important}[data-change-background-color][data-change-background-color-important]{background-color:#000!important}`);this.selectAllNodes(node=>{if(node.nodeType!==1){return};const style=window.getComputedStyle(node,null);const whiteList=[\'rgba(0, 0, 0, 0)\',\'transparent\'];const backgroundColor=style.getPropertyValue(\'background-color\');const borderColor=style.getPropertyValue(\'border-color\');if(whiteList.indexOf(backgroundColor)<0){if(this.isWhiteToBlack(backgroundColor)){node.dataset.changeBackgroundColor=\'\';node.dataset.changeBackgroundColorImportant=\'\'}else{return;delete node.dataset.changeBackgroundColor;delete node.dataset.changeBackgroundColorImportant}};if(whiteList.indexOf(borderColor)<0){if(this.isWhiteToBlack(borderColor)){node.dataset.changeBorderColor=\'\';node.dataset.changeBorderColorImportant=\'\'}else{delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant}};if(borderColor.indexOf(\'rgb(255, 255, 255)\')>=0){delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant;node.style.borderColor=\'transparent\'}})};addStyle(style=\'\'){const styleElm=document.createElement(\'style\');styleElm.innerHTML=style;document.head.appendChild(styleElm)};isWhiteToBlack(colorStr=\'\'){let hasWhiteToBlack=false;const colorArr=colorStr.match(/rgb.+?\\)/g);if(!colorArr||colorArr.length===0){return true};colorArr.forEach(color=>{const reg=/rgb[a]*?\\(([0-9]+),.*?([0-9]+),.*?([0-9]+).*?\\)/g;const result=reg.exec(color);const red=result[1];const green=result[2];const blue=result[3];const deviation=20;const max=Math.max(red,green,blue);const min=Math.min(red,green,blue);if(max-min<=deviation){hasWhiteToBlack=true}});return hasWhiteToBlack};selectAllNodes(callback=()=>{}){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)});this.observe({targetNode:document.documentElement,config:{attributes:false},callback(mutations,observer){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)})}})};observe({targetNode,config={},callback=()=>{}}){if(!targetNode){return};config=Object.assign({attributes:true,childList:true,subtree:true},config);const observer=new MutationObserver(callback);observer.observe(targetNode,config)}};new ChangeBackground()})();");
+            let WebViewClient = android.webkit.WebViewClient;
+            let webViewClient = new JavaAdapter(WebViewClient, {
+                onPageStarted: function (webView, url, bitmap) {
+                    // console.log('页面正在加载');
+                    //  ui.webview.loadUrl("javascript:(function(){if("+web_set.night_mode+" == false){return};const blackList=[\'example.com\'];const hostname=window.location.hostname;const key=encodeURIComponent(\'谷花泰:野径云俱黑，江船火独明:执行判断\');const isBlack=blackList.some(keyword=>{if(hostname.match(keyword)){return true};return false});if(isBlack||window[key]){return};window[key]=true;class ChangeBackground{constructor(){this.init()};init(){this.addStyle(`html,body{background-color:#000!important}*{color:#CCD1D9!important;box-shadow:none!important}*:after,*:before{border-color:#1e1e1e!important;color:#CCD1D9!important;box-shadow:none!important;background-color:transparent!important}a,a>*{color:#409B9B!important}[data-change-border-color][data-change-border-color-important]{border-color:#1e1e1e!important}[data-change-background-color][data-change-background-color-important]{background-color:#000!important}`);this.selectAllNodes(node=>{if(node.nodeType!==1){return};const style=window.getComputedStyle(node,null);const whiteList=[\'rgba(0, 0, 0, 0)\',\'transparent\'];const backgroundColor=style.getPropertyValue(\'background-color\');const borderColor=style.getPropertyValue(\'border-color\');if(whiteList.indexOf(backgroundColor)<0){if(this.isWhiteToBlack(backgroundColor)){node.dataset.changeBackgroundColor=\'\';node.dataset.changeBackgroundColorImportant=\'\'}else{return;delete node.dataset.changeBackgroundColor;delete node.dataset.changeBackgroundColorImportant}};if(whiteList.indexOf(borderColor)<0){if(this.isWhiteToBlack(borderColor)){node.dataset.changeBorderColor=\'\';node.dataset.changeBorderColorImportant=\'\'}else{delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant}};if(borderColor.indexOf(\'rgb(255, 255, 255)\')>=0){delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant;node.style.borderColor=\'transparent\'}})};addStyle(style=\'\'){const styleElm=document.createElement(\'style\');styleElm.innerHTML=style;document.head.appendChild(styleElm)};isWhiteToBlack(colorStr=\'\'){let hasWhiteToBlack=false;const colorArr=colorStr.match(/rgb.+?\\)/g);if(!colorArr||colorArr.length===0){return true};colorArr.forEach(color=>{const reg=/rgb[a]*?\\(([0-9]+),.*?([0-9]+),.*?([0-9]+).*?\\)/g;const result=reg.exec(color);const red=result[1];const green=result[2];const blue=result[3];const deviation=20;const max=Math.max(red,green,blue);const min=Math.min(red,green,blue);if(max-min<=deviation){hasWhiteToBlack=true}});return hasWhiteToBlack};selectAllNodes(callback=()=>{}){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)});this.observe({targetNode:document.documentElement,config:{attributes:false},callback(mutations,observer){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)})}})};observe({targetNode,config={},callback=()=>{}}){if(!targetNode){return};config=Object.assign({attributes:true,childList:true,subtree:true},config);const observer=new MutationObserver(callback);observer.observe(targetNode,config)}};new ChangeBackground()})();");
 
-                        //     console.info(url)
-                        ui.progress.setVisibility(0);
-                    },
-                    onPageFinished: function (webView, curUrl) {
-                        // ui.webview.loadUrl("javascript:(function(){if("+web_set.night_mode+" == false){return};const blackList=[\'example.com\'];const hostname=window.location.hostname;const key=encodeURIComponent(\'谷花泰:野径云俱黑，江船火独明:执行判断\');const isBlack=blackList.some(keyword=>{if(hostname.match(keyword)){return true};return false});if(isBlack||window[key]){return};window[key]=true;class ChangeBackground{constructor(){this.init()};init(){this.addStyle(`html,body{background-color:#000!important}*{color:#CCD1D9!important;box-shadow:none!important}*:after,*:before{border-color:#1e1e1e!important;color:#CCD1D9!important;box-shadow:none!important;background-color:transparent!important}a,a>*{color:#409B9B!important}[data-change-border-color][data-change-border-color-important]{border-color:#1e1e1e!important}[data-change-background-color][data-change-background-color-important]{background-color:#000!important}`);this.selectAllNodes(node=>{if(node.nodeType!==1){return};const style=window.getComputedStyle(node,null);const whiteList=[\'rgba(0, 0, 0, 0)\',\'transparent\'];const backgroundColor=style.getPropertyValue(\'background-color\');const borderColor=style.getPropertyValue(\'border-color\');if(whiteList.indexOf(backgroundColor)<0){if(this.isWhiteToBlack(backgroundColor)){node.dataset.changeBackgroundColor=\'\';node.dataset.changeBackgroundColorImportant=\'\'}else{delete node.dataset.changeBackgroundColor;delete node.dataset.changeBackgroundColorImportant}};if(whiteList.indexOf(borderColor)<0){if(this.isWhiteToBlack(borderColor)){node.dataset.changeBorderColor=\'\';node.dataset.changeBorderColorImportant=\'\'}else{delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant}};if(borderColor.indexOf(\'rgb(255, 255, 255)\')>=0){delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant;node.style.borderColor=\'transparent\'}})};addStyle(style=\'\'){const styleElm=document.createElement(\'style\');styleElm.innerHTML=style;document.head.appendChild(styleElm)};isWhiteToBlack(colorStr=\'\'){let hasWhiteToBlack=false;const colorArr=colorStr.match(/rgb.+?\\)/g);if(!colorArr||colorArr.length===0){return true};colorArr.forEach(color=>{const reg=/rgb[a]*?\\(([0-9]+),.*?([0-9]+),.*?([0-9]+).*?\\)/g;const result=reg.exec(color);const red=result[1];const green=result[2];const blue=result[3];const deviation=20;const max=Math.max(red,green,blue);const min=Math.min(red,green,blue);if(max-min<=deviation){hasWhiteToBlack=true}});return hasWhiteToBlack};selectAllNodes(callback=()=>{}){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)});this.observe({targetNode:document.documentElement,config:{attributes:false},callback(mutations,observer){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)})}})};observe({targetNode,config={},callback=()=>{}}){if(!targetNode){return};config=Object.assign({attributes:true,childList:true,subtree:true},config);const observer=new MutationObserver(callback);observer.observe(targetNode,config)}};new ChangeBackground()})();");
-                        ui.progress.setVisibility(8);
+                    //     console.info(url)
+                    ui.progress.setVisibility(0);
+                },
+                onPageFinished: function (webView, curUrl) {
+                    // ui.webview.loadUrl("javascript:(function(){if("+web_set.night_mode+" == false){return};const blackList=[\'example.com\'];const hostname=window.location.hostname;const key=encodeURIComponent(\'谷花泰:野径云俱黑，江船火独明:执行判断\');const isBlack=blackList.some(keyword=>{if(hostname.match(keyword)){return true};return false});if(isBlack||window[key]){return};window[key]=true;class ChangeBackground{constructor(){this.init()};init(){this.addStyle(`html,body{background-color:#000!important}*{color:#CCD1D9!important;box-shadow:none!important}*:after,*:before{border-color:#1e1e1e!important;color:#CCD1D9!important;box-shadow:none!important;background-color:transparent!important}a,a>*{color:#409B9B!important}[data-change-border-color][data-change-border-color-important]{border-color:#1e1e1e!important}[data-change-background-color][data-change-background-color-important]{background-color:#000!important}`);this.selectAllNodes(node=>{if(node.nodeType!==1){return};const style=window.getComputedStyle(node,null);const whiteList=[\'rgba(0, 0, 0, 0)\',\'transparent\'];const backgroundColor=style.getPropertyValue(\'background-color\');const borderColor=style.getPropertyValue(\'border-color\');if(whiteList.indexOf(backgroundColor)<0){if(this.isWhiteToBlack(backgroundColor)){node.dataset.changeBackgroundColor=\'\';node.dataset.changeBackgroundColorImportant=\'\'}else{delete node.dataset.changeBackgroundColor;delete node.dataset.changeBackgroundColorImportant}};if(whiteList.indexOf(borderColor)<0){if(this.isWhiteToBlack(borderColor)){node.dataset.changeBorderColor=\'\';node.dataset.changeBorderColorImportant=\'\'}else{delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant}};if(borderColor.indexOf(\'rgb(255, 255, 255)\')>=0){delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant;node.style.borderColor=\'transparent\'}})};addStyle(style=\'\'){const styleElm=document.createElement(\'style\');styleElm.innerHTML=style;document.head.appendChild(styleElm)};isWhiteToBlack(colorStr=\'\'){let hasWhiteToBlack=false;const colorArr=colorStr.match(/rgb.+?\\)/g);if(!colorArr||colorArr.length===0){return true};colorArr.forEach(color=>{const reg=/rgb[a]*?\\(([0-9]+),.*?([0-9]+),.*?([0-9]+).*?\\)/g;const result=reg.exec(color);const red=result[1];const green=result[2];const blue=result[3];const deviation=20;const max=Math.max(red,green,blue);const min=Math.min(red,green,blue);if(max-min<=deviation){hasWhiteToBlack=true}});return hasWhiteToBlack};selectAllNodes(callback=()=>{}){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)});this.observe({targetNode:document.documentElement,config:{attributes:false},callback(mutations,observer){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)})}})};observe({targetNode,config={},callback=()=>{}}){if(!targetNode){return};config=Object.assign({attributes:true,childList:true,subtree:true},config);const observer=new MutationObserver(callback);observer.observe(targetNode,config)}};new ChangeBackground()})();");
+                    ui.progress.setVisibility(8);
 
-                        //  ui.webview.loadUrl("javascript:(function(){if("+web_set.night_mode+" == false){return};const blackList=[\'example.com\'];const hostname=window.location.hostname;const key=encodeURIComponent(\'谷花泰:野径云俱黑，江船火独明:执行判断\');const isBlack=blackList.some(keyword=>{if(hostname.match(keyword)){return true};return false});if(isBlack||window[key]){return};window[key]=true;class ChangeBackground{constructor(){this.init()};init(){this.addStyle(`html,body{background-color:#000!important}*{color:#CCD1D9!important;box-shadow:none!important}*:after,*:before{border-color:#1e1e1e!important;color:#CCD1D9!important;box-shadow:none!important;background-color:transparent!important}a,a>*{color:#409B9B!important}[data-change-border-color][data-change-border-color-important]{border-color:#1e1e1e!important}[data-change-background-color][data-change-background-color-important]{background-color:#000!important}`);this.selectAllNodes(node=>{if(node.nodeType!==1){return};const style=window.getComputedStyle(node,null);const whiteList=[\'rgba(0, 0, 0, 0)\',\'transparent\'];const backgroundColor=style.getPropertyValue(\'background-color\');const borderColor=style.getPropertyValue(\'border-color\');if(whiteList.indexOf(backgroundColor)<0){if(this.isWhiteToBlack(backgroundColor)){node.dataset.changeBackgroundColor=\'\';node.dataset.changeBackgroundColorImportant=\'\'}else{return;delete node.dataset.changeBackgroundColor;delete node.dataset.changeBackgroundColorImportant}};if(whiteList.indexOf(borderColor)<0){if(this.isWhiteToBlack(borderColor)){node.dataset.changeBorderColor=\'\';node.dataset.changeBorderColorImportant=\'\'}else{delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant}};if(borderColor.indexOf(\'rgb(255, 255, 255)\')>=0){delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant;node.style.borderColor=\'transparent\'}})};addStyle(style=\'\'){const styleElm=document.createElement(\'style\');styleElm.innerHTML=style;document.head.appendChild(styleElm)};isWhiteToBlack(colorStr=\'\'){let hasWhiteToBlack=false;const colorArr=colorStr.match(/rgb.+?\\)/g);if(!colorArr||colorArr.length===0){return true};colorArr.forEach(color=>{const reg=/rgb[a]*?\\(([0-9]+),.*?([0-9]+),.*?([0-9]+).*?\\)/g;const result=reg.exec(color);const red=result[1];const green=result[2];const blue=result[3];const deviation=20;const max=Math.max(red,green,blue);const min=Math.min(red,green,blue);if(max-min<=deviation){hasWhiteToBlack=true}});return hasWhiteToBlack};selectAllNodes(callback=()=>{}){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)});this.observe({targetNode:document.documentElement,config:{attributes:false},callback(mutations,observer){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)})}})};observe({targetNode,config={},callback=()=>{}}){if(!targetNode){return};config=Object.assign({attributes:true,childList:true,subtree:true},config);const observer=new MutationObserver(callback);observer.observe(targetNode,config)}};new ChangeBackground()})();");
-                        //    ui.webview.loadUrl("javascript:alert(document.getElementsByTagName('html')[0].innerHTML);");
-                    },
-                    shouldOverrideUrlLoading: function (webView, request) {
-                        if (!request.url) {
-                            return
-                        }
+                    //  ui.webview.loadUrl("javascript:(function(){if("+web_set.night_mode+" == false){return};const blackList=[\'example.com\'];const hostname=window.location.hostname;const key=encodeURIComponent(\'谷花泰:野径云俱黑，江船火独明:执行判断\');const isBlack=blackList.some(keyword=>{if(hostname.match(keyword)){return true};return false});if(isBlack||window[key]){return};window[key]=true;class ChangeBackground{constructor(){this.init()};init(){this.addStyle(`html,body{background-color:#000!important}*{color:#CCD1D9!important;box-shadow:none!important}*:after,*:before{border-color:#1e1e1e!important;color:#CCD1D9!important;box-shadow:none!important;background-color:transparent!important}a,a>*{color:#409B9B!important}[data-change-border-color][data-change-border-color-important]{border-color:#1e1e1e!important}[data-change-background-color][data-change-background-color-important]{background-color:#000!important}`);this.selectAllNodes(node=>{if(node.nodeType!==1){return};const style=window.getComputedStyle(node,null);const whiteList=[\'rgba(0, 0, 0, 0)\',\'transparent\'];const backgroundColor=style.getPropertyValue(\'background-color\');const borderColor=style.getPropertyValue(\'border-color\');if(whiteList.indexOf(backgroundColor)<0){if(this.isWhiteToBlack(backgroundColor)){node.dataset.changeBackgroundColor=\'\';node.dataset.changeBackgroundColorImportant=\'\'}else{return;delete node.dataset.changeBackgroundColor;delete node.dataset.changeBackgroundColorImportant}};if(whiteList.indexOf(borderColor)<0){if(this.isWhiteToBlack(borderColor)){node.dataset.changeBorderColor=\'\';node.dataset.changeBorderColorImportant=\'\'}else{delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant}};if(borderColor.indexOf(\'rgb(255, 255, 255)\')>=0){delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant;node.style.borderColor=\'transparent\'}})};addStyle(style=\'\'){const styleElm=document.createElement(\'style\');styleElm.innerHTML=style;document.head.appendChild(styleElm)};isWhiteToBlack(colorStr=\'\'){let hasWhiteToBlack=false;const colorArr=colorStr.match(/rgb.+?\\)/g);if(!colorArr||colorArr.length===0){return true};colorArr.forEach(color=>{const reg=/rgb[a]*?\\(([0-9]+),.*?([0-9]+),.*?([0-9]+).*?\\)/g;const result=reg.exec(color);const red=result[1];const green=result[2];const blue=result[3];const deviation=20;const max=Math.max(red,green,blue);const min=Math.min(red,green,blue);if(max-min<=deviation){hasWhiteToBlack=true}});return hasWhiteToBlack};selectAllNodes(callback=()=>{}){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)});this.observe({targetNode:document.documentElement,config:{attributes:false},callback(mutations,observer){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)})}})};observe({targetNode,config={},callback=()=>{}}){if(!targetNode){return};config=Object.assign({attributes:true,childList:true,subtree:true},config);const observer=new MutationObserver(callback);observer.observe(targetNode,config)}};new ChangeBackground()})();");
+                    //    ui.webview.loadUrl("javascript:alert(document.getElementsByTagName('html')[0].innerHTML);");
+                },
+                shouldOverrideUrlLoading: function (webView, request) {
+                    if (!request.url) {
+                        return
+                    }
 
-                        request = request.url.toString()
-                        if (isCanFinish == request) {
-                            return false
-                        } else {
-                            isCanFinish = false;
-                        }
+                    request = request.url.toString()
+                    if (isCanFinish == request) {
+                        return false
+                    } else {
+                        isCanFinish = false;
+                    }
 
-                        console.verbose(request)
-                        let urls = files.read("./lib/urlfile.txt")
-                        if (urls == "false") {
-                            files.write("./lib/urlfile.txt", request)
-                            return true
-                        }
-                        try {
-                            if (request.startsWith("folder://bookmark")) {
-                                label_plug.label_plug(function (url) {
-                                    ui.run(() => {
-                                        ui.webview.loadUrl(url);
-                                    })
+                    console.verbose(request)
+
+                    try {
+                        if (request.startsWith("folder://bookmark")) {
+                            label_plug.label_plug(function (url) {
+                                ui.run(() => {
+                                    ui.webview.loadUrl(url);
                                 })
-                                return true;
-                            }
-
-                            if (request.startsWith("http://") || request.startsWith("https://") || request.startsWith("file://")) {
-                                webView.loadUrl(request);
-                                return false;
-                            } else {
-                                let app = "第三方APP"
-                                switch (true) {
-                                    case request.startsWith("jianshu"):
-                                        return true
-                                    case request.startsWith("openapp.jdmobile"):
-                                        app = "京东";
-                                        break
-                                    case request.startsWith("tbopen"):
-                                        app = "淘宝";
-                                        break
-                                    case request.startsWith("baidubox"):
-                                        app = "百度";
-                                        break
-                                    case request.startsWith("bilibili"):
-                                        app = "哔哩哔哩";
-                                        break
-
-                                }
-                                if (request.startsWith("hiker") || request.startsWith("folder")) {
-                                    return true
-                                }
-
-                                // confirm("是否允许网页打开 " + app + " ？").then(value => {
-                                //当点击确定后会执行这里, value为true或false, 表示点击"确定"或"取消"
-                                //  if (value) {
-                                ui.web_tips.setVisibility(0);
-                                ui.tips_text.setText("    网页请求打开" + app)
-                                ui.tips_ok.on("click", function () {
-                                    ui.web_tips.setVisibility(8)
-                                    new_ui("activity", request)
-                                });
-                                ui.tips_no.on("click", function () {
-                                    ui.web_tips.setVisibility(8)
-                                });
-                                ui.post(function () {
-                                    ui.web_tips.setVisibility(8)
-                                }, 3000)
-
-                                // });
-                            }
-                            // 返回true代表自定义处理，返回false代表触发webview加载
+                            })
                             return true;
-                        } catch (e) {
-                            if (e.javaException instanceof android.content.ActivityNotFoundException) {
-                                log(e)
-                                webView.loadUrl(request);
-                            } else {
-                                toastLog('无法加载URL: ' + request);
+                        }
 
-                                console.trace(e);
+                        if (request.startsWith("http://") || request.startsWith("https://") || request.startsWith("file://")) {
+                            webView.loadUrl(request);
+                            return false;
+                        } else {
+                            let app = "第三方APP"
+                            switch (true) {
+                                case request.startsWith("jianshu"):
+                                    return true
+                                case request.startsWith("openapp.jdmobile"):
+                                    app = "京东";
+                                    break
+                                case request.startsWith("tbopen"):
+                                    app = "淘宝";
+                                    break
+                                case request.startsWith("baidubox"):
+                                    app = "百度";
+                                    break
+                                case request.startsWith("bilibili"):
+                                    app = "哔哩哔哩";
+                                    break
+
                             }
+                            if (request.startsWith("hiker") || request.startsWith("folder")) {
+                                return true
+                            }
+
+                            // confirm("是否允许网页打开 " + app + " ？").then(value => {
+                            //当点击确定后会执行这里, value为true或false, 表示点击"确定"或"取消"
+                            //  if (value) {
+                            ui.web_tips.setVisibility(0);
+                            ui.tips_text.setText("    网页请求打开" + app)
+                            ui.tips_ok.on("click", function () {
+                                ui.web_tips.setVisibility(8)
+                                new_ui("activity", request)
+                            });
+                            ui.tips_no.on("click", function () {
+                                ui.web_tips.setVisibility(8)
+                            });
+                            ui.post(function () {
+                                ui.web_tips.setVisibility(8)
+                            }, 3000)
+
+                            // });
                         }
-
-                    },
-                });
-                webview.setWebViewClient(webViewClient);
-
-                let WebChromeClient = android.webkit.WebChromeClient;
-
-                let webChromeClient = new JavaAdapter(WebChromeClient, {
-                    /*  onReceivedTitle: function(webView, title) {
-
-                          //  console.log("onReceivedTitle");
-                      },
-                      onProgressChanged: function(view, progress) {
-                         // ui.webview.loadUrl("javascript:(function(){if(" + web_set.night_mode + " == false){return};const blackList=[\'example.com\'];const hostname=window.location.hostname;const key=encodeURIComponent(\'谷花泰:野径云俱黑，江船火独明:执行判断\');const isBlack=blackList.some(keyword=>{if(hostname.match(keyword)){return true};return false});if(isBlack||window[key]){return};window[key]=true;class ChangeBackground{constructor(){this.init()};init(){this.addStyle(`html,body{background-color:#000!important}*{color:#CCD1D9!important;box-shadow:none!important}*:after,*:before{border-color:#1e1e1e!important;color:#CCD1D9!important;box-shadow:none!important;background-color:transparent!important}a,a>*{color:#409B9B!important}[data-change-border-color][data-change-border-color-important]{border-color:#1e1e1e!important}[data-change-background-color][data-change-background-color-important]{background-color:#000!important}`);this.selectAllNodes(node=>{if(node.nodeType!==1){return};const style=window.getComputedStyle(node,null);const whiteList=[\'rgba(0, 0, 0, 0)\',\'transparent\'];const backgroundColor=style.getPropertyValue(\'background-color\');const borderColor=style.getPropertyValue(\'border-color\');if(whiteList.indexOf(backgroundColor)<0){if(this.isWhiteToBlack(backgroundColor)){node.dataset.changeBackgroundColor=\'\';node.dataset.changeBackgroundColorImportant=\'\'}else{return;delete node.dataset.changeBackgroundColor;delete node.dataset.changeBackgroundColorImportant}};if(whiteList.indexOf(borderColor)<0){if(this.isWhiteToBlack(borderColor)){node.dataset.changeBorderColor=\'\';node.dataset.changeBorderColorImportant=\'\'}else{delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant}};if(borderColor.indexOf(\'rgb(255, 255, 255)\')>=0){delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant;node.style.borderColor=\'transparent\'}})};addStyle(style=\'\'){const styleElm=document.createElement(\'style\');styleElm.innerHTML=style;document.head.appendChild(styleElm)};isWhiteToBlack(colorStr=\'\'){let hasWhiteToBlack=false;const colorArr=colorStr.match(/rgb.+?\\)/g);if(!colorArr||colorArr.length===0){return true};colorArr.forEach(color=>{const reg=/rgb[a]*?\\(([0-9]+),.*?([0-9]+),.*?([0-9]+).*?\\)/g;const result=reg.exec(color);const red=result[1];const green=result[2];const blue=result[3];const deviation=20;const max=Math.max(red,green,blue);const min=Math.min(red,green,blue);if(max-min<=deviation){hasWhiteToBlack=true}});return hasWhiteToBlack};selectAllNodes(callback=()=>{}){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)});this.observe({targetNode:document.documentElement,config:{attributes:false},callback(mutations,observer){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)})}})};observe({targetNode,config={},callback=()=>{}}){if(!targetNode){return};config=Object.assign({attributes:true,childList:true,subtree:true},config);const observer=new MutationObserver(callback);observer.observe(targetNode,config)}};new ChangeBackground()})();");
-
-                          //  console.log("onProgressChanged")
-                      },*/
-                    onConsoleMessage: function (message) {
-                        if (web_set.h5rizhi) {
-                            message.message && console.verbose("h5: " + message.message());
-                        }
-                    },
-                    onShowFileChooser: function (webview, filePathCallback_, fileChooserParams) {
-                        filePathCallback = filePathCallback_
-
-                        let i = new android.content.Intent(android.content.Intent.ACTION_GET_CONTENT);
-                        switch (true) {
-                            case webview.url.indexOf("https://penguin-stats.cn") != -1:
-                            case webview.url.indexOf("https://arkn.lolicon.app") != -1:
-                                i.setType("image/*");
-                                toastLog("图片类型")
-                                break
-                            default:
-                                i.setType("*/*")
-                        }
-                        i.addCategory(Intent.CATEGORY_OPENABLE);
-                        activity.startActivityForResult(i, 1);
+                        // 返回true代表自定义处理，返回false代表触发webview加载
                         return true;
-                    },
-                });
-                webview.setWebChromeClient(webChromeClient);
-                //  webview.setDownloadListener(new DownloadListener() {
-                webview.setDownloadListener({
-                    onDownloadStart: function (url, userAgent, contentDisposition, mimeType, contentLength) {
-                        //   console.trace(url)
-                        let webdow = JSON.parse(
-                            files.read("./lib/game_data/webdow.json", (encoding = "utf-8"))
-                        );
-                        if (webdow && webdow.await) {
+                    } catch (e) {
+                        if (e.javaException instanceof android.content.ActivityNotFoundException) {
+                            log(e)
+                            webView.loadUrl(request);
+                        } else {
+                            toastLog('无法加载URL: ' + request);
 
-                            if (webdow.action == "download") {
-                                if (webdow.expectedtime && webdow.expectedtime < new Date()) {
+                            console.trace(e);
+                        }
+                    }
+
+                },
+            });
+            webview.setWebViewClient(webViewClient);
+
+            let WebChromeClient = android.webkit.WebChromeClient;
+
+            let webChromeClient = new JavaAdapter(WebChromeClient, {
+                /*  onReceivedTitle: function(webView, title) {
+
+                      //  console.log("onReceivedTitle");
+                  },
+                  onProgressChanged: function(view, progress) {
+                     // ui.webview.loadUrl("javascript:(function(){if(" + web_set.night_mode + " == false){return};const blackList=[\'example.com\'];const hostname=window.location.hostname;const key=encodeURIComponent(\'谷花泰:野径云俱黑，江船火独明:执行判断\');const isBlack=blackList.some(keyword=>{if(hostname.match(keyword)){return true};return false});if(isBlack||window[key]){return};window[key]=true;class ChangeBackground{constructor(){this.init()};init(){this.addStyle(`html,body{background-color:#000!important}*{color:#CCD1D9!important;box-shadow:none!important}*:after,*:before{border-color:#1e1e1e!important;color:#CCD1D9!important;box-shadow:none!important;background-color:transparent!important}a,a>*{color:#409B9B!important}[data-change-border-color][data-change-border-color-important]{border-color:#1e1e1e!important}[data-change-background-color][data-change-background-color-important]{background-color:#000!important}`);this.selectAllNodes(node=>{if(node.nodeType!==1){return};const style=window.getComputedStyle(node,null);const whiteList=[\'rgba(0, 0, 0, 0)\',\'transparent\'];const backgroundColor=style.getPropertyValue(\'background-color\');const borderColor=style.getPropertyValue(\'border-color\');if(whiteList.indexOf(backgroundColor)<0){if(this.isWhiteToBlack(backgroundColor)){node.dataset.changeBackgroundColor=\'\';node.dataset.changeBackgroundColorImportant=\'\'}else{return;delete node.dataset.changeBackgroundColor;delete node.dataset.changeBackgroundColorImportant}};if(whiteList.indexOf(borderColor)<0){if(this.isWhiteToBlack(borderColor)){node.dataset.changeBorderColor=\'\';node.dataset.changeBorderColorImportant=\'\'}else{delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant}};if(borderColor.indexOf(\'rgb(255, 255, 255)\')>=0){delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant;node.style.borderColor=\'transparent\'}})};addStyle(style=\'\'){const styleElm=document.createElement(\'style\');styleElm.innerHTML=style;document.head.appendChild(styleElm)};isWhiteToBlack(colorStr=\'\'){let hasWhiteToBlack=false;const colorArr=colorStr.match(/rgb.+?\\)/g);if(!colorArr||colorArr.length===0){return true};colorArr.forEach(color=>{const reg=/rgb[a]*?\\(([0-9]+),.*?([0-9]+),.*?([0-9]+).*?\\)/g;const result=reg.exec(color);const red=result[1];const green=result[2];const blue=result[3];const deviation=20;const max=Math.max(red,green,blue);const min=Math.min(red,green,blue);if(max-min<=deviation){hasWhiteToBlack=true}});return hasWhiteToBlack};selectAllNodes(callback=()=>{}){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)});this.observe({targetNode:document.documentElement,config:{attributes:false},callback(mutations,observer){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)})}})};observe({targetNode,config={},callback=()=>{}}){if(!targetNode){return};config=Object.assign({attributes:true,childList:true,subtree:true},config);const observer=new MutationObserver(callback);observer.observe(targetNode,config)}};new ChangeBackground()})();");
+
+                      //  console.log("onProgressChanged")
+                  },*/
+                onConsoleMessage: function (message) {
+                    if (web_set.h5rizhi) {
+                        message.message && console.verbose("h5: " + message.message());
+                    }
+                },
+                onShowFileChooser: function (webview, filePathCallback_, fileChooserParams) {
+                    filePathCallback = filePathCallback_
+
+                    let i = new android.content.Intent(android.content.Intent.ACTION_GET_CONTENT);
+                    switch (true) {
+                        case webview.url.indexOf("https://penguin-stats.cn") != -1:
+                        case webview.url.indexOf("https://arkn.lolicon.app") != -1:
+                            i.setType("image/*");
+                            toastLog("图片类型")
+                            break
+                        default:
+                            i.setType("*/*")
+                    }
+                    i.addCategory(Intent.CATEGORY_OPENABLE);
+                    activity.startActivityForResult(i, 1);
+                    return true;
+                },
+            });
+            webview.setWebChromeClient(webChromeClient);
+            //  webview.setDownloadListener(new DownloadListener() {
+            webview.setDownloadListener({
+                onDownloadStart: function (url, userAgent, contentDisposition, mimeType, contentLength) {
+                    //   console.trace(url)
+                    let webdow = JSON.parse(
+                        files.read("./lib/game_data/webdow.json", (encoding = "utf-8"))
+                    );
+                    if (webdow && webdow.await) {
+
+                        if (webdow.action == "download") {
+                            if (webdow.expectedtime && webdow.expectedtime < new Date()) {
+                                webdow.await = false;
+                                files.write(
+                                    "./lib/game_data/webdow.json",
+                                    JSON.stringify(webdow),
+                                    (encoding = "utf-8")
+                                );
+                                return
+                            }
+                            let datali = {};
+                            datali.link = url;
+                            datali.id = webdow.id || "webdow";
+                            datali.prohibit = true;
+                            datali.myPath = files.path(path_ + "/OCR/");
+                            datali.fileName = "xiaoyueocr.zip";
+                            storages.create("Doolu_download").put("data", datali);
+                            files.createWithDirs(path_ + "/OCR/")
+                            engines.execScriptFile("./lib/download.js");
+                            //监听脚本间广播'download'事件
+                            snakebar('开始下载文件: ' + datali.fileName, 3000);
+                            events.broadcast.on("download" + datali.id, function (X) {
+                                if (X.name == "进度") {
+                                    console.verbose(datali.fileName + " 下载进度: " + X.data);
+
+                                } else if (X.name == "结果") {
+                                    if (X.data == "下载完成") {
+                                        try {
+                                            let event_ = events.broadcast.listeners("download" + datali.id)[0];
+                                            events.broadcast.removeListener("download" + datali.id, event_);
+                                        } catch (e) {
+
+                                        }
+                                        eval(webdow.callback)({
+                                            filepath: datali.myPath,
+                                            filename: datali.fileName,
+                                        });
+                                        webdow.await = false;
+                                        files.write(
+                                            "./lib/game_data/webdow.json",
+                                            JSON.stringify(webdow),
+                                            (encoding = "utf-8")
+                                        );
+                                        console.verbose("完成webdow任务");
+                                        return
+                                    }
+                                } else if (X.name == "关闭") {
+                                    try {
+                                        let event_ = events.broadcast.listeners("download" + datali.id)[0];
+                                        events.broadcast.removeListener("download" + datali.id, event_);
+                                    } catch (e) {
+
+                                    }
+                                    let tips = datali.fileName + "下载失败";
+                                    toast(tips);
+                                    console.error(tips);
                                     webdow.await = false;
                                     files.write(
                                         "./lib/game_data/webdow.json",
@@ -3984,90 +4016,34 @@ function Update_UI(i) {
                                     );
                                     return
                                 }
-                                let datali = {};
-                                datali.link = url;
-                                datali.id = webdow.id || "webdow";
-                                datali.prohibit = true;
-                                datali.myPath = files.path(path_ + "/OCR/");
-                                datali.fileName = "xiaoyueocr.zip";
-                                storages.create("Doolu_download").put("data", datali);
-                                files.createWithDirs(path_ + "/OCR/")
-                                engines.execScriptFile("./lib/download.js");
-                                //监听脚本间广播'download'事件
-                                snakebar('开始下载文件: ' + datali.fileName, 3000);
-                                events.broadcast.on("download" + datali.id, function (X) {
-                                    if (X.name == "进度") {
-                                        console.verbose(datali.fileName + " 下载进度: " + X.data);
 
-                                    } else if (X.name == "结果") {
-                                        if (X.data == "下载完成") {
-                                            try {
-                                                let event_ = events.broadcast.listeners("download" + datali.id)[0];
-                                                events.broadcast.removeListener("download" + datali.id, event_);
-                                            } catch (e) {
+                            });
+                        } if (webdow.action == "geturl") {
+                            webdow.url = url;
+                            webdow.await = false;
+                            files.write(
+                                "./lib/game_data/webdow.json",
+                                JSON.stringify(webdow),
+                                (encoding = "utf-8")
+                            );
 
-                                            }
-                                            eval(webdow.callback)({
-                                                filepath: datali.myPath,
-                                                filename: datali.fileName,
-                                            });
-                                            webdow.await = false;
-                                            files.write(
-                                                "./lib/game_data/webdow.json",
-                                                JSON.stringify(webdow),
-                                                (encoding = "utf-8")
-                                            );
-                                            console.verbose("完成webdow任务");
-                                            return
-                                        }
-                                    } else if (X.name == "关闭") {
-                                        try {
-                                            let event_ = events.broadcast.listeners("download" + datali.id)[0];
-                                            events.broadcast.removeListener("download" + datali.id, event_);
-                                        } catch (e) {
-
-                                        }
-                                        let tips = datali.fileName + "下载失败";
-                                        toast(tips);
-                                        console.error(tips);
-                                        webdow.await = false;
-                                        files.write(
-                                            "./lib/game_data/webdow.json",
-                                            JSON.stringify(webdow),
-                                            (encoding = "utf-8")
-                                        );
-                                        return
-                                    }
-
-                                });
-                            } if (webdow.action == "geturl") {
-                                webdow.url = url;
-                                webdow.await = false;
-                                files.write(
-                                    "./lib/game_data/webdow.json",
-                                    JSON.stringify(webdow),
-                                    (encoding = "utf-8")
-                                );
-
-                            }
-                            return true
                         }
-                        new_ui("activity", url)
+                        return true
                     }
-                });
-                if (web_set.night_mode) {
-                    ui.main_web.attr("bg", "#1e1e1e")
-                    SystemUiVisibility(true)
+                    new_ui("activity", url)
                 }
-                if (!files.exists(path_ + "/html/built_in.html")) {
-                    $zip.unzip("./lib/html/html.zip", path_ + "/html/");
-                }
-                ui.webview.loadUrl(web_set.web_url)
-                console.verbose("初始化webview完成")
-            })
-            break
+            });
+            if (web_set.night_mode) {
+                ui.main_web.attr("bg", "#1e1e1e")
+                SystemUiVisibility(true)
+            }
+            if (!files.exists(path_ + "/html/built_in.html")) {
+                $zip.unzip("./lib/html/html.zip", path_ + "/html/");
+            }
+            ui.webview.loadUrl(web_set.web_url)
+            console.verbose("初始化webview完成");
+        })
     }
-
 }
 
 function new_ui(name, url) {

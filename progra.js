@@ -785,6 +785,7 @@ let collection = {
     main(list) {
         let selectResult;
         switch (list.levelAbbreviation) {
+            case activity_level:
             case '1-7':
 
                 selectResult = this.固源岩();
@@ -793,12 +794,11 @@ let collection = {
 
             case '龙门币-6/5':
                 if (week) {
-                    selectResult = this.资源本(displayText["货物运送"],
-                    );
+                    selectResult = this.资源本(displayText["货物运送"],["CE-6", "CE-5"]);
                     break
                 } else {
                     tool.Floaty_emit("展示文本", "状态", "警告：钱本非开放日，跳转经验本...");
-                    钱_经验本(false);
+                    //钱_经验本(false);
                 }
 
             case '经验-6/5':
@@ -813,9 +813,15 @@ let collection = {
             case '术/狙芯片组':
                 selectResult = this.资源本(displayText["摧枯拉朽"], (this.levelAbbreviation == "术/狙芯片组") ? "PR-B-2" : "PR-B-1");
                 break;
-            case activity_level:
-                固源岩(true);
-                break
+            case '先/辅芯片':
+            case '先辅狙芯片组':
+                selectResult = this.资源本(displayText["势不可挡"], (this.levelAbbreviation == "先/辅芯片组") ? "PR-C-2" : "PR-C-1");
+                break;
+            case '近/特芯片':
+            case '近/特芯片组':
+                selectResult = this.资源本(displayText["身先士卒"], (this.levelAbbreviation == "近/特芯片组") ? "PR-D-2" : "PR-D-1");
+                break;
+
         }
         if (selectResult) {
             return true;
@@ -1252,7 +1258,7 @@ function 行动() {
                 }) || ITimg.picture("理智_确认", {
                     timing: 500,
                     area: "右半屏",
-                 }) || ITimg.picture("理智_确认", {
+                }) || ITimg.picture("理智_确认", {
                     timing: 500,
                     area: "右半屏",
                 })) {

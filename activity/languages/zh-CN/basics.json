@@ -11,7 +11,7 @@
     "image-monitoring": "启用图片监测",
     "image-monitoring-explain": "明日计划纯32位:实时回收图片，如出错则判断为明日计划无法再获取屏幕截图,重新请求辅助截图权限, 出现短时间内重复请求权限请关闭\n明日计划64/32位:间隔15分钟重新请求辅助截图权限, \n禁用该功能后不再检测图片是否被回收，不会出现重复申请辅助截图权限的情况。但是如果脚本长时间运行，系统回收辅助截图权限，导致脚本无法获取新的界面内容，会卡住，(纯32位会报错image has been recycled，64/32位不会),无法执行下一步。关闭后推荐打开异常界面超时暂停",
     "PROJECT_MEDIA": "投影媒体权限",
-    "PROJECT_MEDIA-expiain": "点击授权后，开始运行时录制屏幕的安全提示窗口将不再弹出，外置ADB授权命令:adb shell appops set %packageName% PROJECT_MEDIA allow",
+    "PROJECT_MEDIA-expiain": "点击授权后，开始运行时允许录制屏幕的安全提示窗口将不再弹出，外置ADB授权命令:adb shell appops set %packageName% PROJECT_MEDIA allow",
     "identify-permissions": "请先确认设备是否拥有ADB/ROOT权限:",
     "identify-grant": "请先确认是否已授权明日计划ADB/ROOT权限:",
     "grant": "授权%results%",
