@@ -59,8 +59,8 @@ function initialization_() {
             icon: "https://ark-nights.com/favicon.ico",
         }, {
             title: "材料获取一图流",
-            url: "http://ark.yituliu.site/",
-            icon: "http://ark.yituliu.site/favicon.ico",
+            url: "http://ark.yituliu.cn/",
+            icon: "http://ark.yituliu.cn/favicon.ico",
         }, {
             /*
            title:"夏活攒抽规划",
@@ -75,10 +75,7 @@ function initialization_() {
             url: "https://arkstory.cc/story",
             icon: "https://arkstory.cc/static/images/favicon.png",
         },{
-            title: "明日方舟工具箱",
-            url: "https://www.bigfun.cn/tools/aktools/",
-            icon: "https://www.bigfun.cn/favicon.ico"
-        },{
+        
             title: "必应搜索",
             url: "https://cn.bing.com/search?q=",
             icon: "https://cn.bing.com/favicon.ico"
