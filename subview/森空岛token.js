@@ -303,9 +303,10 @@ function list_awards(game_id, uid) {
 function do_sign(cred_resp) {
     return new Promise((resolve, reject) => {
         try {
-            get_binding_list(cred_resp['cred'], cred_resp['token']).then((value) => {
+            let getBindingList = get_binding_list(cred_resp['cred'], cred_resp['token']);
+            getBindingList.then((value) => {
                 let tips;
-                //console.trace(value)
+                console.trace(value)
 
                 for (let i = 0; i < value.length; i++) {
                     let character = value[i];
@@ -395,64 +396,64 @@ function save(token) {
 
     toastLog("获取角色信息中...");
 
-    get_cred_by_token(token)
-        .then((value) => {
-            //   console.trace(value)
-            let characters = get_binding_list(value['cred'], value['token']);
-            let Altered = false;
-            characters.then(
-                (result) => {
-                    //console.trace(result);
+    let getCredToken = get_cred_by_token(token);
+    getCredToken.then((value) => {
+        //   console.trace(value)
+        let characters = get_binding_list(value['cred'], value['token']);
+        let Altered = false;
+        characters.then(
+            (result) => {
+                //console.trace(result);
 
-                    for (let i = 0; i < result.length; i++) {
+                for (let i = 0; i < result.length; i++) {
 
-                        result[i].sign_status = "未签到";
-                        result[i].code = 1;
-                        result[i].time = new Date();
+                    result[i].sign_status = "未签到";
+                    result[i].code = 1;
+                    result[i].time = new Date();
 
-                        let index = roles_list.findIndex((item) => item.defaultUid == result[i]['uid']);
-                        if (index != -1) {
-                            roles_list[index].token = token;
-                            roles_list[index].nickName = result[i].nickName;
-                            roles_list[index].channelName = result[i].channelName;
-                            roles_list[index].defaultUid = result[i].defaultUid;
-                            Altered = true;
-                            message = "您的鹰角网络通行证TOKEN已经修改"
-                            break;
-                        };
-                        if (result[i].defaultUid == '' || !result[i].defaultUid) {
-                            result[i].defaultUid = result[i]['uid'];
-                        };
-                    }
-
-                    if (!Altered) {
-                        roles_list.push({
-                            "token": token,
-                            "bindingList": result,
-                            "defaultUid": result[0].defaultUid,
-                            "nickName": result[result.findIndex((item) => item.defaultUid == item['uid'])].nickName,
-                            "channelName": result[result.findIndex((item) => item.defaultUid == item['uid'])].channelName,
-                        });
-                    }
-
-
-                    token_storage.put("arknights_binding", roles_list);
-
-                    snackbar(message);
-                    ui_add && ui_add.viewpager.setCurrentItem(1);
-                },
-                (error) => {
-                    message = error.code + ": " + error.msg;
-                    console.error(message);
-                    snackbar(message);
+                    let index = roles_list.findIndex((item) => item.defaultUid == result[i]['uid']);
+                    if (index != -1) {
+                        roles_list[index].token = token;
+                        roles_list[index].nickName = result[i].nickName;
+                        roles_list[index].channelName = result[i].channelName;
+                        roles_list[index].defaultUid = result[i].defaultUid;
+                        Altered = true;
+                        message = "您的鹰角网络通行证TOKEN已经修改"
+                        break;
+                    };
+                    if (result[i].defaultUid == '' || !result[i].defaultUid) {
+                        result[i].defaultUid = result[i]['uid'];
+                    };
                 }
-            )
-        })
-        .catch((error) => {
-            message = error.code + ": " + error.msg;
-            console.error(message);
-            snackbar(message);
-        });
+
+                if (!Altered) {
+                    roles_list.push({
+                        "token": token,
+                        "bindingList": result,
+                        "defaultUid": result[0].defaultUid,
+                        "nickName": result[result.findIndex((item) => item.defaultUid == item['uid'])].nickName,
+                        "channelName": result[result.findIndex((item) => item.defaultUid == item['uid'])].channelName,
+                    });
+                }
+
+
+                token_storage.put("arknights_binding", roles_list);
+
+                snackbar(message);
+                ui_add && ui_add.viewpager.setCurrentItem(1);
+            },
+            (error) => {
+                message = error.code + ": " + error.msg;
+                console.error(message);
+                snackbar(message);
+            }
+        )
+    });
+    getCredToken.catch((error) => {
+        message = error.code + ": " + error.msg;
+        console.error(message);
+        snackbar(message);
+    });
 }
 
 
