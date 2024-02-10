@@ -1786,7 +1786,7 @@ ui.OCRExtensions.on("click", (view) => {
         });
     } else {
         toastLog('已安装插件扩展请勿取消');
-
+        view.checked = true;
     }
 });
 ui.OCRCorrection_rules.on('click', (view) => {
