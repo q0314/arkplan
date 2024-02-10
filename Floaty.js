@@ -1109,7 +1109,7 @@ function 执行次数() {
                 <button id="buiok" text="确认设置" margin="0 -5 0 -4" layout_weight="1" style="Widget.AppCompat.Button.Colored" h="auto" />
             </linear>
         </vertical>, null, false);
-    var rewriteDialogs = dialogs.build({
+    let rewriteDialogs = dialogs.build({
         customView: rewriteView,
         wrapInScrollView: false,
         autoDismiss: true
@@ -1127,7 +1127,6 @@ function 执行次数() {
     let level_choices = JSON.parse(
         files.read("./lib/game_data/level_choices.json", (encoding = "utf-8"))
     );
-
     adapter = new android.widget.ArrayAdapter(context, android.R.layout.simple_spinner_item, level_choices);
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     rewriteView.level_pick.setAdapter(adapter);
@@ -1182,7 +1181,7 @@ function 执行次数() {
             break;
     }
 
-    var modeGather = {
+    let modeGather = {
         "指定关卡+基建": "常规",
         "只执行行动": "行动",
         "只执行基建": "基建",
@@ -1191,7 +1190,7 @@ function 执行次数() {
     if (setting.custom != false) {
         modeGather["执行自定义模块"] = "自定义模块";
     }
-    var modeGatherText = Object.keys(modeGather);
+    let modeGatherText = Object.keys(modeGather);
 
     //   rewriteView.implement.attr("entries",mCountries)
     adapter = new android.widget.ArrayAdapter(context, android.R.layout.simple_spinner_item, modeGatherText);
@@ -1208,6 +1207,10 @@ function 执行次数() {
     } else {
         SE执行 = 0;
         rewriteView.implement.setSelection(0);
+    };
+    SE执行 = level_choices.indexOf(setting.指定关卡.levelAbbreviation);
+    if (SE执行 != -1) {
+        rewriteView.level_pick.setSelection(SE执行);
     };
     delete SE执行;
 
