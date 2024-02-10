@@ -16,6 +16,7 @@ let {
     dp2px,
     createShape
 } = require('../modules/__util__.js');
+
 let BottomWheelPicker = require('../subview/BottomWheelPicker.js').build({
     positiveTextColor: "#FFFFFF",
     positiveBgColor: theme.bar,
@@ -98,7 +99,7 @@ ui.layout(
                                     <text text="{{language['reset-proxy-frequency']}}" textColor="black" textSize="18sp" />
                                     <text text="{{language['reset-proxy-frequency-explain']}}" textColor="#95000000" textSize="10sp" marginTop="2" />
                                 </vertical>
-                                <widget-switch-se7en id="reset_proxy_frequency" checked="{{setting.重置代理次数}}"layout_gravity="center" padding="5 5" textSize="18sp"
+                                <widget-switch-se7en id="reset_proxy_frequency" checked="{{setting.重置代理次数}}" layout_gravity="center" padding="5 5" textSize="18sp"
                                     margin="10 0" thumbSize='24' radius='24' />
                             </horizontal>
                             <card w="*" id="indx2" h="40" gravity="center_vertical"  >
@@ -193,12 +194,16 @@ ui.layout(
                             </card>
 
                             <horizontal margin="10 0" padding="15 5 1 5" gravity="center">
-                                <vertical layout_weight="1" >
+                                <vertical layout_weight="2" >
                                     <text text="{{language['OCRExtensions-type']}}" textColor="black" textSize="18sp" />
                                     <text text="{{language['OCRExtensions-explain']}}" textColor="#95000000" textSize="10sp" marginTop="2" />
                                 </vertical>
-                                <TextView id="OCRExtensions_type" padding="5 5" textSize="15sp"
-                                    margin="10 0" textColor="black" />
+                                <vertical >
+                                    <TextView id="OCRExtensions_type" padding="5 5" textSize="15sp"
+                                        margin="10" textColor="black" lines="1" />
+                                    <TextView id="OCRCorrection_rules" text="{{language['OCRCorrection-rules']}}" padding="5 5" textSize="15sp"
+                                        margin="10 5 10 0" textColor="black" lines="1" gravity="center" />
+                                </vertical>
                             </horizontal>
                             <horizontal margin="10 0" padding="15 5 1 5" id="OCRExtensions_" gravity="center">
                                 <vertical layout_weight="1" >
@@ -1781,9 +1786,20 @@ ui.OCRExtensions.on("click", (view) => {
         });
     } else {
         toastLog('已安装插件扩展请勿取消');
-
+        view.checked = true;
     }
-})
+});
+ui.OCRCorrection_rules.on('click', (view) => {
+    engines.execScriptFile("./ocrfix.js", {
+        arguments: {
+            json_path: {
+                "公招矫正规则": files.path('../lib/game_data/ocr_公招_矫正规则.json'),
+                "通用矫正规则": files.path('../lib/game_data/ocr_通用_矫正规则.json'),
+                "信用矫正规则": files.path('../lib/game_data/ocr_信用_矫正规则.json')
+            }
+        }
+    })
+});
 update_ui()
 
 function update_ui() {
@@ -1793,6 +1809,7 @@ function update_ui() {
 
         ui.OCRExtensions_type.setText(setting.defaultOcr);
         ui.OCRExtensions_type.setBackground(createShape(5, 0, 0, [2, theme.bar]));
+        ui.OCRCorrection_rules.setBackground(createShape(5, 0, 0, [2, theme.bar]));
         setting = tool.writeJSON("ocrExtend", ocr_plugin[setting.defaultOcr].isInstalled());
         ui.OCRExtensions.checked = setting.ocrExtend;
 

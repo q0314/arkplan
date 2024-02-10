@@ -682,7 +682,8 @@ ui.layout(
 let level_choices = JSON.parse(
     files.read("./lib/game_data/level_choices.json", (encoding = "utf-8"))
 );
-change_list(ui.level_pick, level_choices);
+
+
 ui.level_pick.setBackground(createShape(5, 0, 0, [2, theme.bar]));
 ui.level_pick.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
     onItemSelected: function (parent, view, position, id) {
@@ -3678,15 +3679,17 @@ function Update_UI(i) {
             ui.module_config_txt.setText("模块\n配置")
 
             if (gallery.gallery_info) {
-
+                change_list(ui.level_pick, level_choices);
+                SE执行 = level_choices.indexOf(setting.指定关卡.levelAbbreviation);
+                if (SE执行 != -1) {
+                    ui.level_pick.setSelection(SE执行);
+                };
+                
                 change_list(ui.implement, modeGatherText);
 
                 SE执行 = modeGatherText.indexOf(setting.执行);
                 if (SE执行 != -1) {
                     ui.implement.setSelection(modeGatherText.indexOf(setting.执行));
-                } else {
-                    SE执行 = 0;
-                    ui.implement.setSelection(0);
                 }
                 if (setting.行动理智) {
                     ui.xlkz.attr("visibility", "visible");

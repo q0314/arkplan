@@ -474,8 +474,9 @@ function download(url, name) {
         } else if (X.name == "结果") {
             if (X.data == "下载完成") {
                 try {
-                    datali = events.broadcast.listeners("download" + datali.id)[0];
-                    events.broadcast.removeListener("download" + datali.id, datali);
+                    let listeners = events.broadcast.listeners("download" + datali.id);
+                    events.broadcast.removeListener("download" + datali.id, listeners[0]);
+                    delete listeners;
                 } catch (e) {
                     console.error(e);
                 }
@@ -524,10 +525,11 @@ function download(url, name) {
             }
         } else if (X.name == "关闭") {
             try {
-                datali = events.broadcast.listeners("download" + datali.id)[0];
-                events.broadcast.removeListener("download" + datali.id, datali);
+                let listeners = events.broadcast.listeners("download" + datali.id);
+                events.broadcast.removeListener("download" + datali.id, listeners[0]);
+                delete listeners;
             } catch (e) {
-
+                console.error(e);
             }
             if (progressDialog) {
                 progressDialog.dismiss();
