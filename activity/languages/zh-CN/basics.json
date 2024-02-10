@@ -4,7 +4,7 @@
     "auto-allow-screenshots": "自动允许截图权限",
     "auto-allow-screenshots-explain": "(!安卓14出于安全考虑无法使用) 明日计划的PRTS辅助是图像识别脚本程序，需使用录屏(辅助屏幕截图)权限截取屏幕内容进行'图像匹配','图片转文字(OCR识别)'来确定按钮,界面重点信息位置\n如需程序自动允许辅助截图权限，请打开该功能。如果在悬浮窗面板运行时无法申请辅助截图权限，请授权明日计划后台弹出界面权限",
     "reset-proxy-frequency": "重置代理次数",
-    "reset-proxy-frequency-explain": "开始行动时自动重置代理次数,如无效果请替换图库 '代理_勾' 等相关小图",
+    "reset-proxy-frequency-explain": "开始行动时自动重置代理次数为1,如无效果请替换图库 '代理_勾' 等相关小图",
     "OCRCorrection-rules": "矫正规则",
     "OCRExtensions": "OCR插件扩展",
     "OCRExtensions-type": "OCR插件类型",
