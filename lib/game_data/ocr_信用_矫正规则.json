@@ -97,5 +97,8 @@
         "更": false,
         "商": false
     },
+    "filter_full_characters": {
+        "介绍_过滤完整字符的句子_是否正则匹配": false
+    },
     "versionCode": "2"
 }

@@ -13,8 +13,8 @@
         "利余": {
             "correct": "剩余"
         },
-        "球态":{
-            "correct":"状态"
+        "球态": {
+            "correct": "状态"
         },
         "休意": {
             "correct": "剩余"
@@ -28,15 +28,27 @@
         "堤交": {
             "correct": "提交"
         },
-        "反情":{
-            "correct":"反馈"
+        "反情": {
+            "correct": "反馈"
         },
-        "禅经":{
-            "correct":"神经"
+        "禅经": {
+            "correct": "神经"
         },
         "cTED": {
             "correct": "CTED"
         }
+    },
+    "replace_full_character": {
+        "介绍_用于纠正替换完整字符": {
+            "correct": "correct 正确的字符, regular 是否正则匹配",
+            "regular": false
+        }
+    },
+    "filter_partial_characters": {
+        "介绍_过滤包含部分字符的句子_为了让识别结果只有有用的信息_是否正则匹配": false
+    },
+    "filter_full_characters": {
+        "介绍_过滤完整字符的句子_是否正则匹配": false
     },
     "versionCode": "2",
     "update_content": ""
