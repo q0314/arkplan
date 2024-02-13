@@ -344,6 +344,7 @@
         "招算算": false,
         "8": false,
         "J": false,
+        "+":false,
        ":|：|、|,": true,
        "海|×|0|可|准|TO":true,
        "<":false,

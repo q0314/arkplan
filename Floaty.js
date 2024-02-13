@@ -1127,7 +1127,42 @@ function 执行次数() {
     let level_choices = JSON.parse(
         files.read("./lib/game_data/level_choices.json", (encoding = "utf-8"))
     );
-    adapter = new android.widget.ArrayAdapter(context, android.R.layout.simple_spinner_item, level_choices);
+    function isOpen(level, special) {
+        let now = new Date();
+        let day = now.getDay();
+
+        // 判断当前时间是否在凌晨4点之前
+        if (now < now.setHours(4, 0, 0, 0)) {
+            // 如果是，日期减1
+            day = day - 1;
+        };
+        //特别开放
+        if (special) return true;
+        if (level.day) {
+            return level.day.includes(day);
+
+        } else {
+            return true;
+        }
+
+    }
+
+    let level_choices_open = [];
+    for (let id of level_choices) {
+
+        if (isOpen(id)) {
+            if (typeof id.abbreviation == "object") {
+                for (let k in id.abbreviation) {
+          
+                     level_choices_open.push(k);
+                }
+            } else {
+                level_choices_open.push(id.abbreviation);
+            }
+        }
+    };
+
+    adapter = new android.widget.ArrayAdapter(context, android.R.layout.simple_spinner_item, level_choices_open);
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     rewriteView.level_pick.setAdapter(adapter);
     rewriteView.level_pick.setBackground(createShape(5, 0, 0, [2, setting.bg]));

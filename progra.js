@@ -231,6 +231,11 @@ let collection = {
                 break
             } else if (id.id) {
                 selectResult = this[id.id]((list.levelAbbreviation == displayText["龙门外环"]) ? true : false);
+                if (selectResult) {
+                    if (id.id == "指定剿灭") {
+                        setting.执行 = "剿灭";
+                    }
+                }
                 break
             }
 
@@ -467,11 +472,17 @@ let collection = {
     指定剿灭(龙门外环) {
         tool.Floaty_emit("展示文本", "状态", "状态：执行定时指定剿灭中");
         sleep(500);
-        ITimg.picture("终端", {
+        (ITimg.picture("终端", {
+            action: 0,
             timing: 1000,
             area: 2,
             nods: 1000,
-        });
+        }) || ITimg.picture("终端", {
+            action: 0,
+            timing: 1000,
+            area: 2,
+            threshold: 0.75,
+        }));
         if (!ITimg.picture("上次_剿灭", {
             action: 0,
             timing: 2000,
@@ -593,8 +604,13 @@ function 程序(implem) {
                 } else {
                     唤醒.main();
                     if (collection.main(setting.指定关卡)) {
-                        threadMain.interrupt();
-                        threadMain = threads.start(行动);
+                        if (setting.执行 == "剿灭") {
+                            threadMain.interrupt();
+                            threadMain = threads.start(剿灭);
+                        } else {
+                            threadMain.interrupt();
+                            threadMain = threads.start(行动);
+                        }
                     } else {
                         console.error("自动选择关卡失败");
                     }
@@ -603,6 +619,7 @@ function 程序(implem) {
                 break;
 
             case "剿灭":
+                threadMain.interrupt();
                 threadMain = threads.start(剿灭);
                 break;
             case "定时剿灭":
