@@ -1833,9 +1833,6 @@ function 程序(implem) {
             case "剿灭":
                 window.name.setText("剿灭作战");
                 break;
-            case "上次":
-                window.name.setText("上次作战");
-                break;
             case "定时剿灭":
                 window.name.setText("定时剿灭");
                 break;
@@ -1846,6 +1843,9 @@ function 程序(implem) {
                 window.name.setText("明日计划");
                 break;
         };
+        if (setting.指定关卡.levelAbbreviation == "上次") {
+            window.name.setText("上次作战");
+        }
     });
     if (setting.侧边 == "悬浮窗") {
         threads.start(暂停);

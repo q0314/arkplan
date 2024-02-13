@@ -183,52 +183,61 @@ function 启动应用(package_) {
 
 let collection = {
     main(list) {
-        let selectResult;
-        switch (list.levelAbbreviation) {
-            // case activity_level:
-            case '1-7':
+        let level_choices = JSON.parse(
+            files.read("./lib/game_data/level_choices.json", (encoding = "utf-8"))
+        );
+        function isOpen(level, special) {
+            let now = new Date();
+            let day = now.getDay();
 
-                selectResult = this.固源岩();
+            // 判断当前时间是否在凌晨4点之前
+            if (now < now.setHours(4, 0, 0, 0)) {
+                // 如果是，日期减1
+                day = day - 1;
+            };
+            //特别开放
+            if (special) return true;
+            if (level.day) {
+                return level.day.includes(day);
 
-                break;
-
-            case '龙门币-6/5':
-                //还未写日期校验
-                let week = true;
-                if (week) {
-                    selectResult = this.资源本(displayText["货物运送"], ["CE-6", "CE-5"]);
-                    break
-                } else {
-                    tool.Floaty_emit("展示文本", "状态", "警告：钱本非开放日，跳转经验本...");
-                    //钱_经验本(false);
-                }
-                break;
-            case '经验-6/5':
-
-                selectResult = this.资源本(displayText["战术演习"], ["LS-6", "LS-5"]);
-                break;
-            case '奶/盾芯片':
-            case '奶/盾芯片组':
-                selectResult = this.资源本(displayText["固若金汤"], (this.levelAbbreviation == "奶/盾芯片组") ? "PR-A-2" : "PR-A-1");
-                break;
-            case '术/狙芯片':
-            case '术/狙芯片组':
-                selectResult = this.资源本(displayText["摧枯拉朽"], (this.levelAbbreviation == "术/狙芯片组") ? "PR-B-2" : "PR-B-1");
-                break;
-            case '先/辅芯片':
-            case '先辅狙芯片组':
-                selectResult = this.资源本(displayText["势不可挡"], (this.levelAbbreviation == "先/辅芯片组") ? "PR-C-2" : "PR-C-1");
-                break;
-            case '近/特芯片':
-            case '近/特芯片组':
-                selectResult = this.资源本(displayText["身先士卒"], (this.levelAbbreviation == "近/特芯片组") ? "PR-D-2" : "PR-D-1");
-                break;
+            } else {
+                return true;
+            }
 
         }
+        let selectResult;
+        for (let id of level_choices) {
+            //检验是否选择的关卡
+            if (typeof id.abbreviation == "object") {
+                let abbResult;
+                for (let k in id.abbreviation) {
+                    if (list.levelAbbreviation == k) {
+                        abbResult = true;
+                        break
+                    };
+                }
+                if (!abbResult) {
+                    continue;
+                }
+            } else {
+                if (list.levelAbbreviation != id.abbreviation) {
+                    continue;
+                };
+            }
+
+            if (id.name && isOpen(id)) {
+                console.trace(id.abbreviation);
+                selectResult = this.资源本(id["name"], id.level ? id.level : id.abbreviation[Object.keys(id.abbreviation).find(key => key == list.levelAbbreviation)]);
+                break
+            } else if (id.id) {
+                selectResult = this[id.id]((list.levelAbbreviation == displayText["龙门外环"]) ? true : false);
+                break
+            }
+
+        };
+
         if (selectResult) {
             return true;
-            //threadMain.interrupt();
-            //threadMain = threads.start(行动);
 
         } else {
             tool.Floaty_emit("展示文本", "状态", "状态：自动选择关卡失败.");
@@ -323,6 +332,8 @@ let collection = {
                 log_policy: true,
                 refresh: false,
             }))) {
+                swipe(this.staging.left, this.staging.bottom, this.staging.right, width, 300);
+                sleep(100);
                 swipe(this.staging.left, this.staging.bottom, this.staging.right, width, 300);
                 sleep(500);
                 break;
@@ -452,6 +463,80 @@ let collection = {
         }
 
 
+    },
+    指定剿灭(龙门外环) {
+        tool.Floaty_emit("展示文本", "状态", "状态：执行定时指定剿灭中");
+        sleep(500);
+        ITimg.picture("终端", {
+            timing: 1000,
+            area: 2,
+            nods: 1000,
+        });
+        if (!ITimg.picture("上次_剿灭", {
+            action: 0,
+            timing: 2000,
+            nods: 1000,
+            area: "右上半屏",
+        }) && !ITimg.picture("上次_剿灭", {
+            action: 0,
+            timing: 2000,
+            area: "右上半屏",
+            threshold: 0.75,
+        })) {
+
+            toast("没有在终端页面找到待办_剿灭,无法执行上次-剿灭");
+            console.error("没有在终端页面找到待办_剿灭,无法执行上次-剿灭");
+            tool.Floaty_emit("展示文本", "状态", "状态：暂停，找不到待办_剿灭");
+            tool.Floaty_emit("暂停", "结束程序");
+            return false
+        };
+        if (龙门外环) {
+
+            click(height / 2, 25);
+            sleep(1000);
+            click(height, width - 30);
+            sleep(1000);
+            if (!ITimg.picture("上次_龙门外环", {
+                action: 0,
+                timing: 2000,
+                area: "右半屏",
+            })) {
+                click(height - 60, width - 30);
+                sleep(1000);
+                if (!ITimg.picture("上次_龙门外环", {
+                    action: 0,
+                    timing: 2000,
+                    area: "右半屏",
+                })) {
+                    click(height - 120, width - 30);
+                    sleep(1000);
+
+                    if (!ITimg.picture("上次_龙门外环", {
+                        action: 0,
+                        timing: 2000,
+                        area: "右半屏",
+                    })) {
+                        click(height - 180, width - 30);
+                        sleep(1000);
+                        if (!ITimg.picture("上次_龙门外环", {
+                            action: 0,
+                            timing: 2000,
+                            area: "右半屏",
+                        })) {
+                            toast("没有在剿灭页面找到上次_龙门外环,无法执行上次-剿灭");
+                            console.error("没有在剿灭页面找到上次_龙门外环,无法执行上次-剿灭");
+                            tool.Floaty_emit("展示文本", "状态", "状态：暂停，找不到龙门外环");
+                            tool.Floaty_emit("暂停", "结束程序");
+                            return false;
+                        }
+
+                    }
+                }
+
+
+            }
+        }
+        return true;
     }
 }
 
@@ -516,24 +601,34 @@ function 程序(implem) {
                 }
 
                 break;
-            case "基建":
-                threadMain = threads.start(上次);
-                break;
+
             case "剿灭":
                 threadMain = threads.start(剿灭);
                 break;
             case "定时剿灭":
-                threadMain = threads.start(上次);
+                唤醒.main();
+                if (collection.main(setting.指定关卡)) {
+                    threadMain.interrupt();
+                    threadMain = threads.start(剿灭);
+                } else {
+                    console.error("自动选择关卡失败");
+                }
                 break;
+            case "基建":
             case "定时基建":
-                threadMain = threads.start(上次);
+                threadMain.setName("上次作战");
+                唤醒.main();
+                toastLog("启动基建收菜程序");
+
+                tool.Floaty_emit("展示文本", "状态", "状态：查找基建/导航等");
+                threadMain.interrupt();
+                threadMain = threads.start(基建);
                 break;
+
             case "自定义模块":
                 threadMain = threads.start(自定义)
                 break;
         };
-        //throw new java.lang.RuntimeException("这是exception")
-
 
         // Combat_report.record("开始运行PRTS辅助，执行模式：" + implem);
     });
@@ -785,102 +880,6 @@ function 基建换班(fatigue_state) {
     }
 }
 
-function 上次() {
-    sleep(50)
-    threadMain.setName("上次作战");
-    唤醒.main();
-
-
-    switch (setting.执行) {
-        case "定时基建":
-        case "基建":
-            toastLog("两秒后启动基建收菜程序");
-
-            tool.Floaty_emit("展示文本", "状态", "状态：查找基建/导航等");
-            threadMain.interrupt();
-            threadMain = threads.start(基建);
-
-            break;
-        case "定时剿灭":
-            toastLog("两秒后启动定时剿灭程序");
-            tool.Floaty_emit("展示文本", "状态", "状态：执行定时剿灭中");
-            sleep(500);
-            ITimg.picture("终端", {
-                timing: 1000,
-                area: 2,
-                nods: 1000,
-            });
-            if (!ITimg.picture("上次_剿灭", {
-                action: 0,
-                timing: 2000,
-                nods: 1000,
-                area: "右上半屏",
-            }) && !ITimg.picture("上次_剿灭", {
-                action: 0,
-                timing: 2000,
-                area: "右上半屏",
-                threshold: 0.75,
-            })) {
-
-                toast("没有在终端页面找到待办_剿灭,无法执行上次-剿灭");
-                console.error("没有在终端页面找到待办_剿灭,无法执行上次-剿灭");
-                tool.Floaty_emit("展示文本", "状态", "状态：暂停，找不到待办_剿灭");
-                tool.Floaty_emit("暂停", "结束程序");
-                return false
-
-            }
-            click(height / 2, 25);
-            sleep(1000);
-            click(height, width - 30);
-            sleep(1000);
-            if (!ITimg.picture("上次_龙门外环", {
-                action: 0,
-                timing: 2000,
-                area: "右半屏",
-            })) {
-                click(height - 60, width - 30);
-                sleep(1000);
-                if (!ITimg.picture("上次_龙门外环", {
-                    action: 0,
-                    timing: 2000,
-                    area: "右半屏",
-                })) {
-                    click(height - 120, width - 30);
-                    sleep(1000);
-
-                    if (!ITimg.picture("上次_龙门外环", {
-                        action: 0,
-                        timing: 2000,
-                        area: "右半屏",
-                    })) {
-                        click(height - 180, width - 30);
-                        sleep(1000);
-                        if (!ITimg.picture("上次_龙门外环", {
-                            action: 0,
-                            timing: 2000,
-                            area: "右半屏",
-                        })) {
-                            toast("没有在剿灭页面找到上次_龙门外环,无法执行上次-剿灭");
-                            console.error("没有在剿灭页面找到上次_龙门外环,无法执行上次-剿灭");
-                            tool.Floaty_emit("展示文本", "状态", "状态：暂停，找不到龙门外环");
-                            tool.Floaty_emit("暂停", "结束程序");
-                            return false;
-                        }
-
-                    }
-                }
-
-                //  tool.writeJSON("剿灭", "6");
-                // tool.writeJSON("理智", "3");
-                threadMain.interrupt();
-                threadMain = threads.start(剿灭);
-
-            }
-            break;
-
-    }
-
-}; //线程
 /**
      * 负责启动游戏进入到主页
      */
@@ -3688,33 +3687,6 @@ function 等待提交反馈至神经() {
     return false
 }
 
-function 指定关卡(Manual) {
-    tool.Floaty_emit("面板", "复位");
-
-    try {
-        threadMain.setName("指定关卡");
-    } catch (err) { };
-
-
-    if (ITimg.language != "简中服") {
-        toastLog("非常抱歉，自动指定关卡目前仅简中服可使用");
-        tool.Floaty_emit("面板", "展开");
-        threadMain.interrupt();
-        threadMain = threads.start(任务);
-        return;
-    }
-
-    setting = tool.readJSON("configure");
-    if (!ITimg.initocr()) {
-        tool.Floaty_emit("面板", "展开");
-        return false;
-    }
-
-    collection.choice(setting.指定关卡);
-}
-
-
-
 
 
 function 公招(Manual) {
@@ -4192,7 +4164,7 @@ function 公招(Manual) {
                 </linear>
                 <vertical id="tag_sett" padding="20 10" visibility="gone" >
                     <text margin="15"
-                        text="声明:tag词条是由mlkit ocr识别屏幕文字获得的,不一定准确,如果你遇到识别不准的情况可联系开发者进行修正"
+                        text="声明:tag词条是由{{ITimg.default_list.ocr.ocr_type}}识别屏幕文字获得的,不一定准确,如果你遇到识别不准的情况可联系开发者进行修正"
                         textColor="red"
                         textSize="15sp"
                         layout_gravity="center"
