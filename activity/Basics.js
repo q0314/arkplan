@@ -938,12 +938,11 @@ ui.root.on("click", () => {
         adb: false
     });
 
-    let path_ = context.getExternalFilesDir(null).getAbsolutePath()
-    files.createWithDirs(path_ + "/mrfz/screencap.png")
-    let root = shell("screencap -p " + path_ + "/mrfz/screencap.png", true)
+    files.createWithDirs(package_path + "mrfz/screencap.png");
+    let root = shell("screencap -p " + package_path + "mrfz/screencap.png", true);
 
     if (root.code == 0) {
-        toast("开启成功，建议关闭使用超级权限通知")
+        toast("开启成功，建议关闭使用超级权限通知");
         ui.root.checked = true;
         tool.writeJSON("截图", "root")
 
@@ -960,14 +959,14 @@ ui.Shizuku.on("click", (checked) => {
         $shell.setDefaultOptions({
             adb: true
         });
-        let path_ = context.getExternalFilesDir(null).getAbsolutePath()
-        files.createWithDirs(path_ + "/mrfz/screencap.png")
-        let adb = shell("screencap -p " + path_ + "/mrfz/screencap.png")
+    
+        files.createWithDirs(package_path + "mrfz/screencap.png");
+        let adb = shell("screencap -p " + package_path + "mrfz/screencap.png");
 
         if (adb.code == 0) {
-            toast("开启成功")
+            toast("开启成功");
             // ui.Shizuku.checked = true;
-            tool.writeJSON("截图", "Shizuku")
+            tool.writeJSON("截图", "Shizuku");
         } else {
             toastLog("开启失败" + adb);
             ui.Shizuku.checked = false;
@@ -1013,9 +1012,6 @@ ui.xpyx.on("click", (view) => {
 
             }
 
-            setTimeout(function () {
-                files.remove(sh_pathn);
-            }, 5000);
 
             if (setting.监听键 == "音量下键") {
                 toastLog("请先关闭音量下键停止PRTS辅助")
@@ -1033,6 +1029,7 @@ ui.xpyx.on("click", (view) => {
                     if (sh_root_result.code != 0) {
                         toastLog("测试root权限打开屏幕失败,\n错误信息:" + sh_root_result)
                     } else {
+                        files.remove(sh_path);
                         toastLog("root权限测试打开屏幕成功")
                         sh_path = true;
                     }
@@ -1053,7 +1050,7 @@ ui.xpyx.on("click", (view) => {
                     try {
                         let sh_adb_result = shell("sh " + sh_path, {
                             adb: true,
-                        })
+                        });
                         if (sh_adb_result.code != 0) {
                             toastLog("测试adb权限打开屏幕失败\n错误信息:" + sh_adb_result)
                             view.checked = false;

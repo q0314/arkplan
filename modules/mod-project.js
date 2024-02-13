@@ -237,7 +237,7 @@ let exp = {
                 try {
                     let _items = http.get('https://api.github.com/repos/' +
                   //'SuperMonster003/Ant-Forest/releases' +
-                       'qiao34653/arkplan/releases' +
+                       'q0314/arkplan/releases' +
                         '?per_page=' + _per_page + '&page=' + _cur_page++)
                         .body.json().filter(o => o.tag_name >= _min_ver);
                     if (global._$_get_proj_releases_interrupted) {
