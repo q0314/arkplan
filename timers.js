@@ -36,7 +36,7 @@ if (id_str == undefined) {
     exit();
 }
 
-
+判断();
 function 判断() {
     var Floaty;
     var Timing_data;
@@ -67,7 +67,7 @@ function 判断() {
         if (!device.isCharging() && device.getBattery() < setting.电量) {
             toast("定时任务启动失败，电量低于设定值" + setting.电量 + "%且未充电");
             console.error("定时任务启动失败，电量低于设定值" + setting.电量 + "%且未充电");
-            if (setting.个人设置1 == "true") {
+            if (setting.震动) {
                 device.vibrate(2000);
             };
             return;
@@ -76,20 +76,30 @@ function 判断() {
 
 
     log("尝试唤醒设备");
-    device.wakeUpIfNeeded()
+     device.wakeUpIfNeeded()
     if (!device.isScreenOn()) {
-        device.wakeUp()
-    }
-
+        if (storage_d.get("noticeWaken")) {
+            require("./modules/notice.js")("唤醒屏幕", {
+                id: "定时任务",
+                priority: 2,
+                ongoing:false,
+                category: "定时任务",
+                description: "发送通知优先级最高的通知信息使系统唤醒屏幕",
+                text: "当device.wakeUp()命令无法点亮屏幕时，发送通知优先级最高的通知信息使系统唤醒屏幕"
+            });
+        } else {
+            device.wakeUp();
+        }
+    };
     if (setting.解锁屏幕) {
 
         log('======解锁屏幕======')
 
-        var password = storage_d.get("password")
+        let password = storage_d.get("password")
         let ExternalUnlockDevice = files.exists(password) ? require(password) : null
 
         if (ExternalUnlockDevice) {
-            log('使用自定义解锁模块')
+            log('使用自定义解锁模块');
             try {
                 ExternalUnlockDevice.implement();
 
@@ -140,11 +150,11 @@ function 判断() {
         console.warn("未开启自动解锁屏幕，仅点亮屏幕尝试下")
         device.wakeUp();
     }
- 
-    console.info("定时任务ID："+id_str)
+
+    console.info("定时任务ID：" + id_str)
     timers = storage_d.get("items");
     for (let i = 0; i < timers.length; i++) {
-        console.info("任务配置ID："+timers[i].id)
+        console.info("任务配置ID：" + timers[i].id)
         if (timers[i].id == id_str) {
             Timing_data = timers[i];
             id_str = i;
@@ -155,29 +165,30 @@ function 判断() {
     if (Timing_data == undefined) {
         throw new Error("解析数据失败, 未定义：" + Timing_data)
     }
-    try {
-        switch (Timing_data.type) {
-            case '自定义模式':
-                Timing_data.type = "自定义模块";
-                break;
-            case '上一次作战':
-                Timing_data.type = "上次";
-                break;
-            case '基建收菜':
-                Timing_data.type = "定时基建";
-                break;
-            case '龙门外环':
-                Timing_data.type = "定时剿灭";
-                break;
-            default:
-                toastLog("未匹配到的数据:" + JSON.stringify(Timing_data))
-                exit()
-                break;
-        }
-    } catch (err) {
-        console.error(JSON.stringify(Timing_data))
-        throw new Error(" 解析数据失败, " + err.message)
-    }
+    /*  try {
+          switch (Timing_data.type) {
+              case '自定义模式':
+                  Timing_data.type = "自定义模块";
+                  break;
+              case '上次':
+                  Timing_data.type = "上次";
+                  setting.指定关卡.levelAbbreviation == "上次";
+                  break;
+              case '基建收菜':
+                  Timing_data.type = "定时基建";
+                  break;
+              case '龙门外环':
+                  Timing_data.type = "定时剿灭";
+                  break;
+              default:
+                  toastLog("未匹配到的数据:" + JSON.stringify(Timing_data))
+                  exit()
+                  break;
+          }
+      } catch (err) {
+          console.error(JSON.stringify(Timing_data))
+          throw new Error(" 解析数据失败, " + err.message)
+      }  */
     switch (Timing_data.The_server) {
         case '简中服':
             Timing_data.The_server = "com.hypergryph.arknights"
@@ -193,36 +204,39 @@ function 判断() {
             exit()
             break;
     }
-    
+
     sleep(500);
     app.launchPackage(context.getPackageName())
-    sleep(2000);
+    sleep(1500);
     $settings.setEnabled('foreground_service', true);
     sleep(500)
     if (Floaty = tool.script_locate("Floaty.js")) {
         toastLog("关闭上一个悬浮窗，启动新程序")
         Floaty.emit("暂停", "关闭程序");
-    }
+    };
     tool.writeJSON("执行", Timing_data.type);
-    if(Timing_data.frequency){
-    tool.writeJSON(Timing_data.frequency[0], Timing_data.frequency[1]);
+
+    setting.指定关卡.levelAbbreviation = Timing_data.specified;
+    tool.writeJSON("指定关卡", setting.指定关卡);
+    if (Timing_data.frequency) {
+        tool.writeJSON(Timing_data.frequency[0], Timing_data.frequency[1]);
     }
-    if(Timing_data.reason != false){
-    tool.writeJSON("理智", Timing_data.reason);
+    if (Timing_data.reason != false) {
+        tool.writeJSON("理智", Timing_data.reason);
     }
-    tool.writeJSON("音量",Timing_data.volume);
+    tool.writeJSON("音量", Timing_data.volume);
     sleep(500);
     tool.writeJSON("包名", Timing_data.The_server);
 
-    
-    var js= "./Floaty.js"
-    if(files.exists("f_main.js")){
-        js= "./c_Floaty.js"
+
+    let js = "./Floaty.js"
+    if (files.exists("f_main.js")) {
+        js = "./c_Floaty.js"
     }
     engines.execScriptFile(js)
 
-    setTimeout(function() {
-        if(Timing_data.screen){
+    setTimeout(function () {
+        if (Timing_data.screen) {
             console.info("将在熄屏状态下运行此定时任务")
             let execution = engines.all();
             for (let i = 0; i < execution.length; i++) {
@@ -232,9 +246,9 @@ function 判断() {
                 }
             }
             engines.execScript("Screen operation", "if(files.exists(files.path('./module/screen.js'))){require('./module/screen.js').mask()}else{require('./screen.js').mask()}");
-          };
-    },5000)
-    setTimeout(function() {
+        };
+    }, 5000)
+    setTimeout(function () {
         if (Timing_data.shijian.indexOf("单次") != -1) {
             console.verbose("删除单次定时任务")
             timers.splice(id_str, 1);
@@ -244,7 +258,8 @@ function 判断() {
         exit();
     }, 30000);
 
-}
+};
+/*
 threads.start(function(){
 engines.execScript("new Timers", "var Config=engines.myEngine().execArgv;var id_str = Config.id;eval(Config.load)();", {
     arguments: {
@@ -252,4 +267,5 @@ engines.execScript("new Timers", "var Config=engines.myEngine().execArgv;var id_
         id: id_str,
     },
 });
-})
+});
+*/
