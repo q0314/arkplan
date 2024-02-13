@@ -693,20 +693,7 @@ ui.level_pick.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
         tool.writeJSON("指定关卡", setting.指定关卡);
     }
 }));
-/*
-ui.level_pick.click((view) => {
 
-    BottomWheelPicker.setData(["当前/上次", "1-7", "龙门币-6/5", "红票", "经验-6/5", "术/狙芯片", "术/狙芯片组", "先/辅芯片", "先/辅芯片组", "近/特芯片", "近/特芯片组"])
-        .show().then(result => {
-            view.setText(result.text);
-            setting.指定关卡 ? setting.指定关卡.levelAbbreviation = result.text : setting.指定关卡 = {
-                levelAbbreviation: result.text,
-            };
-            tool.writeJSON("指定关卡", setting.指定关卡);
-
-        });
-})
-*/
 let popView,
     popWin,
     pop_textColor = "#ffffff",
@@ -2441,9 +2428,14 @@ ui.timed_tasks_list.on("item_click", function (itemView, i) {
 
 ui.timed_tasks_add.on("click", function () {
     setting = tool.readJSON("configure");
-    require("./subview/timed_tasks_set.js")(timed_tasks_list, function (parameter) {
+    let str_level_choices = [];
+    for (let i = 1; i < ui['level_pick'].getCount(); i++) {
+        str_level_choices.push(String(ui['level_pick'].getItemAtPosition(i)));
+    };
+    require("./subview/timed_tasks_set.js")(timed_tasks_list, str_level_choices, function (parameter) {
         timed_tasks_storage.put("items", parameter);
-    })
+    });
+    delete str_level_choices;
 
 }) //定时任务添加事件
 
@@ -3679,12 +3671,47 @@ function Update_UI(i) {
             ui.module_config_txt.setText("模块\n配置")
 
             if (gallery.gallery_info) {
-                change_list(ui.level_pick, level_choices);
-                SE执行 = level_choices.indexOf(setting.指定关卡.levelAbbreviation);
+                function isOpen(level, special) {
+                    let now = new Date();
+                    let day = now.getDay();
+
+                    // 判断当前时间是否在凌晨4点之前
+                    if (now < now.setHours(4, 0, 0, 0)) {
+                        // 如果是，日期减1
+                        day = day - 1;
+                    };
+                    //特别开放
+                    if (special) return true;
+                    if (level.day) {
+                        return level.day.includes(day);
+
+                    } else {
+                        return true;
+                    }
+
+                }
+
+                let level_choices_open = [];
+                for (let id of level_choices) {
+
+                    if (isOpen(id)) {
+                        if (typeof id.abbreviation == "object") {
+                            for (let k in id.abbreviation) {
+                      
+                                 level_choices_open.push(k);
+                            }
+                        } else {
+                            level_choices_open.push(id.abbreviation);
+                        }
+                    }
+                };
+
+                change_list(ui.level_pick, level_choices_open);
+                SE执行 = level_choices_open.indexOf(setting.指定关卡.levelAbbreviation);
                 if (SE执行 != -1) {
                     ui.level_pick.setSelection(SE执行);
                 };
-                
+
                 change_list(ui.implement, modeGatherText);
 
                 SE执行 = modeGatherText.indexOf(setting.执行);
