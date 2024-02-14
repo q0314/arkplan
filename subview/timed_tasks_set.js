@@ -452,7 +452,7 @@ timed_tasks_set = function (timed_tasks_list, level_choices, callback) {
             app: jsPath,
             frequency: frequency,
             reason: reason,
-            type:  tool.writeJSON("执行", modeGather[modeGatherText[uii.implement.getSelectedItemPosition()]]),
+            type:  modeGather[modeGatherText[uii.implement.getSelectedItemPosition()]],
             specified: uii.level_pick.getSelectedItem().toString(),
             volume: uii.jyyx.checked,
             screen: uii.xpyx.checked,

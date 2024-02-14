@@ -256,7 +256,6 @@ let set_up = dwadlink.get("data", {
     download_catalogue: files.path("/sdcard/脚本/模块下载目录/")
 })
 var path,
-    name,
     tool;
 try {
     tool = require("./modules/tool.js");
