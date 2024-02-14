@@ -1472,8 +1472,8 @@ function sign(tokens, callback) {
                         };*/
 
                     }).finally(() => {
-                        _t--;
-                        if (_t <= 0) {
+                        tokens.pop();
+                        if (tokens.length <= 0) {
                             console.log("森空岛签到完成");
                             token_storage.put("arknights_binding", roles_list);
                             token_global = false;
@@ -1495,11 +1495,12 @@ function sign(tokens, callback) {
                 getCredToken.catch((error) => {
                     log(error);
                     tips = "签到失败";
-                    message = '角色' + _t + '：签到失败，' + error;
-                    _t--;
-                   console.error(error);
+
+                    message = '角色' + (tokens, length - 1) + '：签到失败，' + error;
+                    tokens.pop();
+                    console.error(error);
                 });
-                
+                _t--;
             };
             //保持仅签到模块时持续运行
             threads.start(function () {
