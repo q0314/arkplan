@@ -600,6 +600,7 @@ let exp = {
             success_title: _opt.success_title || '部署完成',
             on_interrupt_btn_text: _opt.on_interrupt_btn_text || 'B',
             show_min_max: true,
+            type:"foreground-or-overlay",
             onStart(v, d) {
                 _onStart();
                 dialogsx.setProgressColorTheme(d, 'download');
