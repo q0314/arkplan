@@ -87,6 +87,7 @@ let logout_url = "https://as.hypergryph.com/user/info/v1/logout";
  */
 
 function get_cred_by_token(token) {
+    console.verbose("认证");
     return new Promise((resolve, reject) => {
         http.postJson(grant_code_url, {
             'appCode': app_code,
@@ -1452,11 +1453,12 @@ function sign(tokens, callback) {
         if (tokens.length > 0) {
 
             toastLog('森空岛签到: \n使用已存储token签到, 可用数量:' + tokens.length);
-            let wait = true;
+            let _t = tokens.length;
+            while (_t) {
 
-            for (let i = 0; i < tokens.length; i++) {
-                token_global = tokens[i];
-                get_cred_by_token(token_global).then((value) => {
+                token_global = tokens[_t - 1];
+                let getCredToken = get_cred_by_token(token_global);
+                getCredToken.then((value) => {
                     console.trace(value);
                     do_sign(value).then((index) => {
                         /*try {
@@ -1470,7 +1472,8 @@ function sign(tokens, callback) {
                         };*/
 
                     }).finally(() => {
-                        if (i == tokens.length) {
+                        _t--;
+                        if (_t <= 0) {
                             console.log("森空岛签到完成");
                             token_storage.put("arknights_binding", roles_list);
                             token_global = false;
@@ -1488,14 +1491,15 @@ function sign(tokens, callback) {
                         }
                     });
 
-                }).catch((error) => {
-                    log(error)
-                    tips = "签到失败";
-                    message = '角色' + i + '：签到失败，' + error;
-
-                    console.error(error);
                 });
-
+                getCredToken.catch((error) => {
+                    log(error);
+                    tips = "签到失败";
+                    message = '角色' + _t + '：签到失败，' + error;
+                    _t--;
+                   console.error(error);
+                });
+                
             };
             //保持仅签到模块时持续运行
             threads.start(function () {
@@ -1517,61 +1521,61 @@ function sign(tokens, callback) {
  * @returns 
  */
 function game_info(token) {
-    return new Promise((resolve, reject) => {
+    let gameInfo = new Promise((resolve, reject) => {
         //使用token获得认证代码,再使用认证代码获取cred,签名sign_key即token返回
-        get_cred_by_token(token)
-            .then((value) => {
-                header['cred'] = value['cred'];
-                sign_key = value['token'];
-                let uid = roles_list.findIndex((curr) => curr.token == token);
-                if (uid != -1) {
-                    uid = roles_list[uid].defaultUid;
+
+        get_cred_by_token(token).then((value) => {
+            header['cred'] = value['cred'];
+            sign_key = value['token'];
+            let uid = roles_list.findIndex((curr) => curr.token == token);
+            if (uid != -1) {
+                uid = roles_list[uid].defaultUid;
+            } else {
+                //获取uid
+                get_binding_list(header['cred'], sign_key)
+                    .then((result) => {
+                        for (let i = 0; i < result.length; i++) {
+                            uid = result[i]['uid'];
+                        };
+
+                    })
+                    .catch((error) => {
+                        throw new Error(error);
+                    });
+            };
+
+            console.verbose("获取角色uid:" + uid + "数据");
+
+            http.get(game_info_url + "?uid=" + uid, {
+                headers: get_sign_header(game_info_url + "?uid=" + uid, 'get', null, header)
+            }, (res, err) => {
+                let statusCode = res['statusCode'] != 200;
+
+                if (err || statusCode) {
+                    reject(err || {
+                        "code": '获得角色数据失败',
+                        "msg": res['statusMessage']
+                    });
                 } else {
-                    //获取uid
-                    get_binding_list(header['cred'], sign_key)
-                        .then((result) => {
-                            for (let i = 0; i < result.length; i++) {
-                                uid = result[i]['uid'];
-                            };
 
-                        })
-                        .catch((error) => {
-                            throw new Error(error);
-                        });
-                };
-
-                console.verbose("获取角色uid:" + uid + "数据");
-
-                http.get(game_info_url + "?uid=" + uid, {
-                    headers: get_sign_header(game_info_url + "?uid=" + uid, 'get', null, header)
-                }, (res, err) => {
-                    let statusCode = res['statusCode'] != 200;
-
-                    if (err || statusCode) {
-                        reject(err || {
+                    let content = gzipInputStream(res.body.bytes());
+                    if (!content) {
+                        reject({
                             "code": '获得角色数据失败',
-                            "msg": res['statusMessage']
+                            "msg": content
                         });
-                    } else {
-
-                        let content = gzipInputStream(res.body.bytes());
-                        if (!content) {
-                            reject({
-                                "code": '获得角色数据失败',
-                                "msg": content
-                            });
-                        }
-
-                        resolve(getGameInfo(content))
                     }
 
-                });
-            })
-            .catch((error) => {
-                throw new Error(error.code + ": " + error.msg)
+                    resolve(getGameInfo(content))
+                }
 
             });
+        }).catch((error) => {
+            throw new Error(error.code + ": " + error.msg)
+
+        });
     });
+    return gameInfo;
 
 }
 function getGameInfo(tree) {
