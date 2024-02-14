@@ -1,12 +1,12 @@
 let {
     $$cvt, isNullish,
 } = require('./mod-global');
-let {appx} = require('./ext-app');
-let {httpx} = require('./ext-http');
-let {filesx} = require('./ext-files');
-let {threadsx} = require('./ext-threads');
-let {dialogsx} = require('./ext-dialogs');
-let {storagesx} = require('./ext-storages');
+let { appx } = require('./ext-app');
+let { httpx } = require('./ext-http');
+let { filesx } = require('./ext-files');
+let { threadsx } = require('./ext-threads');
+let { dialogsx } = require('./ext-dialogs');
+let { storagesx } = require('./ext-storages');
 
 /* Here, importClass() is not recommended for intelligent code completion in IDE like WebStorm. */
 /* The same is true of destructuring assignment syntax (like `let {Uri} = android.net`). */
@@ -25,19 +25,19 @@ let _ = {
         finish_restore: '清理并完成项目恢复',
     },
     structure: [
-        {name: '/activity',necessary:true},
-        {name: '/subview', necessary: true},
-        {name: '/modules', necessary: true},
-        {name: '/lib',necessary:true},
-        {name: 'ITimg.js', necessary: true},
-        {name: 'progra.js'},
-        {name: 'Floaty.js'},
-        {name: 'main.js'},
-        {name: 'theme.js', necessary: true},
-        {name: 'timers.js', necessary: true},
-        {name: 'project.json', necessary: true},
-       // {name: 'LICENSE'},
-      //  {name: 'README.md'},
+        { name: '/activity', necessary: true },
+        { name: '/subview', necessary: true },
+        { name: '/modules', necessary: true },
+        { name: '/lib', necessary: true },
+        { name: 'ITimg.js', necessary: true },
+        { name: 'progra.js' },
+        { name: 'Floaty.js' },
+        { name: 'main.js' },
+        { name: 'theme.js', necessary: true },
+        { name: 'timers.js', necessary: true },
+        { name: 'project.json', necessary: true },
+        // {name: 'LICENSE'},
+        //  {name: 'README.md'},
     ],
     get ignore_list() {
         return this._ignore_list = this._ignore_list
@@ -108,7 +108,7 @@ let exp = {
         let _res = {
             version_name: _ver_name,
             version_code: _ver_code,
-            main: {name: _main_name, path: _main_path},
+            main: { name: _main_name, path: _main_path },
             path: _path,
         };
         if (files.exists(_json_path)) {
@@ -117,7 +117,8 @@ let exp = {
                 return Object.assign(_res, {
                     version_name: 'v' + _o.versionName,
                     version_code: Number(_o.versionCode),
-                    main: {name: _o.main, path: files.join(_path, _o.main)},
+                    main: { name: _o.main, path: files.join(_path, _o.main) },
+                    packageName: _o.packageName
                 });
             } catch (e) {
                 console.warn(e.message);
@@ -174,8 +175,8 @@ let exp = {
     /**
      * @return {string}
      */
-    getPackageName(packageName){
-      //  importPackage(android.content);
+    getPackageName(packageName) {
+        //  importPackage(android.content);
         return context.getPackageManager().getPackageInfo(packageName, 0).versionName;
     },
     /**
@@ -220,7 +221,7 @@ let exp = {
                 dialogsx.setProgressColorTheme(_p_diag = dialogsx.builds([
                     null, '正在获取版本信息...', 0, 0, 'I', 1,
                 ], {
-                    progress: {max: -1, showMinMax: false, horizontal: true},
+                    progress: { max: -1, showMinMax: false, horizontal: true },
                     keycode_back: 'disabled',
                 }).on('positive', (d) => {
                     d.dismiss();
@@ -236,8 +237,8 @@ let exp = {
             while (_max--) {
                 try {
                     let _items = http.get('https://api.github.com/repos/' +
-                  //'SuperMonster003/Ant-Forest/releases' +
-                       'q0314/arkplan/releases' +
+                        //'SuperMonster003/Ant-Forest/releases' +
+                        'q0314/arkplan/releases' +
                         '?per_page=' + _per_page + '&page=' + _cur_page++)
                         .body.json().filter(o => o.tag_name >= _min_ver);
                     if (global._$_get_proj_releases_interrupted) {
@@ -277,13 +278,13 @@ let exp = {
                 o.version_name = o.tag_name;
 
                 o.brief_info_str = [
-                    {key: 'name', desc: '标题'},
-                    {key: 'tag_name', desc: '标签'},
+                    { key: 'name', desc: '标题' },
+                    { key: 'tag_name', desc: '标签' },
                     {
                         key: 'published_at', desc: '发布',
                         cvt: typeof $$cvt !== 'undefined' && $$cvt.date,
                     },
-                    {key: 'body', desc: '内容描述'},
+                    { key: 'body', desc: '内容描述' },
                 ].map((info) => {
                     let _k = info.key;
                     let _v = o[_k];
@@ -337,7 +338,7 @@ let exp = {
         /**
          * @return {GitHub.Releases.ExtendedListItem}
          */
-       let _getRelease = () => this.getReleases(Object.assign(_opt, {
+        let _getRelease = () => this.getReleases(Object.assign(_opt, {
             max_items: 100, per_page: 100,
         })).filter(o => this.version.isCared(o, _opt.ignore_list))[0];
         if (typeof callback !== 'function') {
@@ -448,7 +449,7 @@ let exp = {
                             onDownloadFailure(e) {
                                 _max || _onFailure('请求失败: ' + e);
                             },
-                        }, {is_async: false});
+                        }, { is_async: false });
                     } catch (e) {
                         _onFailure(e.message);
                     }
@@ -491,7 +492,7 @@ let exp = {
             }
             return false;
         }
-      if (!files.isDir(_path)) {
+        if (!files.isDir(_path)) {
             if (is_throw_allowed) {
                 throw Error('Passed "dir" is not a directory');
             }
@@ -503,8 +504,8 @@ let exp = {
         return _.structure
             .filter(o => o.necessary)
             .map((o) => o.name[0] === filesx.sep
-                ? {name: o.name.slice(1), is_dir: true}
-                : {name: o.name})
+                ? { name: o.name.slice(1), is_dir: true }
+                : { name: o.name })
             .every((o) => {
                 if (_files.indexOf(o.name) > -1) {
                     let _cA = o.is_dir;
@@ -545,7 +546,7 @@ let exp = {
 
         let _getVersionByTag = (tag) => {
             if (tag.match(/^(newest|latest)$/)) {
-                return this.getNewestRelease({show_progress_dialog: true});
+                return this.getNewestRelease({ show_progress_dialog: true });
             }
             if (tag.match(/^(newest|latest)_cared$/)) {
                 return this.getNewestReleaseCared({
@@ -633,7 +634,7 @@ let exp = {
                         onDownloadFailure(e) {
                             reject(e);
                         },
-                    }, {is_async: true, path: _full_path});
+                    }, { is_async: true, path: _full_path });
                 }),
             }, {
                 desc: _steps.decompress,
@@ -641,7 +642,7 @@ let exp = {
                     filesx.unzip(v.downloaded_path, null, {
                         onUnzipProgress: o => d.setProgressData(o),
                         onUnzipSuccess(r) {
-                             let _path = r.unzipped_path;
+                            let _path = r.unzipped_path;
                             if (!exp.isAlike(_path)) {
                                 _path = files.join(_path, files.listDir(_path)[0]);
                             }
@@ -654,7 +655,7 @@ let exp = {
                             }));
                         },
                         onUnzipFailure: e => reject(e),
-                    }, {to_archive_name_folder: true, is_delete_source: true});
+                    }, { to_archive_name_folder: true, is_delete_source: true });
                 }),
             }, {
                 desc: _steps.backup,
@@ -665,28 +666,45 @@ let exp = {
                     }
                     this.backup({
                         onBackupProgress: o => d.setProgressData(o),
-                        onBackupSuccess: r => resolve(Object.assign(v, {backup: r})),
+                        onBackupSuccess: r => resolve(Object.assign(v, { backup: r })),
                         onBackupFailure: e => reject(e),
-                    }, {remark: '版本升级前的自动备份', is_save_storage: true});
+                    }, { remark: '版本升级前的自动备份', is_save_storage: true });
                 }),
             }, {
                 desc: _steps.files_update,
                 action: (v, d) => new Promise((resolve, reject) => {
                     let _tar = this.getLocalPath(true);
-                    log(v.unzipped_proj_path)
-                    console.trace( _tar)
-                    filesx.copy(v.unzipped_proj_path, _tar, {is_unbundled: true}, {
+                    // log(v.unzipped_proj_path)
+                    console.trace(_tar);
+                    let _json_name = 'project.json';
+                    let _o = JSON.parse(filesx.read(files.join(v.unzipped_proj_path, _json_name), '{}'));
+                    //兼容明日计划32位
+                    if (this.getLocal().packageName != _o.packageName) {
+                        let _json_path = files.join(_tar, _json_name);
+                        let _y = JSON.parse(filesx.read(_json_path));
+                        _y.main = _o.main;
+                        _y.versionCode = _o.versionCode;
+                        _y.versionName = _o.versionName;
+                        files.write(
+                            _json_path,
+                            _y,
+                            (encoding = "utf-8")
+                        );
+                        filesx.copy(_json_path, files.join(v.unzipped_proj_path, _json_name))
+                    };
+
+                    filesx.copy(v.unzipped_proj_path, _tar, { is_unbundled: true }, {
                         onCopyProgress: o => d.setProgressData(o),
-                        onCopySuccess: () => resolve(Object.assign(v, {tar_proj_path: _tar})),
+                        onCopySuccess: () => resolve(Object.assign(v, { tar_proj_path: _tar })),
                         onCopyFailure: e => reject(e),
                     });
                 }),
             }, {
                 desc: _steps.finish_deploy,
                 action: (v, d) => new Promise((resolve, reject) => {
-                    filesx.deleteByList(v.unzipped_files_path, {is_async: true}, {
+                    filesx.deleteByList(v.unzipped_files_path, { is_async: true }, {
                         onDeleteProgress: o => d.setProgressData(o),
-                        onDeleteSuccess: () => resolve({target_path: v.tar_proj_path}),
+                        onDeleteSuccess: () => resolve({ target_path: v.tar_proj_path }),
                         onDeleteFailure: e => reject(e),
                     });
                 }),
@@ -697,7 +715,7 @@ let exp = {
             _diag_dn.setStepDesc(1, '  [ ' + $$cvt.bytes(_cont_len = value, 'B', {
                 fixed: 1, space: true,
             }) + ' ]', true);
-        }, {timeout: 15e3, concurrence: 15});
+        }, { timeout: 15e3, concurrence: 15 });
     },
     /**
      * @param {Object} [callback]
@@ -812,7 +830,7 @@ let exp = {
                     let _f = _cbk.onBackupFailure || _cbk.onFailure;
                     typeof _f === 'function' && _f.call(_cbk, e);
                 },
-            }, {is_exclude_root_folder: true, is_delete_source: true});
+            }, { is_exclude_root_folder: true, is_delete_source: true });
         };
 
         return !_opt.is_show_dialog ? _backup() : dialogsx.buildProgress({
@@ -870,7 +888,7 @@ let exp = {
                         if (!filesx.isValidZip(_src)) {
                             throw Error('Source file of project.restore() is corrupted');
                         }
-                        return {zip_src_file: _src};
+                        return { zip_src_file: _src };
                     },
                 },
             },
@@ -885,7 +903,7 @@ let exp = {
                             d.setStepDesc(1, '  [ ' + $$cvt.bytes(_cont_len = value, 'B', {
                                 fixed: 1, space: true,
                             }) + ' ]', true);
-                        }, {timeout: 15e3, concurrence: 15});
+                        }, { timeout: 15e3, concurrence: 15 });
 
                         let _file_name = source.slice(source.lastIndexOf(filesx.sep) + 1);
                         let _bak_path = filesx['.local']('bak', 'arkplan');
@@ -905,13 +923,13 @@ let exp = {
                                 d.setProgressData(o);
                             },
                             onDownloadSuccess(r) {
-                                resolve({zip_src_file: r.downloaded_path});
+                                resolve({ zip_src_file: r.downloaded_path });
                                 dialogsx.clearProgressNumberFormat(d);
                             },
                             onDownloadFailure(e) {
                                 reject(e);
                             },
-                        }, {is_async: true, path: _full_path});
+                        }, { is_async: true, path: _full_path });
                     }),
                 },
             },
@@ -958,25 +976,25 @@ let exp = {
                             }
                         },
                         onFailure: e => reject(e),
-                    }, {to_archive_name_folder: true, is_delete_source: false});
+                    }, { to_archive_name_folder: true, is_delete_source: false });
                 }),
             }, {
                 desc: _steps.files_update,
                 action: (v, d) => new Promise((resolve, reject) => {
                     let _tar = this.getLocalPath(true);
-                    filesx.copy(v.unzipped_proj_path, _tar, {is_unbundled: true}, {
+                    filesx.copy(v.unzipped_proj_path, _tar, { is_unbundled: true }, {
                         onProgress: o => d.setProgressData(o),
-                        onSuccess: () => resolve(Object.assign(v, {tar_proj_path: _tar})),
+                        onSuccess: () => resolve(Object.assign(v, { tar_proj_path: _tar })),
                         onFailure: e => reject(e),
                     });
                 }),
             }, {
                 desc: _steps.finish_restore,
                 action: (v, d) => new Promise((resolve, reject) => {
-                    filesx.deleteByList(v.unzipped_files_path, {is_async: true}, {
+                    filesx.deleteByList(v.unzipped_files_path, { is_async: true }, {
                         onStart: () => _mode === 'server' && files.remove(v.zip_src_file),
                         onProgress: o => d.setProgressData(o),
-                        onSuccess: () => resolve({target_path: v.tar_proj_path}),
+                        onSuccess: () => resolve({ target_path: v.tar_proj_path }),
                         onFailure: e => reject(e),
                     });
                 }),
@@ -988,4 +1006,4 @@ let exp = {
 /**
  * @type {Mod.project}
  */
-module.exports = {project: exp};
+module.exports = { project: exp };

@@ -4101,17 +4101,6 @@ function new_ui(name, url) {
             //engines.execScript("journal_ui", java.lang.String.format("'ui';  let theme = storages.create('configure').get('theme_colors');require('./activity/journal.js');"));
             break;
         case 'q群/频道':
-            if (url.length > 10) {
-                qq跳转频道(url);
-            } else {
-                try {
-                    app.startActivity({
-                        data: "mqqapi://card/show_pslcard?card_type=group&uin=" + url,
-                    })
-                } catch (err) {
-                    toastLog("请先安装QQ或升级QQ\n群号：" + url)
-                }
-            }
             function qq跳转频道(频道分享链接) {
                 try {
 
@@ -4125,6 +4114,18 @@ function new_ui(name, url) {
                     toastLog("请先安装QQ或升级QQ")
                 }
             }
+            if (url.length > 10) {
+                qq跳转频道(url);
+            } else {
+                try {
+                    app.startActivity({
+                        data: "mqqapi://card/show_pslcard?card_type=group&uin=" + url,
+                    })
+                } catch (err) {
+                    toastLog("请先安装QQ或升级QQ\n群号：" + url)
+                }
+            }
+            
             break
         case '浏览器':
             if (url != undefined) {
