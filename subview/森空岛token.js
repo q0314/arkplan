@@ -96,6 +96,7 @@ function get_cred_by_token(token) {
         }, {
             headers: header_login,
         }, (res, err) => {
+
             let statusCode = res['statusCode'] != 200;
             res = res.body.json();
             if (err || statusCode || res['status'] !== 0) {
@@ -257,7 +258,6 @@ function get_binding_list(cred, key) {
             reject(e);
         }
     });
-
 }
 /**
  * 登出token,使其失效
@@ -378,7 +378,7 @@ function do_sign(cred_resp) {
                     resolve(index);
 
                 }
-
+                return Promise.resolve();
             }, (error) => {
                 throw new Error(error.toString());
             });
@@ -400,60 +400,64 @@ function save(token) {
     let getCredToken = get_cred_by_token(token);
     getCredToken.then((value) => {
         //   console.trace(value)
+
         let characters = get_binding_list(value['cred'], value['token']);
         let Altered = false;
-        characters.then(
-            (result) => {
-                //console.trace(result);
+        characters.then((result) => {
+            //console.trace(result);
 
-                for (let i = 0; i < result.length; i++) {
+            for (let i = 0; i < result.length; i++) {
 
-                    result[i].sign_status = "未签到";
-                    result[i].code = 1;
-                    result[i].time = new Date();
+                result[i].sign_status = "未签到";
+                result[i].code = 1;
+                result[i].time = new Date();
 
-                    let index = roles_list.findIndex((item) => item.defaultUid == result[i]['uid']);
-                    if (index != -1) {
-                        roles_list[index].token = token;
-                        roles_list[index].nickName = result[i].nickName;
-                        roles_list[index].channelName = result[i].channelName;
-                        roles_list[index].defaultUid = result[i].defaultUid;
-                        Altered = true;
-                        message = "您的鹰角网络通行证TOKEN已经修改"
-                        break;
-                    };
-                    if (result[i].defaultUid == '' || !result[i].defaultUid) {
-                        result[i].defaultUid = result[i]['uid'];
-                    };
-                }
+                let index = roles_list.findIndex((item) => item.defaultUid == result[i]['uid']);
+                if (index != -1) {
+                    roles_list[index].token = token;
+                    roles_list[index].nickName = result[i].nickName;
+                    roles_list[index].channelName = result[i].channelName;
+                    roles_list[index].defaultUid = result[i].defaultUid;
+                    Altered = true;
+                    message = "您的鹰角网络通行证TOKEN已经修改"
+                    break;
+                };
+                if (result[i].defaultUid == '' || !result[i].defaultUid) {
+                    result[i].defaultUid = result[i]['uid'];
+                };
+            }
 
-                if (!Altered) {
-                    roles_list.push({
-                        "token": token,
-                        "bindingList": result,
-                        "defaultUid": result[0].defaultUid,
-                        "nickName": result[result.findIndex((item) => item.defaultUid == item['uid'])].nickName,
-                        "channelName": result[result.findIndex((item) => item.defaultUid == item['uid'])].channelName,
-                    });
-                }
+            if (!Altered) {
+                roles_list.push({
+                    "token": token,
+                    "bindingList": result,
+                    "defaultUid": result[0].defaultUid,
+                    "nickName": result[result.findIndex((item) => item.defaultUid == item['uid'])].nickName,
+                    "channelName": result[result.findIndex((item) => item.defaultUid == item['uid'])].channelName,
+                });
+            }
 
 
-                token_storage.put("arknights_binding", roles_list);
+            token_storage.put("arknights_binding", roles_list);
 
-                snackbar(message);
-                ui_add && ui_add.viewpager.setCurrentItem(1);
-            },
+            snackbar(message);
+            ui_add && ui_add.viewpager.setCurrentItem(1);
+            return Promise.resolve();
+        },
             (error) => {
                 message = error.code + ": " + error.msg;
                 console.error(message);
                 snackbar(message);
+                return Promise.reject();
             }
-        )
+        );
+        return Promise.resolve();
     });
     getCredToken.catch((error) => {
         message = error.code + ": " + error.msg;
         console.error(message);
         snackbar(message);
+        return Promise.reject();
     });
 }
 
@@ -1470,7 +1474,7 @@ function sign(tokens, callback) {
                         } catch (e) {
                             console.error("ui.adapter:" + e)
                         };*/
-
+                        return Promise.resolve();
                     }).finally(() => {
                         tokens.pop();
                         if (tokens.length <= 0) {
@@ -1490,7 +1494,7 @@ function sign(tokens, callback) {
                             });
                         }
                     });
-
+                    return Promise.resolve();
                 });
                 getCredToken.catch((error) => {
                     log(error);
@@ -1571,6 +1575,7 @@ function game_info(token) {
                 }
 
             });
+            return Promise.resolve();
         }).catch((error) => {
             throw new Error(error.code + ": " + error.msg)
 
