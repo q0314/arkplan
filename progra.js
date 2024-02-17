@@ -327,7 +327,7 @@ let collection = {
         tool.Floaty_emit("面板", "隐藏");
         tool.Floaty_emit("展示文本", "状态", "状态: 正在进入固源岩关卡");
         while (true) {
-            sleep(200);
+            sleep(500);
             if (this.staging = (ITimg.ocr(displayText["残阳"], {
                 action: 5,
                 area: 13,
@@ -337,9 +337,9 @@ let collection = {
                 log_policy: true,
                 refresh: false,
             }))) {
-                swipe(this.staging.left, this.staging.bottom, this.staging.right, width, 300);
-                sleep(100);
-                swipe(this.staging.left, this.staging.bottom, this.staging.right, width, 300);
+                swipe(this.staging.left, this.staging.bottom, this.staging.right, width, 500);
+                sleep(500);
+                swipe(this.staging.left, this.staging.bottom, this.staging.right, width, 500);
                 sleep(500);
                 break;
             };
