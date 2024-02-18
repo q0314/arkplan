@@ -1320,71 +1320,7 @@ function 行动() {
                 break;
 
             } else {
-                sleep(300);
-
-                if (ITimg.picture("理智_确认", {
-                    timing: 500,
-                    area: "右半屏",
-                    nods: 1500,
-                }) || ITimg.picture("理智_确认", {
-                    timing: 500,
-                    area: "右半屏",
-                }) || ITimg.picture("理智_确认", {
-                    timing: 500,
-                    area: "右半屏",
-                })) {
-                    tool.Floaty_emit("展示文本", "状态", "状态：理智检测中");
-                    if (setting.已兑理智 < setting.理智) {
-                        if (ITimg.picture("理智_源石", {
-                            timing: 500,
-                            area: "右半屏",
-                        })) {
-                            //仅使用药剂恢复理智
-                            if (!setting.only_medicament) {
-                                setting.已兑理智++;
-                                tool.writeJSON("已兑理智", setting.已兑理智);
-                                //files.write("./mrfz/已兑理智.txt", is);
-                                ITimg.picture("理智_确认", {
-                                    action: 0,
-                                    timing: 1000,
-                                    area: "右半屏",
-                                });
-                                Combat_report.record("本次运行累计兑换" + setting.已兑理智 + "个药剂/石头");
-                                toastLog("成功兑换理智" + setting.已兑理智 + "次");
-                                统计("理智")
-                            } else {
-                                toast("没有药剂可供恢复理智了,仅使用药剂恢复理智" + setting.only_medicament);
-                                console.warn("没有药剂可供恢复理智了,仅使用药剂恢复理智" + setting.only_medicament);
-                                跳转_暂停(false, "行动刷图且没有理智结束后", "状态：暂停，木有理智");
-                            }
-                        } else {
-                            setting.已兑理智++;
-                            tool.writeJSON("已兑理智", setting.已兑理智);
-                            //files.write("./mrfz/已兑理智.txt", is);
-                            ITimg.picture("理智_确认", {
-                                action: 0,
-                                area: "右半屏",
-                                timing: 1000,
-                            });
-                            Combat_report.record("本次运行累计兑换" + setting.已兑理智 + "瓶药剂");
-                            toastLog("成功兑换理智" + setting.已兑理智 + "次");
-
-                            统计("理智")
-                        }
-                        //没有设置理智兑换次数
-                    } else {
-                        tool.Floaty_emit("面板", "复位");
-                        toast("木有理智，更木有理智兑换次数");
-                        console.warn("木有理智，更木有理智兑换次数");
-                        跳转_暂停(false, "行动刷图且没有理智结束后", "状态：暂停，木有理智");
-                    };
-                } else if (ITimg.picture("理智_源石", {
-                    timing: 500,
-                    area: "右半屏",
-                })) {
-                    toast("木有理智药剂，更木有源石可供恢复理智");
-                    console.warn("木有理智药剂，更木有源石可供恢复理智");
-                    tool.Floaty_emit("展示文本", "状态", "状态：没有方法恢复");
+                if (!理智处理()) {
                     跳转_暂停(false, "行动刷图且没有理智结束后", "状态：暂停，木有理智");
                 }
 
@@ -1643,6 +1579,102 @@ function 行动() {
     }, 1000); //总循环
 }; //线程
 
+function 理智处理() {
+    sleep(300);
+    console.info("理智界面检查");
+    if (ITimg.picture("理智_确认", {
+        timing: 500,
+        area: 4,
+        nods: 1500,
+    }) || ITimg.picture("理智_确认", {
+        timing: 500,
+        area: 4,
+    }) || ITimg.picture("理智_确认", {
+        timing: 500,
+        area: 4,
+    })) {
+        setting = tool.readJSON("configure");
+        tool.Floaty_emit("展示文本", "状态", "状态：理智检测中");
+        if (setting.已兑理智 >= setting.理智) {
+            if (setting.无限吃24小时过期理智药 && ITimg.ocr(displayText["小时"], {
+                area: 24,
+                part: true,
+            })) {
+                if (ITimg.picture("理智_确认", {
+                    action: 0,
+                    area: 4,
+                    timing: 1000,
+                })) {
+                    setting.已兑理智++;
+                    tool.writeJSON("已兑理智", setting.已兑理智);
+                }
+                Combat_report.record("本次运行累计兑换" + setting.已兑理智 + "瓶药剂");
+                toastLog("成功兑换理智" + setting.已兑理智 + "次");
+
+                统计("理智");
+                return true;
+            } else {
+                toast("木有理智，更木有理智兑换次数");
+                console.warn("木有理智，更木有理智兑换次数");
+                click(height / 2, width - zox(50));
+                return false;
+            }
+     
+
+        } else {
+            if (ITimg.picture("理智_源石", {
+                timing: 500,
+                area: 2,
+            })) {
+                //仅使用药剂恢复理智
+                if (setting.only_medicament) {
+                    toast("没有药剂可供恢复理智了,仅使用药剂恢复理智" + setting.only_medicament);
+                    console.warn("没有药剂可供恢复理智了,仅使用药剂恢复理智" + setting.only_medicament);
+                    return false;
+                } else {
+                    setting.已兑理智++;
+                    tool.writeJSON("已兑理智", setting.已兑理智);
+
+                    ITimg.picture("理智_确认", {
+                        action: 0,
+                        timing: 1000,
+                        area: "右半屏",
+                    });
+                    Combat_report.record("本次运行累计兑换" + setting.已兑理智 + "个药剂/石头");
+                    toastLog("成功兑换理智" + setting.已兑理智 + "次");
+                    统计("理智");
+                    return true;
+                }
+
+            } else {
+
+                if (ITimg.picture("理智_确认", {
+                    action: 0,
+                    area: 4,
+                    timing: 1000,
+                })) {
+                    setting.已兑理智++;
+                    tool.writeJSON("已兑理智", setting.已兑理智);
+                }
+                Combat_report.record("本次运行累计兑换" + setting.已兑理智 + "瓶药剂");
+                toastLog("成功兑换理智" + setting.已兑理智 + "次");
+
+                统计("理智");
+                return true;
+            }
+            //没有设置理智兑换次数
+        }
+    } else if (ITimg.picture("理智_源石", {
+        area: 2,
+    })) {
+        toast("木有理智药剂，更木有源石可供恢复理智");
+        console.warn("木有理智药剂，更木有源石可供恢复理智");
+        tool.Floaty_emit("展示文本", "状态", "状态：没有方法恢复");
+        click(height / 2, width - zox(50));
+        return false;
+    };
+    return true;
+}
 function 统计(target, attach, exterminate) {
     switch (target) {
         case "次数":
@@ -1682,10 +1714,9 @@ function 统计(target, attach, exterminate) {
 
 function 跳转_暂停(suspended, status, literals) {
 
-    press(600, 50, 50);
     sleep(50);
     便笺(1000);
-    press(600, 60, 100);
+    press(height / 2, zoy(50), 100);
 
     if (setting.执行 == "行动" || suspended) {
         end_task(status, literals)
@@ -1973,69 +2004,9 @@ function 剿灭() {
                     break;
                 }
             } else {
-                sleep(500);
-                if (ITimg.picture("理智_确认", {
-                    timing: 500,
-                    area: "右半屏",
-                    nods: 1500,
-                }) || ITimg.picture("理智_确认", {
-                    timing: 500,
-                    area: "右半屏",
-                    nods: 1500,
-                }) || ITimg.picture("理智_确认", {
-                    timing: 500,
-                    area: "右半屏",
-
-                })) {
-                    // yi = files.read("./mrfz/理智.txt");
-                    setting = tool.readJSON("configure");
-                    if (setting.已兑理智 < setting.理智) {
-                        if (ITimg.picture("理智_源石", {
-                            timing: 500,
-                            area: "右半屏",
-                        })) {
-                            if (!setting.only_medicament) {
-                                setting.已兑理智++;
-                                tool.writeJSON("已兑理智", setting.已兑理智);
-                                //files.write("./mrfz/已兑理智.txt", is);
-                                ITimg.picture("理智_确认", {
-                                    action: 0,
-                                    timing: 1000,
-                                });
-                                Combat_report.record("本次运行累计兑换" + setting.已兑理智 + "个药剂/石头");
-                                toastLog("成功兑换理智" + setting.已兑理智 + "次");
-                                tool.Floaty_emit("展示文本", "理智", "理智：已兑" + setting.已兑理智 + "次&上限" + setting.理智 + "次");
-                            } else {
-                                toast("没有药剂可供恢复理智了,仅使用药剂恢复理智" + setting.only_medicament);
-                                console.warn("没有药剂可供恢复理智了,仅使用药剂恢复理智" + setting.only_medicament);
-                                tool.Floaty_emit("面板", "展开");
-                                跳转_暂停(setting.woie, "剿灭刷图且没有理智结束后", "状态：暂停，木有理智");
-
-                            }
-                        } else {
-                            setting.已兑理智++;
-                            tool.writeJSON("已兑理智", setting.已兑理智);
-                            //files.write("./mrfz/已兑理智.txt", is);
-                            ITimg.picture("理智_确认", {
-                                action: 0,
-                                timing: 1000,
-                                area: "右半屏",
-                            });
-                            Combat_report.record("本次运行累计兑换" + setting.已兑理智 + "瓶药剂");
-                            toastLog("成功兑换理智" + setting.已兑理智 + "次");
-                            tool.Floaty_emit("展示文本", "理智", "理智：已兑" + setting.已兑理智 + "次&上限" + setting.理智 + "次");
-                        }
-                    } else {
-                        tool.Floaty_emit("面板", "复位");
-                        toast("木有理智，更木有理智兑换次数");
-                        console.warn("木有理智，更木有理智兑换次数");
-                        tool.Floaty_emit("面板", "展开");
-                        跳转_暂停(setting.woie, "剿灭刷图且没有理智结束后", "状态：暂停，木有理智");
-
-
-                    };
+                if (!理智处理()) {
+                    跳转_暂停(setting.woie, "剿灭刷图且没有理智结束后", "状态：暂停，木有理智");
                 }
-
                 sleep(500);
                 if (ITimg.picture("行动_普通", {
                     action: 0,

@@ -1087,6 +1087,7 @@ function 执行次数() {
 */}
             </horizontal>
             <Switch id="ysrh" checked="{{setting.only_medicament}}" text="仅使用药剂恢复理智" padding="6 6 6 6" textSize="16sp" />
+            <Switch id="unlimited_eat_expired_sane" checked="{{setting.无限吃24小时过期理智药}}" text="无限吃24小时过期理智药" padding="6 6 6 6" textSize="16" />
             <horizontal gravity="center" marginLeft="5">
                 <text id="mr1" text="刷图上限:" textSize="15" textColor="#212121" />
                 <input id="wordname3" inputType="number" hint="{{setting.剿灭}}次" layout_weight="1" visibility="gone" paddingLeft="6" w="auto" />
@@ -1116,10 +1117,28 @@ function 执行次数() {
     }).on("dismiss", (dialog) => {
         rewriteView = null;
         rewriteDialogs = null;
-    })
+    });
+   // gallery_info.服务器 = (gallery_info.服务器 ? gallery_info.服务器 : gallery_info.server);
 
     rewriteView.ysrh.on("check", (checked) => {
         tool.writeJSON("only_medicament", checked);
+    });
+    rewriteView.unlimited_eat_expired_sane.click((view) => {
+
+        /*  if (view.checked) {
+              if (gallery_info.服务器 == "简中服") {
+                  if (!setting.ocrExtend) {
+                      view.checked = false;
+                      snakebar(language['OCR-Extensions-need-installed']);
+                      return
+                  }
+              } else {
+                  view.checked = false;
+                  snakebar(language['ocr-sorry']);
+              }
+          }
+          */
+        tool.writeJSON("无限吃24小时过期理智药", view.checked);
     });
     rewriteView.buiok.on("click", () => {
         输入框事件()
@@ -1207,14 +1226,7 @@ function 执行次数() {
         }
     });
 
-    let language = (gallery_info.服务器 ? gallery_info.服务器 : gallery_info.server);
 
-    switch (true) {
-        case language == "日服":
-        case language == "美服":
-            language = "禁用服";
-            break;
-    }
 
     let modeGather = {
         "指定关卡+基建": "常规",
