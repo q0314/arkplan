@@ -1236,7 +1236,7 @@ function 执行次数() {
     rewriteView.implement.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener({
         onItemSelected: function (parent, view, position, id) {
             ui.run(function () {
-                
+
                 let r = parent.getSelectedItem();
                 if (r == "执行剿灭作战+基建") {
                     rewriteView.wordname.attr("visibility", "gone")
@@ -1268,7 +1268,7 @@ function 执行次数() {
                         tool.writeJSON("指定关卡", setting.指定关卡);
                         // toastLog(setting.指定关卡.levelAbbreviation);
                     });
-                   
+
                     if (level_choices_open.indexOf(setting.指定关卡.levelAbbreviation) != -1) {
                         rewriteView.level_pick.setSelection(level_choices_open.indexOf(setting.指定关卡.levelAbbreviation));
                     };
@@ -1277,6 +1277,7 @@ function 执行次数() {
             })
         }
     }));
+
     let SE执行 = Object.values(modeGather).findIndex((text) => text == setting.执行);
     if (SE执行 != -1) {
         rewriteView.implement.setSelection(SE执行);
@@ -1285,11 +1286,33 @@ function 执行次数() {
             rewriteView.wordname3.attr("visibility", "visible");
         }
     };
+    if (SE执行 == 4) {
+        rewriteView["levelPickText"].setText("模块选择");
+        let _modData_ = [];
+        for (let _modular_ of mod_data) {
+            if (_modular_.id == "自定义" && _modular_.path) {
+                _modData_.push(_modular_.script_name);
+            }
+        };
+        change_list(_modData_, function (parent, view, position, id) {
+            tool.writeJSON("自定义模块", parent.getSelectedItem());
+        });
+    } else {
+        rewriteView["levelPickText"].setText("关卡选择");
+        change_list(level_choices_open, function (parent, view, position, id) {
 
-    SE执行 = level_choices_open.indexOf(setting.指定关卡.levelAbbreviation);
-    if (SE执行 != -1) {
-        rewriteView.level_pick.setSelection(SE执行);
-    };
+            setting.指定关卡 ? setting.指定关卡.levelAbbreviation = parent.getSelectedItem() : setting.指定关卡 = {
+                levelAbbreviation: parent.getSelectedItem(),
+            };
+            tool.writeJSON("指定关卡", setting.指定关卡);
+            // toastLog(setting.指定关卡.levelAbbreviation);
+        });
+
+        SE执行 = level_choices_open.indexOf(setting.指定关卡.levelAbbreviation);
+        if (SE执行 != -1) {
+            rewriteView.level_pick.setSelection(SE执行);
+        };
+    }
     delete SE执行;
 
 

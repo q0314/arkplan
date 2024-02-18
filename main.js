@@ -2387,7 +2387,7 @@ ui.credit_buy.on("click", (view) => {
                     setting.信用处理 = words;
                     tool.writeJSON("信用处理", words);
                 });
-              } catch (e) {
+            } catch (e) {
                 e = "加载信用处理方案设置出错:\n" + e
                 console.error(e)
             }
@@ -3791,10 +3791,12 @@ function Update_UI(i) {
                         };
                         tool.writeJSON("指定关卡", setting.指定关卡);
                     });
-                    SE执行 = level_choices_open.indexOf(setting.指定关卡.levelAbbreviation);
-                    if (SE执行 != -1) {
-                        ui.level_pick.setSelection(SE执行);
-                    };
+                    if (setting.执行 != "自定义模块") {
+                        SE执行 = level_choices_open.indexOf(setting.指定关卡.levelAbbreviation);
+                        if (SE执行 != -1) {
+                            ui.level_pick.setSelection(SE执行);
+                        };
+                    }
                 }
             }
             floaty.checkPermission() ? ui.floatyCheckPermission.setVisibility(8) : ui.floatyCheckPermission.setVisibility(0);
