@@ -1,4 +1,101 @@
-let RecyclerView = require('../modules/RecyclerView.js');
+/*
+ * @Author: 大柒
+ * @QQ: 531310591@qq.com
+ * @Date: 2021-04-15 18:29:53
+ * @Version: Auto.Js Pro
+ * @Description: 参考文章:https://www.jb51.net/article/141459.htm
+ * @LastEditors: 大柒
+ * @LastEditTime: 2021-04-15 19:37:53
+ */
+
+//导入依赖包;
+importClass("androidx.recyclerview.widget.RecyclerView");
+importClass("androidx.recyclerview.widget.ItemTouchHelper");
+importClass("androidx.recyclerview.widget.GridLayoutManager");
+/**
+* 数组元素交换位置
+* @param {array} arr 数组
+* @param {number} index1 添加项目的位置
+* @param {number} index2 删除项目的位置
+* index1和index2分别是两个数组的索引值，即是两个要交换元素位置的索引值，如1，5就是数组中下标为1和5的两个元素交换位置
+*/
+function swapArray(arr, index1, index2) {
+    arr[index1] = arr.splice(index2, 1, arr[index1])[0];
+    return arr;
+}
+/**
+    * RecyclerView手势器：
+    * 参考文章: https://www.jb51.net/article/141459.htm
+    */
+let helper = new ItemTouchHelper(new ItemTouchHelper.Callback({
+
+    getMovementFlags: function (recyclerView, viewHolder) {
+        //指定支持的拖放方向为上下左右
+        let dragFrlg = ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
+        return this.makeMovementFlags(dragFrlg, 0);
+    },
+
+    onMove: function (recyclerView, viewHolder, target) {
+        //得到当拖拽的viewHolder的Position 
+        let fromPosition = viewHolder.getAdapterPosition();
+        let toPosition = target.getAdapterPosition();
+        if (fromPosition < toPosition) {
+            for (let i = fromPosition; i < toPosition; i++) {
+                //数组指定元素交换位置
+                swapArray(ary, i, i + 1);
+            }
+        } else {
+            for (let i = fromPosition; i > toPosition; i--) {
+                swapArray(ary, i, i - 1);
+            }
+        }
+        //通知适配器移动Item的位置
+        recyclerView.adapter.notifyItemMoved(fromPosition, toPosition);
+        return true;
+    },
+
+    isLongPressDragEnabled: function () {
+        return true;
+    },
+
+    /** 
+     * 长按选中Item的时候开始调用 
+     * 长按高亮 
+     * @param viewHolder 
+     * @param actionState 
+     */
+    onSelectedChanged: function (viewHolder, actionState) {
+        this.super$onSelectedChanged(viewHolder, actionState);
+        if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
+            //改变选中Item的背景色
+            viewHolder.itemView.attr("backgroundTint", "#7AFF0000");
+            try {
+                //震动7毫秒 
+                device.vibrate(7);
+            } catch (e) {
+
+            }
+            ary = new Array();
+            for (let i in _items_) {
+                if (_items_[i]) ary.push(_items_[i]);
+            }
+        }
+    },
+
+    /** 
+     * 手指松开的时候还原高亮 
+     * @param recyclerView 
+     * @param viewHolder 
+     */
+    clearView: function (recyclerView, viewHolder) {
+        this.super$clearView(recyclerView, viewHolder);
+        viewHolder.itemView.attr("backgroundTint", "#FFFFFF");
+        _items_ = ary;
+        recyclerView.setDataSource(_items_);
+        recyclerView.adapter.notifyDataSetChanged(); //完成拖动后刷新适配器，这样拖动后删除就不会错乱 
+    }
+}));
+
 credit_buy_interface = function (words, callback, callback_2) {
     let uii = ui.inflate(
         <vertical id="parent">
@@ -55,7 +152,7 @@ credit_buy_interface = function (words, callback, callback_2) {
     })
     tool.setBackgroundRoundRounded(res.getWindow(), { radius: 5, })
     uii.wenn.on('click', function () {
-        if (items.length == 21) {
+        if (_items_.length == 21) {
             snakebar("无可添加物品")
             return
         }
@@ -68,12 +165,12 @@ credit_buy_interface = function (words, callback, callback_2) {
             if (text == ' ') {
                 return
             }
-            if (items.indexOf(text) != -1) {
+            if (_items_.indexOf(text) != -1) {
                 snakebar(text + " 已添加")
                 return
             }
-            items.push(text)
-            uii.grid.adapter.notifyItemChanged(items.length)
+            _items_.push(text);
+            uii.grid.adapter.notifyItemChanged(_items_.length)
 
             snakebar(text + " 添加成功")
 
@@ -91,19 +188,13 @@ credit_buy_interface = function (words, callback, callback_2) {
         res.dismiss();
     })
 
-    uii.ok.on("click", function () {
-        console.error(uii.s1.checked)
-        console.error(uii.l1.checked)
-        console.info(items)
-        callback({ "购买列表": items, "信用购买": true, "优先顺序": uii.l1.checked ? true : false, "三百信用": uii.s1.checked })
-        res.dismiss()
-    })
+
 
     uii.s1.checked = (words.三百信用 ? true : false);
     words.优先顺序 ? uii.l1.checked = true : uii.l2.checked = true;
 
-    console.info(words.购买列表)
-    items = words.购买列表 || [
+   // console.info(words.购买列表)
+    _items_ = words.购买列表 || [
         "加急许可",
         "招聘许可",
         "赤金",
@@ -127,16 +218,32 @@ credit_buy_interface = function (words, callback, callback_2) {
         "家具零件"
     ] // 商店货物优先级
 
-    uii.grid.setDataSource(items);
+    uii.grid.setDataSource(_items_);
 
     uii.grid.on('item_bind', (itemView, itemHolder) => {
         //删除数据 
         itemView.delete.on('click', () => {
-            items.splice(itemHolder.position, 1);
+            _items_.splice(itemHolder.position, 1);
+            uii.grid.adapter.notifyItemChanged(_items_.length)
+
+            //    RecyclerView.attachToRecyclerView(uii.grid, _items_);
         });
     });
 
-    RecyclerView(uii.grid, items);
+
+    uii.ok.on("click", function () {
+        //let str_level_choices = [];
+        try {
+            console.info(_items_)
+            callback({ "购买列表": _items_, "信用购买": true, "优先顺序": uii.l1.checked, "三百信用": uii.s1.checked })
+            res.dismiss();
+        } catch (e) {
+            console.error(e);
+        }
+    });
+
+    helper.attachToRecyclerView(uii.grid);
+
 
     function snakebar(text) {
         com.google.android.material.snackbar.Snackbar.make(uii.wenn, text, 1000).show();
