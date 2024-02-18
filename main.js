@@ -455,7 +455,7 @@ ui.layout(
                             <vertical id="xingdongquyu">
                                 <vertical id="xlkz" visibility="gone">
                                     <horizontal marginLeft="5" gravity="center">
-                                        <text text="关卡选择" textSize="{{px2dp(48)}}" textColor="{{theme.text}}" marginRight="50" />
+                                        <text id="levelPickText" text="关卡选择" textSize="{{px2dp(48)}}" textColor="{{theme.text}}" marginRight="50" />
                                         <spinner id="level_pick" textSize="{{px2dp(62)}}" entries=""
                                             gravity="center" layout_weight="1" margin="5 5" padding="4" />
                                         {/*  <TextView id="level_pick" textSize="{{px2dp(62)}}"
@@ -682,17 +682,42 @@ ui.layout(
 let level_choices = JSON.parse(
     files.read("./lib/game_data/level_choices.json", (encoding = "utf-8"))
 );
+function isOpen(level, special) {
+    let now = new Date();
+    let day = now.getDay();
 
+    // 判断当前时间是否在凌晨4点之前
+    if (now < now.setHours(4, 0, 0, 0)) {
+        // 如果是，日期减1
+        day = day - 1;
+    };
+    //特别开放
+    if (special) return true;
+    if (level.day) {
+        return level.day.includes(day);
 
-ui.level_pick.setBackground(createShape(5, 0, 0, [2, theme.bar]));
-ui.level_pick.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
-    onItemSelected: function (parent, view, position, id) {
-        setting.指定关卡 ? setting.指定关卡.levelAbbreviation = parent.getSelectedItem() : setting.指定关卡 = {
-            levelAbbreviation: parent.getSelectedItem(),
-        };
-        tool.writeJSON("指定关卡", setting.指定关卡);
+    } else {
+        return true;
     }
-}));
+
+}
+
+let level_choices_open = [];
+for (let id of level_choices) {
+
+    if (isOpen(id)) {
+        if (typeof id.abbreviation == "object") {
+            for (let k in id.abbreviation) {
+
+                level_choices_open.push(k);
+            }
+        } else {
+            level_choices_open.push(id.abbreviation);
+        }
+    }
+};
+
+
 
 let popView,
     popWin,
@@ -1977,7 +2002,7 @@ var modeGather = {
     "只执行基建": "基建",
     "执行剿灭作战+基建": "剿灭",
 };
-if (setting.custom != false) {
+if (setting.自定义模块) {
     modeGather["执行自定义模块"] = "自定义模块";
 }
 var modeGatherText = Object.keys(modeGather);
@@ -1989,28 +2014,35 @@ ui.implement.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
         if (Executionsettings == SE执行) {
             return false
         };
-        if (Executionsettings != 2 && ui.jijianquyu.getVisibility() == 8) {
-            ui.jijianquyu.setVisibility(0);
-        } else if (Executionsettings != 3 && ui.xingdongquyu.getVisibility() == 8) {
-            ui.xingdongquyu.setVisibility(0);
-        }
+
         switch (Executionsettings) {
             case 0:
                 toast("你选择的是行动+基建，理智不足以支持下一把时，启动基建程序");
+
+                ui.xingdongquyu.setVisibility(0);
+                ui.jijianquyu.setVisibility(0);
                 break;
             case 1:
-                tool.writeJSON("行动", "999");
+                ui.xingdongquyu.setVisibility(0);
                 ui.jijianquyu.setVisibility(8);
+                tool.writeJSON("行动", "999");
+
                 toast("你选择的是只执行行动，默认为999次，行动完成或理智不足以开下一把时直接暂停程序");
                 break;
             case 2:
                 toast("你选择的是只启动基建");
                 ui.xingdongquyu.setVisibility(8);
+                ui.jijianquyu.setVisibility(0);
                 break;
             case 3:
+                ui.level_pick.setSelection(level_choices_open.length - 1);
+                ui.xingdongquyu.setVisibility(0);
+                ui.jijianquyu.setVisibility(0);
                 toast("你选择的是剿灭行动，默认为5次，360×5=1800合成玉");
                 break;
             case 4:
+                ui.xingdongquyu.setVisibility(0);
+                ui.jijianquyu.setVisibility(0);
                 toastLog("自定义模式");
                 break;
             case 5:
@@ -2029,18 +2061,50 @@ ui.implement.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
                 break;
 
         };
-        tool.writeJSON("执行", modeGather[modeGatherText[Executionsettings]]);
-        if (setting.行动理智) {
-            if (Executionsettings == 3) {
+        tool.writeJSON("执行", Object.values(modeGather)[Executionsettings]);
+
+        if (Executionsettings == 4) {
+            ui["levelPickText"].setText("模块选择");
+            let _modData_ = [];
+            for (let _modular_ of mod_data) {
+                if (_modular_.id == "自定义" && _modular_.path) {
+                    _modData_.push(_modular_.script_name);
+                }
+            };
+            change_list(ui.level_pick, _modData_, function (parent, view, position, id) {
+                parent.setBackground(createShape(5, 0, 0, [2, theme.bar]));
+                tool.writeJSON("自定义模块", parent.getSelectedItem());
+            });
+        } else {
+            ui["levelPickText"].setText("关卡选择");
+
+            change_list(ui.level_pick, level_choices_open, function (parent, view, position, id) {
+                parent.setBackground(createShape(5, 0, 0, [2, theme.bar]));
+                setting.指定关卡 ? setting.指定关卡.levelAbbreviation = parent.getSelectedItem() : setting.指定关卡 = {
+                    levelAbbreviation: parent.getSelectedItem(),
+                };
+                tool.writeJSON("指定关卡", setting.指定关卡);
+            });
+            SE执行 = level_choices_open.indexOf(setting.指定关卡.levelAbbreviation);
+            if (SE执行 != -1) {
+                ui.level_pick.setSelection(SE执行);
+            };
+        };
+
+        if (Executionsettings == 3) {
+            if (setting.行动理智) {
                 ui.mr1.setText("剿灭上限:");
                 ui.input_extinguish.attr("visibility", "visible");
                 ui.input_ordinary.attr("visibility", "gone");
-            } else {
+            };
+        } else {
+            if (setting.行动理智) {
                 ui.mr1.setText("刷图上限:");
                 ui.input_ordinary.attr("visibility", "visible");
                 ui.input_extinguish.attr("visibility", "gone");
             }
         }
+
         SE执行 = ui.implement.getSelectedItemPosition();
 
     }
@@ -2320,12 +2384,10 @@ ui.credit_buy.on("click", (view) => {
             }
             try {
                 require("./subview/credit_buy.js")(setting.信用处理, function (words) {
+                    setting.信用处理 = words;
                     tool.writeJSON("信用处理", words);
-
-                }, function (id, items_) {
-                    setSpinnerAdapter(id, items_)
-                })
-            } catch (e) {
+                });
+              } catch (e) {
                 e = "加载信用处理方案设置出错:\n" + e
                 console.error(e)
             }
@@ -2355,7 +2417,7 @@ ui.gozh.on("click", (view) => {
             }
 
             ui.tag.setVisibility(0);
-            tool.dialog_tips("mlkit ocr文字识别", "1• 自动公开招募和悬浮窗操控面板的公招识别是两个不同的功能\n\n" +
+            tool.dialog_tips("OCR文字识别", "1• 自动公开招募和悬浮窗操控面板的公招识别是两个不同的功能\n\n" +
                 "2• 自动公开招募仅会自动招募四星，弹窗提示五、六星\n\n" + "3•自动公招优先选择第一个公招词条框，如果正在招募中则会选择第二个，以此类推" +
                 "\n\n4• 8小时无tag招募：无四星及以上的tag时，执行8小时无tag招募\n\n5• 聘用候选人：自动开包，建议配合8小时无tag招募使用。\n\n6• 公招词条必出五六星时会有弹窗提示，且禁用关闭应用模块\n\n7• 自动公招/识别 卡住，应用崩溃？请更换mlkit ocr 其它位数版本试试，关于应用-明日计划32位只能使用32位OCR插件");
         } else {
@@ -2426,24 +2488,27 @@ ui.timed_tasks_list.on("item_click", function (itemView, i) {
 
 });
 
+//定时任务添加事件
 ui.timed_tasks_add.on("click", function () {
     setting = tool.readJSON("configure");
-    let str_level_choices = [];
-    for (let i = 1; i < ui['level_pick'].getCount(); i++) {
-        str_level_choices.push(String(ui['level_pick'].getItemAtPosition(i)));
-    };
-    require("./subview/timed_tasks_set.js")(timed_tasks_list, str_level_choices, function (parameter) {
+    //let str_level_choices = [];
+    // for (let i = 1; i < ui['level_pick'].getCount(); i++) {
+    //     str_level_choices.push(String(ui['level_pick'].getItemAtPosition(i)));
+    //  };
+    //require("./subview/timed_tasks_set.js")(timed_tasks_list, str_level_choices, function (parameter) {
+    require("./subview/timed_tasks_set.js")(timed_tasks_list, function (parameter) {
         timed_tasks_storage.put("items", parameter);
     });
-    delete str_level_choices;
+    // delete str_level_choices;
 
-}) //定时任务添加事件
+});
 
+//模块配置事件
 ui.module_config.on("click", function () {
     let mod = require("./subview/modular_list.js");
-    mod.create_modular()
+    mod.create_modular();
 
-}) //模块配置事件
+});
 
 //开始运行
 ui.start_run.on("click", function () {
@@ -3449,9 +3514,9 @@ function Painting_planning(input, ok) {
 }
 
 
-function change_list(spinner, mCountries) {
+function change_list(view, mCountries, fun) {
 
-    if (spinner == "检测") {
+    if (view == "检测") {
         if (gallery.language != "简中服") {
             ui.indt.attr("visibility", "gone");
             ui.timed_tasks_list.attr("visibility", "gone");
@@ -3460,10 +3525,16 @@ function change_list(spinner, mCountries) {
 
         return true
     } else {
-        sp = spinner
         adapter = new android.widget.ArrayAdapter(context, android.R.layout.simple_spinner_item, mCountries);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sp.setAdapter(adapter);
+        view.setAdapter(adapter);
+        if (fun) {
+            view.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
+                onItemSelected: function (parent, view, position, id) {
+                    fun(parent, view, position, id);
+                }
+            }));
+        }
     }
 }
 
@@ -3671,52 +3742,13 @@ function Update_UI(i) {
             ui.module_config_txt.setText("模块\n配置")
 
             if (gallery.gallery_info) {
-                function isOpen(level, special) {
-                    let now = new Date();
-                    let day = now.getDay();
 
-                    // 判断当前时间是否在凌晨4点之前
-                    if (now < now.setHours(4, 0, 0, 0)) {
-                        // 如果是，日期减1
-                        day = day - 1;
-                    };
-                    //特别开放
-                    if (special) return true;
-                    if (level.day) {
-                        return level.day.includes(day);
-
-                    } else {
-                        return true;
-                    }
-
-                }
-
-                let level_choices_open = [];
-                for (let id of level_choices) {
-
-                    if (isOpen(id)) {
-                        if (typeof id.abbreviation == "object") {
-                            for (let k in id.abbreviation) {
-                      
-                                 level_choices_open.push(k);
-                            }
-                        } else {
-                            level_choices_open.push(id.abbreviation);
-                        }
-                    }
-                };
-
-                change_list(ui.level_pick, level_choices_open);
-                SE执行 = level_choices_open.indexOf(setting.指定关卡.levelAbbreviation);
-                if (SE执行 != -1) {
-                    ui.level_pick.setSelection(SE执行);
-                };
 
                 change_list(ui.implement, modeGatherText);
 
-                SE执行 = modeGatherText.indexOf(setting.执行);
+                SE执行 = Object.values(modeGather).findIndex((text) => text == setting.执行);
                 if (SE执行 != -1) {
-                    ui.implement.setSelection(modeGatherText.indexOf(setting.执行));
+                    ui.implement.setSelection(SE执行);
                 }
                 if (setting.行动理智) {
                     ui.xlkz.attr("visibility", "visible");
@@ -3735,6 +3767,35 @@ function Update_UI(i) {
                         ui.xingdongquyu.setVisibility(8);
                         break;
                 };
+
+                if (SE执行 == 4) {
+                    ui["levelPickText"].setText("模块选择");
+                    let _modData_ = [];
+                    for (let _modular_ of mod_data) {
+                        if (_modular_.id == "自定义") {
+                            _modData_.push(_modular_.script_name);
+                        }
+                    };
+                    change_list(ui.level_pick, _modData_, function (parent, view, position, id) {
+                        parent.setBackground(createShape(5, 0, 0, [2, theme.bar]));
+                        tool.writeJSON("自定义模块", parent.getSelectedItem());
+                    });
+                } else {
+                    ui["levelPickText"].setText("关卡选择");
+
+
+                    change_list(ui.level_pick, level_choices_open, function (parent, view, position, id) {
+                        parent.setBackground(createShape(5, 0, 0, [2, theme.bar]));
+                        setting.指定关卡 ? setting.指定关卡.levelAbbreviation = parent.getSelectedItem() : setting.指定关卡 = {
+                            levelAbbreviation: parent.getSelectedItem(),
+                        };
+                        tool.writeJSON("指定关卡", setting.指定关卡);
+                    });
+                    SE执行 = level_choices_open.indexOf(setting.指定关卡.levelAbbreviation);
+                    if (SE执行 != -1) {
+                        ui.level_pick.setSelection(SE执行);
+                    };
+                }
             }
             floaty.checkPermission() ? ui.floatyCheckPermission.setVisibility(8) : ui.floatyCheckPermission.setVisibility(0);
 
@@ -4125,7 +4186,7 @@ function new_ui(name, url) {
                     toastLog("请先安装QQ或升级QQ\n群号：" + url)
                 }
             }
-            
+
             break
         case '浏览器':
             if (url != undefined) {

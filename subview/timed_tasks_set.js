@@ -44,7 +44,7 @@ function ischeck(id) {
 /*
 var storage = storages.create("time");
 var timed_tasks_list = storage.get("items", []);*/
-timed_tasks_set = function (timed_tasks_list, level_choices, callback) {
+timed_tasks_set = function (timed_tasks_list, callback) {
 
     let uii = ui.inflate(
         <vertical id="parent">
@@ -89,7 +89,7 @@ timed_tasks_set = function (timed_tasks_list, level_choices, callback) {
 
                                 </horizontal>
                                 <horizontal marginLeft="5" gravity="center" w="*">
-                                    <text text="关卡选择" textSize="{{px2dp(48)}}" textColor="#212121" marginRight="50" />
+                                    <text id="levelPickText" text="关卡选择" textSize="{{px2dp(48)}}" textColor="#212121" marginRight="50" />
                                     <spinner id="level_pick" textSize="{{px2dp(62)}}" entries=""
                                         gravity="center" layout_weight="1" margin="5 5" padding="4" />
 
@@ -195,33 +195,70 @@ timed_tasks_set = function (timed_tasks_list, level_choices, callback) {
         "\n\n 2. 自动解锁手机\n如需明日计划自动解锁屏幕，请打开自动解锁屏幕,并设置锁屏密码，九宫格(1-9)请自行转换。内置解锁目前支持的手机品牌不多，仅小米，vivo。如果不支持你的手机，请录制解锁动作，如果你会编写js模块也可以直接在输入框输入文件路径确认" +
         "\n\n 3. 定时任务不运行？\n请检查相关权限，你也可以通过设置-开发人员代码测试-DIY属于自己的循环定时任务")
 
+    function change_list(item, fun) {
+        adapter = new android.widget.ArrayAdapter(context, android.R.layout.simple_spinner_item, item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        uii.level_pick.setAdapter(adapter);
+        uii.level_pick.setBackground(createShape(5, 0, 0, [2, setting.bg]));
+        if (fun) {
+            uii.level_pick.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
+                onItemSelected: function (parent, view, position, id) {
+                    fun(parent, view, position, id);
+                }
+            }));
+        };
+    };
 
-    adapter = new android.widget.ArrayAdapter(context, android.R.layout.simple_spinner_item, level_choices);
-    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    uii.level_pick.setAdapter(adapter);
-    uii.level_pick.setBackground(createShape(5, 0, 0, [2, setting.bg]));
-    uii.level_pick.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
-        onItemSelected: function (parent, view, position, id) {
-            //  setting.指定关卡.levelAbbreviation = parent.getSelectedItem();
-            switch (parent.getSelectedItem()) {
-                case "龙门外环":
-                case "当前剿灭":
-                    uii.mr.attr("visibility", "visible")
-                    uii.wordname.attr("visibility", "gone")
-                    uii.wordname3.attr("visibility", "visible");
-                    break;
-                default:
-                    uii.mr.attr("visibility", "visible")
-                    uii.wordname.attr("visibility", "visible")
-                    uii.wordname3.attr("visibility", "gone");
-                    break;
-            }
-        }
-    }));
     adapter = new android.widget.ArrayAdapter(context, android.R.layout.simple_spinner_item, modeGatherText);
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     uii.implement.setAdapter(adapter);
     uii.implement.setBackground(createShape(5, 0, 0, [2, setting.bg]));
+
+    uii.implement.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener({
+        onItemSelected: function (parent, view, position, id) {
+            ui.run(function () {
+
+                if (position == 4) {
+                    uii["levelPickText"].setText("模块选择");
+                    let _modData_ = [];
+                    for (let _modular_ of mod_data) {
+                        if (_modular_.id == "自定义" && _modular_.path) {
+                            _modData_.push(_modular_.script_name);
+                        }
+                    };
+                    change_list(_modData_);
+                } else {
+                    uii["levelPickText"].setText("关卡选择");
+
+                    change_list(level_choices_open, function (parent, view, position, id) {
+
+                        switch (parent.getSelectedItem()) {
+                            case "龙门外环":
+                            case "当期剿灭":
+                                uii.mr.attr("visibility", "visible")
+                                uii.wordname.attr("visibility", "gone")
+                                uii.wordname3.attr("visibility", "visible");
+                                break;
+                            default:
+                                uii.mr.attr("visibility", "visible")
+                                uii.wordname.attr("visibility", "visible")
+                                uii.wordname3.attr("visibility", "gone");
+                                break;
+                        }
+                    });
+
+                    if (level_choices_open.indexOf(setting.指定关卡.levelAbbreviation) != -1) {
+                        uii.level_pick.setSelection(level_choices_open.indexOf(setting.指定关卡.levelAbbreviation));
+                    };
+                    if (position == 3) {
+                        uii.level_pick.setSelection(level_choices_open.length - 1);
+                    }
+                }
+
+            })
+        }
+    }));
+
 
     uii.wenn.on('click', function () {
         if (uii.wxts.getHint() == "true") {
@@ -452,7 +489,7 @@ timed_tasks_set = function (timed_tasks_list, level_choices, callback) {
             app: jsPath,
             frequency: frequency,
             reason: reason,
-            type:  modeGather[modeGatherText[uii.implement.getSelectedItemPosition()]],
+            type: Object.values(modeGather)[uii.implement.getSelectedItemPosition()],
             specified: uii.level_pick.getSelectedItem().toString(),
             volume: uii.jyyx.checked,
             screen: uii.xpyx.checked,

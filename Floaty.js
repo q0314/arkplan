@@ -199,6 +199,9 @@ function 创建悬浮窗() {
     return window;
 }
 
+var sto_mod = storages.create("modular");
+//sto_mod.clear()
+var mod_data = sto_mod.get("modular", []);
 function 悬浮窗监听(window) {
     //初始化悬浮窗及悬浮窗操作对象
     ui.post(() => {
@@ -267,9 +270,6 @@ function 悬浮窗监听(window) {
         return true;
     });
 
-    var sto_mod = storages.create("modular");
-    //sto_mod.clear()
-    var mod_data = sto_mod.get("modular", []);
     if (mod_data[0] != undefined) {
         window.name.on("click", () => {
             mod_data = sto_mod.get("modular", []);
@@ -1079,7 +1079,7 @@ function 执行次数() {
             </card>
             <View bg="#000000" h="1" w="auto" />
             <horizontal marginLeft="5" gravity="center">
-                <text text="关卡选择" textSize="{{px2dp(48)}}" textColor="#212121" marginRight="50" />
+                <text id="levelPickText" text="关卡选择" textSize="{{px2dp(48)}}" textColor="#212121" marginRight="50" />
                 <spinner id="level_pick" textSize="{{px2dp(62)}}" entries=""
                     gravity="center" layout_weight="1" margin="5 5" padding="4" />
                 {/*  <TextView id="level_pick" textSize="{{px2dp(62)}}"
@@ -1153,8 +1153,8 @@ function 执行次数() {
         if (isOpen(id)) {
             if (typeof id.abbreviation == "object") {
                 for (let k in id.abbreviation) {
-          
-                     level_choices_open.push(k);
+
+                    level_choices_open.push(k);
                 }
             } else {
                 level_choices_open.push(id.abbreviation);
@@ -1162,18 +1162,18 @@ function 执行次数() {
         }
     };
 
-    adapter = new android.widget.ArrayAdapter(context, android.R.layout.simple_spinner_item, level_choices_open);
-    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    rewriteView.level_pick.setAdapter(adapter);
-    rewriteView.level_pick.setBackground(createShape(5, 0, 0, [2, setting.bg]));
-    rewriteView.level_pick.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
-        onItemSelected: function (parent, view, position, id) {
-            setting.指定关卡 ? setting.指定关卡.levelAbbreviation = parent.getSelectedItem() : setting.指定关卡 = {
-                levelAbbreviation: parent.getSelectedItem(),
-            };
-            tool.writeJSON("指定关卡", setting.指定关卡);
-        }
-    }));
+    function change_list(item, fun) {
+        adapter = new android.widget.ArrayAdapter(context, android.R.layout.simple_spinner_item, item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        rewriteView.level_pick.setAdapter(adapter);
+        rewriteView.level_pick.setBackground(createShape(5, 0, 0, [2, setting.bg]));
+        rewriteView.level_pick.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
+            onItemSelected: function (parent, view, position, id) {
+                fun(parent, view, position, id);
+            }
+        }));
+    };
+
 
     rewriteView.WaitForRun.attr("cardCornerRadius", "25dp");
     rewriteView.WaitForRun.on("click", () => {
@@ -1222,37 +1222,21 @@ function 执行次数() {
         "只执行基建": "基建",
         "执行剿灭作战+基建": "剿灭",
     };
-    if (setting.custom != false) {
+    if (setting.自定义模块) {
         modeGather["执行自定义模块"] = "自定义模块";
     }
-    let modeGatherText = Object.keys(modeGather);
 
     //   rewriteView.implement.attr("entries",mCountries)
-    adapter = new android.widget.ArrayAdapter(context, android.R.layout.simple_spinner_item, modeGatherText);
+
+    adapter = new android.widget.ArrayAdapter(context, android.R.layout.simple_spinner_item, Object.keys(modeGather));
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     rewriteView.implement.setAdapter(adapter);
-
-    let SE执行 = modeGatherText.indexOf(setting.执行);
-    if (SE执行 != -1) {
-        rewriteView.implement.setSelection(modeGatherText.indexOf(setting.执行));
-        if (SE执行 == 3) {
-            rewriteView.wordname.attr("visibility", "gone")
-            rewriteView.wordname3.attr("visibility", "visible");
-        }
-    } else {
-        SE执行 = 0;
-        rewriteView.implement.setSelection(0);
-    };
-    SE执行 = level_choices.indexOf(setting.指定关卡.levelAbbreviation);
-    if (SE执行 != -1) {
-        rewriteView.level_pick.setSelection(SE执行);
-    };
-    delete SE执行;
 
     rewriteDialogs.show();
     rewriteView.implement.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener({
         onItemSelected: function (parent, view, position, id) {
             ui.run(function () {
+                
                 let r = parent.getSelectedItem();
                 if (r == "执行剿灭作战+基建") {
                     rewriteView.wordname.attr("visibility", "gone")
@@ -1262,36 +1246,77 @@ function 执行次数() {
                     rewriteView.wordname3.attr("visibility", "gone")
                     rewriteView.wordname.attr("visibility", "visible");
 
+                };
+                if (position == 4) {
+                    rewriteView["levelPickText"].setText("模块选择");
+                    let _modData_ = [];
+                    for (let _modular_ of mod_data) {
+                        if (_modular_.id == "自定义" && _modular_.path) {
+                            _modData_.push(_modular_.script_name);
+                        }
+                    };
+                    change_list(_modData_, function (parent, view, position, id) {
+                        tool.writeJSON("自定义模块", parent.getSelectedItem());
+                    });
+                } else {
+                    rewriteView["levelPickText"].setText("关卡选择");
+                    change_list(level_choices_open, function (parent, view, position, id) {
+
+                        setting.指定关卡 ? setting.指定关卡.levelAbbreviation = parent.getSelectedItem() : setting.指定关卡 = {
+                            levelAbbreviation: parent.getSelectedItem(),
+                        };
+                        tool.writeJSON("指定关卡", setting.指定关卡);
+                        // toastLog(setting.指定关卡.levelAbbreviation);
+                    });
+                   
+                    if (level_choices_open.indexOf(setting.指定关卡.levelAbbreviation) != -1) {
+                        rewriteView.level_pick.setSelection(level_choices_open.indexOf(setting.指定关卡.levelAbbreviation));
+                    };
                 }
 
             })
         }
     }));
+    let SE执行 = Object.values(modeGather).findIndex((text) => text == setting.执行);
+    if (SE执行 != -1) {
+        rewriteView.implement.setSelection(SE执行);
+        if (SE执行 == 3) {
+            rewriteView.wordname.attr("visibility", "gone")
+            rewriteView.wordname3.attr("visibility", "visible");
+        }
+    };
+
+    SE执行 = level_choices_open.indexOf(setting.指定关卡.levelAbbreviation);
+    if (SE执行 != -1) {
+        rewriteView.level_pick.setSelection(SE执行);
+    };
+    delete SE执行;
 
 
     function 输入框事件() {
-        let Executionsettingss = rewriteView.implement.getSelectedItemPosition();
-        switch (Executionsettingss) {
-            case 0:
-                tool.writeJSON("执行", "常规");
-                break;
-            case 1:
-                tool.writeJSON("执行", "行动");
-                tool.writeJSON("行动", "999")
-                //  files.write("./mrfz/行动.txt", "999");
-                break;
-            case 2:
-                tool.writeJSON("执行", "基建");
-                break;
-            case 3:
-                tool.writeJSON("执行", "剿灭");
-                tool.writeJSON("剿灭", "5")
-                break;
-            case 4:
-                tool.writeJSON("执行", "自定义模块");
-                break;
-        };
-
+        let Executionsettings = rewriteView.implement.getSelectedItemPosition();
+        tool.writeJSON("执行", Object.values(modeGather)[Executionsettings]);
+        /*  switch (Executionsettings) {
+              case 0:
+                  tool.writeJSON("执行", "常规");
+                  break;
+              case 1:
+                  tool.writeJSON("执行", "行动");
+                  tool.writeJSON("行动", "999")
+                  //  files.write("./mrfz/行动.txt", "999");
+                  break;
+              case 2:
+                  tool.writeJSON("执行", "基建");
+                  break;
+              case 3:
+                  tool.writeJSON("执行", "剿灭");
+                  tool.writeJSON("剿灭", "5")
+                  break;
+              case 4:
+                  tool.writeJSON("执行", "自定义模块");
+                  break;
+          };
+  */
         let rwt = rewriteView.wordname.text(),
             rwt2 = rewriteView.wordname2.text(),
             rwt3 = rewriteView.wordname3.text()
