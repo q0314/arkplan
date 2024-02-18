@@ -254,7 +254,7 @@ var dwadlink = storages.create("Doolu_download");
 let set_up = dwadlink.get("data", {
     delete_zip: true,
     download_catalogue: files.path("/sdcard/脚本/模块下载目录/")
-})
+});
 var path,
     tool;
 try {
@@ -733,7 +733,7 @@ function modular_id(file) {
 
         switch (route_c.id) {
             case '自定义':
-                tool.writeJSON("custom", file);
+                tool.writeJSON("自定义模块", route_c.modular_configuration ? route_c.modular_configuration.script_name : files.getName(file));
 
                 break
             case '屏幕解锁':
@@ -742,39 +742,44 @@ function modular_id(file) {
                 storage.put("password", file);
                 break
             case '关闭应用':
-                tool.writeJSON("公告", true);
-                tool.writeJSON("关闭应用", file);
+                //   tool.writeJSON("公告", true);
+                //    tool.writeJSON("关闭应用", file);
                 break;
             case '基建换班':
                 tool.writeJSON("基建换班", true);
-                tool.writeJSON("换班路径", file);
+                //  tool.writeJSON("换班路径", file);
                 break;
             default:
                 snakebar("未匹配到相应模块id，非标准插件模块，请参考其他相关示例模块修改")
                 return
         }
-        snakebar("确认ID完成，" + route_c.id + "模块导入成功!");
-        if (route_c.modular_configuration != undefined) {
-            if (route_c.modular_configuration.open) {
-                for (var i = 0; i < mod_data.length; i++) {
-                    if (mod_data[i].id == route_c.id) {
-                        mod_data.splice(i, 1);
-                    }
-                }
 
-                mod_data.push({
-                    id: route_c.id,
-                    pre_run: route_c.pre_run_configuration ? true : false,
-                    pre_run_check: false,
-                    script_name: route_c.modular_configuration.script_name,
-                    developer: route_c.modular_configuration.developer,
-                    version: route_c.modular_configuration.version
-                })
 
+        for (let i = mod_data.length - 1; i >= 0; i--) {
+            if ((route_c.id != "自定义" && mod_data[i].id == route_c.id) || ((route_c.modular_configuration ? route_c.modular_configuration.script_name : files.getName(file)) == mod_data[i].script_name)) {
+                mod_data.splice(i, 1);
             }
         }
-        sto_mod.put("modular", mod_data)
+        if (route_c.modular_configuration && route_c.modular_configuration.open) {
+            mod_data.unshift({
+                id: route_c.id,
+                pre_run: route_c.pre_run_configuration ? true : false,
+                pre_run_check: false,
+                script_name: route_c.modular_configuration.script_name,
+                developer: route_c.modular_configuration.developer,
+                version: route_c.modular_configuration.version,
+                path: file
+            });
 
+        } else {
+            mod_data.unshift({
+                id: route_c.id,
+                script_name: files.getName(file),
+                path: file
+            });
+        }
+        sto_mod.put("modular", mod_data)
+        snakebar("确认ID完成，" + route_c.id + "模块导入成功!");
     })
 }
 ui.files_0.on("item_bind", function (itemView, itemHolder) {

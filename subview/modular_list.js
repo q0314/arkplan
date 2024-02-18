@@ -1,7 +1,5 @@
 function create_modular() {
-    let sto_mod = storages.create("modular");
-    let mod_data = sto_mod.get("modular", []);
-
+  
     let uii = ui.inflate(
         <vertical id="parent">
             <frame>
@@ -80,70 +78,78 @@ function create_modular() {
             </frame>
         </vertical>, null, false);
 
+
+  let sto_mod = storages.create("modular");
+  let mod_data = sto_mod.get("modular", []);
+
     var res = dialogs.build({
         type: "foreground-or-overlay",
         customView: uii,
         wrapInScrollView: false
     }).on("dismiss", (dialog) => {
-        storages.create("modular").put("modular", mod_data);
+        sto_mod.put("modular", mod_data);
     }).show();
+    let _modData_ = [];
+    for (let _modular_ of mod_data) {
+        if (_modular_.version&&_modular_.path) {
+            _modData_.push(_modular_);
+        }
+    };
 
-    uii.files_0.setDataSource(mod_data);
+    uii.files_0.setDataSource(_modData_);
     uii.Exit.on("click", () => {
         res.dismiss();
     });
     uii.files_0.on("item_bind", function (itemView, itemHolder, i) {
         ui.run(() => {
 
-
             itemView.execute_.on("click", function () {
                 let item = itemHolder.item;
                 let modular_route = false;
                 threads.start(function () {
-                switch (item.id) {
-                    case '自定义':
-                        modular_route = setting.custom
-                        break;
-                    case '关闭应用':
-                        modular_route = setting.关闭应用
-                        break;
-                    case '基建换班':
-                        modular_route = setting.换班路径;
-                        break;
-                    case '屏幕解锁':
-                        modular_route = storage.get("password");
-                        break;
-                    case "熄屏运行":
-                        res.dismiss()
-                        let execution = engines.all();
-                        for (let i = 0; i < execution.length; i++) {
-                            if (execution[i].getSource().toString().indexOf("Screen operation") > -1) {
-                                console.verbose("已停止运行同名脚本")
-                                execution[i].forceStop();
+                    switch (item.id) {
+                        case '自定义':
+                            modular_route = item.path;
+                            break;
+                        case '关闭应用':
+                            modular_route =  item.path;
+                            break;
+                        case '基建换班':
+                            modular_route =  item.path;
+                            break;
+                        case '屏幕解锁':
+                            modular_route = storage.get("password");
+                            break;
+                        case "熄屏运行":
+                            res.dismiss();
+                            let execution = engines.all();
+                            for (let i = 0; i < execution.length; i++) {
+                                if (execution[i].getSource().toString().indexOf("Screen operation") > -1) {
+                                    console.verbose("已停止运行同名脚本")
+                                    execution[i].forceStop();
+                                }
                             }
-                        }
-                        engines.execScript("Screen operation", "if(files.exists(files.path('./modules/screen.js'))){require('./modules/screen.js').mask()}else{require('./screen.js').mask()}");
-                        return
-                    default:
-                        toastLog('未匹配到的模块id')
-                        break
-                }
-                let modular_cache = files.exists(modular_route) ? require(modular_route) : false
-                if (modular_cache) {
-                    res.dismiss()
-                    
-                    modular_cache.import_configuration({
-                        'cwd': modular_route.replace(files.getName(modular_route), ""),
-                        'getSource': modular_route,
-                        'getinterface': '模块列表对话框',
-                    });
-                } else {
-                    toastLog('文件不存在，无法运行' + item.id + '模块:' + item.script_name + "。\n路径:" + modular_route)
+                            engines.execScript("Screen operation", "if(files.exists(files.path('./modules/screen.js'))){require('./modules/screen.js').mask()}else{require('./screen.js').mask()}");
+                            return
+                        default:
+                            toastLog('未匹配到的模块id');
+                            break
+                    }
+                    let modular_cache = files.exists(modular_route) ? require(modular_route) : false
+                    if (modular_cache) {
+                        res.dismiss()
 
-                }
+                        modular_cache.import_configuration({
+                            'cwd': modular_route.replace(files.getName(modular_route), ""),
+                            'getSource': modular_route,
+                            'getinterface': '模块列表对话框',
+                        });
+                    } else {
+                        toastLog('文件不存在，无法运行' + item.id + '模块:' + item.script_name + "。\n路径:" + modular_route)
 
+                    }
 
-            })
+                })
             })
             itemView.done.on("click", function () {
                 let item = itemHolder.item;
@@ -165,20 +171,20 @@ function create_modular() {
     })
 
     uii.files_0.on("item_long_click", function (e, item, i, itemView, listView) {
-        ui.run(()=>{
-        dialogs.build({
-            type: "foreground-or-overlay",
-            title: "确定要删除 " + item.script_name + " 吗？",
-            positive: "确定",
-            negative: "取消"
-        }).on("positive", () => {
-            mod_data.splice(i, 1);
-            sto_mod.put("modular", mod_data);
-            ui.post(() => {
-                uii.files_0.adapter.notifyDataSetChanged();
-            }, 50);
-        }).show()
-    })
+        ui.run(() => {
+            dialogs.build({
+                type: "foreground-or-overlay",
+                title: "确定要删除 " + item.script_name + " 吗？",
+                positive: "确定",
+                negative: "取消"
+            }).on("positive", () => {
+                mod_data.splice(i, 1);
+                sto_mod.put("modular", mod_data);
+                ui.post(() => {
+                    uii.files_0.adapter.notifyDataSetChanged();
+                }, 50);
+            }).show()
+        })
         e.consumed = true;
     });
 }

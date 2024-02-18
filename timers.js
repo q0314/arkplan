@@ -76,13 +76,13 @@ function 判断() {
 
 
     log("尝试唤醒设备");
-     device.wakeUpIfNeeded()
+    device.wakeUpIfNeeded()
     if (!device.isScreenOn()) {
         if (storage_d.get("noticeWaken")) {
             require("./modules/notice.js")("唤醒屏幕", {
                 id: "定时任务",
                 priority: 2,
-                ongoing:false,
+                ongoing: false,
                 category: "定时任务",
                 description: "发送通知优先级最高的通知信息使系统唤醒屏幕",
                 text: "当device.wakeUp()命令无法点亮屏幕时，发送通知优先级最高的通知信息使系统唤醒屏幕"
@@ -209,15 +209,21 @@ function 判断() {
     app.launchPackage(context.getPackageName())
     sleep(1500);
     $settings.setEnabled('foreground_service', true);
-    sleep(500)
+    sleep(500);
     if (Floaty = tool.script_locate("Floaty.js")) {
         toastLog("关闭上一个悬浮窗，启动新程序")
         Floaty.emit("暂停", "关闭程序");
     };
     tool.writeJSON("执行", Timing_data.type);
-
-    setting.指定关卡.levelAbbreviation = Timing_data.specified;
-    tool.writeJSON("指定关卡", setting.指定关卡);
+    switch (Timing_data.type) {
+        case '自定义模块':
+            tool.writeJSON("自定义模块", Timing_data.specified);
+            break;
+        default:
+            setting.指定关卡.levelAbbreviation = Timing_data.specified;
+            tool.writeJSON("指定关卡", setting.指定关卡);
+            break
+    }
     if (Timing_data.frequency) {
         tool.writeJSON(Timing_data.frequency[0], Timing_data.frequency[1]);
     }

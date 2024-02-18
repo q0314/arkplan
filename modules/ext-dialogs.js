@@ -286,7 +286,7 @@ let exp = {
 
         let _props = {
             autoDismiss: !$obstinate,
-            type:"foreground-or-overlay",
+            type: "foreground-or-overlay",
             canceledOnTouchOutside: !$obstinate,
             checkBoxPrompt: $cbx ? typeof $cbx === 'string'
                 ? $cbx : this.text.no_more_prompt : undefined,
@@ -1138,10 +1138,12 @@ let exp = {
                                 execution[i].forceStop();
                             };
                         };
-                        try{
-                        engines.execScriptFile("./main.js");
-                        }catch(e){
-                            engines.execScriptFile("../main.js");
+                        try {
+                            engines.execScriptFile("./main.js");
+                        } catch (e) {
+                            engines.execScriptFile("../main.js", {
+                                path: files.path('./')
+                            });
                         }
                         d.dismiss();
                         exit();

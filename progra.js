@@ -327,7 +327,7 @@ let collection = {
         tool.Floaty_emit("面板", "隐藏");
         tool.Floaty_emit("展示文本", "状态", "状态: 正在进入固源岩关卡");
         while (true) {
-            sleep(200);
+            sleep(500);
             if (this.staging = (ITimg.ocr(displayText["残阳"], {
                 action: 5,
                 area: 13,
@@ -337,9 +337,9 @@ let collection = {
                 log_policy: true,
                 refresh: false,
             }))) {
-                swipe(this.staging.left, this.staging.bottom, this.staging.right, width, 300);
-                sleep(100);
-                swipe(this.staging.left, this.staging.bottom, this.staging.right, width, 300);
+                swipe(this.staging.left, this.staging.bottom, this.staging.right, width, 500);
+                sleep(500);
+                swipe(this.staging.left, this.staging.bottom, this.staging.right, width, 500);
                 sleep(500);
                 break;
             };
@@ -656,7 +656,7 @@ function 程序(implem) {
  * @returns 
  */
 function 上次作战() {
-
+    console.info("上次作战");
     while (true) {
 
         tool.Floaty_emit("展示文本", "状态", "状态：判断界面中");
@@ -790,19 +790,30 @@ function 检验是否已选中关卡() {
     }
 }
 function 自定义() {
-    tool.Floaty_emit("展示文本", "状态", "状态：开始执行自定义模块")
+    let mod_data = storages.create("modular").get("modular", []);
+    tool.Floaty_emit("展示文本", "状态", "状态：开始执行自定义模块");
+
     ITimg.重置计时器(false);
     try {
-        let jijian = require(setting.custom);
-        jijian.main_entrance({
-            'cwd': setting.custom.replace(files.getName(setting.custom), ""),
-            'getSource': setting.custom,
-            'ITimg': ITimg,
-            'get_onstage_package': tool.currentPackage,
-            'startup_app': 启动应用,
-            'startup_mode': 程序,
+        let customize;
+        for (let _modular_ of mod_data) {
+            if (_modular_.script_name == setting.自定义模块) {
+                customize = _modular_;
+                break;
+            }
+        }
 
-        })
+        if (customize) {
+            require(customize.path).main_entrance({
+                'cwd': customize.path.replace(files.getName(customize.path), ""),
+                'getSource': customize.path,
+                'ITimg': ITimg,
+                'get_onstage_package': tool.currentPackage,
+                'startup_app': 启动应用,
+                'startup_mode': 程序,
+
+            });
+        };
 
     } catch (e) {
         let tips = "自定义执行模式模块发生异常，，请检查:\n" + $debug.getStackTrace(e);
@@ -815,19 +826,23 @@ function 自定义() {
 }
 
 function 关闭应用(getmode, getstate) {
-    tool.Floaty_emit("展示文本", "状态", "状态：执行关闭应用中")
+    tool.Floaty_emit("展示文本", "状态", "状态：执行关闭应用中");
+    let mod_data = storages.create("modular").get("modular", []);
     try {
-        let gbyyan = require(setting.关闭应用);
-        gbyyan.main_entrance({
-            'cwd': setting.关闭应用.replace(files.getName(setting.关闭应用), ""),
-            'getSource': setting.关闭应用,
-            'ITimg': ITimg,
-            'get_onstage_package': tool.currentPackage,
-            'startup_app': 启动应用,
-            'startup_mode': 程序,
-            'get_implement_mode': getmode,
-            'get_implement_state': getstate,
-        })
+
+        let gbyyan = mod_data.find((item) => item.id == "关闭应用")
+        if (gbyyan) {
+            require(gbyyan.path).main_entrance({
+                'cwd': gbyyan.path.replace(files.getName(gbyyan.path), ""),
+                'getSource': gbyyan.path,
+                'ITimg': ITimg,
+                'get_onstage_package': tool.currentPackage,
+                'startup_app': 启动应用,
+                'startup_mode': 程序,
+                'get_implement_mode': getmode,
+                'get_implement_state': getstate,
+            });
+        }
 
         toastLog("关闭应用执行完成");
         gbyyan = null;
@@ -848,27 +863,30 @@ function 基建换班(fatigue_state) {
         click(height / 2, 50)
         tool.Floaty_emit("展示文本", "状态", "状态：执行基建换班中")
         try {
-            ITimg.重置计时器(false)
-            let jijian = require(setting.换班路径);
-
-            jijian.main_entrance({
-                //'start_position':value,
-                'cwd': setting.换班路径.replace(files.getName(setting.换班路径), ""),
-                'getSource': setting.换班路径,
-                'ITimg': ITimg,
-                'get_onstage_package': tool.currentPackage,
-                'startup_app': 启动应用,
-                // 'startup_mode':程序,
-                'fatigue_worker': fatigue_state,
-            })
-            toastLog("基建换班执行完成");
+            ITimg.重置计时器(false);
+            let mod_data = storages.create("modular").get("modular", []);
+            let shift = mod_data.find((item) => item.id == "基建换班");
+            if (shift) {
+                require(shift.path).main_entrance({
+                    //'start_position':value,
+                    'cwd': shift.path.replace(files.getName(shift.path), ""),
+                    'getSource': shift.path,
+                    'ITimg': ITimg,
+                    'get_onstage_package': tool.currentPackage,
+                    'startup_app': 启动应用,
+                    // 'startup_mode':程序,
+                    'fatigue_worker': fatigue_state,
+                });
+                toastLog("基建换班执行完成");
+            }
             ITimg.重置计时器(true);
             jijian = null;
+
         } catch (e) {
             sleep(1000)
             jijian = null;
             ITimg.重置计时器(true);
-            let tips = "自定义基建换班模块发生异常，请检查:\n" + $debug.getStackTrace(e);
+            let tips = "自定义基建换班模块发生异常，请检查:\n" + e;
 
             console.error(tips + "\n" + e);
             toast(tips);
@@ -913,8 +931,8 @@ let 唤醒 = {
 
         sleep(2000);
         this.开始唤醒();
+        sleep(500);
         this.取消公告();
-
 
         return true;
 
@@ -1022,6 +1040,7 @@ let 唤醒 = {
     取消公告() {
         this.frequency = 0;
         tool.Floaty_emit("展示文本", "状态", "状态：取消公告签到通知");
+        console.info("取消公告");
         while (true) {
 
             if (ITimg.picture("关闭公告", {
@@ -1053,9 +1072,11 @@ let 唤醒 = {
                 //点击边缘位置来取消取消按钮不一样的公告
                 click(height / 2, width - zoy(100));
                 if (ITimg.picture("终端", {
-                    area: 2
+                    area: 2,
+                    //        action:5,
                 }) || ITimg.picture("基建", {
                     area: 24,
+                    action: 5,
                 })) {
                     if (this.frequency >= 3) {
                         break;

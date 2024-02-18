@@ -513,6 +513,7 @@ function 图像匹配(picture, list) {
         ITimg.results.x = ITimg.results.x + random((ITimg.results.x > 10) ? - 5 : 0, 10);
         ITimg.results.y = ITimg.results.y + random((ITimg.results.y > 10) ? - 5 : 0, 10);
         switch (list.action) {
+
             case 0:
                 sleep(50);
                 //click_s(cx,cy)
@@ -543,12 +544,12 @@ function 图像匹配(picture, list) {
                     "bottom": ITimg.results.y + img_small_xy.h,
                 };
             case 6:
-                return ITimg.results
+                return ITimg.results;
 
         };
         (list.log_policy || ITimg.default_list.picture.log_policy) ? "" : console.info(picture + " 匹配成功 " + ITimg.results);
 
-        sleep(list.timing)
+        sleep(list.timing);
         return true;
     } else {
         img_small.recycle();
