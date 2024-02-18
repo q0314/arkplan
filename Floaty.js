@@ -115,7 +115,16 @@ setTimeout(() => {
     悬浮窗监听(window);
 
 }, 800);
-
+/**
+* 获取类内部私有变量
+* @param {*} javaObject
+* @param {*} name
+*/
+function getClassField(javaObject, name) {
+    var field = javaObject.class.getDeclaredField(name);
+    field.setAccessible(true);
+    return field.get(javaObject);
+}
 function 创建悬浮窗() {
     var window = floaty.rawWindow(
         // var window = floaty.window(
@@ -196,6 +205,14 @@ function 创建悬浮窗() {
      params.flags |= WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
     params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
      */
+    //悬浮窗待在屏幕里面
+    //let WindowManager = android.view.WindowManager;
+    let mWindow = getClassField(window, 'mWindow');
+    let params = mWindow.getWindowLayoutParams();
+    params.flags &= ~WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
+    ui.run(function () {
+        mWindow.updateWindowLayoutParams(params);
+    });
     return window;
 }
 
@@ -1118,7 +1135,7 @@ function 执行次数() {
         rewriteView = null;
         rewriteDialogs = null;
     });
-   // gallery_info.服务器 = (gallery_info.服务器 ? gallery_info.服务器 : gallery_info.server);
+    // gallery_info.服务器 = (gallery_info.服务器 ? gallery_info.服务器 : gallery_info.server);
 
     rewriteView.ysrh.on("check", (checked) => {
         tool.writeJSON("only_medicament", checked);
@@ -1857,16 +1874,16 @@ function 旋转监听() {
                 console.error("获取悬浮窗白名单设置出错" + e)
             }
         }
-        if (this.cutter_package) {
-            let getDirection = 获取屏幕方向();
-            if (getDirection != screenAttribute.direction) {
-                screenAttribute.direction = getDirection;
-                // screenAttribute.direction == "竖屏" ? (screenAttribute.w = device.width, screenAttribute.h = device.height - screenAttribute.titleH) : (screenAttribute.h = device.width, screenAttribute.w = device.height - screenAttribute.titleH);
-                threads.start(function () {
-                    悬浮窗复位();
-                })
-            };
-        }
+        /*   if (this.cutter_package) {
+               let getDirection = 获取屏幕方向();
+               if (getDirection != screenAttribute.direction) {
+                   screenAttribute.direction = getDirection;
+                   // screenAttribute.direction == "竖屏" ? (screenAttribute.w = device.width, screenAttribute.h = device.height - screenAttribute.titleH) : (screenAttribute.h = device.width, screenAttribute.w = device.height - screenAttribute.titleH);
+                   threads.start(function () {
+                       悬浮窗复位();
+                   })
+               };
+           }*/
     }, 1500);
     setInterval(() => {
         ui.run(() => {
