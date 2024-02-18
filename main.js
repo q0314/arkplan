@@ -1664,7 +1664,9 @@ ui.viewpager.setOnPageChangeListener({
                     }
 
                     if (gallery.gallery_info) {
-                        if ((setting.custom.length >= 6 && ui.implement.getCount() == 5) || (setting.custom == false && ui.implement.getCount() == 6)) {
+                        if (setting.自定义模块 && ui.implement.getCount() == 4) {
+                            modeGather["执行自定义模块"] = "自定义模块";
+                            modeGatherText = Object.keys(modeGather);
                             change_list(ui.implement, modeGatherText);
                         }
                     }
