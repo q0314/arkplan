@@ -205,37 +205,6 @@ try {
 
 threads.start(function () {
 
-    http.get("https://gitee.com/q0314/script-module-warehouse/raw/master/secret_key", {}, (res, err) => {
-        if (err || res["statusCode"] != 200) {
-
-        } else {
-            try {
-                server = res["body"].string();
-                let server_ = server;
-                server = $crypto.decrypt(server, key, "AES", {
-                    "input": "base64",
-                    "output": "string"
-                });
-                storages.create("server").put("server", server_);
-
-            } catch (e) {
-                server = storages.create("server").get("server");
-                server = $crypto.decrypt(server, key, "AES", {
-                    "input": "base64",
-                    "output": "string"
-                });
-
-                let tips = "解码出错" + e
-                toast(tips);
-                console.error(tips)
-            }
-
-
-        }
-
-
-    });
-
     try {
         http.get(server + "about_link.json", {
             headers: {
@@ -262,6 +231,7 @@ threads.start(function () {
             }
         }, (res, err) => {
             if (err || res['statusCode'] != 200) {
+                console.error(System.getProperty("http.agent"))
                 throw Error('请求云端图库列表信息出错:\n' + (res ? res : err.messag));
 
             } else {
@@ -288,7 +258,7 @@ threads.start(function () {
             })
         })
     } catch (e) {
-        e = $debug.getStackTrace(e);
+    //    e = $debug.getStackTrace(e);
         console.error(e);
         network_reminder_tips(e)
     };

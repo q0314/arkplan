@@ -1132,19 +1132,8 @@ let exp = {
                     _diag.removeAllListeners('positive');
                     _diag.setActionButton('positive', "重启应用");
                     _diag.on('positive', d => {
-                        let execution = engines.all();
-                        for (let i = 0; i < execution.length; i++) {
-                            if (execution[i].getSource().toString().match(/([^/]+)$/)[1] == "main.js") {
-                                execution[i].forceStop();
-                            };
-                        };
-                        try {
-                            engines.execScriptFile("./main.js");
-                        } catch (e) {
-                            engines.execScriptFile("../main.js", {
-                                path: files.path('./')
-                            });
-                        }
+                        let Process =android.os.Process;
+                        Process.killProcess(Process.myPid());
                         d.dismiss();
                         exit();
                     });

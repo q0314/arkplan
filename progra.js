@@ -924,6 +924,7 @@ let 唤醒 = {
 
         sleep(1500);
         if (this.确认返回主页()) {
+            this.取消公告();
             return true;
         }
         启动应用(true);

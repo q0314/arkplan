@@ -151,7 +151,7 @@ ui.layout(
                                     </text>
                                     <card w="*" id="indx2" h="40" >
                                         <horizontal id="github" gravity="center_vertical" foreground="?android:attr/selectableItemBackgroundBorderless">
-                                            <text textSize="15" text="GitHub:qiao34653/arkplan" textColor="#080808" margin="25 0 0 0" gravity="center_vertical" />
+                                            <text textSize="15" text="GitHub:q0314/arkplan" textColor="#080808" margin="25 0 0 0" gravity="center_vertical" />
                                             <text layout_weight="1" />
                                         </horizontal>
                                     </card>
@@ -209,8 +209,8 @@ delete mDrawable;
 
 ui.ai.on("click", () => toast(language['like']));
 let edition = jiance()
-ui.localVerName.setText(language['localVerName'] + toupdate.getLocalVerName())
-ui.apply_version.setText("应用版本：" + edition.replace("main.js", "") + app.versionName);
+ui.localVerName.setText(edition.replace("main.js", "")+language['localVerName'] + toupdate.getLocalVerName())
+ui.apply_version.setText("应用版本：v"  + app.versionName);
 
 ui.menu.setDataSource([{
     title: "QQ：梦月時謌",
@@ -516,7 +516,7 @@ ui.banben.on("click", () => {
 
 
 ui.github.click((view) => {
-    app.openUrl("https://github.com/qiao34653/arkplan");
+    app.openUrl("https://github.com/q0314/arkplan");
 })
 
 

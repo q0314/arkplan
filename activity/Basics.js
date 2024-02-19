@@ -959,7 +959,7 @@ ui.Shizuku.on("click", (checked) => {
         $shell.setDefaultOptions({
             adb: true
         });
-    
+
         files.createWithDirs(package_path + "mrfz/screencap.png");
         let adb = shell("screencap -p " + package_path + "mrfz/screencap.png");
 
@@ -1075,6 +1075,7 @@ ui.xpyx.on("click", (view) => {
                 id: "熄屏运行",
                 pre_run: false,
                 pre_run_check: false,
+                path: true,
                 script_name: "熄屏运行",
                 developer: "梦月時謌",
                 version: "1.2.0"
@@ -1614,7 +1615,7 @@ function modular_id(file) {
             var route_c = modular.import_configuration({
                 'cwd': file.replace(files.getName(file), ""),
                 'getSource': file,
-                'getinterface': '设置',
+                'getinterface': '模块仓库',
             });
 
         } catch (err) {
@@ -1632,68 +1633,56 @@ function modular_id(file) {
 
         switch (route_c.id) {
             case '自定义':
-                ui.run(() => {
-                    // ui.indx3.attr("h", "80")
-                    ui.input_c.attr("visibility", "visible");
-                    tool.writeJSON("custom", file);
-                    ui.input_c.setHint(file);
-                    ui.input_c.setText(null);
-                })
+                tool.writeJSON("自定义模块", route_c.modular_configuration ? route_c.modular_configuration.script_name : files.getName(file));
+
                 break
+            case '屏幕解锁':
 
+                let storage = storages.create("time");
+                storage.put("password", file);
+                break
             case '关闭应用':
-
-                ui.run(() => {
-                    ui.gbyy.checked = true;
-                    ui.indx6.attr("h", "80")
-                    ui.inputgb.attr("visibility", "visible");
-                    ui.input_file.attr("visibility", "visible")
-
-                    tool.writeJSON("公告", true);
-                    tool.writeJSON("关闭应用", file);
-                    ui.inputgb.setHint(file);
-                    ui.inputgb.setText(null);
-                })
+                //   tool.writeJSON("公告", true);
+                //    tool.writeJSON("关闭应用", file);
                 break;
             case '基建换班':
-                ui.run(() => {
-                    ui.jjhb.checked = true;
-                    ui.indx4.attr("h", "80")
-                    ui.inputd2.attr("visibility", "visible");
-                    ui.input_file2.attr("visibility", "visible")
-
-                    tool.writeJSON("基建换班", true);
-                    tool.writeJSON("换班路径", file);
-                    ui.inputd2.setHint(file);
-                    ui.inputd2.setText(null);
-                })
+                tool.writeJSON("基建换班", true);
+                //  tool.writeJSON("换班路径", file);
                 break;
+            case '熄屏运行':
+
+                break
             default:
-                toastLog("未匹配到相应模块id，非标准插件模块，请参考相关示例修改")
+                snakebar("未匹配到相应模块id，非标准插件模块，请参考其他相关示例模块修改")
                 return
         }
-        toastLog("确认ID完成，" + route_c.id + "导入成功");
-        if (route_c.modular_configuration != undefined) {
-            if (route_c.modular_configuration.open) {
-                for (var i = 0; i < mod_data.length; i++) {
-                    if (mod_data[i].id == route_c.id) {
-                        mod_data.splice(i, 1);
-                    }
-                }
 
-                mod_data.push({
-                    id: route_c.id,
-                    pre_run: route_c.pre_run_configuration ? true : false,
-                    pre_run_check: false,
-                    script_name: route_c.modular_configuration.script_name,
-                    developer: route_c.modular_configuration.developer,
-                    version: route_c.modular_configuration.version
-                })
 
+        for (let i = mod_data.length - 1; i >= 0; i--) {
+            if ((route_c.id != "自定义" && mod_data[i].id == route_c.id) || ((route_c.modular_configuration ? route_c.modular_configuration.script_name : files.getName(file)) == mod_data[i].script_name)) {
+                mod_data.splice(i, 1);
             }
         }
-        sto_mod.put("modular", mod_data)
+        if (route_c.modular_configuration && route_c.modular_configuration.open) {
+            mod_data.unshift({
+                id: route_c.id,
+                pre_run: route_c.pre_run_configuration ? true : false,
+                pre_run_check: false,
+                script_name: route_c.modular_configuration.script_name,
+                developer: route_c.modular_configuration.developer,
+                version: route_c.modular_configuration.version,
+                path: file
+            });
 
+        } else {
+            mod_data.unshift({
+                id: route_c.id,
+                script_name: files.getName(file),
+                path: file
+            });
+        }
+        sto_mod.put("modular", mod_data)
+        snakebar("确认ID完成，" + route_c.id + "模块导入成功!");
     })
 }
 //当离开本界面时保存
