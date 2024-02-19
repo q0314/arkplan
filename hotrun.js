@@ -41,9 +41,9 @@ threads.start(function () {
         if (!files.exists(path + _proj_def_n + '/')) {
             let { filesx } = require('./modules/ext-files');
 
-            files.rename('./', _proj_def_n);
-  
-            filesx.copy(files.path('../' + _proj_def_n + '/'), path);
+            filesx.copy(files.path('./'), path);
+            files.rename(path + 'project/', _proj_def_n);
+
         };
         engines.execScriptFile(path + _proj_def_n + '/main.js', {
             path: path + _proj_def_n + '/'

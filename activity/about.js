@@ -209,7 +209,7 @@ delete mDrawable;
 
 ui.ai.on("click", () => toast(language['like']));
 let edition = jiance()
-ui.localVerName.setText(edition.replace("main.js", "")+language['localVerName'] + toupdate.getLocalVerName())
+ui.localVerName.setText(language['localVerName'] + edition.replace("main.js", "")+toupdate.getLocalVerName())
 ui.apply_version.setText("应用版本：v"  + app.versionName);
 
 ui.menu.setDataSource([{
