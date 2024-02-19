@@ -15,7 +15,7 @@
     "activityIntentTasks": false,
     "nodejs": "auto"
   },
-  "icon": "images/ic_app_logo.png",
+  "icon": "res/icon.png",
   "launchConfig": {
     "displaySplash": true,
     "hideLogs": false,
@@ -23,7 +23,7 @@
     "splashText": "",
     "stableMode": false
   },
-  "main": "main.js",
+  "main": "hotrun.js",
   "name": "明日计划",
   "optimization": {
     "obfuscateComponents": true,
@@ -88,6 +88,6 @@
     "uuid": "0d9d596d-ce42-49e6-99d2-d7387fb33d87"
   },
   "useFeatures": [],
-  "versionCode": 2024021844,
-  "versionName": "4.4.85"
+  "versionCode": 2024021944,
+  "versionName": "4.4.9"
 }

@@ -5,38 +5,36 @@ var gzget = {
     get_t: function (arr) {
         log("获取聘用干员名");
         let name_;
-          for (let i = 0; i < gzgy.length; i++) {
+        for (let i = 0; i < gzgy.length; i++) {
             name_ = arr.find(ele => ele.text.indexOf(gzgy[i].name) != -1) ? gzgy[i] : undefined;
             if (!name_) {
                 continue;
-            }else{
-                switch (name_.name) {
-                    case '阿':
-                        if (arr.find(ele => ele.text.indexOf('SHAW') != -1)) {
-                            name_.name = "阿消";
-                        }
-                        break
-                        case '星熊':
-                         name_.name = "星极";
-                            
-                            break
+            } else {
+                if (name_.name == '阿') {
+                    if (arr.find(ele => ele.text.indexOf('SHAW') != -1)) {
+                        gzgy[i].name = "阿消";
+                        i--;
+                        continue;
+                    }
+                } else if (name_.name == '星熊') {
+                    name_ = false;
+                    continue;
                 }
-                break;
+
             }
-          
-    
+
         }
         if (!name_) {
-            log("屏幕内容:\n"+JSON.stringify(arr)+"\n识别到的干员名:"+name_)
+            log("屏幕内容:\n" + JSON.stringify(arr) + "\n识别到的干员名:" + name_)
         }
         return name_;
     },
-    get_r: function (tags,filter) {
+    get_r: function (tags, filter) {
         log("检验tag词条,返回可招募的干员组合");
         gz = [];
         gzgy = eval(files.read("./lib/game_data/RecruitData.json"));
         for (let i = 0; i < gzgy.length; i++) {
-             gzgy[i].tags.push(gzgy[i].type + "干员");
+            gzgy[i].tags.push(gzgy[i].type + "干员");
             gzgy[i].add = 0;
             gzgy[i].right_tag = [];
             for (let j = 0; j < tags.length; j++) {
@@ -51,25 +49,25 @@ var gzget = {
         }
         var above_four = [];
         for (let a = 0; a < tags.length; a++) {
-            above_four = this.check_e_tag([tags[a]], above_four,filter);
+            above_four = this.check_e_tag([tags[a]], above_four, filter);
         }
         for (let a = 0; a < tags.length - 1; a++) {
             for (b = a + 1; b < tags.length; b++) {
-               above_four = this.check_e_tag([tags[a], tags[b]], above_four,filter);
-           //    console.warn(above_four)
-             
+                above_four = this.check_e_tag([tags[a], tags[b]], above_four, filter);
+                //    console.warn(above_four)
+
             }
         }
-        
+
         for (let a = 0; a < tags.length - 2; a++) {
             for (b = a + 1; b < tags.length - 1; b++) {
                 for (let c = b + 1; c < tags.length; c++) {
-                    above_four = this.check_e_tag([tags[a], tags[b], tags[c]], above_four,filter);
-                  
+                    above_four = this.check_e_tag([tags[a], tags[b], tags[c]], above_four, filter);
+
                 }
             }
         }
-        
+
         var delete_m = [];
         for (let i = 0; i < above_four.length; i++) {
             let is_e = true;
@@ -104,7 +102,7 @@ var gzget = {
         }
         return delete_m;
     },
-    check_e_tag: function (tags_check, above_four,filter) {
+    check_e_tag: function (tags_check, above_four, filter) {
         //校验tag,过滤出包含该tag的干员
         let tmp_arr = [];
         let is_add = true,
@@ -112,7 +110,7 @@ var gzget = {
         for (let d = 0; d < gz.length; d++) {
             let e_tag = 0;
             for (let i = 0; i < tags_check.length; i++) {
-                  e_tag += gz[d].tags.indexOf(tags_check[i]) == -1 ? -1 : 0;
+                e_tag += gz[d].tags.indexOf(tags_check[i]) == -1 ? -1 : 0;
             }
             if (e_tag < 0) {
                 continue;
@@ -130,14 +128,14 @@ var gzget = {
             }
         }
         //过滤不一定出的5星tag
-        if (min_level == 4&&filter) {
+        if (min_level == 4 && filter) {
             for (let i = tmp_arr.length - 1; i >= 0; i--) {
                 if (tmp_arr[i].level == 5) {
                     tmp_arr.splice(i, 1);
                 }
             }
         }
-        
+
         if (is_add) {
             above_four.push.apply(above_four, tmp_arr);
         }

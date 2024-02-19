@@ -115,7 +115,16 @@ setTimeout(() => {
     悬浮窗监听(window);
 
 }, 800);
-
+/**
+* 获取类内部私有变量
+* @param {*} javaObject
+* @param {*} name
+*/
+function getClassField(javaObject, name) {
+    var field = javaObject.class.getDeclaredField(name);
+    field.setAccessible(true);
+    return field.get(javaObject);
+}
 function 创建悬浮窗() {
     var window = floaty.rawWindow(
         // var window = floaty.window(
@@ -196,6 +205,14 @@ function 创建悬浮窗() {
      params.flags |= WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
     params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
      */
+    //悬浮窗待在屏幕里面
+    //let WindowManager = android.view.WindowManager;
+    let mWindow = getClassField(window, 'mWindow');
+    let params = mWindow.getWindowLayoutParams();
+    params.flags &= ~WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
+    ui.run(function () {
+        mWindow.updateWindowLayoutParams(params);
+    });
     return window;
 }
 
@@ -1087,6 +1104,7 @@ function 执行次数() {
 */}
             </horizontal>
             <Switch id="ysrh" checked="{{setting.only_medicament}}" text="仅使用药剂恢复理智" padding="6 6 6 6" textSize="16sp" />
+            <Switch id="unlimited_eat_expired_sane" checked="{{setting.无限吃24小时过期理智药}}" text="无限吃24小时过期理智药" padding="6 6 6 6" textSize="16" />
             <horizontal gravity="center" marginLeft="5">
                 <text id="mr1" text="刷图上限:" textSize="15" textColor="#212121" />
                 <input id="wordname3" inputType="number" hint="{{setting.剿灭}}次" layout_weight="1" visibility="gone" paddingLeft="6" w="auto" />
@@ -1116,10 +1134,28 @@ function 执行次数() {
     }).on("dismiss", (dialog) => {
         rewriteView = null;
         rewriteDialogs = null;
-    })
+    });
+    // gallery_info.服务器 = (gallery_info.服务器 ? gallery_info.服务器 : gallery_info.server);
 
     rewriteView.ysrh.on("check", (checked) => {
         tool.writeJSON("only_medicament", checked);
+    });
+    rewriteView.unlimited_eat_expired_sane.click((view) => {
+
+        /*  if (view.checked) {
+              if (gallery_info.服务器 == "简中服") {
+                  if (!setting.ocrExtend) {
+                      view.checked = false;
+                      snakebar(language['OCR-Extensions-need-installed']);
+                      return
+                  }
+              } else {
+                  view.checked = false;
+                  snakebar(language['ocr-sorry']);
+              }
+          }
+          */
+        tool.writeJSON("无限吃24小时过期理智药", view.checked);
     });
     rewriteView.buiok.on("click", () => {
         输入框事件()
@@ -1207,14 +1243,7 @@ function 执行次数() {
         }
     });
 
-    let language = (gallery_info.服务器 ? gallery_info.服务器 : gallery_info.server);
 
-    switch (true) {
-        case language == "日服":
-        case language == "美服":
-            language = "禁用服";
-            break;
-    }
 
     let modeGather = {
         "指定关卡+基建": "常规",
@@ -1845,16 +1874,16 @@ function 旋转监听() {
                 console.error("获取悬浮窗白名单设置出错" + e)
             }
         }
-        if (this.cutter_package) {
-            let getDirection = 获取屏幕方向();
-            if (getDirection != screenAttribute.direction) {
-                screenAttribute.direction = getDirection;
-                // screenAttribute.direction == "竖屏" ? (screenAttribute.w = device.width, screenAttribute.h = device.height - screenAttribute.titleH) : (screenAttribute.h = device.width, screenAttribute.w = device.height - screenAttribute.titleH);
-                threads.start(function () {
-                    悬浮窗复位();
-                })
-            };
-        }
+        /*   if (this.cutter_package) {
+               let getDirection = 获取屏幕方向();
+               if (getDirection != screenAttribute.direction) {
+                   screenAttribute.direction = getDirection;
+                   // screenAttribute.direction == "竖屏" ? (screenAttribute.w = device.width, screenAttribute.h = device.height - screenAttribute.titleH) : (screenAttribute.h = device.width, screenAttribute.w = device.height - screenAttribute.titleH);
+                   threads.start(function () {
+                       悬浮窗复位();
+                   })
+               };
+           }*/
     }, 1500);
     setInterval(() => {
         ui.run(() => {

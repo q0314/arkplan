@@ -108,7 +108,8 @@ timed_tasks_set = function (timed_tasks_list, callback) {
                                         <text id="mr2" text="磕药/碎石:" textSize="15" textColor="#212121" />
                                         <input id="wordname2" inputType="number" hint="{{setting.理智}}个" layout_weight="1" w="auto" />
                                     </horizontal>
-                                    <Switch id="ysrh" checked="{{setting.only_medicament}}" text="仅使用药剂恢复理智" padding="6 6 6 6" textSize="16sp" />
+                                    <widget-switch-se7en id="only_medicament" checked="{{setting.only_medicament}}" text="仅使用药剂恢复理智" padding="6 6 6 6" textSize="16sp" textColor="{{theme.text}}" />
+                                    <widget-switch-se7en id="unlimited_eat_expired_sane" checked="{{setting.无限吃24小时过期理智药}}" text="{{language['unlimited-eat-expired-sane']}}" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
                                 </vertical>
                                 <linear gravity="center" margin="0 -2">
                                     <text text=" 运行时间" textSize="8" />
@@ -274,6 +275,15 @@ timed_tasks_set = function (timed_tasks_list, callback) {
             uii.prompt_line.setText(" 使用帮助")
             uii.wenn.setTextColor(colors.parseColor("#f4a406"))
         }
+    });
+    uii.only_medicament.on('check', (checked) => {
+        //调用主脚本的
+        ui.only_medicament.performClick();
+        //  tool.writeJSON("only_medicament", checked);
+    });
+    uii.unlimited_eat_expired_sane.click((view) => {
+        //调用主脚本的
+        ui.unlimited_eat_expired_sane.performClick();
     })
 
     var storage = storages.create("time");

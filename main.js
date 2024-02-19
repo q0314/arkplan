@@ -205,37 +205,6 @@ try {
 
 threads.start(function () {
 
-    http.get("https://gitee.com/q0314/script-module-warehouse/raw/master/secret_key", {}, (res, err) => {
-        if (err || res["statusCode"] != 200) {
-
-        } else {
-            try {
-                server = res["body"].string();
-                let server_ = server;
-                server = $crypto.decrypt(server, key, "AES", {
-                    "input": "base64",
-                    "output": "string"
-                });
-                storages.create("server").put("server", server_);
-
-            } catch (e) {
-                server = storages.create("server").get("server");
-                server = $crypto.decrypt(server, key, "AES", {
-                    "input": "base64",
-                    "output": "string"
-                });
-
-                let tips = "解码出错" + e
-                toast(tips);
-                console.error(tips)
-            }
-
-
-        }
-
-
-    });
-
     try {
         http.get(server + "about_link.json", {
             headers: {
@@ -262,6 +231,7 @@ threads.start(function () {
             }
         }, (res, err) => {
             if (err || res['statusCode'] != 200) {
+                console.error(System.getProperty("http.agent"))
                 throw Error('请求云端图库列表信息出错:\n' + (res ? res : err.messag));
 
             } else {
@@ -288,7 +258,7 @@ threads.start(function () {
             })
         })
     } catch (e) {
-        e = $debug.getStackTrace(e);
+    //    e = $debug.getStackTrace(e);
         console.error(e);
         network_reminder_tips(e)
     };
@@ -416,7 +386,7 @@ ui.layout(
                         />
                         <text
                             w="auto" h="auto"
-                            text="PRTS配置" textSize="21sp"
+                            text="PRTS配置" textSize="21"
                             textStyle="bold|italic"
                             textColor="{{theme.icons}}"
                             typeface="monospace" layout_gravity="center"
@@ -425,7 +395,7 @@ ui.layout(
                         <horizontal id="selectTime" layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right" foreground="?android:attr/selectableItemBackgroundBorderless">
                             <img w="35dp" h="35dp" scaleType="fitXY" circle="true" src="file://./res/hd.png" />
 
-                            <text id="text_ap" text="实时数据" w="auto" h="auto" marginLeft="8dp" marginRight="20dp" textSize="15sp" textStyle="bold" layout_gravity="center" />
+                            <text id="text_ap" text="实时数据" w="auto" h="auto" marginLeft="8dp" marginRight="20dp" textSize="15" textStyle="bold" layout_gravity="center" />
 
 
                         </horizontal>
@@ -463,6 +433,8 @@ ui.layout(
 */}
                                     </horizontal>
                                     <widget-switch-se7en id="only_medicament" checked="{{setting.only_medicament}}" text="仅使用药剂恢复理智" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
+                                    <widget-switch-se7en id="unlimited_eat_expired_sane" checked="{{setting.无限吃24小时过期理智药}}" text="{{language['unlimited-eat-expired-sane']}}" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
+
                                     <horizontal gravity="center" marginLeft="5">
                                         <text id="mr1" text="刷图上限:" textSize="15" textColor="{{theme.text}}" />
                                         <input id="input_extinguish" inputType="number" hint="{{setting.剿灭}}次" layout_weight="1" visibility="gone" paddingLeft="6" w="auto" textColorHint="{{theme.text3}}" />
@@ -2156,8 +2128,8 @@ ui.autoService.on("click", (checked) => {
             if (!setting.ADB提醒) {
                 dialogs.build({
                     type: "app-or-overlay",
-                    title: "自启动无障碍提醒",
-                    content: "请在接下来跳转的系统界面中打开 已下载服务/已安装的应用程序：明日计划的无障碍，不知道如何打开请百度或使用音量键快捷方式打开\n\n如需应用自动打开无障碍，请前往左边侧滑栏-左下角设置-自启动无障碍服务，点击了解)",
+                    title: language['accessibility-remind-title'],
+                    content: language['accessibility-remind'],
                     checkBoxPrompt: "不再提示",
                     positive: "我清楚了",
                     positiveColor: "#FF8C00",
@@ -2220,7 +2192,23 @@ ui.emitter.on("resume", function () {
 
 ui.only_medicament.on('check', (checked) => {
     tool.writeJSON("only_medicament", checked);
-})
+});
+ui.unlimited_eat_expired_sane.click((view) => {
+
+    if (view.checked) {
+        if (gallery.language == "简中服") {
+            if (!setting.ocrExtend) {
+                view.checked = false;
+                snakebar(language['OCR-Extensions-need-installed']);
+                return
+            }
+        } else {
+            view.checked = false;
+            snakebar(language['ocr-sorry']);
+        }
+    }
+    tool.writeJSON("无限吃24小时过期理智药", view.checked);
+});
 
 //企鹅物流数据统计
 ui.qetj.on("check", (checked) => {
@@ -2347,13 +2335,12 @@ ui.hks1.on("check", (checked) => {
         if (!files.exists("./mrfz/tuku/线索_传递.png")) {
             tool.dialog_tips("确认图库", "当前图库不完整,你的设备将无法正常使用明日计划-PRTS辅助的处理线索溢出功能\n请在左边侧滑栏-检查图库进行更换!")
             return;
-        }
-
+        };
 
         if (gallery.language != "简中服") {
 
             ui.hks1.checked = false;
-            toastLog("很抱歉，暂不支持OCR识别非简中服文字")
+            snakebar(language['ocr-sorry']);
             return
         }
         if (!setting.ocrExtend) {
@@ -2393,6 +2380,9 @@ ui.credit_buy.on("click", (view) => {
                 e = "加载信用处理方案设置出错:\n" + e
                 console.error(e)
             }
+        } else {
+            view.checked = false;
+            snakebar(language['ocr-sorry']);
         }
     }
     tool.writeJSON("信用处理", {
@@ -2424,7 +2414,7 @@ ui.gozh.on("click", (view) => {
                 "\n\n4• 8小时无tag招募：无四星及以上的tag时，执行8小时无tag招募\n\n5• 聘用候选人：自动开包，建议配合8小时无tag招募使用。\n\n6• 公招词条必出五六星时会有弹窗提示，且禁用关闭应用模块\n\n7• 自动公招/识别 卡住，应用崩溃？请更换mlkit ocr 其它位数版本试试，关于应用-明日计划32位只能使用32位OCR插件");
         } else {
             view.checked = false;
-            snakebar("很抱歉，暂不支持OCR识别非简中服文字")
+            snakebar(language['ocr-sorry']);
             return
         }
     } else {
