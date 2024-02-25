@@ -198,8 +198,9 @@ let collection = {
             //特别开放
             if (special) return true;
             if (level.day) {
-                return level.day.includes(day);
-
+                //不知道为什么在autojs Pro8上运行会报错cannot find function includes in object
+                //  return level.day.includes(day);
+                return (level.day.indexOf(day) != -1)
             } else {
                 return true;
             }
@@ -953,12 +954,16 @@ let 唤醒 = {
                 area: "右半屏",
                 action: 0,
             })) {
-
-                ITimg.picture("返回", {
+                (ITimg.picture("返回", {
                     action: 4,
                     timing: 3000,
-                    area: "上半屏"
-                });
+                    area: 1,
+                    nods: 1000,
+                }) || ITimg.picture("返回", {
+                    action: 4,
+                    timing: 3000,
+                    area: 1
+                }));
             }
             if (setting.调试) {
                 images.save(ITimg.captureScreen_(), path_ + "/captureScreen/唤醒主页.png");
@@ -1620,7 +1625,7 @@ function 理智处理() {
                 click(height / 2, width - zox(50));
                 return false;
             }
-     
+
 
         } else {
             if (ITimg.picture("理智_源石", {
