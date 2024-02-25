@@ -1323,22 +1323,22 @@ ui.gmvptxt.on("click", () => {
  */
 
 //自定义执行
-ui.custom.on("click", () => {
-    if (ui.custom.checked) {
+ui.custom.on("click", (view) => {
+    if (view.checked) {
         ui.run(() => {
             ui.indxc.attr("h", "80")
             ui.input_c.attr("visibility", "visible");
             ui.input_file3.attr("visibility", "visible")
             try {
-                if (setting.custom.length > 5) {
-                    ui.input_c.setHint(setting.custom);
+                if (setting.自定义模块&&setting.自定义模块.length > 5) {
+                    ui.input_c.setHint(setting.自定义模块);
                 }
             } catch (err) {
 
             }
         })
     } else {
-        tool.writeJSON("custom", false);
+        tool.writeJSON("自定义模块", false);
         tool.writeJSON("执行", "常规")
 
         ui.run(() => {
@@ -1847,15 +1847,14 @@ function update_ui() {
         }
 
 
-        if (setting.custom != false && setting.custom != undefined) {
-            if (setting.custom.length > 5) {
+        if (setting.自定义模块&&setting.自定义模块.length > 5) {
                 ui.custom.checked = true;
                 ui.indxc.attr("h", "80")
                 ui.input_c.attr("visibility", "visible");
                 ui.input_file3.attr("visibility", "visible");
-                ui.input_c.setHint(setting.custom);
+                ui.input_c.setHint(setting.自定义模块);
             }
-        }
+        
         if (setting.截图 == "root" || setting.截图 == "Shizuku") {
             ui.getu.checked = true;
             ui.indxu.attr("h", "70")

@@ -128,7 +128,6 @@ var setting = tool.readJSON("configure", {
         "购买列表": false,
         "优先顺序": true
     },
-    "custom": false,
     "基建换班": false,
     "换班路径": "",
     "关闭应用": "",
@@ -192,6 +191,7 @@ if (setting.start == undefined || setting == null) {
 
 
 try {
+    setting.defaultOcr.length;
     setting.重置代理次数.length;
 } catch (err) {
     setting.指定关卡 = {
@@ -199,6 +199,7 @@ try {
     };
     tool.writeJSON("指定关卡", setting.指定关卡);
     tool.writeJSON("重置代理次数", true);
+    tool.writeJSON("defaultOcr", 'MlkitOCR');
     setting = tool.readJSON("configure");
 }
 
@@ -258,7 +259,7 @@ threads.start(function () {
             })
         })
     } catch (e) {
-    //    e = $debug.getStackTrace(e);
+        //    e = $debug.getStackTrace(e);
         console.error(e);
         network_reminder_tips(e)
     };
@@ -2946,7 +2947,7 @@ function 开始运行jk(jk, tips_) {
                 if (mod_data[i].pre_run_check) {
                     if (setting.执行 == "自定义模块") {
                         if (mod_data[i].id == "自定义") {
-                            modular_route = setting.custom
+                            modular_route = setting.自定义模块
                         }
                     } else {
                         switch (mod_data[i].id) {
@@ -2964,7 +2965,7 @@ function 开始运行jk(jk, tips_) {
                                 modular_route = timed_tasks_storage.get("password");
                                 break;
                             default:
-                                toastLog('未匹配到的模块id')
+                                toastLog('未匹配到的模块id' + mod_data[i].id)
                                 break
                         }
                     }
@@ -3695,102 +3696,66 @@ function Update_UI(i) {
             //输入法
             activity.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-            // if (morikujima_setting != undefined && morikujima_setting.理智数 != false) {
             initPop()
-            /*   } else {
-                   ui.text_ap.setText("未启用");
-                   ui.selectTime.click(() => {
-                       if (ui.text_ap.getText() != "未启用") {
-                           return
-                       }
-                       dialogs.build({
-                           type: "app-or-overlay",
-                           title: "实时便笺",
-                           content: "是否启用实时便笺功能？\n实时显示当前剩余理智数量，公招完成时间。建议启用(OCR)自动识别。每次脚本刷完关卡后，自动识别剩余理智数量",
-                           checkBoxPrompt: "(OCR)自动识别",
-                           positive: "确认",
-                           negative: "取消",
-                           positiveColor: "#FF8C00",
-                           canceledOnTouchOutside: false
-                       }).on("positive", (dialog) => {
-                           if (dialog.checkBoxPrompt.checked) {
-                               if (!检测ocr(true)) {
-                                   return;
-                               }
-                           }
-                           tool.writeJSON("理智数", "0/135", "morikujima_setting")
-                           tool.writeJSON("理智时间", new Date(), "morikujima_setting")
-                           tool.writeJSON("自动识别", dialog.checkBoxPrompt.checked, "morikujima_setting")
- 
-                           morikujima_setting = tool.readJSON("morikujima_setting");
-                           initPop()
-                           ui.text_ap.setText(morikujima_setting.理智数);
-                           ui.selectTime.performClick();
-                       }).show()
-                   })
-               }
-*/
 
             ui.module_config_txt.setText("模块\n配置")
 
-            if (gallery.gallery_info) {
 
+            change_list(ui.implement, modeGatherText);
 
-                change_list(ui.implement, modeGatherText);
-
-                SE执行 = Object.values(modeGather).findIndex((text) => text == setting.执行);
-                if (SE执行 != -1) {
-                    ui.implement.setSelection(SE执行);
+            SE执行 = Object.values(modeGather).findIndex((text) => text == setting.执行);
+            if (SE执行 != -1) {
+                ui.implement.setSelection(SE执行);
+            }
+            if (setting.行动理智) {
+                ui.xlkz.attr("visibility", "visible");
+                if (SE执行 == 3) {
+                    ui.input_extinguish.attr("visibility", "visible");
+                    ui.input_ordinary.attr("visibility", "gone");
                 }
-                if (setting.行动理智) {
-                    ui.xlkz.attr("visibility", "visible");
-                    if (SE执行 == 3) {
-                        ui.input_extinguish.attr("visibility", "visible");
-                        ui.input_ordinary.attr("visibility", "gone");
-                    }
-                } else {
-                    ui.xlkz.attr("visibility", "gone");
-                };
-                switch (SE执行) {
-                    case 1:
-                        ui.jijianquyu.setVisibility(8);
-                        break;
-                    case 2:
-                        ui.xingdongquyu.setVisibility(8);
-                        break;
-                };
+            } else {
+                ui.xlkz.attr("visibility", "gone");
+            };
+            switch (SE执行) {
+                case 1:
+                    ui.jijianquyu.setVisibility(8);
+                    break;
+                case 2:
+                    ui.xingdongquyu.setVisibility(8);
+                    break;
+            };
 
-                if (SE执行 == 4) {
-                    ui["levelPickText"].setText("模块选择");
-                    let _modData_ = [];
-                    for (let _modular_ of mod_data) {
-                        if (_modular_.id == "自定义") {
-                            _modData_.push(_modular_.script_name);
-                        }
+            if (SE执行 == 4) {
+                ui["levelPickText"].setText("模块选择");
+                let _modData_ = [];
+                for (let _modular_ of mod_data) {
+                    if (_modular_.id == "自定义") {
+                        _modData_.push(_modular_.script_name);
+                    }
+                };
+                change_list(ui.level_pick, _modData_, function (parent, view, position, id) {
+                    parent.setBackground(createShape(5, 0, 0, [2, theme.bar]));
+                    tool.writeJSON("自定义模块", parent.getSelectedItem());
+                });
+            } else {
+                ui["levelPickText"].setText("关卡选择");
+
+
+                change_list(ui.level_pick, level_choices_open, function (parent, view, position, id) {
+                    parent.setBackground(createShape(5, 0, 0, [2, theme.bar]));
+                    setting.指定关卡 ? setting.指定关卡.levelAbbreviation = parent.getSelectedItem() : setting.指定关卡 = {
+                        levelAbbreviation: parent.getSelectedItem(),
                     };
-                    change_list(ui.level_pick, _modData_, function (parent, view, position, id) {
-                        parent.setBackground(createShape(5, 0, 0, [2, theme.bar]));
-                        tool.writeJSON("自定义模块", parent.getSelectedItem());
-                    });
-                } else {
-                    ui["levelPickText"].setText("关卡选择");
-
-
-                    change_list(ui.level_pick, level_choices_open, function (parent, view, position, id) {
-                        parent.setBackground(createShape(5, 0, 0, [2, theme.bar]));
-                        setting.指定关卡 ? setting.指定关卡.levelAbbreviation = parent.getSelectedItem() : setting.指定关卡 = {
-                            levelAbbreviation: parent.getSelectedItem(),
-                        };
-                        tool.writeJSON("指定关卡", setting.指定关卡);
-                    });
-                    if (setting.执行 != "自定义模块") {
-                        SE执行 = level_choices_open.indexOf(setting.指定关卡.levelAbbreviation);
-                        if (SE执行 != -1) {
-                            ui.level_pick.setSelection(SE执行);
-                        };
-                    }
+                    tool.writeJSON("指定关卡", setting.指定关卡);
+                });
+                if (setting.执行 != "自定义模块") {
+                    SE执行 = level_choices_open.indexOf(setting.指定关卡.levelAbbreviation);
+                    if (SE执行 != -1) {
+                        ui.level_pick.setSelection(SE执行);
+                    };
                 }
             }
+
             floaty.checkPermission() ? ui.floatyCheckPermission.setVisibility(8) : ui.floatyCheckPermission.setVisibility(0);
 
             try {

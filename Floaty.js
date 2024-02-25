@@ -147,9 +147,9 @@ function 创建悬浮窗() {
                     </horizontal>
                 </frame>
                 <frame id="xxbj" w="*" h="*">
-                    <text id="tos" text="状态：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="top" lines="1" ellipsize="marquee" />
-                    <text id="tod" text="行动：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="center" lines="1" ellipsize="marquee" />
-                    <text id="tof" text="理智：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="bottom" lines="1" ellipsize="marquee" />
+                    <text id="tos" text="状态：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="top" lines="1"  />
+                    <text id="tod" text="行动：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="center" lines="1"  />
+                    <text id="tof" text="理智：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="bottom" lines="1"/>
                     <horizontal id="Material_Science" w="*" h="20" marginLeft="-3" layout_gravity="bottom">
 
                     </horizontal>
