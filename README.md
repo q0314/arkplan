@@ -29,9 +29,9 @@ arkplan中文名为明日计划,明日计划是一款明日方舟第三方辅助
 
 [Auto.js Pro ](https://pro.autojs.org/) 正版正在整改，无法使用，可考虑使用非正版
 
-[Auto.js] (https://wwwq.lanzouc.com/b02wvkxih) 4.0免费版，bug多，开发者已不再维护
+[Auto.js](https://wwwq.lanzouc.com/b02wvkxih) 4.0免费版，bug多，开发者已不再维护
 
-[AutoX.js] (http://doc.autoxjs.com/) 第三方维护的auto.js免费版,新加了不少东西
+[AutoX.js](http://doc.autoxjs.com/) 第三方维护的auto.js免费版,新加了不少东西
 
 ### 非官方完整Autojs文档
 
