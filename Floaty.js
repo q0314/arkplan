@@ -147,9 +147,9 @@ function 创建悬浮窗() {
                     </horizontal>
                 </frame>
                 <frame id="xxbj" w="*" h="*">
-                    <text id="tos" text="状态：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="top" lines="1"  />
-                    <text id="tod" text="行动：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="center" lines="1"  />
-                    <text id="tof" text="理智：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="bottom" lines="1"/>
+                    <text id="tos" text="状态：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="top" lines="1" />
+                    <text id="tod" text="行动：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="center" lines="1" />
+                    <text id="tof" text="理智：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="bottom" lines="1" />
                     <horizontal id="Material_Science" w="*" h="20" marginLeft="-3" layout_gravity="bottom">
 
                     </horizontal>
@@ -1166,16 +1166,22 @@ function 执行次数() {
     function isOpen(level, special) {
         let now = new Date();
         let day = now.getDay();
-
+        let gnow = new Date().setHours(4, 0, 0, 0);
         // 判断当前时间是否在凌晨4点之前
-        if (now < now.setHours(4, 0, 0, 0)) {
+        if (now < gnow) {
             // 如果是，日期减1
-            day = day - 1;
+            if (day <= 0) {
+                day = 6;
+            } else {
+                day = day - 1;
+            }
         };
         //特别开放
         if (special) return true;
         if (level.day) {
-            return level.day.includes(day);
+            //不知道为什么在autojs Pro8上运行会报错cannot find function includes in object
+            //  return level.day.includes(day);
+            return (level.day.indexOf(day) != -1);
 
         } else {
             return true;

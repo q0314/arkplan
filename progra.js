@@ -189,18 +189,22 @@ let collection = {
         function isOpen(level, special) {
             let now = new Date();
             let day = now.getDay();
-
+            let gnow = new Date().setHours(4,0,0,0);
             // 判断当前时间是否在凌晨4点之前
-            if (now < now.setHours(4, 0, 0, 0)) {
+            if (now < gnow) {
                 // 如果是，日期减1
-                day = day - 1;
+                if (day <= 0) {
+                    day = 6;
+                } else {
+                    day = day - 1;
+                }
             };
             //特别开放
             if (special) return true;
             if (level.day) {
                 //不知道为什么在autojs Pro8上运行会报错cannot find function includes in object
                 //  return level.day.includes(day);
-                return (level.day.indexOf(day) != -1)
+                return (level.day.indexOf(day) != -1);
             } else {
                 return true;
             }
