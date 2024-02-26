@@ -189,7 +189,7 @@ let collection = {
         function isOpen(level, special) {
             let now = new Date();
             let day = now.getDay();
-            let gnow = new Date().setHours(4,0,0,0);
+            let gnow = new Date().setHours(4, 0, 0, 0);
             // 判断当前时间是否在凌晨4点之前
             if (now < gnow) {
                 // 如果是，日期减1
@@ -958,16 +958,18 @@ let 唤醒 = {
                 area: "右半屏",
                 action: 0,
             })) {
-                (ITimg.picture("返回", {
+                if (!ITimg.picture("返回", {
                     action: 4,
-                    timing: 3000,
+                    timing: 1000,
                     area: 1,
                     nods: 1000,
-                }) || ITimg.picture("返回", {
+                }) && !ITimg.picture("返回", {
                     action: 4,
                     timing: 3000,
                     area: 1
-                }));
+                })) {
+                    return false;
+                }
             }
             if (setting.调试) {
                 images.save(ITimg.captureScreen_(), path_ + "/captureScreen/唤醒主页.png");

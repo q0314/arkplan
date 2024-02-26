@@ -1,8 +1,5 @@
 "ui";
-if (device.sdkInt < 24) {
-    engines.execScriptFile("./activity/device_usage.js")
-    exit();
-}
+
 
 runtime.loadDex('./lib/java/webview-bridge.dex');
 importClass(android.webkit.DownloadListener);
@@ -220,7 +217,6 @@ threads.start(function () {
             } else {
                 jlink_mian = JSON.parse(res.body.string());
             }
-
 
 
         })
@@ -658,7 +654,7 @@ let level_choices = JSON.parse(
 function isOpen(level, special) {
     let now = new Date();
     let day = now.getDay();
-    let gnow = new Date().setHours(4,0,0,0);
+    let gnow = new Date().setHours(4, 0, 0, 0);
     // 判断当前时间是否在凌晨4点之前
     if (now < gnow) {
         // 如果是，日期减1
@@ -671,8 +667,10 @@ function isOpen(level, special) {
     //特别开放
     if (special) return true;
     if (level.day) {
-        return level.day.includes(day);
-
+        //不知道为什么这段在autojs Pro8上运行就不会报错cannot find function includes in object
+        //但是为了稳妥还是改了
+        //  return level.day.includes(day);
+        return (level.day.indexOf(day) != -1);
     } else {
         return true;
     }
@@ -3683,7 +3681,6 @@ function notice() {
             })
 
         } catch (e) {
-            e = $debug.getStackTrace(e)
             console.error(e);
             network_reminder_tips(e)
         };
@@ -4233,10 +4230,7 @@ function network_reminder_tips(e) {
         customView: network_reminder_view,
         wrapInScrollView: false,
         autoDismiss: true
-    }).on("dismiss", () => {
-        log("结束ui")
-        exit();
-    })
+    });
 
     network_reminder_dialogs.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 

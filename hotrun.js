@@ -25,7 +25,13 @@ setInterval(function () {
 let _proj_def_n = 'arkplan';
 let path = context.getExternalFilesDir(null).getAbsolutePath() + '/';
 threads.start(function () {
-
+    if (device.sdkInt < 24) {
+        engines.execScriptFile("./activity/device_usage.js");
+        setTimeout(function () {
+            ui.finish();
+        }, 1000);
+        return
+    }
     let packageName = context.packageName;
     if (false && packageName.match(/^org.autojs.autojs(pro)?$/)) {
         sleep(2000);

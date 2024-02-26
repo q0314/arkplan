@@ -1793,7 +1793,7 @@ function update_ui() {
         ui.button_pause.setText(setting.监听键);
         ui.button_pause.setBackground(createShape(5, 0, 0, [2, theme.bar]));
 
-        ui.OCRExtensions_type.setText(setting.defaultOcr);
+        ui.OCRExtensions_type.setText(setting.defaultOcr ? setting.defaultOcr : 'undefined');
         ui.OCRExtensions_type.setBackground(createShape(5, 0, 0, [2, theme.bar]));
         ui.OCRCorrection_rules.setBackground(createShape(5, 0, 0, [2, theme.bar]));
         setting = tool.writeJSON("ocrExtend", ocr_plugin[setting.defaultOcr].isInstalled());
