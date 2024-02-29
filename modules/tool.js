@@ -456,30 +456,30 @@ function launchPackage(package) {
         console.error("启动" + package + "错误:\n" + e)
         app.launchPackage(package);
     }
-/*
-    setTimeout(() => {
-
-        let currentPackage = getpackage();
-        switch (currentPackage) {
-            case package:
-                break
-            default:
-                console.error(currentPackage + " 与预期包名不符，重新启动");
-
-                function uiLaunchApp(appName) {
-                    var script = '"ui";\nvar args = engines.myEngine().execArgv;\nlet appName = args.appName;\app.launchPackage(appName);exit();';
-                    engines.execScript("uiLaunchApp", script, {
-                        arguments: {
-                            appName: appName
-                        }
-                    });
-                };
-
-                uiLaunchApp(setting.包名);
-                break
-        }
-    }, 2000);
-    */
+    /*
+        setTimeout(() => {
+    
+            let currentPackage = getpackage();
+            switch (currentPackage) {
+                case package:
+                    break
+                default:
+                    console.error(currentPackage + " 与预期包名不符，重新启动");
+    
+                    function uiLaunchApp(appName) {
+                        var script = '"ui";\nvar args = engines.myEngine().execArgv;\nlet appName = args.appName;\app.launchPackage(appName);exit();';
+                        engines.execScript("uiLaunchApp", script, {
+                            arguments: {
+                                appName: appName
+                            }
+                        });
+                    };
+    
+                    uiLaunchApp(setting.包名);
+                    break
+            }
+        }, 2000);
+        */
 }
 
 /**
@@ -491,8 +491,30 @@ function formatFileName(fileName) {
     let pattern = Pattern.compile("[\\s\\\\/:\\*\\?\\\"<>\\|]");
     let matcher = pattern.matcher(fileName);
     return matcher.replaceAll("");
-}
+};
+
+let hanZiSimilarBridge = null;
+function nlpSimilarity(s1, s2) {
+    if (!hanZiSimilarBridge) {
+        // @ts-expect-error dex包
+        hanZiSimilarBridge = new Packages.cn.zzliux.HanZiSimilarBridge();
+        hanZiSimilarBridge.init(
+            files.read(files.cwd() + '/lib/java/nlp/bihuashu.txt'),
+            files.read(files.cwd() + '/lib/java/nlp/bushou.txt'),
+            files.read(files.cwd() + '/lib/java/nlp/jiegou.txt'),
+            files.read(files.cwd() + '/lib/java/nlp/sijiao.txt'),
+            files.read(files.cwd() + '/lib/java/nlp/userdefine.txt')
+        );
+      //  log(files.cwd())
+        log("初始化字形计算\n字符串1：" + s1 + "\n字符串2：" + s2 + "\n相似度：" + hanZiSimilarBridge.similarity(s1, s2));
+    }
+    /*let result =*/ return hanZiSimilarBridge.similarity(s1, s2);
+    //console.log('result=${result}');
+    // return result;
+};
+
 let tool = {}
+tool.nlpSimilarity = nlpSimilarity;
 tool.Floaty_emit = Floaty_emit;
 tool.script_locate = script_locate;
 tool.writeJSON = writeJSON;

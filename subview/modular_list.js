@@ -1,5 +1,5 @@
 function create_modular() {
-  
+
     let uii = ui.inflate(
         <vertical id="parent">
             <frame>
@@ -79,8 +79,8 @@ function create_modular() {
         </vertical>, null, false);
 
 
-  let sto_mod = storages.create("modular");
-  let mod_data = sto_mod.get("modular", []);
+    let sto_mod = storages.create("modular");
+    let mod_data = sto_mod.get("modular", []);
 
     var res = dialogs.build({
         type: "foreground-or-overlay",
@@ -90,11 +90,12 @@ function create_modular() {
         sto_mod.put("modular", mod_data);
     }).show();
     let _modData_ = [];
-    for (let _modular_ of mod_data) {
-        if (_modular_.version&&_modular_.path) {
-            _modData_.push(_modular_);
-        }
-    };
+
+    for (let _modular_ in mod_data) {
+        if (mod_data[_modular_].version && mod_data[_modular_].path) {
+            _modData_.push(mod_data[_modular_]);
+        };
+    }
 
     uii.files_0.setDataSource(_modData_);
     uii.Exit.on("click", () => {
@@ -112,10 +113,10 @@ function create_modular() {
                             modular_route = item.path;
                             break;
                         case '关闭应用':
-                            modular_route =  item.path;
+                            modular_route = item.path;
                             break;
                         case '基建换班':
-                            modular_route =  item.path;
+                            modular_route = item.path;
                             break;
                         case '屏幕解锁':
                             modular_route = storage.get("password");

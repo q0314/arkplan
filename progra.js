@@ -1,4 +1,7 @@
 importClass(android.content.ComponentName);
+runtime.unloadDex('./lib/java/nlp-hanzi-similar-1.3.0.dex');
+runtime.loadDex('./lib/java/nlp-hanzi-similar-1.3.0.dex');
+
 let tool = require("./modules/tool.js");
 let setting = tool.readJSON("configure");
 let path_ = context.getExternalFilesDir(null).getAbsolutePath();

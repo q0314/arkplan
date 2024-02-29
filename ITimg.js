@@ -50,6 +50,7 @@ function Prepare(picture_default, ocr_default) {
         area: ocr_default.area || "全屏",
         nods: ocr_default.nods || 0,
         part: ocr_default.part || false,
+        similar: ocr_default.similar || 0.7,
         resolution: ocr_default.resolution || undefined,
         ocr_type: ocr_default.ocr_type || setting.defaultOcr,
         correction_path: ocr_default.correction_path || undefined,
@@ -572,6 +573,7 @@ function 图像匹配(picture, list) {
  * @param {object} [list.picture = ITimg.captureScreen_()] - 在指定大图中识别
  * @param {number} [list.nods = 0] - 没有匹配到相关的文字后等待时间
  * @param {boolean} [list.part = fasle] - text需要包含字符串words的筛选条件
+ * @param {number} [lis.similar = 0.7] - 中文模糊匹配相似度,基于字形计算因子
  * @param {boolean} [list.refresh = true] - 是否重新截图界面,在新图片中识别, false:不刷新
  * @param {boolean|object} [list.resolution = false] - 使用多分辨率兼容(缩放大图)识别文字
  * @param {object} [list.gather] - 仅在该数据集{text,left,top,right,bottom}中匹配words文字
@@ -593,6 +595,7 @@ function ocr文字识别(words, list) {
         area: list.area || ITimg.default_list.ocr.area,
         nods: list.nods || ITimg.default_list.ocr.nods,
         part: list.part || ITimg.default_list.ocr.part,
+        similar: list.similar || ITimg.default_list.ocr.similar,
         refresh: list.refresh,
         resolution: list.resolution || ITimg.default_list.ocr.correction_path,
         gather: list.gather,
@@ -673,7 +676,22 @@ function ocr文字识别(words, list) {
     }
     query_ = undefined;
     //true=匹配部分文字
-    list.part ? query_ = (list.gather || ITimg.results).find(ele => ele.text.indexOf(words) != -1) : query_ = (list.gather || ITimg.results).find(ele => ele.text == words);
+    if (list.part) {
+        query_ = (list.gather || ITimg.results).find(ele => ele.text.indexOf(words) != -1);
+        list.similar = undefined;
+    } else {
+        //模糊匹配
+        query_ = (list.gather || ITimg.results).find(ele => {
+            let similar = list.similar;
+            list.similar = tool.nlpSimilarity(ele.text, words);
+            if (list.similar >= similar) {
+                return true;
+            } else {
+                list.similar = similar;
+                return false;
+            };
+        });
+    };
 
     if (query_ != undefined) {
         if (ITimg.elements.content == words) {
