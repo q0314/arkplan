@@ -372,10 +372,12 @@ let collection = {
             action: 0,
             timing: 1000,
             area: 4,
+            similar: 1,
         }) || ITimg.ocr("01", {
             action: 0,
             timing: 1000,
             area: 4,
+            similar: 1,
             refresh: false,
             log_policy: "brief",
         }));
@@ -384,6 +386,7 @@ let collection = {
             action: 0,
             timing: 1000,
             area: 12,
+            similar: 1,
         })) {
             return true;
         }
@@ -440,10 +443,12 @@ let collection = {
             if ((ITimg.ocr(levelName[0], {
                 action: 0,
                 timing: 1000,
+                similar: 1,
                 area: (levelName[0].indexOf("1") != -1) ? 13 : 24,
             }) || ITimg.ocr(levelName[1], {
                 action: 0,
                 timing: 1000,
+                similar: 1,
                 area: (levelName[1].indexOf("1") != -1) ? 13 : 24,
                 refresh: false,
                 log_policy: "brief",
@@ -451,9 +456,11 @@ let collection = {
             })) || (ITimg.ocr(levelName[0], {
                 action: 0,
                 timing: 1000,
+                similar: 1,
                 area: (levelName[0].indexOf("1") != -1) ? 13 : 24,
             }) || ITimg.ocr(levelName[1], {
                 action: 0,
+                similar: 1,
                 timing: 1000,
                 area: (levelName[1].indexOf("1") != -1) ? 13 : 24,
                 refresh: false,
@@ -465,10 +472,12 @@ let collection = {
             if (ITimg.ocr(levelName, {
                 action: 0,
                 timing: 1000,
+                similar: 1,
                 area: levelName.indexOf("1") ? 13 : 24,
             }) || ITimg.ocr(levelName, {
                 action: 0,
                 timing: 1000,
+                similar: 1,
                 area: levelName.indexOf("1") ? 13 : 24,
             })) {
                 return true;
@@ -1611,10 +1620,14 @@ function 理智处理() {
         setting = tool.readJSON("configure");
         tool.Floaty_emit("展示文本", "状态", "状态：理智检测中");
         if (setting.已兑理智 >= setting.理智) {
-            if (setting.无限吃24小时过期理智药 && ITimg.ocr(displayText["小时"], {
+            if (setting.无限吃24小时过期理智药 && (ITimg.ocr(displayText["小时"], {
                 area: 24,
                 part: true,
-            })) {
+            })||ITimg.ocr(displayText["分钟"], {
+                area: 24,
+                part: true,
+                refresh:false,
+            }))) {
                 if (ITimg.picture("理智_确认", {
                     action: 0,
                     area: 4,
@@ -2787,7 +2800,7 @@ function 基建() {
                 if (ITimg.ocr("传递奖励", {
                     action: 5, part: true, area: "右半屏", correction_path: "信用",
                 }) || ITimg.ocr("20", {
-                    action: 5, part: true, area: "右半屏", correction_path: "信用",
+                    action: 5, part: true,similar: 1, area: "右半屏", correction_path: "信用",
                 })) {
                     sleep(500)
                     click(height - 72, 50)
@@ -3520,6 +3533,7 @@ function 购买信用物品() {
                 if (goods = ITimg.ocr(discount_list[i], {
                     gather: taglb,
                     log_policy: true,
+                    similar: 1,
                     action: 5, part: true, correction_path: "信用",
                 })) {
                     click(goods.right, goods.bottom);
@@ -3642,13 +3656,14 @@ function 购买信用物品() {
         if (setting.信用处理.三百信用) {
             tool.Floaty_emit("展示文本", "状态", "状态：判断是否需要购买中");
             let credits = ITimg.ocr("300", {
+                similar: 1,
                 area: [Math.floor(height / 1.2), 0, height - Math.floor(height / 1.2), 200],
                 action: 5, part: true, correction_path: "信用",
             })
             if (!credits) {
                 credits = ITimg.ocr("300", {
                     area: [Math.floor(height / 1.2), 0, height - Math.floor(height / 1.2), 200],
-                    action: 6, part: true, correction_path: "信用",
+                    similar: 1, action: 6, part: true, correction_path: "信用",
                 });
 
                 if (!credits) {
@@ -3985,7 +4000,6 @@ function 公招(Manual) {
 
                 if (ITimg.ocr("点击刷新标签", {
                     action: 0,
-                    part: true,
                     refresh: false,
                     timing: 1000,
                 }) || ITimg.ocr("刷新标签", {

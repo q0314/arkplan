@@ -573,7 +573,7 @@ function 图像匹配(picture, list) {
  * @param {object} [list.picture = ITimg.captureScreen_()] - 在指定大图中识别
  * @param {number} [list.nods = 0] - 没有匹配到相关的文字后等待时间
  * @param {boolean} [list.part = fasle] - text需要包含字符串words的筛选条件
- * @param {number} [lis.similar = 0.7] - 中文模糊匹配相似度,基于字形计算因子
+ * @param {number} [list.similar = 0.7] - 中文模糊匹配相似度,基于字形计算因子
  * @param {boolean} [list.refresh = true] - 是否重新截图界面,在新图片中识别, false:不刷新
  * @param {boolean|object} [list.resolution = false] - 使用多分辨率兼容(缩放大图)识别文字
  * @param {object} [list.gather] - 仅在该数据集{text,left,top,right,bottom}中匹配words文字
