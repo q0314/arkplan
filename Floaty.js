@@ -11,8 +11,8 @@ var settings;
 
 
 //启动一个线程用于处理可能阻塞UI线程的操作
-var blockHandle = threads.start(function () {
-    setInterval(() => { }, 1000);
+var blockHandle = threads.start(function() {
+    setInterval(() => {}, 1000);
 });
 let gallery_info = JSON.parse(files.read("./mrfz/tuku/gallery_info.json"), (encoding = "utf-8"));
 let tool = require("./modules/tool.js");
@@ -31,6 +31,23 @@ let {
     iStatusBarHeight,
     createShape
 } = require('./modules/__util__.js');
+
+if (!Object.values) {
+    /**
+     * @param {Iterable|Object} o
+     * @return {*[]}
+     */
+    Object.values = function(o) {
+        if (o[Symbol['iterator']] !== undefined) {
+            let _res = [];
+            for (let v of o) {
+                _res.push(v);
+            }
+            return _res;
+        }
+        return Object.keys(o).map(k => o[k]);
+    };
+};
 //设置悬浮窗初始属性{!
 var layoutAttribute = {
     //设置悬浮窗左上角小圆点的尺寸
@@ -116,15 +133,16 @@ setTimeout(() => {
 
 }, 800);
 /**
-* 获取类内部私有变量
-* @param {*} javaObject
-* @param {*} name
-*/
+ * 获取类内部私有变量
+ * @param {*} javaObject
+ * @param {*} name
+ */
 function getClassField(javaObject, name) {
     var field = javaObject.class.getDeclaredField(name);
     field.setAccessible(true);
     return field.get(javaObject);
 }
+
 function 创建悬浮窗() {
     var window = floaty.rawWindow(
         // var window = floaty.window(
@@ -139,7 +157,7 @@ function 创建悬浮窗() {
                     </horizontal>
                     <horizontal w="*" gravity="right|center" id="operation2" visibility="gone">
                         <img id="daxiao" w="{{zoom(75)}}px" h="*" margin="4 0 2 0 " tint="{{layoutAttribute.setColor.theme}}" src="@drawable/ic_crop_free_black_48dp" />
-
+                        
                         <grid id="操作" w="auto" h="auto" spanCount="6" layout_gravity="right">
                             <img text="1" w="{{zoom(60)}}px" h="*" src="{{this}}" tint="{{layoutAttribute.setColor.theme}}" margin="8 0" />
                         </grid>
@@ -151,7 +169,7 @@ function 创建悬浮窗() {
                     <text id="tod" text="行动：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="center" lines="1" />
                     <text id="tof" text="理智：信息待更新中" textColor="{{layoutAttribute.setColor.toast}}" textSize="{{zoom(45)}}px" h="auto" layout_gravity="bottom" lines="1" />
                     <horizontal id="Material_Science" w="*" h="20" marginLeft="-3" layout_gravity="bottom">
-
+                        
                     </horizontal>
                     <frame w="auto" h="auto" marginRight="{{zoom(3)}}px" layout_gravity="center_vertical|right">
                         <list id="optionList" w="*" h="auto">
@@ -210,7 +228,7 @@ function 创建悬浮窗() {
     let mWindow = getClassField(window, 'mWindow');
     let params = mWindow.getWindowLayoutParams();
     params.flags &= ~WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
-    ui.run(function () {
+    ui.run(function() {
         mWindow.updateWindowLayoutParams(params);
     });
     return window;
@@ -219,6 +237,7 @@ function 创建悬浮窗() {
 var sto_mod = storages.create("modular");
 //sto_mod.clear()
 var mod_data = sto_mod.get("modular", []);
+
 function 悬浮窗监听(window) {
     //初始化悬浮窗及悬浮窗操作对象
     ui.post(() => {
@@ -232,7 +251,7 @@ function 悬浮窗监听(window) {
 
     var windowX, windowY, downTime, x, y, maxSwipeW, maxSwipeH, swipe;
 
-    window.windowOperate.setOnTouchListener(function (view, event) {
+    window.windowOperate.setOnTouchListener(function(view, event) {
         switch (event.getAction()) {
             case event.ACTION_DOWN:
                 x = event.getRawX();
@@ -260,10 +279,10 @@ function 悬浮窗监听(window) {
                 if (sY >= maxSwipeH) sY = maxSwipeH;
                 if (new Date().getTime() - downTime > 100 && Math.abs(event.getRawY() - y) > 10 && Math.abs(event.getRawX() - x) > 10 || swipe) {
                     /* 第一次滑动时震动30ms，并且将swipe置为true以忽略滑动条件避免卡顿*/
-                    if (swipe == false) (device.vibrate(30), swipe = true);
+                    if (swipe == false)(device.vibrate(30), swipe = true);
                     layoutAttribute.whole.x = sX;
                     layoutAttribute.whole.y = sY;
-                    ui.run(function () {
+                    ui.run(function() {
                         window.setPosition(sX, sY);
                     })
 
@@ -291,7 +310,7 @@ function 悬浮窗监听(window) {
         window.name.on("click", () => {
             mod_data = sto_mod.get("modular", []);
             let mod = require("./subview/modular_list.js");
-            mod.create_modular(mod_data, function (i) {
+            mod.create_modular(mod_data, function(i) {
                 //  console.verbose("储存")
                 sto_mod.put("modular", mod_data);
                 mod_data = sto_mod.get("modular")
@@ -302,12 +321,12 @@ function 悬浮窗监听(window) {
     window.tof.longClick(() => {
         tool.writeJSON("已兑理智", 0);
         tool.writeJSON("理智", 0);
-        ui.run(function () {
+        ui.run(function() {
             window.tof.setText("理智：已兑" + setting.已兑理智 + "次&上限" + setting.理智 + "次");
         });
         toastLog("已通过悬浮窗清除兑换理智上限次数");
     })
-    window.daxiao.on("click", function () {
+    window.daxiao.on("click", function() {
         confirm("是否切换悬浮窗大小为" + (获取屏幕方向() == "竖屏" ? "横屏" : "竖屏") + "？", "介绍：内置智能调节悬浮浏览器大小，但是由于无法准确获取屏幕方向，该功能可能失效，请手动切换。")
             .then(clear => {
                 if (clear) {
@@ -334,7 +353,7 @@ function 悬浮窗监听(window) {
 
     })
     let delay = true;
-    window.功能.on("item_click", function (icon) {
+    window.功能.on("item_click", function(icon) {
         switch (icon) {
             case 功能图标[0]:
                 if (delay) {
@@ -348,7 +367,7 @@ function 悬浮窗监听(window) {
                         threads.start(继续);
                     };
                     delay = false;
-                    setTimeout(function () {
+                    setTimeout(function() {
                         delay = true;
                     }, 1000);
                 } else {
@@ -388,7 +407,7 @@ function 悬浮窗监听(window) {
                 window.close()
                 toastLog("主动关闭PRTS辅助及悬浮窗");
 
-                setTimeout(function () {
+                setTimeout(function() {
                     let execution = engines.all();
                     for (let i = 0; i < execution.length; i++) {
                         if (execution[i].getSource().toString().indexOf("PRTS辅助") > -1) {
@@ -403,7 +422,7 @@ function 悬浮窗监听(window) {
         }
 
     });
-    window.操作.on("item_click", function (icon) {
+    window.操作.on("item_click", function(icon) {
         switch (icon) {
             case 操作图标[0]:
                 ui.run(() => {
@@ -540,7 +559,7 @@ function 悬浮窗监听(window) {
         }
 
     })
-    window.optionList.on("item_click", function (icon) {
+    window.optionList.on("item_click", function(icon) {
 
         switch (icon) {
             case optionList[0]:
@@ -641,31 +660,31 @@ function web_initialization() {
             function setAdapter_gj(dataList) {
                 let Options_menu = null;
                 let adapter = JavaAdapter(android.widget.SpinnerAdapter, {
-                    getCount: function () {
+                    getCount: function() {
                         return dataList.length;
                     },
-                    getItem: function (position) {
+                    getItem: function(position) {
                         return dataList[position];
                     },
-                    getItemId: function (position) {
+                    getItemId: function(position) {
                         return position;
                     },
-                    getViewTypeCount: function () {
+                    getViewTypeCount: function() {
                         return 1;
                     },
-                    getItemViewType: function (pos) {
+                    getItemViewType: function(pos) {
                         return 0;
                     },
-                    getDropDownView: function (position, convertView, parent) {
-                        ui.run(function () {
+                    getDropDownView: function(position, convertView, parent) {
+                        ui.run(function() {
                             if (!convertView) {
                                 // let boxXml = <text textColor="#ff5722" paddingTop="34" gravity="center" textSize="20sp"></text>;
                                 //展开菜单
                                 let boxXml = (
                                     <frame>
-                                        <TextView id="_text" padding="8dp" gravity="center"
-                                            textColor="#000000" textSize="15sp" />
-                                    </frame>
+                                                                    <TextView id="_text" padding="8dp" gravity="center"
+                                                                    textColor="#000000" textSize="15sp" />
+                                                                </frame>
                                 );
                                 convertView = ui.inflate(boxXml);
                                 convertView.attr("bg", "#00ff0000");
@@ -678,14 +697,14 @@ function web_initialization() {
 
                         return convertView;
                     },
-                    getView: function (position, convertView, parent) {
-                        ui.run(function () {
+                    getView: function(position, convertView, parent) {
+                        ui.run(function() {
                             if (!convertView) {
                                 //在选中确认之后显示的控件?
                                 let boxXml =
                                     <text id="name" textColor="#00000000"
-                                        gravity="center" textSize="2sp">
-                                    </text>;
+                                                            gravity="center" textSize="2sp">
+                                                            </text>;
                                 convertView = ui.inflate(boxXml);
                             }
                             //点击事件
@@ -709,7 +728,7 @@ function web_initialization() {
 
                 return adapter;
             }
-            ui.run(function () {
+            ui.run(function() {
                 spinner.setAdapter(setAdapter_gj(dataList));
             })
         }
@@ -734,7 +753,7 @@ function web_initialization() {
         settings.setDomStorageEnabled(true); // 是否本地存储
         let WebChromeClient = android.webkit.WebChromeClient;
         var webChromeClient = new JavaAdapter(WebChromeClient, {
-            onShowFileChooser: function (webview, filePathCallback_, fileChooserParams) {
+            onShowFileChooser: function(webview, filePathCallback_, fileChooserParams) {
                 filePathCallback = filePathCallback_
                 if (files.exists(context.getExternalFilesDir(null).getAbsolutePath() + "be_identified.png")) {
                     infile("file://" + context.getExternalFilesDir(null).getAbsolutePath() + "be_identified.png");
@@ -802,7 +821,7 @@ function 悬浮浏览器(url) {
 }
 
 function 材料显示() {
-    ui.run(function () {
+    ui.run(function() {
 
         if (setting.企鹅统计 && setting.指定材料) {
 
@@ -846,7 +865,7 @@ function 材料显示() {
                     window.Material_Science.addView(AddView);
                     for (let i = 0; i < window.Material_Science.getChildCount(); i++) {
                         window.Material_Science.getChildAt(i).removeAllListeners()
-                        window.Material_Science.getChildAt(i).click(function (e) {
+                        window.Material_Science.getChildAt(i).click(function(e) {
                             toastLog(e.getChildAt(0).getChildAt(1).getHint())
                         })
                     }
@@ -862,7 +881,7 @@ function Penguin_statistics() {
     ui.run(() => {
         window.webview.loadUrl("https://penguin-stats.cn/report/recognition");
     });
-    threads.start(function () {
+    threads.start(function() {
         sleep(3000);
         get_penguin();
     })
@@ -935,7 +954,7 @@ function Penguin_statistics() {
             window.tos.setText("状态：材料统计..");
             var getresult = files.read("./lib/prototype/obtain_Statistics.txt")
             window.webview.evaluateJavascript("javascript:" + getresult.toString() + "getresult();", new ValueCallback({
-                onReceiveValue: function (value) {
+                onReceiveValue: function(value) {
                     result++;
                     if (value == "false" || value == "null") {
                         if (result <= 10) {
@@ -1037,7 +1056,7 @@ function Penguin_statistics() {
                         if (Material_data.done[i] >= Material_data.number[i]) {
                             let name = Material_data.name[i].toString();
                             let number = Material_data.number[i].toString()
-                            ui.run(function () {
+                            ui.run(function() {
                                 window.tos.setText("状态：" + name + "×" + number + "刷取完成")
                             })
                             Material_data.name.splice(i, 1);
@@ -1088,44 +1107,44 @@ function 执行次数() {
         <vertical padding="10 0">
             <View bg="#ffffff" h="1" w="auto" />
             <card w="*" id="indx2" margin="0 0 0 1" h="45dp" cardCornerRadius="0"
-                cardElevation="3dp" gravity="center_vertical"  >
-
-                <linear clipChildren="false" elevation="0" gravity="center_vertical" >
-                    <spinner id="implement" layout_gravity="center" layout_weight="1" entries="指定关卡+基建|只执行行动刷图|只执行基建收菜|执行剿灭作战+基建" />
-                </linear>
-            </card>
-            <View bg="#000000" h="1" w="auto" />
-            <horizontal marginLeft="5" gravity="center">
-                <text id="levelPickText" text="关卡选择" textSize="{{px2dp(48)}}" textColor="#212121" marginRight="50" />
-                <spinner id="level_pick" textSize="{{px2dp(62)}}" entries=""
-                    gravity="center" layout_weight="1" margin="5 5" padding="4" />
-                {/*  <TextView id="level_pick" textSize="{{px2dp(62)}}"
-                                            margin="5 5" textColor="black" w="*" text="当前/上次" gravity="center" />
-*/}
-            </horizontal>
-            <Switch id="ysrh" checked="{{setting.only_medicament}}" text="仅使用药剂恢复理智" padding="6 6 6 6" textSize="16sp" />
-            <Switch id="unlimited_eat_expired_sane" checked="{{setting.无限吃24小时过期理智药}}" text="无限吃24小时过期理智药" padding="6 6 6 6" textSize="16" />
-            <horizontal gravity="center" marginLeft="5">
-                <text id="mr1" text="刷图上限:" textSize="15" textColor="#212121" />
-                <input id="wordname3" inputType="number" hint="{{setting.剿灭}}次" layout_weight="1" visibility="gone" paddingLeft="6" w="auto" />
-                <input id="wordname" inputType="number" hint="{{setting.行动}}次" layout_weight="1" paddingLeft="6" w="auto" />
-                <text id="mr2" text="磕药/碎石:" textSize="15" textColor="#212121" />
-                <input id="wordname2" inputType="number" hint="{{setting.理智}}个" layout_weight="1" w="auto" />
-            </horizontal>
-            <linear >
-                <card id="WaitForRun" w="35" h="35" cardCornerRadius="25dp" cardElevation="0dp" margin="5 0"
-                    layout_gravity="right" cardBackgroundColor="#03a9f5" foreground="?attr/selectableItemBackground" clickable="true">
-                    <linear gravity="center">
-                        <img
-                            id="icon"
-                            w="25" h="25"
-                            tint="#ffffff"
-                            src="@drawable/ic_delete_forever_black_48dp"
-                        />
-                    </linear>
-                </card>
-                <button id="buiok" text="确认设置" margin="0 -5 0 -4" layout_weight="1" style="Widget.AppCompat.Button.Colored" h="auto" />
+            cardElevation="3dp" gravity="center_vertical"  >
+            
+            <linear clipChildren="false" elevation="0" gravity="center_vertical" >
+                <spinner id="implement" layout_gravity="center" layout_weight="1" entries="指定关卡+基建|只执行行动刷图|只执行基建收菜|执行剿灭作战+基建" />
             </linear>
+        </card>
+        <View bg="#000000" h="1" w="auto" />
+        <horizontal marginLeft="5" gravity="center">
+            <text id="levelPickText" text="关卡选择" textSize="{{px2dp(48)}}" textColor="#212121" marginRight="50" />
+            <spinner id="level_pick" textSize="{{px2dp(62)}}" entries=""
+            gravity="center" layout_weight="1" margin="5 5" padding="4" />
+            {/*  <TextView id="level_pick" textSize="{{px2dp(62)}}"
+            margin="5 5" textColor="black" w="*" text="当前/上次" gravity="center" />
+            */}
+        </horizontal>
+        <Switch id="ysrh" checked="{{setting.only_medicament}}" text="仅使用药剂恢复理智" padding="6 6 6 6" textSize="16sp" />
+        <Switch id="unlimited_eat_expired_sane" checked="{{setting.无限吃24小时过期理智药}}" text="无限吃24小时过期理智药" padding="6 6 6 6" textSize="16" />
+        <horizontal gravity="center" marginLeft="5">
+            <text id="mr1" text="刷图上限:" textSize="15" textColor="#212121" />
+            <input id="wordname3" inputType="number" hint="{{setting.剿灭}}次" layout_weight="1" visibility="gone" paddingLeft="6" w="auto" />
+            <input id="wordname" inputType="number" hint="{{setting.行动}}次" layout_weight="1" paddingLeft="6" w="auto" />
+            <text id="mr2" text="磕药/碎石:" textSize="15" textColor="#212121" />
+            <input id="wordname2" inputType="number" hint="{{setting.理智}}个" layout_weight="1" w="auto" />
+        </horizontal>
+        <linear >
+            <card id="WaitForRun" w="35" h="35" cardCornerRadius="25dp" cardElevation="0dp" margin="5 0"
+            layout_gravity="right" cardBackgroundColor="#03a9f5" foreground="?attr/selectableItemBackground" clickable="true">
+            <linear gravity="center">
+                <img
+                id="icon"
+                w="25" h="25"
+                tint="#ffffff"
+                src="@drawable/ic_delete_forever_black_48dp"
+                />
+            </linear>
+        </card>
+        <button id="buiok" text="确认设置" margin="0 -5 0 -4" layout_weight="1" style="Widget.AppCompat.Button.Colored" h="auto" />
+        </linear>
         </vertical>, null, false);
     let rewriteDialogs = dialogs.build({
         customView: rewriteView,
@@ -1163,6 +1182,7 @@ function 执行次数() {
     let level_choices = JSON.parse(
         files.read("./lib/game_data/level_choices.json", (encoding = "utf-8"))
     );
+
     function isOpen(level, special) {
         let now = new Date();
         let day = now.getDay();
@@ -1210,7 +1230,7 @@ function 执行次数() {
         rewriteView.level_pick.setAdapter(adapter);
         rewriteView.level_pick.setBackground(createShape(5, 0, 0, [2, setting.bg]));
         rewriteView.level_pick.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
-            onItemSelected: function (parent, view, position, id) {
+            onItemSelected: function(parent, view, position, id) {
                 fun(parent, view, position, id);
             }
         }));
@@ -1222,7 +1242,7 @@ function 执行次数() {
         tool.writeJSON("已执行动", "0");
         toastLog("清空已执行动记录");
         setting = tool.readJSON("configure");
-        ui.run(function () {
+        ui.run(function() {
             rewriteView.WaitForRun.setVisibility(8)
             if (setting.执行 != "剿灭") {
                 window.tod.setText("行动：执行" + setting.已执行动 + "次&上限" + setting.行动 + "次");
@@ -1236,13 +1256,13 @@ function 执行次数() {
     if (setting.已执行动 == 0) {
         rewriteView.WaitForRun.setVisibility(8)
     }
-    rewriteView.wordname.on("key", function (keyCode, event) {
+    rewriteView.wordname.on("key", function(keyCode, event) {
         if (event.getAction() == 0 && keyCode == 66) {
             输入框事件()
             event.consumed = true;
         }
     });
-    rewriteView.wordname2.on("key", function (keyCode, event) {
+    rewriteView.wordname2.on("key", function(keyCode, event) {
         if (event.getAction() == 0 && keyCode == 66) {
             输入框事件()
             event.consumed = true;
@@ -1269,8 +1289,8 @@ function 执行次数() {
 
     rewriteDialogs.show();
     rewriteView.implement.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener({
-        onItemSelected: function (parent, view, position, id) {
-            ui.run(function () {
+        onItemSelected: function(parent, view, position, id) {
+            ui.run(function() {
 
                 let r = parent.getSelectedItem();
                 if (r == "执行剿灭作战+基建") {
@@ -1290,12 +1310,12 @@ function 执行次数() {
                             _modData_.push(_modular_.script_name);
                         }
                     };
-                    change_list(_modData_, function (parent, view, position, id) {
+                    change_list(_modData_, function(parent, view, position, id) {
                         tool.writeJSON("自定义模块", parent.getSelectedItem());
                     });
                 } else {
                     rewriteView["levelPickText"].setText("关卡选择");
-                    change_list(level_choices_open, function (parent, view, position, id) {
+                    change_list(level_choices_open, function(parent, view, position, id) {
 
                         setting.指定关卡 ? setting.指定关卡.levelAbbreviation = parent.getSelectedItem() : setting.指定关卡 = {
                             levelAbbreviation: parent.getSelectedItem(),
@@ -1329,12 +1349,12 @@ function 执行次数() {
                 _modData_.push(_modular_.script_name);
             }
         };
-        change_list(_modData_, function (parent, view, position, id) {
+        change_list(_modData_, function(parent, view, position, id) {
             tool.writeJSON("自定义模块", parent.getSelectedItem());
         });
     } else {
         rewriteView["levelPickText"].setText("关卡选择");
-        change_list(level_choices_open, function (parent, view, position, id) {
+        change_list(level_choices_open, function(parent, view, position, id) {
 
             setting.指定关卡 ? setting.指定关卡.levelAbbreviation = parent.getSelectedItem() : setting.指定关卡 = {
                 levelAbbreviation: parent.getSelectedItem(),
@@ -1416,7 +1436,7 @@ function 执行次数() {
         Executionsettingss = null;
         rwt = null;
         rwt2 = null;
-        ui.run(function () {
+        ui.run(function() {
             setting = tool.readJSON("configure");
             if (setting.执行 != "剿灭") {
                 window.tod.setText("行动：执行" + setting.已执行动 + "次&上限" + setting.行动 + "次");
@@ -1474,7 +1494,7 @@ function 主页设置() {
                             <text text="PRTS辅助运行结束后自动返回桌面,如PRTS运行期间出现报错将无法执行" textColor="#95000000" textSize="10sp" marginTop="2" />
                         </vertical>
                         <Switch id="home" checked="{{setting.end_action.home}}" layout_gravity="center" textSize="18sp"
-                            thumbSize='24' radius='24' />
+                        thumbSize='24' radius='24' />
                     </horizontal>
                     <horizontal margin="5 0" id="lock_screen_" >
                         <vertical layout_weight="1" >
@@ -1482,11 +1502,11 @@ function 主页设置() {
                             <text text="PRTS辅助运行结束后自动锁定屏幕,需Android 9.0 (API 28)才能生效" textColor="#95000000" textSize="10sp" marginTop="2" />
                         </vertical>
                         <Switch id="lock_screen" checked="{{setting.end_action.lock_screen}}" layout_gravity="center" textSize="18sp"
-                            thumbSize='24' radius='24' />
+                        thumbSize='24' radius='24' />
                     </horizontal>
-
+                    
                     <Switch id="jjhb" checked="{{setting.基建换班}}" text="基建换班模块" padding="6 6 6 6" textSize="16sp" />
-
+                    
                     <Switch id="jjjs" checked="{{setting.无人机加速}}" text="基建内无人机加速" padding="6 6 6 6" textSize="16sp" />
                     <radiogroup id="rawrj" orientation="horizontal">
                         <radio id="raw1" text="无人机加速生产" w="auto" />
@@ -1498,17 +1518,17 @@ function 主页设置() {
                     </radiogroup>
                     <Switch id="hyfw" checked="{{setting.好友访问}}" text="基建内好友访问" padding="6 6 6 6" textSize="16sp" />
                     <Switch id="hyqk" checked="{{setting.好友限制}}" text="仅访问10位好友" padding="6 6 6 6" textSize="16sp" />
-
+                    
                     <Switch id="sqxy" checked="{{setting.收取信用}}" text="收取每日信用" padding="6 6 6 6" textSize="16sp" />
                     <Switch id="gmcs" text="购买信用物品" padding="6 6 6 6" textSize="16sp" visibility="gone" />
-
+                    
                     <Switch id="gozh" checked="{{setting.公招}}" text="自动公开招募" padding="6 6 6 6" textSize="16sp" />
                     <radiogroup id="tag_" orientation="horizontal" visibility="{{setting.公招 ? 'visible':'gone'}}">
                         <checkbox id="tag1" text="8小时无tag招募" w="auto" checked="{{setting.无tag招募}}" />
                         <checkbox id="tag2" text="聘用候选人" w="auto" checked="{{setting.自动聘用}}" />
                     </radiogroup>
                     <Switch id="rwjl" checked="{{setting.任务奖励}}" text="领取任务奖励" padding="6 6 6 6" textSize="16" />
-
+                    
                     <Switch id="dili" checked="{{setting.设置电量}}" text="低电量暂停辅助" padding="6 6 6 6" textSize="16sp" />
                     <linear id="szdl">
                         <input id="inputd" inputType="number" hint="设置低电量自暂停：{{setting.电量}}" layout_weight="2" textColor="black" textSize="16sp" marginLeft="15" />
@@ -1625,7 +1645,7 @@ function 主页设置() {
     setupView.searchd.click(() => {
         电量输入框()
     });
-    setupView.inputd.on("key", function (keyCode, event) {
+    setupView.inputd.on("key", function(keyCode, event) {
         if (event.getAction() == 0 && keyCode == 66) {
             电量输入框()
             event.consumed = true;
@@ -1683,7 +1703,7 @@ function 暂停(form) {
     form = form || "无";
     功能图标[0] = "@drawable/ic_play_circle_outline_black_48dp";
 
-    ui.run(function () {
+    ui.run(function() {
         window.功能.setDataSource(功能图标);
     });
 
@@ -1693,7 +1713,7 @@ function 暂停(form) {
     }
 
     tool.writeJSON("侧边", "0");
-    setTimeout(function () {
+    setTimeout(function() {
         progra = tool.script_locate("progra.js");
         if (progra) {
             progra.emit("暂停", "结束程序");
@@ -1732,7 +1752,7 @@ function 暂停(form) {
 function 继续() {
     功能图标[0] = "@drawable/ic_pause_circle_outline_black_48dp";
 
-    ui.run(function () {
+    ui.run(function() {
         window.功能.setDataSource(功能图标);
         window.tos.setText("状态：等待程序重启中");
         if (setting.设置电量) {
@@ -1931,7 +1951,7 @@ tool.writeJSON("已兑理智", 0)
 
 function 程序(implem) {
 
-    ui.run(function () {
+    ui.run(function() {
         if (setting.执行 != "剿灭") {
             window.tod.setText("行动：已执" + setting.已执行动 + "次，上限" + setting.行动 + "次");
         } else {
@@ -1967,7 +1987,7 @@ function 程序(implem) {
     });
     if (setting.侧边 == "悬浮窗") {
         threads.start(暂停);
-        ui.run(function () {
+        ui.run(function() {
             window.tos.setText("状态：主程序暂停中");
         })
         tool.writeJSON("侧边", "0");
@@ -1980,7 +2000,7 @@ function 程序(implem) {
         });
 
 
-        setTimeout(function () {
+        setTimeout(function() {
             if (!active_end && !tool.script_locate("progra.js")) {
                 switch (window.tos.text()) {
                     case "状态：主程序暂停中":
@@ -1992,7 +2012,7 @@ function 程序(implem) {
                     default:
                         toastLog("PRTS辅助启动失败，请尝试重新启动");
                         暂停();
-                        ui.run(function () {
+                        ui.run(function() {
                             window.tos.setText("状态：PRTS辅助启动失败");
                         })
                         return
@@ -2005,12 +2025,12 @@ function 程序(implem) {
     }
 }
 
-threads.start(function () {
-    events.on("暂停", function (words) {
+threads.start(function() {
+    events.on("暂停", function(words) {
         暂停();
         switch (words) {
             case "状态异常":
-                ui.run(function () {
+                ui.run(function() {
                     window.tos.setText("状态：异常，超时暂停处理");
                 });
                 home();
@@ -2020,13 +2040,13 @@ threads.start(function () {
                 if (setting.公告 == true) {
                     关闭应用(setting.执行, "电量低于设定值且未充电");
                 } else {
-                    ui.run(function () {
+                    ui.run(function() {
                         window.tos.setText("状态：暂停，电量低且未充电");
                     })
                 }
                 break
             case "关闭程序":
-                ui.post(function () {
+                ui.post(function() {
                     toastLog("停止悬浮窗及PRTS辅助中...")
                     exit();
                 }, 200);
@@ -2034,24 +2054,24 @@ threads.start(function () {
         }
     });
 
-    setTimeout(function () {
-        events.on("展示文本", function (words, text) {
+    setTimeout(function() {
+        events.on("展示文本", function(words, text) {
             if (active_end) {
                 return
             }
             switch (words) {
                 case "状态":
-                    ui.run(function () {
+                    ui.run(function() {
                         window.tos.setText(text);
                     });
                     break;
                 case "行动":
-                    ui.run(function () {
+                    ui.run(function() {
                         window.tod.setText(text);
                     });
                     break;
                 case "理智":
-                    ui.run(function () {
+                    ui.run(function() {
                         window.tof.setText(text);
                     });
                     break;
@@ -2065,24 +2085,24 @@ threads.start(function () {
             }
         });
 
-        events.on("面板", function (words, xy) {
+        events.on("面板", function(words, xy) {
 
             switch (words) {
                 case "展开":
-                    threads.start(function () {
+                    threads.start(function() {
 
                         展开主界面();
                     })
 
                     break;
                 case "隐藏":
-                    threads.start(function () {
+                    threads.start(function() {
 
                         隐藏主界面();
                     })
                     break;
                 case "复位":
-                    threads.start(function () {
+                    threads.start(function() {
                         悬浮窗复位();
                     })
                     break;
@@ -2098,11 +2118,11 @@ threads.start(function () {
                     try {
                         if (xy == "统计") {
                             xy = "-500,-500";
-                            setTimeout(function () {
+                            setTimeout(function() {
                                 window.setPosition(layoutAttribute.whole.x, layoutAttribute.whole.y);
                             }, 1500);
                         } else {
-                            setTimeout(function () {
+                            setTimeout(function() {
                                 layoutAttribute.whole.x = window.getX();
                                 layoutAttribute.whole.y = window.getY();
                             }, 500)

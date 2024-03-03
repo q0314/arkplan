@@ -27,10 +27,11 @@ if (setting.模拟器) {
     };
 };
 let zox = (value) => {
-    return Math.floor((height / 2340) * value);
-}, zoy = (value) => {
-    return Math.floor((width / 1080) * value);
-};
+        return Math.floor((height / 2340) * value);
+    },
+    zoy = (value) => {
+        return Math.floor((width / 1080) * value);
+    };
 var displayText = JSON.parse(
     files.read("./lib/game_data/displayText.json", (encoding = "utf-8"))
 );
@@ -45,7 +46,7 @@ if (setting.企鹅统计 && setting.指定材料) {
     }
 }
 
-events.on("暂停", function (words) {
+events.on("暂停", function(words) {
     log(words);
     if (words == "继续") {
         Material_await = "允许";
@@ -67,14 +68,16 @@ if (setting.image_memory_manage) {
 log("加载图片识别程序");
 let ITimg = require("./ITimg.js"); //读取识图库
 
-new ITimg.Prepare();
+new ITimg.Prepare({}, {
+    correction_path: "通用"
+});
 
 
 var taglb;
 
 
 if (setting.监听键 != "关闭") {
-    threads.start(function () {
+    threads.start(function() {
         sleep(100);
         events.observeKey();
         if (setting.监听键 == "音量上键") {
@@ -82,7 +85,7 @@ if (setting.监听键 != "关闭") {
         } else if (setting.监听键 == "音量下键") {
             events.setKeyInterceptionEnabled("volume_down", true);
         }
-        events.on("key_down", function (keyCode, events) {
+        events.on("key_down", function(keyCode, events) {
             if (keyCode == keys.volume_up && setting.监听键 == "音量上键") {
                 toastLog("音量上键被按下，PRTS辅助将停止运行");
                 tool.Floaty_emit("展示文本", "状态", "状态：暂停，音量上键按下");
@@ -173,7 +176,7 @@ function 启动应用(package_) {
         tool.writeJSON("当前音量", gmvp);
     }
 
-    threads.start(function () {
+    threads.start(function() {
         if (setting.音量) {
             device.setMusicVolume(0)
         } else if (setting.音量修复) {
@@ -189,6 +192,7 @@ let collection = {
         let level_choices = JSON.parse(
             files.read("./lib/game_data/level_choices.json", (encoding = "utf-8"))
         );
+
         function isOpen(level, special) {
             let now = new Date();
             let day = now.getDay();
@@ -265,24 +269,27 @@ let collection = {
         while (true) {
             tool.Floaty_emit("展示文本", "状态", "状态: 进入终端");
             if (ITimg.ocr(displayText["终端"], {
-                action: 0,
-                timing: 1000,
-                area: 2,
-            }) || ITimg.ocr(displayText["当前"], {
-                action: 0,
-                timing: 1000,
-                area: 2,
-                log_policy: true,
-                refresh: false,
-            }) || ITimg.ocr(affairs, {
-                area: 34,
-            })) {
-                tool.Floaty_emit("展示文本", "状态", "状态: 切换事务");
-                //以左下角的终端做坐标点击
-                if (this.staging = ITimg.ocr(displayText["终端"], {
-                    action: 5,
+                    action: 0,
+                    timing: 1000,
+                    area: 2,
+                }) || ITimg.ocr(displayText["当前"], {
+                    action: 0,
+                    timing: 1000,
+                    area: 2,
+                    log_policy: true,
+                    refresh: false,
+                }) || ITimg.ocr(affairs, {
                     area: 34,
                 })) {
+                tool.Floaty_emit("展示文本", "状态", "状态: 切换事务");
+                //以左下角的终端做坐标点击
+                this.staging = ITimg.ocr(displayText["终端"], {
+                    action: 5,
+                    area: 34,
+                });
+
+
+                if (this.staging) {
                     switch (affairs) {
                         case displayText["主题曲"]:
                             click(this.staging.right + zox(150), this.staging.bottom);
@@ -296,15 +303,14 @@ let collection = {
                             click(this.staging.right + zox(150) * 7, this.staging.bottom);
                             click(this.staging.right + zox(150) * 8, this.staging.bottom);
                             log(this.staging.right + zox(150) * 7)
-                            log(this.staging.right + zox(150) * 8)
                             break;
                         case displayText["常态事务"]:
                             click(this.staging.right + zox(150) * 9, this.staging.bottom);
-                            click(this.staging.right + zox(150) * 10, this.staging.bottom);
+                            //   click(this.staging.right + zox(150) * 10, this.staging.bottom);
                             break;
                         case displayText["长期探索"]:
                             click(this.staging.right + zox(150) * 11, this.staging.bottom);
-                            click(this.staging.right + zox(150) * 12, this.staging.bottom);
+                            //  click(this.staging.right + zox(150) * 12, this.staging.bottom);
                             break;
                     }
                 } else {
@@ -321,10 +327,17 @@ let collection = {
                     }
                 };
                 sleep(1000);
-                console.info("尝试退出事务切换")
+                console.info("尝试退出事务切换");
+                // if(this.staging&&ITimg.results.length <= 0){
+
+                //  }
                 if (ITimg.ocr(affairs, {
-                    area: 34,
-                })) {
+                        area: 34,
+                        action: 5,
+                    }) || ITimg.ocr(affairs, {
+                        action: 5,
+
+                    })) {
                     break
                 }
             }
@@ -337,14 +350,14 @@ let collection = {
         while (true) {
             sleep(500);
             if (this.staging = (ITimg.ocr(displayText["残阳"], {
-                action: 5,
-                area: 13,
-            }) || ITimg.ocr(displayText["EPISODE"], {
-                action: 5,
-                area: 13,
-                log_policy: true,
-                refresh: false,
-            }))) {
+                    action: 5,
+                    area: 13,
+                }) || ITimg.ocr(displayText["EPISODE"], {
+                    action: 5,
+                    area: 13,
+                    log_policy: true,
+                    refresh: false,
+                }))) {
                 swipe(this.staging.left, this.staging.bottom, this.staging.right, width, 500);
                 sleep(500);
                 swipe(this.staging.left, this.staging.bottom, this.staging.right, width, 500);
@@ -355,15 +368,15 @@ let collection = {
         sleep(500);
         tool.Floaty_emit("面板", "展开");
         if (this.staging = (ITimg.ocr(displayText["黑暗时代"], {
-            action: 5,
-            area: 34,
-            part: true,
-            nods: 500,
-        }) || ITimg.ocr(displayText["黑暗时代"], {
-            action: 5,
-            area: 34,
-            part: true
-        }))) {
+                action: 5,
+                area: 34,
+                part: true,
+                nods: 500,
+            }) || ITimg.ocr(displayText["黑暗时代"], {
+                action: 5,
+                area: 34,
+                part: true
+            }))) {
             click(this.staging.right, this.staging.top);
             sleep(1000);
         };
@@ -383,11 +396,11 @@ let collection = {
         }));
 
         if (ITimg.ocr("1-7", {
-            action: 0,
-            timing: 1000,
-            area: 12,
-            similar: 1,
-        })) {
+                action: 0,
+                timing: 1000,
+                area: 12,
+                similar: 1,
+            })) {
             return true;
         }
 
@@ -404,17 +417,17 @@ let collection = {
         tool.Floaty_emit("展示文本", "状态", "状态: 进入关卡");
         while (true) {
             if (ITimg.ocr(levelEntrance, {
-                timing: 300,
-                action: 0,
-                area: 34,
-                nods: 500,
-            })) {
+                    timing: 300,
+                    action: 0,
+                    area: 34,
+                    nods: 500,
+                })) {
                 //不可进入右上角出现关卡尚未开放
                 if (ITimg.ocr(displayText["关卡"], {
-                    timing: 200,
-                    area: 2,
-                    part: true,
-                })) {
+                        timing: 200,
+                        area: 2,
+                        part: true,
+                    })) {
                     console.error(levelEntrance + " 不在开放时间");
                     return false;
                 };
@@ -441,45 +454,45 @@ let collection = {
 
         if (typeof levelName == "object") {
             if ((ITimg.ocr(levelName[0], {
-                action: 0,
-                timing: 1000,
-                similar: 1,
-                area: (levelName[0].indexOf("1") != -1) ? 13 : 24,
-            }) || ITimg.ocr(levelName[1], {
-                action: 0,
-                timing: 1000,
-                similar: 1,
-                area: (levelName[1].indexOf("1") != -1) ? 13 : 24,
-                refresh: false,
-                log_policy: "brief",
-                nods: 1000,
-            })) || (ITimg.ocr(levelName[0], {
-                action: 0,
-                timing: 1000,
-                similar: 1,
-                area: (levelName[0].indexOf("1") != -1) ? 13 : 24,
-            }) || ITimg.ocr(levelName[1], {
-                action: 0,
-                similar: 1,
-                timing: 1000,
-                area: (levelName[1].indexOf("1") != -1) ? 13 : 24,
-                refresh: false,
-                log_policy: "brief"
-            }))) {
+                    action: 0,
+                    timing: 1000,
+                    similar: 1,
+                    area: (levelName[0].indexOf("1") != -1) ? 13 : 24,
+                }) || ITimg.ocr(levelName[1], {
+                    action: 0,
+                    timing: 1000,
+                    similar: 1,
+                    area: (levelName[1].indexOf("1") != -1) ? 13 : 24,
+                    refresh: false,
+                    log_policy: "brief",
+                    nods: 1000,
+                })) || (ITimg.ocr(levelName[0], {
+                    action: 0,
+                    timing: 1000,
+                    similar: 1,
+                    area: (levelName[0].indexOf("1") != -1) ? 13 : 24,
+                }) || ITimg.ocr(levelName[1], {
+                    action: 0,
+                    similar: 1,
+                    timing: 1000,
+                    area: (levelName[1].indexOf("1") != -1) ? 13 : 24,
+                    refresh: false,
+                    log_policy: "brief"
+                }))) {
                 return true;
             }
         } else {
             if (ITimg.ocr(levelName, {
-                action: 0,
-                timing: 1000,
-                similar: 1,
-                area: levelName.indexOf("1") ? 13 : 24,
-            }) || ITimg.ocr(levelName, {
-                action: 0,
-                timing: 1000,
-                similar: 1,
-                area: levelName.indexOf("1") ? 13 : 24,
-            })) {
+                    action: 0,
+                    timing: 1000,
+                    similar: 1,
+                    area: levelName.indexOf("1") ? 13 : 24,
+                }) || ITimg.ocr(levelName, {
+                    action: 0,
+                    timing: 1000,
+                    similar: 1,
+                    area: levelName.indexOf("1") ? 13 : 24,
+                })) {
                 return true;
             }
         }
@@ -501,16 +514,16 @@ let collection = {
             threshold: 0.75,
         }));
         if (!ITimg.picture("上次_剿灭", {
-            action: 0,
-            timing: 2000,
-            nods: 1000,
-            area: "右上半屏",
-        }) && !ITimg.picture("上次_剿灭", {
-            action: 0,
-            timing: 2000,
-            area: "右上半屏",
-            threshold: 0.75,
-        })) {
+                action: 0,
+                timing: 2000,
+                nods: 1000,
+                area: "右上半屏",
+            }) && !ITimg.picture("上次_剿灭", {
+                action: 0,
+                timing: 2000,
+                area: "右上半屏",
+                threshold: 0.75,
+            })) {
 
             toast("没有在终端页面找到待办_剿灭,无法执行上次-剿灭");
             console.error("没有在终端页面找到待办_剿灭,无法执行上次-剿灭");
@@ -525,32 +538,32 @@ let collection = {
             click(height, width - 30);
             sleep(1000);
             if (!ITimg.picture("上次_龙门外环", {
-                action: 0,
-                timing: 2000,
-                area: "右半屏",
-            })) {
-                click(height - 60, width - 30);
-                sleep(1000);
-                if (!ITimg.picture("上次_龙门外环", {
                     action: 0,
                     timing: 2000,
                     area: "右半屏",
                 })) {
-                    click(height - 120, width - 30);
-                    sleep(1000);
-
-                    if (!ITimg.picture("上次_龙门外环", {
+                click(height - 60, width - 30);
+                sleep(1000);
+                if (!ITimg.picture("上次_龙门外环", {
                         action: 0,
                         timing: 2000,
                         area: "右半屏",
                     })) {
-                        click(height - 180, width - 30);
-                        sleep(1000);
-                        if (!ITimg.picture("上次_龙门外环", {
+                    click(height - 120, width - 30);
+                    sleep(1000);
+
+                    if (!ITimg.picture("上次_龙门外环", {
                             action: 0,
                             timing: 2000,
                             area: "右半屏",
                         })) {
+                        click(height - 180, width - 30);
+                        sleep(1000);
+                        if (!ITimg.picture("上次_龙门外环", {
+                                action: 0,
+                                timing: 2000,
+                                area: "右半屏",
+                            })) {
                             toast("没有在剿灭页面找到上次_龙门外环,无法执行上次-剿灭");
                             console.error("没有在剿灭页面找到上次_龙门外环,无法执行上次-剿灭");
                             tool.Floaty_emit("展示文本", "状态", "状态：暂停，找不到龙门外环");
@@ -569,7 +582,7 @@ let collection = {
 }
 
 function 程序(implem) {
-    threadMain = threads.start(function () {
+    threadMain = threads.start(function() {
         if (ITimg.exit) {
             return;
         }
@@ -636,16 +649,22 @@ function 程序(implem) {
                 break;
 
             case "剿灭":
-                threadMain.interrupt();
-                threadMain = threads.start(剿灭);
-                break;
+                //  threadMain.interrupt();
+                //  threadMain = threads.start(剿灭);
+                //break;
             case "定时剿灭":
-                唤醒.main();
-                if (collection.main(setting.指定关卡)) {
+                if (setting.指定关卡.levelAbbreviation == "当前") {
+                    Combat_report.record("关卡选择:当前剿灭");
                     threadMain.interrupt();
                     threadMain = threads.start(剿灭);
                 } else {
-                    console.error("自动选择关卡失败");
+                    唤醒.main();
+                    if (collection.main(setting.指定关卡)) {
+                        threadMain.interrupt();
+                        threadMain = threads.start(剿灭);
+                    } else {
+                        console.error("自动选择关卡失败");
+                    }
                 }
                 break;
             case "基建":
@@ -683,31 +702,31 @@ function 上次作战() {
             area: 2
         });
         if (ITimg.picture("上一次作战", {
-            timing: 500,
-            area: "右下半屏",
-            nods: 500,
-        }) && (ITimg.picture("返回", {
-            timing: 200,
-            area: "左上半屏",
-        }) || ITimg.picture("导航", {
-            timing: 200,
-            area: "左上半屏",
-        }) || ITimg.picture("导航2", {
-            timing: 200,
-            area: "左上半屏",
-        }))) {
+                timing: 500,
+                area: "右下半屏",
+                nods: 500,
+            }) && (ITimg.picture("返回", {
+                timing: 200,
+                area: "左上半屏",
+            }) || ITimg.picture("导航", {
+                timing: 200,
+                area: "左上半屏",
+            }) || ITimg.picture("导航2", {
+                timing: 200,
+                area: "左上半屏",
+            }))) {
             log("验证通过")
             break;
         } else {
             if (ITimg.picture("导航", {
-                action: 0,
-                timing: 1000,
-                area: "上半屏",
-            }) || ITimg.picture("导航2", {
-                action: 0,
-                timing: 1000,
-                area: "上半屏",
-            })) {
+                    action: 0,
+                    timing: 1000,
+                    area: "上半屏",
+                }) || ITimg.picture("导航2", {
+                    action: 0,
+                    timing: 1000,
+                    area: "上半屏",
+                })) {
                 ITimg.picture("导航_终端", {
                     action: 0,
                     timing: 2000,
@@ -724,36 +743,36 @@ function 上次作战() {
     }
     tool.Floaty_emit("展示文本", "状态", "状态：判断上次作战类型中");
     if (ITimg.picture("上次部署", {
-        area: 4,
-    })) {
+            area: 4,
+        })) {
         return false;
     };
 
     if (!ITimg.picture("上一次作战", {
-        action: 0,
-        timing: 2000,
-        area: 4,
-    }) && !ITimg.picture("上一次作战", {
-        action: 0,
-        timing: 2000,
-        area: 4,
-        threshold: 0.75,
-    })) {
+            action: 0,
+            timing: 2000,
+            area: 4,
+        }) && !ITimg.picture("上一次作战", {
+            action: 0,
+            timing: 2000,
+            area: 4,
+            threshold: 0.75,
+        })) {
         let tips = "上次作战无法确认当前界面,重试";
         toast(tips);
         console.error(tips);
         return false
     } else {
         if (ITimg.picture("行动_普通", {
-            area: "右半屏",
-        }) || ITimg.picture("行动_磨难", {
-            threshold: 0.75,
-            area: "右半屏",
-        }) || ITimg.picture("行动_愚人号", {
-            area: "右半屏",
-        }) || ITimg.picture("行动_活动", {
-            area: "右半屏",
-        })) {
+                area: "右半屏",
+            }) || ITimg.picture("行动_磨难", {
+                threshold: 0.75,
+                area: "右半屏",
+            }) || ITimg.picture("行动_愚人号", {
+                area: "右半屏",
+            }) || ITimg.picture("行动_活动", {
+                area: "右半屏",
+            })) {
             return true;
         } else {
             sleep(1500);
@@ -766,35 +785,35 @@ function 上次作战() {
 function 检验是否已选中关卡() {
     //有开始行动界面才能判断
     if (ITimg.picture("行动_普通", {
-        action: 5,
-        threshold: 0.75,
-        area: 4,
-    }) || ITimg.picture("行动_磨难", {
-        action: 5,
-        threshold: 0.75,
-        area: 4,
-    }) || ITimg.picture("行动_愚人号", {
-        action: 5,
-        area: 4,
-    }) || ITimg.picture("行动_活动", {
-        action: 5,
-        area: 4,
-        threshold: 0.75,
-    })) {
+            action: 5,
+            threshold: 0.75,
+            area: 4,
+        }) || ITimg.picture("行动_磨难", {
+            action: 5,
+            threshold: 0.75,
+            area: 4,
+        }) || ITimg.picture("行动_愚人号", {
+            action: 5,
+            area: 4,
+        }) || ITimg.picture("行动_活动", {
+            action: 5,
+            area: 4,
+            threshold: 0.75,
+        })) {
 
         if (ITimg.picture("代理_未勾", {
-            action: 0,
-            timing: 1000,
-            area: "右下半屏",
-        }) || ITimg.picture("代理_未勾_愚人号", {
-            action: 0,
-            timing: 1000,
-            area: "右下半屏",
-        }) || ITimg.picture("代理_未勾_活动", {
-            action: 0,
-            timing: 1000,
-            area: "右下半屏",
-        })) { //有开始行动界面才能判断
+                action: 0,
+                timing: 1000,
+                area: "右下半屏",
+            }) || ITimg.picture("代理_未勾_愚人号", {
+                action: 0,
+                timing: 1000,
+                area: "右下半屏",
+            }) || ITimg.picture("代理_未勾_活动", {
+                action: 0,
+                timing: 1000,
+                area: "右下半屏",
+            })) { //有开始行动界面才能判断
             toastlog("自动勾选代理指挥");
             return true;
         } else {
@@ -806,6 +825,7 @@ function 检验是否已选中关卡() {
         return false;
     }
 }
+
 function 自定义() {
     let mod_data = storages.create("modular").get("modular", []);
     tool.Floaty_emit("展示文本", "状态", "状态：开始执行自定义模块");
@@ -911,10 +931,10 @@ function 基建换班(fatigue_state) {
         }
 
         if (!ITimg.picture("导航", {
-            action: 0,
-            timing: 1500,
-            area: "左半屏",
-        })) {
+                action: 0,
+                timing: 1500,
+                area: "左半屏",
+            })) {
             ITimg.picture("导航2", {
                 action: 0,
                 timing: 1500,
@@ -933,8 +953,8 @@ function 基建换班(fatigue_state) {
 }
 
 /**
-     * 负责启动游戏进入到主页
-     */
+ * 负责启动游戏进入到主页
+ */
 let 唤醒 = {
     main() {
         tool.Floaty_emit("展示文本", "状态", "状态：唤醒程序运行中...");
@@ -958,28 +978,28 @@ let 唤醒 = {
     确认返回主页() {
         tool.Floaty_emit("展示文本", "状态", "状态：确认主界面并重连");
         if (ITimg.picture("终端", {
-            timing: 2000,
-            area: "右半屏"
-        }) || ITimg.picture("基建", {
-            timing: 2000,
-            area: 24,
-        })) {
+                timing: 2000,
+                area: "右半屏"
+            }) || ITimg.picture("基建", {
+                timing: 2000,
+                area: 24,
+            })) {
             //防止此次需要重连
             if (ITimg.picture("终端", {
-                timing: 1000,
-                area: "右半屏",
-                action: 0,
-            })) {
-                if (!ITimg.picture("返回", {
-                    action: 4,
                     timing: 1000,
-                    area: 1,
-                    nods: 1000,
-                }) && !ITimg.picture("返回", {
-                    action: 4,
-                    timing: 3000,
-                    area: 1
+                    area: "右半屏",
+                    action: 0,
                 })) {
+                if (!ITimg.picture("返回", {
+                        action: 4,
+                        timing: 1000,
+                        area: 1,
+                        nods: 1000,
+                    }) && !ITimg.picture("返回", {
+                        action: 4,
+                        timing: 3000,
+                        area: 1
+                    })) {
                     return false;
                 }
             }
@@ -991,17 +1011,17 @@ let 唤醒 = {
         };
         //返回到主页
         if (ITimg.picture("导航", {
-            timing: 1500,
-            area: "左半屏",
-        }) || ITimg.picture("导航2", {
-            timing: 1500,
-            area: "左半屏",
-        })) {
-            while (ITimg.picture("返回", {
-                timing: 1000,
-                action: 0,
-                area: 1,
+                timing: 1500,
+                area: "左半屏",
+            }) || ITimg.picture("导航2", {
+                timing: 1500,
+                area: "左半屏",
             })) {
+            while (ITimg.picture("返回", {
+                    timing: 1000,
+                    action: 0,
+                    area: 1,
+                })) {
                 ITimg.picture("基建_离开", {
                     timing: 5000,
                     action: 0,
@@ -1023,11 +1043,15 @@ let 唤醒 = {
         while (true) {
             sleep(1000);
             if (!ITimg.picture("开始唤醒", {
-                action: 0,
-                area: "下半屏",
-            })) {
+                    action: 0,
+                    area: "下半屏",
+                })) {
                 //用于确认方舟流量热更新
-                ITimg.picture("基建_离开", { timing: 5000, action: 0, area: "右半屏", });
+                ITimg.picture("基建_离开", {
+                    timing: 5000,
+                    action: 0,
+                    area: "右半屏",
+                });
                 click(height / 2, width - 100);
                 sleep(1000);
                 getpackage = tool.currentPackage();
@@ -1051,10 +1075,10 @@ let 唤醒 = {
             } else {
                 sleep(2000);
                 if (!ITimg.picture("开始唤醒", {
-                    timing: 8000,
-                    action: 0,
-                    area: "下半屏",
-                })) {
+                        timing: 8000,
+                        action: 0,
+                        area: "下半屏",
+                    })) {
                     break
                 }
             }
@@ -1068,27 +1092,27 @@ let 唤醒 = {
         while (true) {
 
             if (ITimg.picture("关闭公告", {
-                timing: 2000,
-                action: 0,
-                area: "上半屏",
-            }) || ITimg.picture("获得物资", {
-                timing: 1000,
-                action: 1,
-            })) {
-                if (ITimg.picture("终端", {
-                    timing: 1500,
-                    area: "右半屏"
-                }) || ITimg.picture("基建", {
-                    timing: 1500,
-                    area: 24,
+                    timing: 2000,
+                    action: 0,
+                    area: "上半屏",
+                }) || ITimg.picture("获得物资", {
+                    timing: 1000,
+                    action: 1,
                 })) {
-                    if (ITimg.picture("终端", {
-                        timing: 2000,
+                if (ITimg.picture("终端", {
+                        timing: 1500,
                         area: "右半屏"
                     }) || ITimg.picture("基建", {
                         timing: 1500,
                         area: 24,
                     })) {
+                    if (ITimg.picture("终端", {
+                            timing: 2000,
+                            area: "右半屏"
+                        }) || ITimg.picture("基建", {
+                            timing: 1500,
+                            area: 24,
+                        })) {
                         break;
                     };
                 };
@@ -1096,12 +1120,12 @@ let 唤醒 = {
                 //点击边缘位置来取消取消按钮不一样的公告
                 click(height / 2, width - zoy(100));
                 if (ITimg.picture("终端", {
-                    area: 2,
-                    //        action:5,
-                }) || ITimg.picture("基建", {
-                    area: 24,
-                    action: 5,
-                })) {
+                        area: 2,
+                        //        action:5,
+                    }) || ITimg.picture("基建", {
+                        area: 24,
+                        action: 5,
+                    })) {
                     if (this.frequency >= 3) {
                         break;
                     }
@@ -1132,7 +1156,7 @@ function 行动() {
         exit();
     }
 
-    setInterval(function () {
+    setInterval(function() {
         device.keepScreenDim(240 * 1000);
         setting = tool.readJSON("configure");
         if (setting.设置电量) {
@@ -1172,45 +1196,45 @@ function 行动() {
             };
 
             if (ITimg.picture("行动_编队确认开始", {
-                action: 5,
-                timing: 1000,
-                area: "右半屏",
-            })) {
+                    action: 5,
+                    timing: 1000,
+                    area: "右半屏",
+                })) {
                 console.verbose("结束自动代理环节")
                 break
             }
             if (setting.已执行动 == 0) {
                 //有开始行动界面才能判断
                 if (ITimg.picture("行动_普通", {
-                    action: 5,
-                    threshold: 0.75,
-                    area: "右半屏",
+                        action: 5,
+                        threshold: 0.75,
+                        area: "右半屏",
 
-                }) || ITimg.picture("行动_磨难", {
-                    action: 5,
-                    threshold: 0.75,
-                    area: "右半屏",
-                }) || ITimg.picture("行动_愚人号", {
-                    action: 5,
-                    area: "右半屏",
-                }) || ITimg.picture("行动_活动", {
-                    action: 5,
-                    area: "右半屏",
-                    threshold: 0.75,
-                })) {
+                    }) || ITimg.picture("行动_磨难", {
+                        action: 5,
+                        threshold: 0.75,
+                        area: "右半屏",
+                    }) || ITimg.picture("行动_愚人号", {
+                        action: 5,
+                        area: "右半屏",
+                    }) || ITimg.picture("行动_活动", {
+                        action: 5,
+                        area: "右半屏",
+                        threshold: 0.75,
+                    })) {
                     tool.Floaty_emit("展示文本", "状态", "状态：校验关卡中");
                     sleep(10);
                     let staging;
                     if (staging = (ITimg.picture("代理_勾", {
-                        action: 5,
-                        area: 4,
-                    }) || ITimg.picture("代理_勾_愚人号", {
-                        action: 5,
-                        area: 4,
-                    }) || ITimg.picture("代理_勾_活动", {
-                        action: 5,
-                        area: 4,
-                    }))) {
+                            action: 5,
+                            area: 4,
+                        }) || ITimg.picture("代理_勾_愚人号", {
+                            action: 5,
+                            area: 4,
+                        }) || ITimg.picture("代理_勾_活动", {
+                            action: 5,
+                            area: 4,
+                        }))) {
                         if (setting.重置代理次数) {
 
                             click(staging.left - zox(70), staging.y + staging.h / 2);
@@ -1221,43 +1245,43 @@ function 行动() {
                         }
                         tool.Floaty_emit("展示文本", "状态", "状态：正在代理中");
                         if (ITimg.picture("行动_普通", {
-                            action: 0,
-                            timing: 1000,
-                            area: "右半屏",
-                            threshold: 0.75,
-                        }) || ITimg.picture("行动_磨难", {
-                            action: 0,
-                            threshold: 0.75,
-                            timing: 1000,
-                            area: "右半屏",
+                                action: 0,
+                                timing: 1000,
+                                area: "右半屏",
+                                threshold: 0.75,
+                            }) || ITimg.picture("行动_磨难", {
+                                action: 0,
+                                threshold: 0.75,
+                                timing: 1000,
+                                area: "右半屏",
 
-                        }) || ITimg.picture("行动_愚人号", {
-                            action: 0,
-                            timing: 1000,
-                            area: "右半屏",
-                        }) || ITimg.picture("行动_活动", {
-                            action: 0,
-                            timing: 1500,
-                            area: "右半屏",
-                        })) {
+                            }) || ITimg.picture("行动_愚人号", {
+                                action: 0,
+                                timing: 1000,
+                                area: "右半屏",
+                            }) || ITimg.picture("行动_活动", {
+                                action: 0,
+                                timing: 1500,
+                                area: "右半屏",
+                            })) {
                             toastLog("代理点击成功!");
                             break;
                         };
                     };
 
                     if (ITimg.picture("代理_未勾", {
-                        action: 0,
-                        timing: 1000,
-                        area: "右下半屏",
-                    }) || ITimg.picture("代理_未勾_愚人号", {
-                        action: 0,
-                        timing: 1000,
-                        area: "右下半屏",
-                    }) || ITimg.picture("代理_未勾_活动", {
-                        action: 0,
-                        timing: 1000,
-                        area: "右下半屏",
-                    })) { //有开始行动界面才能判断
+                            action: 0,
+                            timing: 1000,
+                            area: "右下半屏",
+                        }) || ITimg.picture("代理_未勾_愚人号", {
+                            action: 0,
+                            timing: 1000,
+                            area: "右下半屏",
+                        }) || ITimg.picture("代理_未勾_活动", {
+                            action: 0,
+                            timing: 1000,
+                            area: "右下半屏",
+                        })) { //有开始行动界面才能判断
                         toast("自动勾选代理指挥");
                     } else {
                         toast("当前关卡未解锁代理指挥，请选择已勾选可代理的关卡");
@@ -1269,10 +1293,10 @@ function 行动() {
                     sleep(3000);
                     if (setting.防沉迷) {
                         if (ITimg.picture("防沉迷_确认", {
-                            action: 0,
-                            timing: 1500,
-                            area: "右半屏",
-                        })) {
+                                action: 0,
+                                timing: 1500,
+                                area: "右半屏",
+                            })) {
                             tool.Floaty_emit("展示文本", "状态", "状态：暂停，游戏时长已上限!");
                             tool.Floaty_emit("暂停", "结束程序");
                         };
@@ -1281,26 +1305,26 @@ function 行动() {
             } else {
                 tool.Floaty_emit("展示文本", "状态", "状态：正在代理中");
                 if (ITimg.picture("行动_普通", {
-                    action: 0,
-                    timing: 1500,
-                    area: "右半屏",
-                    threshold: 0.75,
-                }) || ITimg.picture("行动_磨难", {
-                    action: 0,
-                    threshold: 0.75,
-                    timing: 1000,
-                    area: "右半屏",
+                        action: 0,
+                        timing: 1500,
+                        area: "右半屏",
+                        threshold: 0.75,
+                    }) || ITimg.picture("行动_磨难", {
+                        action: 0,
+                        threshold: 0.75,
+                        timing: 1000,
+                        area: "右半屏",
 
-                }) || ITimg.picture("行动_愚人号", {
-                    action: 0,
-                    timing: 1000,
-                    area: "右半屏",
-                }) || ITimg.picture("行动_活动", {
-                    action: 0,
-                    timing: 1500,
-                    area: "右半屏",
-                    threshold: 0.75,
-                })) {
+                    }) || ITimg.picture("行动_愚人号", {
+                        action: 0,
+                        timing: 1000,
+                        area: "右半屏",
+                    }) || ITimg.picture("行动_活动", {
+                        action: 0,
+                        timing: 1500,
+                        area: "右半屏",
+                        threshold: 0.75,
+                    })) {
                     toastLog("代理点击成功!");
                     break;
                 };
@@ -1310,10 +1334,10 @@ function 行动() {
         while (true) {
             setting = tool.readJSON("configure");
             if (ITimg.picture("行动_编队确认开始", {
-                action: 0,
-                timing: 2000,
-                area: "右半屏",
-            })) {
+                    action: 0,
+                    timing: 2000,
+                    area: "右半屏",
+                })) {
                 setting.已执行动++;
                 tool.writeJSON("已执行动", setting.已执行动)
                 tool.Floaty_emit("展示文本", "状态", "状态：正在行动中");
@@ -1326,10 +1350,10 @@ function 行动() {
 
                 sleep(1000)
                 if (!ITimg.picture("行动_编队确认开始", {
-                    action: 0,
-                    timing: 2000,
-                    area: "右半屏",
-                })) {
+                        action: 0,
+                        timing: 2000,
+                        area: "右半屏",
+                    })) {
                     console.verbose("结束开始行动环节")
                     break;
                 }
@@ -1350,36 +1374,36 @@ function 行动() {
 
                 sleep(500);
                 if (ITimg.picture("行动_普通", {
-                    action: 0,
-                    timing: 1500,
-                    area: "右半屏",
-                    threshold: 0.75,
+                        action: 0,
+                        timing: 1500,
+                        area: "右半屏",
+                        threshold: 0.75,
 
-                }) || ITimg.picture("行动_磨难", {
-                    action: 0,
-                    threshold: 0.75,
-                    timing: 1000,
-                    area: "右半屏",
+                    }) || ITimg.picture("行动_磨难", {
+                        action: 0,
+                        threshold: 0.75,
+                        timing: 1000,
+                        area: "右半屏",
 
-                }) || ITimg.picture("行动_愚人号", {
-                    action: 0,
-                    timing: 1000,
-                    area: "右半屏",
-                }) || ITimg.picture("行动_活动", {
-                    action: 0,
-                    timing: 1500,
-                    area: "右半屏",
-                    threshold: 0.75,
-                })) {
+                    }) || ITimg.picture("行动_愚人号", {
+                        action: 0,
+                        timing: 1000,
+                        area: "右半屏",
+                    }) || ITimg.picture("行动_活动", {
+                        action: 0,
+                        timing: 1500,
+                        area: "右半屏",
+                        threshold: 0.75,
+                    })) {
                     toastLog("代理点击成功_?");
                 };
                 sleep(200);
                 if (setting.防沉迷) {
                     if (ITimg.picture("防沉迷_确认", {
-                        action: 0,
-                        timing: 1500,
-                        area: "右半屏",
-                    })) {
+                            action: 0,
+                            timing: 1500,
+                            area: "右半屏",
+                        })) {
                         tool.Floaty_emit("展示文本", "状态", "状态：暂停，游戏时长已上限!");
                         tool.Floaty_emit("暂停", "结束程序");
                     };
@@ -1422,10 +1446,10 @@ function 行动() {
             setting = tool.readJSON("configure");
             sleep(100)
             if (temporary_xy = ITimg.picture((setting.agent ? "代理_放弃行动" : "代理_继续结算"), {
-                action: 5,
-                timing: 500,
-                area: "下半屏",
-            })) {
+                    action: 5,
+                    timing: 500,
+                    area: "下半屏",
+                })) {
                 toast("代理失误，" + (setting.agent ? "放弃行动，重新代理" : "继续结算，二星评价"))
                 console.warn("代理失误，" + (setting.agent ? "放弃行动，重新代理" : "继续结算，二星评价"))
                 agent++;
@@ -1441,33 +1465,33 @@ function 行动() {
 
             }
             if (ITimg.picture("基建_离开", {
-                action: 1,
-                timing: 500,
-                area: "下半屏",
-            })) {
+                    action: 1,
+                    timing: 500,
+                    area: "下半屏",
+                })) {
                 toastLog("网络不佳,重新提交战斗记录")
             };
             sleep(500);
 
             if (ITimg.picture("行动_结算", {
-                timing: 500,
-                area: "左半屏",
-            }) || ITimg.picture("行动_结算", {
-                timing: 500,
-                area: "左半屏",
-                threshold: 0.75,
-            }) || ITimg.picture("行动_结算", {
-                timing: 500,
-                area: "左上半屏",
-                threshold: 0.75,
-            })) {
+                    timing: 500,
+                    area: "左半屏",
+                }) || ITimg.picture("行动_结算", {
+                    timing: 500,
+                    area: "左半屏",
+                    threshold: 0.75,
+                }) || ITimg.picture("行动_结算", {
+                    timing: 500,
+                    area: "左上半屏",
+                    threshold: 0.75,
+                })) {
                 while (true) {
                     tool.Floaty_emit("展示文本", "状态", "状态：正在结算中");
                     if (ITimg.picture("等级_提升", {
-                        action: 0,
-                        timing: 1000,
-                        area: "右半屏",
-                    })) {
+                            action: 0,
+                            timing: 1000,
+                            area: "右半屏",
+                        })) {
                         tool.Floaty_emit("展示文本", "状态", "状态：正在结算中");
                         toast("等级提升了");
                         console.warn("等级提升了，理智已恢复");
@@ -1516,22 +1540,22 @@ function 行动() {
                         sleep(1500);
                     }
                     if (!ITimg.picture("等级_提升", {
-                        timing: 100,
-                        action: 5,
-                    }) && !ITimg.picture("行动_结算", {
-                        action: 0,
-                        timing: 200,
-                        nods: 1000,
-                        area: "左半屏",
-                    }) && !ITimg.picture("行动_结算", {
-                        action: 0,
-                        timing: 200,
-                        area: "左半屏",
-                    }) && !ITimg.picture("行动_结算", {
-                        timing: 100,
-                        area: "左半屏",
-                        threshold: 0.75,
-                    })) {
+                            timing: 100,
+                            action: 5,
+                        }) && !ITimg.picture("行动_结算", {
+                            action: 0,
+                            timing: 200,
+                            nods: 1000,
+                            area: "左半屏",
+                        }) && !ITimg.picture("行动_结算", {
+                            action: 0,
+                            timing: 200,
+                            area: "左半屏",
+                        }) && !ITimg.picture("行动_结算", {
+                            timing: 100,
+                            area: "左半屏",
+                            threshold: 0.75,
+                        })) {
                         toast("已完成" + setting.已执行动 + "次行动");
                         console.info("已完成" + setting.已执行动 + "次行动")
                         break;
@@ -1542,21 +1566,21 @@ function 行动() {
                 while (true) {
                     sleep(1500);
                     if (ITimg.picture("行动_普通", {
-                        timing: 500,
-                        area: "右半屏",
-                        threshold: 0.75,
-                    }) || ITimg.picture("行动_磨难", {
-                        timing: 500,
-                        area: "右半屏",
-                        threshold: 0.75,
-                    }) || ITimg.picture("行动_愚人号", {
-                        timing: 1000,
-                        area: "右半屏",
-                    }) || ITimg.picture("行动_活动", {
-                        timing: 500,
-                        area: "右半屏",
-                        threshold: 0.75,
-                    })) {
+                            timing: 500,
+                            area: "右半屏",
+                            threshold: 0.75,
+                        }) || ITimg.picture("行动_磨难", {
+                            timing: 500,
+                            area: "右半屏",
+                            threshold: 0.75,
+                        }) || ITimg.picture("行动_愚人号", {
+                            timing: 1000,
+                            area: "右半屏",
+                        }) || ITimg.picture("行动_活动", {
+                            timing: 500,
+                            area: "右半屏",
+                            threshold: 0.75,
+                        })) {
                         break;
                     };
                     (ITimg.picture("行动_结算", {
@@ -1575,10 +1599,10 @@ function 行动() {
 
             sleep(200);
             if (ITimg.picture("等级_提升", {
-                action: 0,
-                timing: 1000,
-                area: "右半屏",
-            })) {
+                    action: 0,
+                    timing: 1000,
+                    area: "右半屏",
+                })) {
                 tool.Floaty_emit("展示文本", "状态", "状态：正在结算中");
                 toast("等级提升了");
                 Combat_report.record("等级提升了，理智已恢复");
@@ -1587,10 +1611,10 @@ function 行动() {
             sleep(200);
             if (setting.防沉迷) {
                 if (ITimg.picture("防沉迷_确认", {
-                    action: 0,
-                    timing: 1500,
-                    area: "右半屏",
-                })) {
+                        action: 0,
+                        timing: 1500,
+                        area: "右半屏",
+                    })) {
                     tool.Floaty_emit("展示文本", "状态", "状态：暂停，游戏时长已上限!");
                     tool.Floaty_emit("暂停", "结束程序");
                 };
@@ -1607,32 +1631,32 @@ function 理智处理() {
     sleep(300);
     console.info("理智界面检查");
     if (ITimg.picture("理智_确认", {
-        timing: 500,
-        area: 4,
-        nods: 1500,
-    }) || ITimg.picture("理智_确认", {
-        timing: 500,
-        area: 4,
-    }) || ITimg.picture("理智_确认", {
-        timing: 500,
-        area: 4,
-    })) {
+            timing: 500,
+            area: 4,
+            nods: 1500,
+        }) || ITimg.picture("理智_确认", {
+            timing: 500,
+            area: 4,
+        }) || ITimg.picture("理智_确认", {
+            timing: 500,
+            area: 4,
+        })) {
         setting = tool.readJSON("configure");
         tool.Floaty_emit("展示文本", "状态", "状态：理智检测中");
         if (setting.已兑理智 >= setting.理智) {
             if (setting.无限吃24小时过期理智药 && (ITimg.ocr(displayText["小时"], {
-                area: 24,
-                part: true,
-            })||ITimg.ocr(displayText["分钟"], {
-                area: 24,
-                part: true,
-                refresh:false,
-            }))) {
+                    area: 24,
+                    part: true,
+                }) || ITimg.ocr(displayText["分钟"], {
+                    area: 24,
+                    part: true,
+                    refresh: false,
+                }))) {
                 if (ITimg.picture("理智_确认", {
-                    action: 0,
-                    area: 4,
-                    timing: 1000,
-                })) {
+                        action: 0,
+                        area: 4,
+                        timing: 1000,
+                    })) {
                     setting.已兑理智++;
                     tool.writeJSON("已兑理智", setting.已兑理智);
                 }
@@ -1651,9 +1675,9 @@ function 理智处理() {
 
         } else {
             if (ITimg.picture("理智_源石", {
-                timing: 500,
-                area: 2,
-            })) {
+                    timing: 500,
+                    area: 2,
+                })) {
                 //仅使用药剂恢复理智
                 if (setting.only_medicament) {
                     toast("没有药剂可供恢复理智了,仅使用药剂恢复理智" + setting.only_medicament);
@@ -1677,10 +1701,10 @@ function 理智处理() {
             } else {
 
                 if (ITimg.picture("理智_确认", {
-                    action: 0,
-                    area: 4,
-                    timing: 1000,
-                })) {
+                        action: 0,
+                        area: 4,
+                        timing: 1000,
+                    })) {
                     setting.已兑理智++;
                     tool.writeJSON("已兑理智", setting.已兑理智);
                 }
@@ -1693,8 +1717,8 @@ function 理智处理() {
             //没有设置理智兑换次数
         }
     } else if (ITimg.picture("理智_源石", {
-        area: 2,
-    })) {
+            area: 2,
+        })) {
         toast("木有理智药剂，更木有源石可供恢复理智");
         console.warn("木有理智药剂，更木有源石可供恢复理智");
         tool.Floaty_emit("展示文本", "状态", "状态：没有方法恢复");
@@ -1703,6 +1727,7 @@ function 理智处理() {
     };
     return true;
 }
+
 function 统计(target, attach, exterminate) {
     switch (target) {
         case "次数":
@@ -1778,6 +1803,7 @@ function end_task(status, literals) {
     tool.Floaty_emit("暂停", "结束程序");
     sleep(5000);
 }
+
 function 便笺(sleep_, tag, hour, type) {
     if (sleep_ == undefined) {
         sleep_ = 1000;
@@ -1845,7 +1871,7 @@ function 剿灭() {
     tool.Floaty_emit("展示文本", "状态", "状态：等待手动选定剿灭关卡");
     tool.Floaty_emit("展示文本", "行动", "剿灭：执行" + setting.已执行动 + "次&上限" + setting.剿灭 + "次");
     tool.Floaty_emit("展示文本", "理智", "理智：已兑" + setting.已兑理智 + "次&上限" + setting.理智 + "次");
-    setInterval(function () {
+    setInterval(function() {
         device.keepScreenDim(1800 * 1000);
         setting = tool.readJSON("configure");
         if (setting.设置电量) {
@@ -1883,11 +1909,11 @@ function 剿灭() {
                 threshold: 0.75,
             }))
             if (ITimg.picture("行动_普通", {
-                action: 0,
-                timing: 1000,
-                area: "右半屏",
-                nods: 3000,
-            })) {
+                    action: 0,
+                    timing: 1000,
+                    area: "右半屏",
+                    nods: 3000,
+                })) {
 
                 this.xy_ = (ITimg.picture("导航", {
                     action: 5,
@@ -1905,10 +1931,10 @@ function 剿灭() {
                     threshold: 0.7,
                 }))
                 if (ITimg.picture("代理_全权委托_确认使用", {
-                    action: 0,
-                    timing: 1000,
-                    area: "右半屏",
-                })) {
+                        action: 0,
+                        timing: 1000,
+                        area: "右半屏",
+                    })) {
                     setting.已执行动++;
                     tool.writeJSON("已执行动", setting.已执行动);
                     tool.Floaty_emit("展示文本", "状态", "状态：正在剿灭中");
@@ -1918,9 +1944,9 @@ function 剿灭() {
                             click(this.xy_.x, this.xy_.y);
                             sleep(1500);
                             if (ITimg.picture("行动_普通", {
-                                area: "右半屏",
+                                    area: "右半屏",
 
-                            })) {
+                                })) {
                                 break;
                             }
                         }
@@ -1934,13 +1960,13 @@ function 剿灭() {
                     area: "右半屏"
                 });
                 if (!ITimg.picture("代理_全权委托_确认", {
-                    timing: 1000,
-                    area: "右半屏",
-                }) && !ITimg.picture("代理_全权委托_确认", {
-                    timing: 1000,
-                    area: "下半屏",
-                    threshold: 0.7,
-                })) {
+                        timing: 1000,
+                        area: "右半屏",
+                    }) && !ITimg.picture("代理_全权委托_确认", {
+                        timing: 1000,
+                        area: "下半屏",
+                        threshold: 0.7,
+                    })) {
                     toastLog("似乎没有代理卡可使用...")
                     setting.proxy_card = false;
                 }
@@ -1963,29 +1989,29 @@ function 剿灭() {
             sleep(1100);
             //有开始行动界面才能判断
             if (ITimg.picture("行动_普通", {
-                timing: 1000,
-                area: "右半屏",
-            })) {
-                if (ITimg.picture("代理_勾", {
                     timing: 1000,
                     area: "右半屏",
                 })) {
-                    tool.Floaty_emit("展示文本", "状态", "状态：正在代理中");
-                    if (ITimg.picture("行动_普通", {
-                        action: 0,
-                        timing: 1500,
+                if (ITimg.picture("代理_勾", {
+                        timing: 1000,
                         area: "右半屏",
                     })) {
+                    tool.Floaty_emit("展示文本", "状态", "状态：正在代理中");
+                    if (ITimg.picture("行动_普通", {
+                            action: 0,
+                            timing: 1500,
+                            area: "右半屏",
+                        })) {
                         toastLog("代理点击成功!");
                         break;
                     };
                 };
 
                 if (ITimg.picture("代理_未勾", {
-                    action: 0,
-                    timing: 1000,
-                    area: "右半屏",
-                })) { //有开始行动界面才能判断
+                        action: 0,
+                        timing: 1000,
+                        area: "右半屏",
+                    })) { //有开始行动界面才能判断
                     toast("自动勾选代理指挥");
                 } else {
                     toast("当前关卡未解锁代理指挥，请选择已勾选可代理的关卡");
@@ -1997,9 +2023,9 @@ function 剿灭() {
                 toast("请选择某剿灭关卡!")
                 if (setting.防沉迷) {
                     if (ITimg.picture("防沉迷_确认", {
-                        action: 0,
-                        timing: 1500,
-                    })) {
+                            action: 0,
+                            timing: 1500,
+                        })) {
                         tool.Floaty_emit("展示文本", "状态", "状态：暂停，游戏时长已上限!");
                         tool.Floaty_emit("暂停", "结束程序");
                     };
@@ -2011,10 +2037,10 @@ function 剿灭() {
             setting = tool.readJSON("configure");
             sleep(800);
             if (ITimg.picture("行动_编队确认开始", {
-                action: 0,
-                timing: 2000,
-                area: "右半屏",
-            })) {
+                    action: 0,
+                    timing: 2000,
+                    area: "右半屏",
+                })) {
                 setting.已执行动++;
                 tool.writeJSON("已执行动", setting.已执行动);
                 tool.Floaty_emit("展示文本", "状态", "状态：正在剿灭中");
@@ -2025,10 +2051,10 @@ function 剿灭() {
                 }
                 sleep(1000);
                 if (!ITimg.picture("行动_编队确认开始", {
-                    action: 0,
-                    timing: 2000,
-                    area: "右半屏",
-                })) {
+                        action: 0,
+                        timing: 2000,
+                        area: "右半屏",
+                    })) {
                     break;
                 }
             } else {
@@ -2037,19 +2063,19 @@ function 剿灭() {
                 }
                 sleep(500);
                 if (ITimg.picture("行动_普通", {
-                    action: 0,
-                    timing: 1000,
-                    area: "右半屏",
-                })) {
+                        action: 0,
+                        timing: 1000,
+                        area: "右半屏",
+                    })) {
                     toastLog("兑换理智后再次代理点击成功!");
                 };
                 sleep(500);
                 if (setting.防沉迷) {
                     if (ITimg.picture("防沉迷_确认", {
-                        action: 0,
-                        timing: 1500,
-                        area: "右半屏",
-                    })) {
+                            action: 0,
+                            timing: 1500,
+                            area: "右半屏",
+                        })) {
                         tool.Floaty_emit("展示文本", "状态", "状态：暂停，游戏时长已上限!");
                         tool.Floaty_emit("暂停", "结束程序");
                     };
@@ -2060,15 +2086,15 @@ function 剿灭() {
         log("预定10分钟后判断结算页面")
         sleep(4 * 60000);
         if (!ITimg.picture("剿灭_简报1", {
-            timing: 1000,
-            area: "左半屏",
-        })) {
+                timing: 1000,
+                area: "左半屏",
+            })) {
             sleep(3 * 60000);
         }
         if (!ITimg.picture("剿灭_简报1", {
-            timing: 1000,
-            area: "左半屏",
-        })) {
+                timing: 1000,
+                area: "左半屏",
+            })) {
             sleep(3 * 60000)
         }
         tool.Floaty_emit("面板", "隐藏");
@@ -2077,9 +2103,9 @@ function 剿灭() {
             tool.Floaty_emit("面板", "位置", "300,280");
             sleep(100)
             if (temporary_xy = ITimg.picture((setting.agent ? "代理_放弃行动" : "代理_继续结算"), {
-                action: 5,
-                timing: 500,
-            })) {
+                    action: 5,
+                    timing: 500,
+                })) {
                 toast("代理失误，" + (setting.agent ? "放弃行动，重新代理" : "继续结算，二星评价"))
                 console.warn("代理失误，" + (setting.agent ? "放弃行动，重新代理" : "继续结算，二星评价"))
                 agent++;
@@ -2095,17 +2121,17 @@ function 剿灭() {
 
             }
             if (ITimg.picture("基建_离开", {
-                action: 1,
-                timing: 500,
-                area: "下半屏",
-            })) {
+                    action: 1,
+                    timing: 500,
+                    area: "下半屏",
+                })) {
                 toastLog("网络不佳,重新提交战斗记录")
             };
             sleep(500);
             if (ITimg.picture("剿灭_简报", {
-                timing: 1000,
-                area: "左半屏",
-            })) {
+                    timing: 1000,
+                    area: "左半屏",
+                })) {
                 tool.Floaty_emit("展示文本", "状态", "状态：正在结算中");
                 ITimg.picture("剿灭_简报", {
                     action: 0,
@@ -2114,9 +2140,9 @@ function 剿灭() {
                 })
             };
             if (ITimg.picture("剿灭_简报1", {
-                timing: 1000,
-                area: "左半屏",
-            })) {
+                    timing: 1000,
+                    area: "左半屏",
+                })) {
                 tool.Floaty_emit("展示文本", "状态", "状态：正在结算中");
                 ITimg.picture("剿灭_简报1", {
                     action: 0,
@@ -2126,31 +2152,31 @@ function 剿灭() {
             };
             sleep(500);
             if (ITimg.picture("剿灭_报酬", {
-                action: 0,
-                timing: 3000,
-                area: "左半屏",
-            })) {
-                if (!ITimg.picture("剿灭_报酬", {
                     action: 0,
-                    timing: 500,
+                    timing: 3000,
                     area: "左半屏",
                 })) {
+                if (!ITimg.picture("剿灭_报酬", {
+                        action: 0,
+                        timing: 500,
+                        area: "左半屏",
+                    })) {
                     toast("已完成" + setting.已执行动 + "次剿灭行动");
                     console.info("已完成" + setting.已执行动 + "次剿灭行动");
                     break;
                 }
             } else if (ITimg.picture("行动_普通", {
-                timing: 500,
-                area: "右半屏",
-            })) {
+                    timing: 500,
+                    area: "右半屏",
+                })) {
                 break;
             }
             sleep(500);
             if (ITimg.picture("等级_提升", {
-                action: 0,
-                timing: 1000,
-                area: "右半屏",
-            })) {
+                    action: 0,
+                    timing: 1000,
+                    area: "右半屏",
+                })) {
                 tool.Floaty_emit("展示文本", "状态", "状态：正在结算中");
                 toast("等级提升了");
                 Combat_report.record("等级提升了，理智已恢复");
@@ -2159,10 +2185,10 @@ function 剿灭() {
             sleep(500);
             if (setting.防沉迷) {
                 if (ITimg.picture("防沉迷_确认", {
-                    action: 0,
-                    timing: 1500,
-                    area: "右半屏",
-                })) {
+                        action: 0,
+                        timing: 1500,
+                        area: "右半屏",
+                    })) {
                     tool.Floaty_emit("展示文本", "状态", "状态：暂停，游戏时长已上限!");
                     tool.Floaty_emit("暂停", "结束程序");
                 };
@@ -2182,36 +2208,20 @@ function 基建() {
      */
     var fatigue_state;
 
-    待办处理 = function () {
+    待办处理 = function() {
         if (!ITimg.picture("基建_铃铛", {
-            action: 0,
-            area: "右上半屏",
-            timing: 2000,
-        }) && !ITimg.picture("基建_铃铛", {
-            action: 0,
-            area: "右上半屏",
-            timing: 2000,
-            threshold: 0.7,
-        })) {
-            toastLog("无法匹配铃铛 / 待办事项按钮，等待6秒")
-            sleep(6000);
-            if (!ITimg.picture("基建_铃铛", {
                 action: 0,
                 area: "右上半屏",
-                timing: 1500,
+                timing: 2000,
             }) && !ITimg.picture("基建_铃铛", {
                 action: 0,
                 area: "右上半屏",
-                timing: 1500,
+                timing: 2000,
                 threshold: 0.7,
             })) {
-                toastLog("没有匹配到基建_铃铛, 点击返回重试");
-                ITimg.picture("返回", {
-                    action: 4,
-                    timing: 1500,
-                    area: "左上半屏",
-                });
-                if (!ITimg.picture("基建_铃铛", {
+            toastLog("无法匹配铃铛 / 待办事项按钮，等待6秒")
+            sleep(6000);
+            if (!ITimg.picture("基建_铃铛", {
                     action: 0,
                     area: "右上半屏",
                     timing: 1500,
@@ -2221,6 +2231,22 @@ function 基建() {
                     timing: 1500,
                     threshold: 0.7,
                 })) {
+                toastLog("没有匹配到基建_铃铛, 点击返回重试");
+                ITimg.picture("返回", {
+                    action: 4,
+                    timing: 1500,
+                    area: "左上半屏",
+                });
+                if (!ITimg.picture("基建_铃铛", {
+                        action: 0,
+                        area: "右上半屏",
+                        timing: 1500,
+                    }) && !ITimg.picture("基建_铃铛", {
+                        action: 0,
+                        area: "右上半屏",
+                        timing: 1500,
+                        threshold: 0.7,
+                    })) {
                     toastLog("没有匹配到基建_铃铛, 没有待办");
                     基建换班(fatigue_state);
                     访问好友();
@@ -2234,32 +2260,32 @@ function 基建() {
         }
         let to_do = 0;
         if (ITimg.picture("基建_可收获", {
-            action: 0,
-            timing: 2000,
-            area: "左半屏",
-        })) {
+                action: 0,
+                timing: 2000,
+                area: "左半屏",
+            })) {
             to_do++;
         }
         if (ITimg.picture("基建_订单交付", {
-            action: 0,
-            timing: 2000,
-            area: "左半屏",
-        })) {
+                action: 0,
+                timing: 2000,
+                area: "左半屏",
+            })) {
             to_do++;
         };
         sleep(1000);
         if (ITimg.picture("基建_订单交付", {
-            action: 0,
-            timing: 2000,
-            area: "左半屏",
-        })) {
+                action: 0,
+                timing: 2000,
+                area: "左半屏",
+            })) {
             to_do++;
         };
         if (ITimg.picture("基建_信赖", {
-            action: 0,
-            timing: 3000,
-            area: "左半屏",
-        })) {
+                action: 0,
+                timing: 3000,
+                area: "左半屏",
+            })) {
             to_do++;
         };
         fatigue_state = ITimg.picture("基建_干员疲劳", {
@@ -2280,7 +2306,7 @@ function 基建() {
         }
     }
 
-    无人机加速 = function () {
+    无人机加速 = function() {
         if (!setting.无人机加速) {
             sleep(500);
             return false
@@ -2367,10 +2393,10 @@ function 基建() {
                 timing: 1000,
             });
             if (!ITimg.picture("无人机_确定", {
-                action: 0,
-                area: "右半屏",
-                timing: 3000,
-            })) {
+                    action: 0,
+                    area: "右半屏",
+                    timing: 3000,
+                })) {
                 ITimg.picture("无人机_确定", {
                     action: 0,
                     area: "右半屏",
@@ -2396,9 +2422,9 @@ function 基建() {
             });
             //防止偶然点击返回方舟无反应的情况
             if (ITimg.picture("制造站_制造中", {
-                action: 5,
-                area: "左下半屏",
-            })) {
+                    action: 5,
+                    area: "左下半屏",
+                })) {
                 ITimg.picture("返回", {
                     action: 4,
                     timing: 2000,
@@ -2413,23 +2439,23 @@ function 基建() {
             while (this.identify_frequency) {
 
                 if (ITimg.picture("基建_贸易站", {
-                    action: 0,
-                    timing: 1500,
-                    nods: 500,
-                    area: "左半屏",
-                }) || ITimg.picture("基建_贸易站", {
-                    action: 0,
-                    timing: 1500,
-                    threshold: 0.75,
-                    log_policy: true,
-                    area: "下半屏",
-                }) || ITimg.picture("基建_贸易站", {
-                    action: 0,
-                    timing: 1500,
-                    threshold: 0.70,
-                    area: "上半屏",
-                    log_policy: true,
-                })) {
+                        action: 0,
+                        timing: 1500,
+                        nods: 500,
+                        area: "左半屏",
+                    }) || ITimg.picture("基建_贸易站", {
+                        action: 0,
+                        timing: 1500,
+                        threshold: 0.75,
+                        log_policy: true,
+                        area: "下半屏",
+                    }) || ITimg.picture("基建_贸易站", {
+                        action: 0,
+                        timing: 1500,
+                        threshold: 0.70,
+                        area: "上半屏",
+                        log_policy: true,
+                    })) {
                     break
                 } else {
                     if (this.identify_frequency == 1) {
@@ -2481,26 +2507,26 @@ function 基建() {
             this.drone_assistance = 3;
             while (this.drone_assistance) {
                 if (!ITimg.picture("无人机_协助", {
-                    action: 0,
-                    timing: 1000,
-                    nods: 1000,
-                    area: 34,
-                }) && !ITimg.picture("无人机_协助", {
-                    action: 0,
-                    timing: 1000,
-                    area: 34,
-                    log_policy: true,
-                }) && (this.drone_assistance == 3)) {
+                        action: 0,
+                        timing: 1000,
+                        nods: 1000,
+                        area: 34,
+                    }) && !ITimg.picture("无人机_协助", {
+                        action: 0,
+                        timing: 1000,
+                        area: 34,
+                        log_policy: true,
+                    }) && (this.drone_assistance == 3)) {
                     if ((ITimg.picture("贸易站_获取中", {
-                        action: 0,
-                        timing: 1000,
-                        area: "下半屏",
-                    }) || ITimg.picture("贸易站_获取中", {
-                        action: 0,
-                        timing: 1000,
-                        area: "下半屏",
-                        threshold: 0.75,
-                    }))) {
+                            action: 0,
+                            timing: 1000,
+                            area: "下半屏",
+                        }) || ITimg.picture("贸易站_获取中", {
+                            action: 0,
+                            timing: 1000,
+                            area: "下半屏",
+                            threshold: 0.75,
+                        }))) {
                         (ITimg.picture("无人机_协助", {
                             action: 0,
                             timing: 1000,
@@ -2551,9 +2577,9 @@ function 基建() {
             });
 
             if (ITimg.picture("贸易站_获取中", {
-                action: 5,
-                area: "下半屏",
-            })) {
+                    action: 5,
+                    area: "下半屏",
+                })) {
                 ITimg.picture("返回", {
                     action: 4,
                     timing: 2000,
@@ -2561,15 +2587,15 @@ function 基建() {
                 });
             }
             if (ITimg.picture("基建_蓝色铃铛", {
-                action: 0,
-                timing: 1500,
-                area: "右半屏",
-            }) || ITimg.picture("基建_蓝色铃铛", {
-                action: 0,
-                timing: 1500,
-                area: "上半屏",
-                threshold: 0.75,
-            })) {
+                    action: 0,
+                    timing: 1500,
+                    area: "右半屏",
+                }) || ITimg.picture("基建_蓝色铃铛", {
+                    action: 0,
+                    timing: 1500,
+                    area: "上半屏",
+                    threshold: 0.75,
+                })) {
                 ITimg.picture("基建_订单交付", {
                     action: 0,
                     timing: 2000,
@@ -2582,7 +2608,7 @@ function 基建() {
 
     }
 
-    会客室线索处理 = function () {
+    会客室线索处理 = function() {
         if (!setting.会客室线索) {
             sleep(200);
             log("会客室线索" + setting.会客室线索);
@@ -2601,17 +2627,17 @@ function 基建() {
         });
 
         if (!ITimg.picture("基建_线索", {
-            action: 0,
-            timing: 1500,
-            area: "右半屏",
-        }) && !ITimg.picture("基建_线索", {
-            action: 0,
-            timing: 1500,
-            area: "上半屏",
-            resolution: true,
-            log_policy: true,
-            threshold: 0.70,
-        })) {
+                action: 0,
+                timing: 1500,
+                area: "右半屏",
+            }) && !ITimg.picture("基建_线索", {
+                action: 0,
+                timing: 1500,
+                area: "上半屏",
+                resolution: true,
+                log_policy: true,
+                threshold: 0.70,
+            })) {
             toastLog("没有匹配到 基建_线索.png 尝试放大基建主页面重新进行匹配");
             放大基建界面();
             sleep(50);
@@ -2619,17 +2645,17 @@ function 基建() {
             swipe(Math.floor(height / 1.2), Math.floor(width / 6), Math.floor(height / 2.5), Math.floor(width / 1.2), 500);
             sleep(500);
             if (!ITimg.picture("基建_线索", {
-                action: 0,
-                timing: 1500,
-                log_policy: true,
-                area: "右上半屏",
-            }) && !ITimg.picture("基建_线索", {
-                action: 0,
-                timing: 1500,
-                area: "右上半屏",
-                resolution: true,
-                threshold: 0.70,
-            })) {
+                    action: 0,
+                    timing: 1500,
+                    log_policy: true,
+                    area: "右上半屏",
+                }) && !ITimg.picture("基建_线索", {
+                    action: 0,
+                    timing: 1500,
+                    area: "右上半屏",
+                    resolution: true,
+                    threshold: 0.70,
+                })) {
                 toastLog("没有匹配到基建_线索.png, 可能会客室没有新线索待处理");
                 sleep(500)
                 return false;
@@ -2644,36 +2670,36 @@ function 基建() {
         if (setting.处理线索溢出 && ITimg.initocr()) {
 
             if (ITimg.ocr("8/10", {
-                action: 5,
-                part: true,
-                area: "左半屏",
-            }) || ITimg.ocr("9/10", {
-                action: 5,
-                area: "左半屏",
-                refresh: false,
-                part: true,
-                log_policy: true,
-            }) || ITimg.ocr("10/10", {
-                action: 5,
-                refresh: false,
-                area: "左半屏",
-                part: true,
-                log_policy: "简短",
-            })) {
+                    action: 5,
+                    part: true,
+                    area: "左半屏",
+                }) || ITimg.ocr("9/10", {
+                    action: 5,
+                    area: "左半屏",
+                    refresh: false,
+                    part: true,
+                    log_policy: true,
+                }) || ITimg.ocr("10/10", {
+                    action: 5,
+                    refresh: false,
+                    area: "左半屏",
+                    part: true,
+                    log_policy: "简短",
+                })) {
                 setting.处理线索溢出 = "线索待处理"
             }
         }
         //进入线索界面
         if (!ITimg.picture("线索_会客室", {
-            action: 0,
-            timing: 2000,
-            area: "下半屏",
-        }) && !ITimg.picture("线索_会客室", {
-            action: 0,
-            timing: 2000,
-            area: "左半屏",
-            threshold: 0.75,
-        })) {
+                action: 0,
+                timing: 2000,
+                area: "下半屏",
+            }) && !ITimg.picture("线索_会客室", {
+                action: 0,
+                timing: 2000,
+                area: "左半屏",
+                threshold: 0.75,
+            })) {
 
             toastLog("没有匹配到 线索_会客室.png , 无法处理线索! ");
             sleep(500);
@@ -2703,25 +2729,25 @@ function 基建() {
 
         sleep(2000);
         if (ITimg.picture("线索_交流", {
-            timing: 3000,
-            area: "左半屏",
-        }) || ITimg.picture("线索_交流", {
-            action: 0,
-            timing: 3000,
-            area: "上半屏",
-            threshold: 0.75,
-        })) {
-            if (!ITimg.picture("返回", {
-                action: 4,
-                timing: 1500,
-                nods: 500,
+                timing: 3000,
                 area: "左半屏",
-            }) && !ITimg.picture("返回", {
-                action: 4,
-                timing: 1500,
+            }) || ITimg.picture("线索_交流", {
+                action: 0,
+                timing: 3000,
                 area: "上半屏",
                 threshold: 0.75,
             })) {
+            if (!ITimg.picture("返回", {
+                    action: 4,
+                    timing: 1500,
+                    nods: 500,
+                    area: "左半屏",
+                }) && !ITimg.picture("返回", {
+                    action: 4,
+                    timing: 1500,
+                    area: "上半屏",
+                    threshold: 0.75,
+                })) {
                 toastLog("找不到返回键");
             };
         }
@@ -2729,16 +2755,16 @@ function 基建() {
         if (setting.处理线索溢出 == "线索待处理") {
 
             if (ITimg.picture("线索_传递", {
-                action: 0,
-                timing: 3000,
-                nods: 1000,
-                area: "右半屏",
-            }) || ITimg.picture("线索_传递", {
-                action: 0,
-                timing: 3000,
-                area: "右半屏",
-                threshold: 0.75,
-            })) {
+                    action: 0,
+                    timing: 3000,
+                    nods: 1000,
+                    area: "右半屏",
+                }) || ITimg.picture("线索_传递", {
+                    action: 0,
+                    timing: 3000,
+                    area: "右半屏",
+                    threshold: 0.75,
+                })) {
                 sleep(1000)
                 //将线索集合
                 let xsmc = ["莱茵生命", "企鹅物流", "黑钢", "乌萨斯学生自治团", "格拉斯哥帮", "喀兰贸易", "罗德岛制药"]
@@ -2798,10 +2824,17 @@ function 基建() {
                 click(height - 72 * 4, 50)
 
                 if (ITimg.ocr("传递奖励", {
-                    action: 5, part: true, area: "右半屏", correction_path: "信用",
-                }) || ITimg.ocr("20", {
-                    action: 5, part: true,similar: 1, area: "右半屏", correction_path: "信用",
-                })) {
+                        action: 5,
+                        part: true,
+                        area: "右半屏",
+                        correction_path: "信用",
+                    }) || ITimg.ocr("20", {
+                        action: 5,
+                        part: true,
+                        similar: 1,
+                        area: "右半屏",
+                        correction_path: "信用",
+                    })) {
                     sleep(500)
                     click(height - 72, 50)
                     click(height - 72 * 2, 50)
@@ -2873,10 +2906,10 @@ function 基建() {
 
             sleep(2000);
             if (ITimg.picture("线索_全部收取", {
-                action: 0,
-                timing: 2500,
-                area: "下半屏",
-            })) {
+                    action: 0,
+                    timing: 2500,
+                    area: "下半屏",
+                })) {
                 sleep(100);
                 click(height / 2 + random(-10, 10), 50 + random(-5, 5));
                 sleep(500);
@@ -2900,15 +2933,15 @@ function 基建() {
         //放入线索
         for (let i = 1; i <= 7; i++) {
             if (ITimg.picture("线索" + i.toString(), {
-                action: 0,
-                timing: 1000,
-            })) {
-                if (!ITimg.picture("线索_相关搜集者", {
                     action: 0,
-                    timing: 3000,
-                    nods: 500,
-                    area: "下半屏",
+                    timing: 1000,
                 })) {
+                if (!ITimg.picture("线索_相关搜集者", {
+                        action: 0,
+                        timing: 3000,
+                        nods: 500,
+                        area: "下半屏",
+                    })) {
                     ITimg.picture("线索_相关搜集者", {
                         action: 0,
                         timing: 3000,
@@ -2963,23 +2996,23 @@ function 基建() {
 
     }
 
-    传递线索 = function (xs) {
+    传递线索 = function(xs) {
         swipe(250, 200, 250, width - 100, 500);
         sleep(500)
 
         if (!ITimg.ocr(xs, {
-            action: 0,
-            area: "左半屏",
-            correction_path: "信用",
-        })) {
-            swipe(250, width - 100, 250, 200, 500);
-            sleep(500)
-
-            if (!ITimg.ocr(xs, {
                 action: 0,
                 area: "左半屏",
                 correction_path: "信用",
             })) {
+            swipe(250, width - 100, 250, 200, 500);
+            sleep(500)
+
+            if (!ITimg.ocr(xs, {
+                    action: 0,
+                    area: "左半屏",
+                    correction_path: "信用",
+                })) {
                 return false
             }
         }
@@ -2991,7 +3024,7 @@ function 基建() {
         });
         try {
             img.recycle();
-        } catch (e) { };
+        } catch (e) {};
         console.info(point)
         if (point) {
             click(Math.floor((height / 2340) * 2000), point.y)
@@ -3002,7 +3035,7 @@ function 基建() {
         }
         return false
     }
-    放大基建界面 = function () {
+    放大基建界面 = function() {
         //0秒后执行,持续500毫秒
         let left_gesture = [0, 500]
         let right_gesture = [0, 500]
@@ -3026,14 +3059,16 @@ function 基建() {
             }
             right_gesture.push([axis_x, axis_y]);
         }
-        let gesturesAry_ = [[left_gesture, right_gesture]];
+        let gesturesAry_ = [
+            [left_gesture, right_gesture]
+        ];
 
         for (let i = 0; i < gesturesAry_.length; i++) {
             gestures.apply(null, gesturesAry_[i]);
             sleep(400);
         };
     }
-    确认已进入基建页面 = function () {
+    确认已进入基建页面 = function() {
         while (true) {
             sleep(100)
             ITimg.picture("基建", {
@@ -3043,31 +3078,31 @@ function 基建() {
             })
             sleep(100);
             if (ITimg.picture("返回", {
-                action: 5,
-                timing: 1500,
-                area: "左上半屏",
-            }) || ITimg.picture("基建_铃铛", {
-                action: 5,
-                timing: 1500,
-                area: "右上半屏",
-            })) {
+                    action: 5,
+                    timing: 1500,
+                    area: "左上半屏",
+                }) || ITimg.picture("基建_铃铛", {
+                    action: 5,
+                    timing: 1500,
+                    area: "右上半屏",
+                })) {
                 sleep(200)
                 break;
             } else {
                 if (ITimg.picture("导航", {
-                    action: 0,
-                    timing: 1500,
-                    area: "左半屏",
-                }) || ITimg.picture("导航2", {
-                    action: 0,
-                    timing: 1500,
-                    area: "左半屏",
-                })) {
-                    if (ITimg.picture("导航_基建", {
                         action: 0,
-                        timing: 3000,
-                        area: "上半屏",
+                        timing: 1500,
+                        area: "左半屏",
+                    }) || ITimg.picture("导航2", {
+                        action: 0,
+                        timing: 1500,
+                        area: "左半屏",
                     })) {
+                    if (ITimg.picture("导航_基建", {
+                            action: 0,
+                            timing: 3000,
+                            area: "上半屏",
+                        })) {
                         break;
                     }
                 }
@@ -3076,7 +3111,7 @@ function 基建() {
         }
         return true;
     }
-    访问好友 = function () {
+    访问好友 = function() {
         setting = tool.readJSON("configure");
         let Day = new Date().getMonth(); //月
         let Dat = new Date().getDate(); //日
@@ -3154,11 +3189,11 @@ function 基建() {
         this.identify_frequency = 10;
         while (this.identify_frequency) {
             if (!ITimg.picture("好友列表", {
-                action: 0,
-                timing: 1000,
-                area: "上半屏",
-                nods: 1000,
-            })) {
+                    action: 0,
+                    timing: 1000,
+                    area: "上半屏",
+                    nods: 1000,
+                })) {
                 if (this.identify_frequency == 1) {
                     let tips = "长时间无法匹配到 好友访问.png 小图，请确认图库是否匹配设备分辨率, 或当前界面是否好友界面";
                     toast(tips);
@@ -3174,17 +3209,17 @@ function 基建() {
         sleep(200);
 
         if (!ITimg.picture("访问基建", {
-            action: 0,
-            timing: 8000,
-            nods: 1500,
-        }) && !ITimg.picture("访问基建", {
-            action: 0,
-            timing: 8000,
-            nods: 1500,
-        }) && !ITimg.picture("访问基建", {
-            action: 0,
-            timing: 8000
-        })) {
+                action: 0,
+                timing: 8000,
+                nods: 1500,
+            }) && !ITimg.picture("访问基建", {
+                action: 0,
+                timing: 8000,
+                nods: 1500,
+            }) && !ITimg.picture("访问基建", {
+                action: 0,
+                timing: 8000
+            })) {
             toast("没有找到访问基建，无法执行好友访问");
             console.error("没有找到访问基建，无法执行好友访问");
             return false
@@ -3202,20 +3237,20 @@ function 基建() {
 
 
             if (ITimg.picture("访问下位", {
-                action: 0,
-                timing: 5000,
-                nods: 1500,
-                area: "下半屏",
-            }) || ITimg.picture("访问下位", {
-                action: 0,
-                timing: 6000,
-                nods: 2500,
-                area: "下半屏",
-            }) || ITimg.picture("访问下位", {
-                action: 0,
-                timing: 8000,
-                area: "下半屏",
-            })) {
+                    action: 0,
+                    timing: 5000,
+                    nods: 1500,
+                    area: "下半屏",
+                }) || ITimg.picture("访问下位", {
+                    action: 0,
+                    timing: 6000,
+                    nods: 2500,
+                    area: "下半屏",
+                }) || ITimg.picture("访问下位", {
+                    action: 0,
+                    timing: 8000,
+                    area: "下半屏",
+                })) {
                 setting.好友 = setting.好友 + 1;
                 tool.writeJSON("好友", setting.好友);
                 sleep(1000);
@@ -3239,45 +3274,45 @@ function 基建() {
     setting = tool.readJSON("configure");
     tool.Floaty_emit("展示文本", "状态", "状态：执行基建收菜中");
     if (!ITimg.picture("基建", {
-        action: 0,
-        timing: 3000,
-        nods: 1000,
-        area: "右半屏",
-    }) && !ITimg.picture("基建", {
-        action: 0,
-        timing: 3000,
-        area: 4,
-    })) {
-        if (ITimg.picture("导航", {
             action: 0,
+            timing: 3000,
             nods: 1000,
-            timing: 1500,
-            area: "左半屏",
-        }) || ITimg.picture("导航", {
+            area: "右半屏",
+        }) && !ITimg.picture("基建", {
             action: 0,
-            timing: 1500,
-            area: "上半屏",
-        }) || ITimg.picture("导航2", {
-            action: 0,
-            timing: 1500,
-            nods: 1000,
-            area: "左半屏",
-        }) || ITimg.picture("导航2", {
-            action: 0,
-            timing: 1500,
-            area: "上半屏",
+            timing: 3000,
+            area: 4,
         })) {
-
-            if (!ITimg.picture("导航_基建", {
+        if (ITimg.picture("导航", {
                 action: 0,
-                timing: 500,
                 nods: 1000,
-                area: "上半屏",
-            }) && !ITimg.picture("导航_基建", {
+                timing: 1500,
+                area: "左半屏",
+            }) || ITimg.picture("导航", {
                 action: 0,
-                timing: 500,
+                timing: 1500,
+                area: "上半屏",
+            }) || ITimg.picture("导航2", {
+                action: 0,
+                timing: 1500,
+                nods: 1000,
+                area: "左半屏",
+            }) || ITimg.picture("导航2", {
+                action: 0,
+                timing: 1500,
                 area: "上半屏",
             })) {
+
+            if (!ITimg.picture("导航_基建", {
+                    action: 0,
+                    timing: 500,
+                    nods: 1000,
+                    area: "上半屏",
+                }) && !ITimg.picture("导航_基建", {
+                    action: 0,
+                    timing: 500,
+                    area: "上半屏",
+                })) {
                 toastLog("没有找到导航_基建，无法执行基建");
                 threadMain.interrupt();
                 threadMain = threads.start(采购);
@@ -3320,40 +3355,40 @@ function 采购() {
         sleep(1500);
 
         if (ITimg.picture("导航", {
-            action: 0,
-            timing: 1500,
-            area: "左半屏",
-        }) || ITimg.picture("导航2", {
-            action: 0,
-            timing: 1500,
-            area: "左半屏",
-        })) {
-            if (ITimg.picture("导航_采购中心", {
                 action: 0,
-                timing: 3000,
-                nods: 1000,
-                area: "上半屏",
-            }) || ITimg.picture("导航_采购中心", {
+                timing: 1500,
+                area: "左半屏",
+            }) || ITimg.picture("导航2", {
                 action: 0,
-                timing: 3000,
-                nods: 1000,
-                area: "右半屏",
+                timing: 1500,
+                area: "左半屏",
             })) {
-                if (ITimg.picture("信用交易所", {
+            if (ITimg.picture("导航_采购中心", {
                     action: 0,
-                    timing: 2000,
+                    timing: 3000,
+                    nods: 1000,
+                    area: "上半屏",
+                }) || ITimg.picture("导航_采购中心", {
+                    action: 0,
+                    timing: 3000,
+                    nods: 1000,
                     area: "右半屏",
                 })) {
-                    if (ITimg.picture("收取信用", {
+                if (ITimg.picture("信用交易所", {
                         action: 0,
-                        timing: 3000,
-                        area: "上半屏",
+                        timing: 2000,
+                        area: "右半屏",
                     })) {
+                    if (ITimg.picture("收取信用", {
+                            action: 0,
+                            timing: 3000,
+                            area: "上半屏",
+                        })) {
                         sleep(1000)
                         if (ITimg.picture("获得物资", {
-                            action: 0,
-                            timing: 2000,
-                        })) {
+                                action: 0,
+                                timing: 2000,
+                            })) {
                             toastLog("收获信用");
                             Combat_report.record("收取了信用");
                         } else {
@@ -3439,13 +3474,17 @@ function 购买信用物品() {
             for (let i = 0; i < setting.信用处理.购买列表.length; i++) {
                 goods = ITimg.ocr(setting.信用处理.购买列表[i], {
                     gather: taglb,
-                    action: 5, part: true, correction_path: "信用",
+                    action: 5,
+                    part: true,
+                    correction_path: "信用",
                     log_policy: true,
                 });
                 if (!goods) {
                     goods = ITimg.ocr(setting.信用处理.购买列表[i], {
                         gather: taglb_,
-                        action: 5, part: true, correction_path: "信用",
+                        action: 5,
+                        part: true,
+                        correction_path: "信用",
                         log_policy: true,
                     })
                 }
@@ -3465,21 +3504,21 @@ function 购买信用物品() {
                 });
                 try {
                     img.recycle();
-                } catch (e) { };
+                } catch (e) {};
                 if (point) {
                     click(point.x + 50, point.y + 20);
                     sleep(1500)
                     if (!ITimg.picture("获得物资", {
-                        action: 0,
-                        timing: 1000,
-                    })) {
-                        sleep(1000)
-
-                        while (等待提交反馈至神经()) { };
-                        if (!ITimg.picture("获得物资", {
                             action: 0,
                             timing: 1000,
                         })) {
+                        sleep(1000)
+
+                        while (等待提交反馈至神经()) {};
+                        if (!ITimg.picture("获得物资", {
+                                action: 0,
+                                timing: 1000,
+                            })) {
                             click(height / 2, 50);
                             sleep(500)
                             toastLog("没有足够的信用点购买 " + setting.信用处理.购买列表[i])
@@ -3531,17 +3570,20 @@ function 购买信用物品() {
             console.warn("商品优惠集合:\n" + JSON.stringify(product_collection))
             for (let i = 0; i < discount_list.length; i++) {
                 if (goods = ITimg.ocr(discount_list[i], {
-                    gather: taglb,
-                    log_policy: true,
-                    similar: 1,
-                    action: 5, part: true, correction_path: "信用",
-                })) {
+                        gather: taglb,
+                        log_policy: true,
+                        similar: 1,
+                        action: 5,
+                        part: true,
+                        correction_path: "信用",
+                    })) {
                     click(goods.right, goods.bottom);
                     //判断物品名是否在购买列表
                     sleep(500)
                     let shangpinming = ITimg.ocr("购买的物品名", {
                         action: 6,
-                        area: "左上半屏", correction_path: "信用",
+                        area: "左上半屏",
+                        correction_path: "信用",
                     })
                     for (var l = 0; l < shangpinming.length; l++) {
                         if (setting.信用处理.购买列表.indexOf(shangpinming[l].text) == -1) {
@@ -3567,21 +3609,21 @@ function 购买信用物品() {
                             });
                             try {
                                 img.recycle();
-                            } catch (e) { };
+                            } catch (e) {};
                             if (point) {
                                 click(point.x + 50, point.y + 20);
                                 sleep(1000)
                                 if (!ITimg.picture("获得物资", {
-                                    action: 0,
-                                    timing: 1000,
-                                })) {
-                                    sleep(1000)
-
-                                    while (等待提交反馈至神经()) { }
-                                    if (!ITimg.picture("获得物资", {
                                         action: 0,
                                         timing: 1000,
                                     })) {
+                                    sleep(1000)
+
+                                    while (等待提交反馈至神经()) {}
+                                    if (!ITimg.picture("获得物资", {
+                                            action: 0,
+                                            timing: 1000,
+                                        })) {
                                         click(height / 2, 50);
                                         sleep(500)
                                         toastLog("没有足够的信用点购买 " + setting.信用处理.购买列表[i])
@@ -3618,10 +3660,10 @@ function 购买信用物品() {
         tool.Floaty_emit("展示文本", "状态", "状态：执行购买商品中");
         while (true) {
             if (ITimg.picture("信用交易所_物品", {
-                action: 0,
-                timing: 1500,
-                area: "上半屏",
-            })) {
+                    action: 0,
+                    timing: 1500,
+                    area: "上半屏",
+                })) {
                 let img = ITimg.captureScreen_()
                 let point = findColor(img, "#ff6800", {
                     region: [Math.floor(height / 1.6), width / 2, 170, width / 2],
@@ -3629,15 +3671,15 @@ function 购买信用物品() {
                 });
                 try {
                     img.recycle();
-                } catch (e) { };
+                } catch (e) {};
 
                 if (point) {
                     click(point.x + 50, point.y + 20);
                     sleep(1500)
                     if (!ITimg.picture("获得物资", {
-                        action: 0,
-                        timing: 1000,
-                    })) {
+                            action: 0,
+                            timing: 1000,
+                        })) {
                         click(height / 2, 50);
                         Combat_report.record("购买了信用商品");
                         sleep(500)
@@ -3658,12 +3700,17 @@ function 购买信用物品() {
             let credits = ITimg.ocr("300", {
                 similar: 1,
                 area: [Math.floor(height / 1.2), 0, height - Math.floor(height / 1.2), 200],
-                action: 5, part: true, correction_path: "信用",
+                action: 5,
+                part: true,
+                correction_path: "信用",
             })
             if (!credits) {
                 credits = ITimg.ocr("300", {
                     area: [Math.floor(height / 1.2), 0, height - Math.floor(height / 1.2), 200],
-                    similar: 1, action: 6, part: true, correction_path: "信用",
+                    similar: 1,
+                    action: 6,
+                    part: true,
+                    correction_path: "信用",
                 });
 
                 if (!credits) {
@@ -3712,12 +3759,12 @@ function 等待提交反馈至神经() {
     var to_match = ['正在提交反馈至神经', '提交反馈', '提交', '反馈', '神经']
     for (let i in to_match) {
         if (ITimg.ocr(to_match[i], {
-            action: 5,
-            part: true,
-            refresh: false,
-            log_policy: true,
-            timing: 1000,
-        })) {
+                action: 5,
+                part: true,
+                refresh: false,
+                log_policy: true,
+                timing: 1000,
+            })) {
             return true;
         }
 
@@ -3735,7 +3782,7 @@ function 公招(Manual) {
 
     try {
         threadMain.setName("公招程序");
-    } catch (err) { };
+    } catch (err) {};
 
 
     if (ITimg.language != "简中服") {
@@ -3760,35 +3807,54 @@ function 公招(Manual) {
     } else {
 
         if (!ITimg.picture("导航", {
-            timing: 500, area: "左半屏", action: 5,
-        }) && !ITimg.picture("导航2", {
-            timing: 500, area: "左半屏", action: 5,
-        })) {
+                timing: 500,
+                area: "左半屏",
+                action: 5,
+            }) && !ITimg.picture("导航2", {
+                timing: 500,
+                area: "左半屏",
+                action: 5,
+            })) {
             click(height / 3 + random(-10, 10), 5 + random(5, 10));
             sleep(1000);
         }
 
         if (ITimg.picture("导航", {
-            action: 0, timing: 1000, area: "左半屏",
-        }) || ITimg.picture("导航2", {
-            action: 0, timing: 1000, area: "左半屏",
-        })) {
-            if (ITimg.picture("导航_公开招募", {
-                action: 0, timing: 1000, area: "右半屏",
-            }) || ITimg.picture("导航_公开招募", {
-                action: 0, timing: 1000, area: "上半屏", threshold: 0.75,
+                action: 0,
+                timing: 1000,
+                area: "左半屏",
+            }) || ITimg.picture("导航2", {
+                action: 0,
+                timing: 1000,
+                area: "左半屏",
             })) {
+            if (ITimg.picture("导航_公开招募", {
+                    action: 0,
+                    timing: 1000,
+                    area: "右半屏",
+                }) || ITimg.picture("导航_公开招募", {
+                    action: 0,
+                    timing: 1000,
+                    area: "上半屏",
+                    threshold: 0.75,
+                })) {
                 tool.Floaty_emit("面板", "隐藏");
                 while (true) {
 
                     ITimg.picture("基建_离开", {
-                        action: 0, area: "右半屏", timing: 3000,
+                        action: 0,
+                        area: "右半屏",
+                        timing: 3000,
                     });
                     if (ITimg.picture("导航", {
-                        timing: 1000, nods: 500, area: "左半屏",
-                    }) || ITimg.picture("导航2", {
-                        timing: 1000, nods: 500, area: "左半屏",
-                    })) {
+                            timing: 1000,
+                            nods: 500,
+                            area: "左半屏",
+                        }) || ITimg.picture("导航2", {
+                            timing: 1000,
+                            nods: 500,
+                            area: "左半屏",
+                        })) {
                         break;
                     }
                 }
@@ -3796,22 +3862,36 @@ function 公招(Manual) {
                 if (setting.自动聘用) {
                     while (true) {
                         if (ITimg.picture("公招_聘用", {
-                            action: 0, timing: 2000, nods: 500,
-                        }) || ITimg.picture("公招_聘用", {
-                            action: 0, timing: 2000, area: "左半屏",
-                        }) || ITimg.picture("公招_聘用", {
-                            action: 0, timing: 2000, area: "右半屏",
-                        })) {
+                                action: 0,
+                                timing: 2000,
+                                nods: 500,
+                            }) || ITimg.picture("公招_聘用", {
+                                action: 0,
+                                timing: 2000,
+                                area: "左半屏",
+                            }) || ITimg.picture("公招_聘用", {
+                                action: 0,
+                                timing: 2000,
+                                area: "右半屏",
+                            })) {
                             while (true) {
                                 if (ITimg.picture("公招_skip", {
-                                    action: 0, timing: 2000, area: "上半屏", nods: 200,
-                                }) || ITimg.picture("公招_skip", {
-                                    action: 0, timing: 2000, area: "右半屏",
-                                }) || ITimg.picture("公招_skip", {
-                                    action: 0, timing: 2000, area: "右上半屏",
-                                })) {
+                                        action: 0,
+                                        timing: 2000,
+                                        area: "上半屏",
+                                        nods: 200,
+                                    }) || ITimg.picture("公招_skip", {
+                                        action: 0,
+                                        timing: 2000,
+                                        area: "右半屏",
+                                    }) || ITimg.picture("公招_skip", {
+                                        action: 0,
+                                        timing: 2000,
+                                        area: "右上半屏",
+                                    })) {
                                     let czname = ITimg.ocr("获取干员名", {
-                                        action: 6, correction_path: "公招",
+                                        action: 6,
+                                        correction_path: "公招",
                                     });
                                     czname = result_js.get_t(czname);
                                     czname = (czname ? czname.level + "☆ " + czname.name : "无法获取干员名");
@@ -3819,10 +3899,12 @@ function 公招(Manual) {
                                 }
 
                                 if (ITimg.picture("导航", {
-                                    timing: 500, area: "上半屏",
-                                }) || ITimg.picture("导航2", {
-                                    timing: 500, area: "上半屏",
-                                })) {
+                                        timing: 500,
+                                        area: "上半屏",
+                                    }) || ITimg.picture("导航2", {
+                                        timing: 500,
+                                        area: "上半屏",
+                                    })) {
                                     break;
                                 } else {
                                     click(500 + random(-10, 10), 500 + random(-10, 10));
@@ -3862,22 +3944,22 @@ function 公招(Manual) {
     tool.Floaty_emit("面板", "展开");
 
     if (ITimg.ocr("蓝色开始行动", {
-        action: 5,
-        part: true,
-        log_policy: true,
-        refresh: false,
-    })) {
+            action: 5,
+            part: true,
+            log_policy: true,
+            refresh: false,
+        })) {
         console.error("发现截取的图片中含有手动选定关卡气泡提示\n可能会挡住重要标签，请重启程序");
         toast("发现截取的图片中含有手动选定关卡气泡提示\n可能会挡住重要标签，请重启程序");
         tool.Floaty_emit("展示文本", "状态", "状态：图片内容异常");
         tool.Floaty_emit("暂停", "结束程序");
         return
     } else if (ITimg.ocr("超级用户", {
-        action: 5,
-        part: true,
-        log_policy: true,
-        refresh: false,
-    })) {
+            action: 5,
+            part: true,
+            log_policy: true,
+            refresh: false,
+        })) {
         console.error("发现截取的图片中含有授权超级用户气泡提示\n可能会挡住重要标签，请前往相关授权应用关闭通知");
         toast("发现截取的图片中含有请求授权超级用户气泡提示\n可能会挡住重要标签，请前往相关授权应用关闭通知");
         tool.Floaty_emit("展示文本", "状态", "状态：图片内容异常");
@@ -3999,38 +4081,38 @@ function 公招(Manual) {
             default:
 
                 if (ITimg.ocr("点击刷新标签", {
-                    action: 0,
-                    refresh: false,
-                    timing: 1000,
-                }) || ITimg.ocr("刷新标签", {
-                    action: 0,
-                    part: true,
-                    refresh: false,
-                    timing: 1000,
-                })) {
+                        action: 0,
+                        refresh: false,
+                        timing: 1000,
+                    }) || ITimg.ocr("刷新标签", {
+                        action: 0,
+                        part: true,
+                        refresh: false,
+                        timing: 1000,
+                    })) {
                     while (true) {
                         if (ITimg.picture("基建_离开", {
-                            action: 0,
-                            timing: 500,
-                            nods: 500,
-                            threshold: 0.85,
-                            area: 4,
-                        }) || ITimg.picture("基建_离开", {
-                            action: 0,
-                            timing: 500,
-                            nods: 1000,
-                            threshold: 0.85,
-                            area: 24,
-                        }) || ITimg.picture("基建_离开", {
-                            action: 0,
-                            timing: 500,
-                            area: 4,
-                            threshold: 0.75,
-                        })) {
+                                action: 0,
+                                timing: 500,
+                                nods: 500,
+                                threshold: 0.85,
+                                area: 4,
+                            }) || ITimg.picture("基建_离开", {
+                                action: 0,
+                                timing: 500,
+                                nods: 1000,
+                                threshold: 0.85,
+                                area: 24,
+                            }) || ITimg.picture("基建_离开", {
+                                action: 0,
+                                timing: 500,
+                                area: 4,
+                                threshold: 0.75,
+                            })) {
                             toast("没有四星以上的词条组合，已为您刷新标签重新检测");
                             console.error("没有四星以上的词条组合，已为您刷新标签重新检测");
                             sleep(1000);
-                            while (等待提交反馈至神经()) { };
+                            while (等待提交反馈至神经()) {};
                             break
                         }
                     }
@@ -4051,20 +4133,20 @@ function 公招(Manual) {
                             sleep(random(500, 600));
                             click(taglb.x + taglb.w / 2 + random(-10, 10), taglb.y + taglb.h / 2 - random(-10, 10));
                             if (ITimg.picture("公招_确认", {
-                                action: 0,
-                                timing: 1000,
-                                area: "右下半屏",
-                            }) || ITimg.picture("公招_确认", {
-                                action: 0,
-                                timing: 1500,
-                                area: "下半屏",
-                            }) || ITimg.picture("公招_确认", {
-                                action: 0,
-                                timing: 1500,
-                                area: "下半屏",
-                                threshold: 0.7,
-                            })) {
-                                while (等待提交反馈至神经()) { };
+                                    action: 0,
+                                    timing: 1000,
+                                    area: "右下半屏",
+                                }) || ITimg.picture("公招_确认", {
+                                    action: 0,
+                                    timing: 1500,
+                                    area: "下半屏",
+                                }) || ITimg.picture("公招_确认", {
+                                    action: 0,
+                                    timing: 1500,
+                                    area: "下半屏",
+                                    threshold: 0.7,
+                                })) {
+                                while (等待提交反馈至神经()) {};
                                 便笺(position, "无tag，8小时招募", 8, true);
                                 return true;
                             };
@@ -4077,6 +4159,7 @@ function 公招(Manual) {
 
 
     }
+
     function 检测tag() {
         tool.Floaty_emit("展示文本", "状态", "状态：校验tag组合");
         bon = [];
@@ -4127,34 +4210,34 @@ function 公招(Manual) {
             }
 
             if (ITimg.picture("公招_九小时", {
-                action: 0,
-                timing: 1000,
-                area: [0, 0, parseInt(height / 2.4), width],
-            }) || ITimg.picture("公招_九小时", {
-                action: 0,
-                timing: 1000,
-                threshold: 0.75,
-                area: "上半屏",
-            }) || ITimg.picture("公招_九小时", {
-                action: 0,
-                timing: 1000,
-                resolution: true,
-            })) {
-                if (ITimg.picture("公招_确认", {
                     action: 0,
                     timing: 1000,
-                    area: "右下半屏",
-                }) || ITimg.picture("公招_确认", {
+                    area: [0, 0, parseInt(height / 2.4), width],
+                }) || ITimg.picture("公招_九小时", {
                     action: 0,
                     timing: 1000,
-                    area: "下半屏",
-                }) || ITimg.picture("公招_确认", {
+                    threshold: 0.75,
+                    area: "上半屏",
+                }) || ITimg.picture("公招_九小时", {
                     action: 0,
                     timing: 1000,
-                    area: "右半屏",
-                    threshold: 0.7
+                    resolution: true,
                 })) {
-                    while (等待提交反馈至神经()) { };
+                if (ITimg.picture("公招_确认", {
+                        action: 0,
+                        timing: 1000,
+                        area: "右下半屏",
+                    }) || ITimg.picture("公招_确认", {
+                        action: 0,
+                        timing: 1000,
+                        area: "下半屏",
+                    }) || ITimg.picture("公招_确认", {
+                        action: 0,
+                        timing: 1000,
+                        area: "右半屏",
+                        threshold: 0.7
+                    })) {
+                    while (等待提交反馈至神经()) {};
                     便笺(position, tag_bon, 9, true);
 
                 }
@@ -4189,52 +4272,52 @@ function 公招(Manual) {
                     <img src="file://res/icon.png" w="50" h="30" margin="0 5" />
                     <text text="公招结果" layout_gravity="left|center_vertical" textColor="#000000" />
                     <horizontal w="*" h="*" gravity="right|center_vertical" clickable="true" >
-
+                        
                         <text id="tips" text="tips:记得拉满9个小时" typeface="sans" textColor="#ff7f27" textSize="12sp" gravity="right" marginRight="10" />
                         <linear marginLeft="5">
                             <img id="sett" marginRight="8" src="@drawable/ic_settings_applications_black_48dp" w="35" h="35" tint="#000000" foreground="?attr/selectableItemBackground" clickable="true" />
                         </linear>
                     </horizontal>
-
+                    
                 </horizontal>
                 <linear gravity="center" margin="0 -2">
                     <View bg="#f5f5f5" w="*" h="2" />
                 </linear>
                 <vertical id="tag_sett" padding="20 10" visibility="gone" >
                     <text margin="15"
-                        text="声明:tag词条是由{{ITimg.default_list.ocr.ocr_type}}识别屏幕文字获得的,不一定准确,如果你遇到识别不准的情况可联系开发者进行修正"
-                        textColor="red"
-                        textSize="15sp"
-                        layout_gravity="center"
-                        w="*" />
-                    <Switch id="pop_ups" text="tag变化时弹出tag计算" padding="6 6 6 6" textSize="16sp" />
-                    <View bg="#666666" h="1" w="*" />
-                    <Switch id="guarantees" text="仅查看保底tag词条组合" padding="6 6 6 6" textSize="16sp" />
-
-                    <View bg="#666666" h="1" w="*" />
-                </vertical>
-
-                <text id="bon" text=""
-                    margin="10"
-                    textSize="16sp"
-                    textColor="black"
-                    layout_gravity="center"
-                    w="*" />
-                <text id="tag_result"
-                    margin="15"
-                    text="随便选吧，反正没有四星及以上"
-                    visibility="gone"
+                    text="声明:tag词条是由{{ITimg.default_list.ocr.ocr_type}}识别屏幕文字获得的,不一定准确,如果你遇到识别不准的情况可联系开发者进行修正"
+                    textColor="red"
                     textSize="15sp"
                     layout_gravity="center"
                     w="*" />
-
+                    <Switch id="pop_ups" text="tag变化时弹出tag计算" padding="6 6 6 6" textSize="16sp" />
+                    <View bg="#666666" h="1" w="*" />
+                    <Switch id="guarantees" text="仅查看保底tag词条组合" padding="6 6 6 6" textSize="16sp" />
+                    
+                    <View bg="#666666" h="1" w="*" />
+                </vertical>
+                
+                <text id="bon" text=""
+                margin="10"
+                textSize="16sp"
+                textColor="black"
+                layout_gravity="center"
+                w="*" />
+                <text id="tag_result"
+                margin="15"
+                text="随便选吧，反正没有四星及以上"
+                visibility="gone"
+                textSize="15sp"
+                layout_gravity="center"
+                w="*" />
+                
                 <ScrollView h="auto" id="scrollView" visibility="gone">
-
+                    
                     <vertical id="content" padding="3" h="auto">
-
-
+                        
+                        
                     </vertical>
-
+                    
                 </ScrollView >
             </vertical>);
 
@@ -4288,17 +4371,17 @@ function 公招(Manual) {
                 result[i].add_tags = result[i].add_tags.join("，")
                 let AddText = ui.inflate(
                     <horizontal w="*" h="auto" margin="20 0 0 0">
-
+                        
                         <text id="name"
-                            margin="0 0"
-                            textSize="15sp"
-                            layout_gravity="center"
-                            w="{{250}}px" />
+                        margin="0 0"
+                        textSize="15sp"
+                        layout_gravity="center"
+                        w="{{250}}px" />
                         <text id="add_tags"
-                            margin="0"
-                            textSize="15sp"
-                            layout_gravity="center"
-                            w="*" />
+                        margin="0"
+                        textSize="15sp"
+                        layout_gravity="center"
+                        w="*" />
                     </horizontal>,
                     tag_result_ui.content
                 );
@@ -4364,11 +4447,11 @@ function 公招(Manual) {
                 });
 
                 if (!ITimg.ocr("职业需求", {
-                    action: 6,
-                    refresh: false,
-                    log_policy: true,
-                    correction_path: "公招",
-                })) {
+                        action: 6,
+                        refresh: false,
+                        log_policy: true,
+                        correction_path: "公招",
+                    })) {
                     continue;
                 }
                 bon = [];
@@ -4512,10 +4595,10 @@ function 任务() {
         sleep(2000);
 
         if (!ITimg.picture("导航", {
-            action: 0,
-            area: "上半屏",
-            timing: 2000,
-        })) {
+                action: 0,
+                area: "上半屏",
+                timing: 2000,
+            })) {
             ITimg.picture("导航2", {
                 action: 0,
                 area: "上半屏",
@@ -4523,10 +4606,10 @@ function 任务() {
             });
         };
         if (ITimg.picture("导航_任务", {
-            action: 0,
-            area: "上半屏",
-            timing: 2000,
-        })) {
+                action: 0,
+                area: "上半屏",
+                timing: 2000,
+            })) {
             ITimg.picture("基建_离开", {
                 action: 0,
                 area: "下半屏",
@@ -4569,15 +4652,15 @@ function 任务() {
             }
 
             if (ITimg.picture("收集全部", {
-                action: 0,
-                area: 2,
-                timing: 3000,
-                nods: 1000,
-            }) || ITimg.picture("收集全部", {
-                action: 0,
-                area: 2,
-                timing: 3000,
-            })) {
+                    action: 0,
+                    area: 2,
+                    timing: 3000,
+                    nods: 1000,
+                }) || ITimg.picture("收集全部", {
+                    action: 0,
+                    area: 2,
+                    timing: 3000,
+                })) {
                 (ITimg.picture("获得物资", {
                     action: 0,
                     area: "上半屏",
@@ -4592,10 +4675,10 @@ function 任务() {
             sleep(1000)
 
             if (ITimg.picture("收集全部", {
-                action: 0,
-                area: "上半屏",
-                timing: 3000,
-            })) {
+                    action: 0,
+                    area: "上半屏",
+                    timing: 3000,
+                })) {
                 ITimg.picture("获得物资", {
                     action: 0,
                     area: "上半屏",
@@ -4608,23 +4691,23 @@ function 任务() {
 
         }
         if (!ITimg.picture("返回", {
-            action: 4,
-            area: "上半屏",
-            timing: 1500,
-            nods: 1000,
-        })) {
-            if (ITimg.picture("获得物资", {
-                action: 0,
+                action: 4,
                 area: "上半屏",
-                timing: 1000,
+                timing: 1500,
+                nods: 1000,
             })) {
+            if (ITimg.picture("获得物资", {
+                    action: 0,
+                    area: "上半屏",
+                    timing: 1000,
+                })) {
 
                 if (!ITimg.picture("返回", {
-                    action: 4,
-                    area: "上半屏",
-                    timing: 1500,
-                    nods: 1000,
-                })) {
+                        action: 4,
+                        area: "上半屏",
+                        timing: 1500,
+                        nods: 1000,
+                    })) {
                     toastLog("找不到返回键");
                 }
             }
@@ -4632,10 +4715,10 @@ function 任务() {
 
     } else {
         if (!ITimg.picture("返回", {
-            action: 4,
-            area: "上半屏",
-            timing: 1500,
-        })) {
+                action: 4,
+                area: "上半屏",
+                timing: 1500,
+            })) {
             toastLog("找不到返回键");
         }
         toastLog("任务奖励:" + setting.任务奖励)
@@ -4667,5 +4750,3 @@ function 任务() {
 
 
 }; //线程
-
-
