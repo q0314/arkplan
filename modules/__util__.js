@@ -18,10 +18,10 @@ const scale = _resources_.getDisplayMetrics().density;
 module.exports = {
     dp2px:
         /**
-        * dp转px , 密度比例
-        * @param {Number} dp 
-        * @returns 
-        */
+         * dp转px , 密度比例
+         * @param {Number} dp 
+         * @returns 
+         */
         dp => Math.floor(dp * scale + 0.5),
     px2dp:
 
@@ -33,32 +33,59 @@ module.exports = {
         px => Math.floor(px / scale + 0.5),
     isHorizontalScreen:
         /**
-        * 是否横屏
-        * @returns 
-        */
-        function () {
-            let config = _resources_.getConfiguration();
-            let ori = config.orientation;
-            if (ori == config.ORIENTATION_LANDSCAPE) {
-                //横屏
-                return true;
-            } else if (ori == config.ORIENTATION_PORTRAIT) {
-                //竖屏
-                return false;
+         * 是否横屏
+         * @returns 
+         */
+        function() {
+            let ori;
+
+            try {
+                ori = context.getSystemService(context.WINDOW_SERVICE).getDefaultDisplay().getRotation();
+                //0竖屏 1横屏
+                return ori
+            } catch (e) {
+                let config = _resources_.getConfiguration();
+                ori = config.orientation;
+                if (ori == config.ORIENTATION_LANDSCAPE) {
+                    //横屏2
+                    return true;
+                } else if (ori == config.ORIENTATION_PORTRAIT) {
+                    //竖屏1
+                    return false;
+                }
             }
+
+
+        },
+    getWidthHeight:
+        /**
+         * 返回分辨率宽，高
+         * 跟随屏幕方向变化
+         */
+        function() {
+            //方法1
+            let wPixel = _resources_.getDisplayMetrics().widthPixels;
+            let hPixel = _resources_.getDisplayMetrics().heightPixels;
+            if (wPixel > hPixel) {
+                wPixel += this.iStatusBarHeight;
+            } else {
+                hPixel += this.iStatusBarHeight;
+            }
+            return [wPixel, hPixel];
+
         },
     createShape:
         /**
-        * 创建样式
-        * @param {px} roundRadius 圆角
-       * @param {Number} shape  设置样式形状类型:包括默认RECTANGLE（矩形）, OVAL（椭圆）, LINE（线条）, RING（环形）；
-        * @param {ColorString} fillColor 背景颜色 null:透明 
-        * @param {Array} strokes 边框线样式 [宽度:px ,颜色:ColorStr ,间隔:px ,长度:px]
-        */
-        function (roundRadius, shape, fillColor, strokes) {
+         * 创建样式
+         * @param {px} roundRadius 圆角
+         * @param {Number} shape  设置样式形状类型:包括默认RECTANGLE（矩形）, OVAL（椭圆）, LINE（线条）, RING（环形）；
+         * @param {ColorString} fillColor 背景颜色 null:透明 
+         * @param {Array} strokes 边框线样式 [宽度:px ,颜色:ColorStr ,间隔:px ,长度:px]
+         */
+        function(roundRadius, shape, fillColor, strokes) {
             strokes = strokes || null;
             if (strokes != null && strokes[1] != "") strokes[1] = colors.parseColor(strokes[1]);
-             fillColor = colors.parseColor((fillColor && fillColor != "") ? fillColor : "#00000000");
+            fillColor = colors.parseColor((fillColor && fillColor != "") ? fillColor : "#00000000");
             var gd = new GradientDrawable();
             gd.setColor(fillColor);
             gd.setShape(shape ? GradientDrawable[shape] : GradientDrawable.RECTANGLE);
@@ -66,13 +93,13 @@ module.exports = {
             if (strokes != null && strokes[0] != -1) gd.setStroke.apply(gd, strokes);
             return gd;
         },
-    ObjectDefinePro: function (obj, key, action) {
+    ObjectDefinePro: function(obj, key, action) {
         var mValue = obj[key];
         Object.defineProperty(obj, key, {
-            get: function () {
+            get: function() {
                 return mValue;
             },
-            set: function (newval) {
+            set: function(newval) {
                 mValue = newval;
                 action(newval);
             }
@@ -80,6 +107,11 @@ module.exports = {
     },
     ColorEvaluator: ColorEvaluator,
     resources: _resources_,
+    // log(context.getDisplay)
+    //context.getSystemService(context.WINDOW_SERVICE).getDefaultDisplay().getHeight();
+
+    getWidthPixels: _resources_.getDisplayMetrics().widthPixels,
+    getHeightPixels: _resources_.getDisplayMetrics().heightPixels,
     iStatusBarHeight: _resources_.getDimensionPixelSize(_resources_.getIdentifier("status_bar_height", "dimen", "android")),
 };
 
@@ -92,7 +124,7 @@ function ColorEvaluator(value, action) {
     let mCurrentRed, mCurrentGreen, mCurrentBlue, mCurrentColor;
 
     // 在evaluate（）里写入对象动画过渡的逻辑:此处是写颜色过渡的逻辑
-    this.evaluate = function (fraction, startValue, endValue) {
+    this.evaluate = function(fraction, startValue, endValue) {
         // 获取到颜色的初始值和结束值
         let startColor = mCurrentColor || startValue;
         let endColor = colors.parseColor(endValue);
@@ -121,7 +153,9 @@ function ColorEvaluator(value, action) {
         // 将计算出的当前颜色的值组装返回
         var color = colors.rgb(mCurrentRed, mCurrentGreen, mCurrentBlue)
         var currentColor = colors.toString(color);
-        action(value, currentColor, color, colorStr => { mCurrentColor = colorStr }, fraction);//执行回调方法
+        action(value, currentColor, color, colorStr => {
+            mCurrentColor = colorStr
+        }, fraction); //执行回调方法
         return currentColor;
     }
 

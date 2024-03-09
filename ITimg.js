@@ -1,11 +1,13 @@
-
 importClass(android.os.Build);
 //var setting = storages.create("configure").get("configure");
 
 
 let ITimg = {};
 //识别的小图,ocr文字
-ITimg.elements = { "content": "", "number": 0 };
+ITimg.elements = {
+    "content": "",
+    "number": 0
+};
 ITimg.results = false;
 ITimg.gallery_info = JSON.parse(files.read("./mrfz/tuku/gallery_info.json"), (encoding = "utf-8"));
 ITimg.language = ITimg.gallery_info.服务器;
@@ -21,7 +23,7 @@ ITimg.timer_lock = threads.atomic(0);
  */
 function Prepare(picture_default, ocr_default) {
     let context;
-    (function () {
+    (function() {
         context = this;
     }());
     if (this === context) {
@@ -64,7 +66,7 @@ function Prepare(picture_default, ocr_default) {
 
     if (setting.image_monitor && (app.autojs.versionCode > 8082200)) {
         ITimg.permission_detection = false;
-        setTimeout(function () {
+        setTimeout(function() {
             ITimg.permission_detection = true;
         }, 60000 * 15)
     }
@@ -86,7 +88,7 @@ function Prepare(picture_default, ocr_default) {
                 break;
         }
         if (setting.异常超时) {
-            threads.start(function () {
+            threads.start(function() {
                 let is;
 
                 if (setting.执行.indexOf("剿灭") >= 0) {
@@ -96,7 +98,7 @@ function Prepare(picture_default, ocr_default) {
                     is = 12;
                     console.info("异常界面超时暂停处理：6分钟。" + setting.执行);
                 }
-                fn = function () {
+                fn = function() {
                     if (ITimg.timer_lock == is) {
 
                         toast("程序在" + (is / 2) + "分钟内未能判断当前界面，状态异常，将暂停并返回桌面")
@@ -145,7 +147,7 @@ function 申请截图() {
                 sleep(20)
                 console.verbose("确认线程启动中");
                 sleep(30)
-                threads.start(function () {
+                threads.start(function() {
                     if (device.brand != "HUAWEI") {
                         if (device.release != 11) {
                             //  if (files.read("./lib/prototype/Capture.txt") != "true") {
@@ -181,10 +183,11 @@ function 申请截图() {
         sleep(200);
         try {
             console.warn("开始请求辅助截图权限\n----------如一直卡住请打开后台弹出界面权限")
+            if (!requestScreenCapture(isHorizontalScreen() ?  width < height:height > width)) {
 
-            if (!requestScreenCapture({
-                orientation: setting.模拟器 ? 1 : 2,
-            })) {
+                //if (!requestScreenCapture({
+                //    orientation: setting.模拟器 ? 1 : 2,
+                //})) {
 
                 // 请求截图权限
                 toast("申请录屏(横屏辅助截图)权限被拒绝！");
@@ -194,6 +197,7 @@ function 申请截图() {
                 tool.Floaty_emit("暂停", "结束程序");
                 ITimg.exit = true;
                 break
+
             } else {
                 setting = storages.create("configure").get("configure");
                 if (setting.侧边 != "公招") {
@@ -413,7 +417,7 @@ function 图像匹配(picture, list) {
         }
         try {
             img.recycle()
-        } catch (e) { };
+        } catch (e) {};
     } else {
         img_small = images.read(small_image_catalog);
     }
@@ -491,13 +495,13 @@ function 图像匹配(picture, list) {
         try {
             imgList.recycle()
             img_small.recycle()
-        } catch (e) { }
+        } catch (e) {}
 
         return false
     }
     try {
         !imgList.isRecycled() && imgList.recycle();
-    } catch (e) { }
+    } catch (e) {}
     if (ITimg.results) {
         let img_small_xy = {
             w: img_small.getWidth(),
@@ -509,10 +513,13 @@ function 图像匹配(picture, list) {
         if (ITimg.elements.content == picture) {
             ITimg.elements.number = ITimg.elements.number + 1;
         } else {
-            ITimg.elements = { "content": picture, "number": 0 };
+            ITimg.elements = {
+                "content": picture,
+                "number": 0
+            };
         }
-        ITimg.results.x = ITimg.results.x + random((ITimg.results.x > 10) ? - 5 : 0, 10);
-        ITimg.results.y = ITimg.results.y + random((ITimg.results.y > 10) ? - 5 : 0, 10);
+        ITimg.results.x = ITimg.results.x + random((ITimg.results.x > 10) ? -5 : 0, 10);
+        ITimg.results.y = ITimg.results.y + random((ITimg.results.y > 10) ? -5 : 0, 10);
         switch (list.action) {
 
             case 0:
@@ -597,7 +604,7 @@ function ocr文字识别(words, list) {
         part: list.part || ITimg.default_list.ocr.part,
         similar: list.similar || ITimg.default_list.ocr.similar,
         refresh: list.refresh,
-        resolution: list.resolution || ITimg.default_list.ocr.correction_path,
+        resolution: list.resolution || ITimg.default_list.ocr.resolution,
         gather: list.gather,
         log_policy: list.log_policy,
         ocr_type: list.ocr_type || ITimg.default_list.ocr.ocr_type,
@@ -697,7 +704,10 @@ function ocr文字识别(words, list) {
         if (ITimg.elements.content == words) {
             ITimg.elements.number = ITimg.elements.number + 1;
         } else {
-            ITimg.elements = { "content": words, "number": 0 };
+            ITimg.elements = {
+                "content": words,
+                "number": 0
+            };
         }
 
 
@@ -722,7 +732,7 @@ function ocr文字识别(words, list) {
                 click(query_.left + Math.floor((query_.right - query_.left) / 2), query_.top + Math.floor((query_.bottom - query_.top) / 2))
                 break;
 
-            //点击文字左上角
+                //点击文字左上角
             case 1:
                 click(query_.left, query_.top);
                 break
@@ -811,7 +821,7 @@ function captureScreen_(way) {
                                 break;
                         }
                         ITimg.permission_detection = false;
-                        setTimeout(function () {
+                        setTimeout(function() {
                             ITimg.permission_detection = true;
                         }, 60000 * 15);
 
@@ -831,7 +841,7 @@ function captureScreen_(way) {
                         console.error("图片似乎已被回收，重新申请辅助截图权限");
                         try {
                             imgList.recycle()
-                        } catch (err) { }
+                        } catch (err) {}
                         $images.stopScreenCapture();
                         sleep(100);
                         try {
@@ -917,7 +927,7 @@ function 重置计时器(i) {
 }
 
 ITimg.ocr = ocr文字识别;
-ITimg.MlkitOCR = function (words, list) {
+ITimg.MlkitOCR = function(words, list) {
     if (!ITimg.MlkitOCR_module) {
         if (!initocr("MlkitOCR")) {
             return false;
@@ -929,7 +939,7 @@ ITimg.MlkitOCR = function (words, list) {
     list.ocr_type = "MlkitOCR";
     return ocr文字识别(words, list);
 }
-ITimg.XiaoYueOCR = function (words, list) {
+ITimg.XiaoYueOCR = function(words, list) {
     if (!ITimg.XiaoYueOCR_module) {
         if (!initocr("XiaoYueOCR")) {
             return false;

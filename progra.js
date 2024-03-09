@@ -5,7 +5,11 @@ runtime.loadDex('./lib/java/nlp-hanzi-similar-1.3.0.dex');
 let tool = require("./modules/tool.js");
 let setting = tool.readJSON("configure");
 let path_ = context.getExternalFilesDir(null).getAbsolutePath();
-
+let {
+    getWidthHeight,
+    iStatusBarHeight,
+    isHorizontalScreen,
+} = require('./modules/__util__.js');
 //保存对比图后的返回值,保存当前线程
 let agent = 0,
     /**
@@ -16,16 +20,16 @@ let agent = 0,
     Material_data,
     Material_await,
     recruit_tag = [];
-let height = device.height,
-    width = device.width;
-if (setting.模拟器) {
-    height = device.width,
-        width = device.height;
-} else {
+let height = getWidthHeight()[1],
+    width = getWidthHeight()[0];
+    console.info("宽："+width+"，高："+height+"。是否横屏："+isHorizontalScreen())
+
     if (setting.坐标) {
         setScreenMetrics(width, height);
     };
-};
+
+
+
 let zox = (value) => {
         return Math.floor((height / 2340) * value);
     },
@@ -71,7 +75,7 @@ let ITimg = require("./ITimg.js"); //读取识图库
 new ITimg.Prepare({}, {
     correction_path: "通用"
 });
-
+//images.save(ITimg.captureScreen_(),"./nn.png");
 
 var taglb;
 

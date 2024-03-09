@@ -34,7 +34,6 @@ let {
 require("./modules/ButtonLayout");
 require('./modules/widget-switch-se7en');
 require("./modules/NonSwipeableViewPager");
-
 var server = storages.create("server").get("server"),
     url_info = {
         now: new Date().getTime(),
