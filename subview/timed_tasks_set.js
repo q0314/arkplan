@@ -44,34 +44,34 @@ function ischeck(id) {
 /*
 var storage = storages.create("time");
 var timed_tasks_list = storage.get("items", []);*/
-timed_tasks_set = function (timed_tasks_list, callback) {
+timed_tasks_set = function(timed_tasks_list, callback) {
 
     let uii = ui.inflate(
         <vertical id="parent">
-            <frame>
-                <ScrollView>
-                    <vertical>
-                        <card gravity="center_vertical" cardElevation="0dp" margin="0" cardBackgroundColor="#00000000">
-                            <img src="file://res/icon.png" w="50" h="30" margin="0" layout_gravity="center|left" />
-                            <text text="定时任务" gravity="center|left" textColor="#000000" marginLeft="50" />
-
-                            <linear gravity="center||right" marginLeft="5" >
-                                <text id="wenn" textColor="#03a9f4" text="了解更多" padding="10" w="auto" h="auto" foreground="?attr/selectableItemBackground" clickable="true" />
+                <frame>
+                    <ScrollView>
+                        <vertical>
+                            <card gravity="center_vertical" cardElevation="0dp" margin="0" cardBackgroundColor="#00000000">
+                                <img src="file://res/icon.png" w="50" h="30" margin="0" layout_gravity="center|left" />
+                                <text text="定时任务" gravity="center|left" textColor="#000000" marginLeft="50" />
+                                
+                                <linear gravity="center||right" marginLeft="5" >
+                                    <text id="wenn" textColor="#03a9f4" text="了解更多" padding="10" w="auto" h="auto" foreground="?attr/selectableItemBackground" clickable="true" />
+                                </linear>
+                                
+                            </card>
+                            
+                            <linear gravity="center" margin="0 -2">
+                                <text text=" 渠道服" id="prompt_line" textSize="8" marginLeft="5" />
+                                <View bg="#f5f5f5" w="*" h="2" />
                             </linear>
-
-                        </card>
-
-                        <linear gravity="center" margin="0 -2">
-                            <text text=" 渠道服" id="prompt_line" textSize="8" marginLeft="5" />
-                            <View bg="#f5f5f5" w="*" h="2" />
-                        </linear>
-                        <text id="wxts" text="温馨" typeface="sans" padding="5" visibility="gone" textColor="#000000" textSize="15sp" layout_gravity="center" />
-
-                        <card id="car" w="*" h="auto" margin="5 0 5 0" cardCornerRadius="2dp"
+                            <text id="wxts" text="温馨" typeface="sans" padding="5" visibility="gone" textColor="#000000" textSize="15sp" layout_gravity="center" />
+                            
+                            <card id="car" w="*" h="auto" margin="5 0 5 0" cardCornerRadius="2dp"
                             cardElevation="1dp" foreground="?selectableItemBackground" cardBackgroundColor="#eff0f4">
-
+                            
                             <radiogroup mariginTop="0" w="*">
-
+                                
                                 <radiogroup id="fu" orientation="horizontal">
                                     <radio id="fu1" text="简中服" checked="true" />
                                     <radio id="fu2" text="B服" />
@@ -81,21 +81,21 @@ timed_tasks_set = function (timed_tasks_list, callback) {
                                     <text text=" 执行选项" textSize="8" />
                                     <View bg="#f5f5f5" w="*" h="2" />
                                 </linear>
-
+                                
                                 <horizontal marginLeft="5" gravity="center" w="*">
                                     <text text="执行模式" textSize="{{px2dp(48)}}" textColor="#212121" marginRight="50" />
                                     <spinner id="implement" textSize="{{px2dp(62)}}" entries=""
-                                        gravity="center" layout_weight="1" margin="5 5" padding="4" />
-
+                                    gravity="center" layout_weight="1" margin="5 5" padding="4" />
+                                    
                                 </horizontal>
                                 <horizontal marginLeft="5" gravity="center" w="*">
                                     <text id="levelPickText" text="关卡选择" textSize="{{px2dp(48)}}" textColor="#212121" marginRight="50" />
                                     <spinner id="level_pick" textSize="{{px2dp(62)}}" entries=""
-                                        gravity="center" layout_weight="1" margin="5 5" padding="4" />
-
+                                    gravity="center" layout_weight="1" margin="5 5" padding="4" />
+                                    
                                 </horizontal>
-
-
+                                
+                                
                                 <vertical id="mr">
                                     <linear gravity="center" margin="0 -2">
                                         <text text=" 执行配置" textSize="8" />
@@ -120,10 +120,10 @@ timed_tasks_set = function (timed_tasks_list, callback) {
                                     <radio id="l3" text="仅运行一次" w="*" />
                                     <radio id="l2" text="按星期运行" w="*" h="auto" />
                                 </radiogroup>
-
-
+                                
+                                
                                 <datepicker id="datepicker" margin="0 -20 0 -40" datePickerMode="spinner" layout_gravity="center" visibility="gone" />
-
+                                
                                 <timepicker id="timePickerMode" margin="0 -20" timePickerMode="spinner" layout_gravity="center" />
                                 <vertical id="li2" padding="0 0 0 0" w="*" layout_gravity="center" visibility="gone">
                                     <horizontal weightSum='4' margin="10 0 0 0" gravity="center">
@@ -144,7 +144,7 @@ timed_tasks_set = function (timed_tasks_list, callback) {
                                         <checkbox id='z0' text="周日" h='*' w='0dp' layout_weight='1'>
                                         </checkbox>
                                     </horizontal>
-
+                                    
                                 </vertical>
                                 <linear gravity="center" margin="0 -2">
                                     <text text=" 高级功能" textSize="8" />
@@ -152,30 +152,30 @@ timed_tasks_set = function (timed_tasks_list, callback) {
                                 </linear>
                                 <vertical w="*">
                                     <widget-switch-se7en id="noticeWaken" text="发送通知唤醒屏幕" checked="false" padding="0 5 10 5" textSize="18sp"
-                                        margin="10 0" thumbSize='24' gravity="center_vertical" w="*"
-                                        radius='24' />
+                                    margin="10 0" thumbSize='24' gravity="center_vertical" w="*"
+                                    radius='24' />
                                     <widget-switch-se7en id="xpyx" text="此次任务熄屏运行" checked="false" padding="0 5 10 5" textSize="18sp"
-                                        margin="10 0" thumbSize='24' gravity="center_vertical" w="*"
-                                        radius='24' />
+                                    margin="10 0" thumbSize='24' gravity="center_vertical" w="*"
+                                    radius='24' />
                                     <widget-switch-se7en id="jyyx" text="此次任务静音运行" checked="false" padding="0 5 10 5" textSize="18sp"
-                                        margin="10 0" thumbSize='24' gravity="center_vertical" w="*"
-                                        radius='24' />
+                                    margin="10 0" thumbSize='24' gravity="center_vertical" w="*"
+                                    radius='24' />
                                 </vertical>
-
+                                
                                 <linear gravity="center" margin="0 -2">
                                     <text text=" 密码解锁管理" id="prompt_line" textSize="8" />
                                     <View bg="#f5f5f5" w="*" h="2" />
                                 </linear>
                                 <horizontal w="*">
                                     <widget-switch-se7en id="zdjs" text="自动解锁屏幕" checked="false" padding="0 5 10 5" textSize="18sp"
-                                        margin="10 0" thumbSize='24' gravity="center_vertical" w="*"
-                                        radius='24' />
-
+                                    margin="10 0" thumbSize='24' gravity="center_vertical" w="*"
+                                    radius='24' />
+                                    
                                 </horizontal>
                             </radiogroup>
-
+                            
                         </card>
-
+                        
                         <horizontal w="*" padding="-3" gravity="center_vertical">
                             <button text="退出" id="exit" textColor="#F4A460" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
                             <button text="确认" id="ok" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
@@ -183,14 +183,16 @@ timed_tasks_set = function (timed_tasks_list, callback) {
                     </vertical>
                 </ScrollView>
             </frame>
-        </vertical>);
+            </vertical>);
 
     var res = dialogs.build({
         type: "app",
         customView: uii,
         wrapInScrollView: false
     })
-    tool.setBackgroundRoundRounded(res.getWindow(), { radius: 0, })
+    tool.setBackgroundRoundRounded(res.getWindow(), {
+        radius: 0,
+    })
     res.show();
     uii.wxts.setText(" 1. 需保持后台运行\n由于各系统的限制，定时任务不能一定保证准时运行，可能会延迟1~5分钟。请尽量将明日计划加入各种白名单和允许自启动权限，后台任务上锁，让明日计划持续在后台运行。" +
         "\n\n 2. 自动解锁手机\n如需明日计划自动解锁屏幕，请打开自动解锁屏幕,并设置锁屏密码，九宫格(1-9)请自行转换。内置解锁目前支持的手机品牌不多，仅小米，vivo。如果不支持你的手机，请录制解锁动作，如果你会编写js模块也可以直接在输入框输入文件路径确认" +
@@ -203,7 +205,7 @@ timed_tasks_set = function (timed_tasks_list, callback) {
         uii.level_pick.setBackground(createShape(5, 0, 0, [2, setting.bg]));
         if (fun) {
             uii.level_pick.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
-                onItemSelected: function (parent, view, position, id) {
+                onItemSelected: function(parent, view, position, id) {
                     fun(parent, view, position, id);
                 }
             }));
@@ -216,8 +218,8 @@ timed_tasks_set = function (timed_tasks_list, callback) {
     uii.implement.setBackground(createShape(5, 0, 0, [2, setting.bg]));
 
     uii.implement.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener({
-        onItemSelected: function (parent, view, position, id) {
-            ui.run(function () {
+        onItemSelected: function(parent, view, position, id) {
+            ui.run(function() {
 
                 if (position == 4) {
                     uii["levelPickText"].setText("模块选择");
@@ -231,7 +233,7 @@ timed_tasks_set = function (timed_tasks_list, callback) {
                 } else {
                     uii["levelPickText"].setText("关卡选择");
 
-                    change_list(level_choices_open, function (parent, view, position, id) {
+                    change_list(level_choices_open, function(parent, view, position, id) {
 
                         switch (parent.getSelectedItem()) {
                             case "龙门外环":
@@ -261,7 +263,7 @@ timed_tasks_set = function (timed_tasks_list, callback) {
     }));
 
 
-    uii.wenn.on('click', function () {
+    uii.wenn.on('click', function() {
         if (uii.wxts.getHint() == "true") {
             uii.wxts.setVisibility(8)
             uii.wxts.setHint("false");
@@ -289,33 +291,33 @@ timed_tasks_set = function (timed_tasks_list, callback) {
     var storage = storages.create("time");
     var password = storage.get("password");
 
-    uii.zdjs.on("click", function (view) {
+    uii.zdjs.on("click", function(view) {
         password = storage.get("password");
 
         if (view.checked) {
             let entry_ui = ui.inflate(
                 <vertical id="parent">
-                    <frame>
-                        <ScrollView>
-                            <vertical>
-                                <card gravity="center_vertical" cardElevation="0dp" margin="0" cardBackgroundColor="#00000000">
-                                    <img src="file://res/icon.png" w="50" h="30" margin="0" layout_gravity="center|left" />
-                                    <text text="密码解锁管理" gravity="center|left" textColor="#000000" marginLeft="50" />
-
-                                    <linear gravity="center||right" marginLeft="5" >
-                                        <text id="entry_unlocking" textColor="#f4a406" text="录制解锁动作" padding="10" w="auto" h="auto" foreground="?attr/selectableItemBackground" clickable="true" />
-                                    </linear>
-
-                                </card>
-                                <input id="password" text="" hint="输入：图形.数字.混合密码 或 录制解锁动作" singleLine="2" />
-
-                                <horizontal w="*" padding="-3" gravity="right|center_vertical" margin="5 0" >
-                                    <button text="确认" id="ok" style="Widget.AppCompat.Button.Borderless.Colored" />
-                                </horizontal>
-                            </vertical>
-                        </ScrollView>
-                    </frame>
-                </vertical>);
+                                <frame>
+                                    <ScrollView>
+                                        <vertical>
+                                            <card gravity="center_vertical" cardElevation="0dp" margin="0" cardBackgroundColor="#00000000">
+                                                <img src="file://res/icon.png" w="50" h="30" margin="0" layout_gravity="center|left" />
+                                                <text text="密码解锁管理" gravity="center|left" textColor="#000000" marginLeft="50" />
+                                                
+                                                <linear gravity="center||right" marginLeft="5" >
+                                                    <text id="entry_unlocking" textColor="#f4a406" text="录制解锁动作" padding="10" w="auto" h="auto" foreground="?attr/selectableItemBackground" clickable="true" />
+                                                </linear>
+                                                
+                                            </card>
+                                            <input id="password" text="" hint="输入：图形.数字.混合密码 或 录制解锁动作" singleLine="2" />
+                                            
+                                            <horizontal w="*" padding="-3" gravity="right|center_vertical" margin="5 0" >
+                                                <button text="确认" id="ok" style="Widget.AppCompat.Button.Borderless.Colored" />
+                                            </horizontal>
+                                        </vertical>
+                                    </ScrollView>
+                                </frame>
+                            </vertical>);
 
             var entry = dialogs.build({
                 type: "app",
@@ -361,13 +363,24 @@ timed_tasks_set = function (timed_tasks_list, callback) {
             }
         }
     }
-    if (setting.音量) {
-        uii.jyyx.setVisibility(8)
-    }
+
     uii.noticeWaken.checked = storage.get("noticeWaken") ? true : false;
     uii.noticeWaken.on("check", (checked) => {
         storage.put("noticeWaken", checked);
     });
+    uii.jyyx.click((view) => {
+        if (view.checked) {
+            try {
+                
+                device.setMusicVolume(device.getMusicVolume());
+            } catch (err) {
+                toastLog("没有修改系统设置权限！");
+                return
+            }
+        }
+        tool.writeJSON("音量", view.checked);
+    });
+
     uii.xpyx.click((view) => {
         if (!view.checked) {
             return
@@ -384,7 +397,7 @@ timed_tasks_set = function (timed_tasks_list, callback) {
     //滑动时间选择
     uii.timePickerMode.setIs24HourView(true); //设置当前时间控件为24小时制
     uii.timePickerMode.setOnTimeChangedListener({
-        onTimeChanged: function (v, h, m) {
+        onTimeChanged: function(v, h, m) {
             //h 获取的值 为24小时格式
             time = h + ":" + m;
         }
@@ -404,7 +417,7 @@ timed_tasks_set = function (timed_tasks_list, callback) {
         });
     });
 
-    uii.exit.on("click", function () {
+    uii.exit.on("click", function() {
         res.dismiss();
     });
     var data = new Date()
@@ -413,12 +426,12 @@ timed_tasks_set = function (timed_tasks_list, callback) {
     var d = data.getDate()
 
     let now_date = y + "-" + (m + 1) + "-" + d;
-    uii.datepicker.init(y, m, d, function (v, y, m, d) {
+    uii.datepicker.init(y, m, d, function(v, y, m, d) {
         //月值计算是从0开始的 要手动加1
         now_date = y + "-" + (m + 1) + "-" + d;
     });
 
-    uii.ok.on("click", function () {
+    uii.ok.on("click", function() {
         if (time == null) {
             snakebar("请先选择时间");
             return

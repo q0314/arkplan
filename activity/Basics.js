@@ -1255,15 +1255,17 @@ ui.xlkz_.on("click", () => {
 })
 
 ui.gmvp.on("click", (view) => {
-    tool.writeJSON("音量", view.checked);
     if (view.checked) {
         try {
             var gmvp = device.getMusicVolume()
             device.setMusicVolume(gmvp)
         } catch (err) {
-            toastLog("没有修改系统设置权限！")
+            toastLog("没有修改系统设置权限！");
+            return
         }
     }
+      tool.writeJSON("音量", view.checked);
+  
 });
 ui.gmvptxt.on("click", () => {
     提示(ui.gmvp)
