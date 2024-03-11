@@ -2,9 +2,10 @@
 try {
     ui.statusBarColor(theme.bar);
 } catch (err) {
-var theme = require("../theme.js");
+    var theme = require("../theme.js");
 
 }
+let path_ = context.getExternalFilesDir(null).getAbsolutePath();
 importClass(android.content.Context);
 
 ui.layout(
@@ -43,17 +44,35 @@ ui.emitter.on("options_item_selected", (e, item) => {
             ui.globalconsole.clear();
             break;
         case "其他应用打开":
-            app.viewFile("/data/data/"+packageName+"/files/logs/log.txt");
+            if (files.exists(path_ + "/arkplan_log.txt")) {
+                app.viewFile(path_ + "/arkplan_log.txt");
+                return
+            }
+            app.viewFile("/data/data/" + packageName + "/files/logs/log.txt");
             break;
         case "保存至下载目录":
             let path = files.path("/sdcard/Download/明日计划运行日志.txt");
-            log("文件是否存在："+files.exists("/data/data/"+packageName+"/files/logs/log.txt"))
-            if (files.copy("/data/data/"+packageName+"/files/logs/log.txt", path)){
+            // log("文件是否存在："+files.exists(path_+"/arkplan_log.txt"));
+            if (files.exists(path_ + "/arkplan_log.txt")) {
+                log("文件是否存在：" + files.exists(path_ + "/arkplan_log.txt"));
+                if (files.copy(path_ + "/arkplan_log.txt", path)) {
+                    toastLog("成功保存至" + path);
+                } else {
+                    toastLog("保存" + path + "失败")
+
+                }
+
+                return
+            };
+
+            log("文件是否存在：" + files.exists("/data/data/" + packageName + "/files/logs/log.txt"));
+            if (files.copy("/data/data/" + packageName + "/files/logs/log.txt", path)) {
                 toastLog("成功保存至" + path);
             } else {
                 toastLog("保存" + path + "失败")
-             
+
             }
+
             break;
         case "导入日志(开发人员使用)":
             File_selector(".txt")
@@ -99,10 +118,15 @@ function File_selector(mime_Type, fun) {
                 ui.globalconsole.clear();
                 log("清空旧日志")
                 console.info("选择的文件路径：" + file);
-                if (!files.copy(file, "/data/data/"+packageName+"/files/logs/log.txt")) {
+                if (files.exists(path_ + "/arkplan_log.txt")) {
+                    if (files.copy(file, path_ + "/arkplan_log.txt")) {
+                        return
+                    };
+                }
+                if (!files.copy(file, "/data/data/" + packageName + "/files/logs/log.txt")) {
                     //   if(!files.copy(file,"/storage/emulated/0/Android/data/org.autojs.autojspro/files/logs/log.txt")){
                     toast("导入日志" + file + "失败")
-                    console.error("导入日志"+file+"失败"+random(0,9999))
+                    console.error("导入日志" + file + "失败" + random(0, 9999))
                 }
             }
 

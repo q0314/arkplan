@@ -3132,6 +3132,7 @@ threads.start(function () {
     if (setting.公告 == "公告") {
         notice();
     } else if (setting.更新内容 != toupdate.getLocalVerName()) {
+     if(files.exists("./lib/logs/版本更新内容.txt")){
         $ui.post(() => {
             let edition_Updates = dialogs.build({
                 type: "app",
@@ -3151,7 +3152,7 @@ threads.start(function () {
             }, 100)
         }, 100)
 
-
+}
     }
     let rtu = random(1, 3)
     if (!files.copy("./res/Startpage/" + rtu + ".png", "./res/start-up.png")) {

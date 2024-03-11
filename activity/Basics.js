@@ -167,7 +167,7 @@ ui.layout(
 
 
                             <card w="*" id="indx2" h="40" gravity="center_vertical"  >
-                                <widget-switch-se7en id="home" text="任务结束后返回桌面" checked="false" padding="15 5 15 5" textSize="18sp"
+                                <widget-switch-se7en id="_home" text="任务结束后返回桌面" checked="false" padding="15 5 15 5" textSize="18sp"
                                     margin="10 0" thumbSize='24' radius='24' />
 
                             </card>
@@ -871,7 +871,7 @@ ui.gamestxt.on("click", () => {
     提示(ui.games);
 });
 //桌面
-ui.home.on("click", (view) => {
+ui._home.on("click", (view) => {
     setting.end_action.home = view.checked
     tool.writeJSON("end_action", setting.end_action);
 
@@ -1808,7 +1808,7 @@ function update_ui() {
         setting.woie ? ui.woie.checked = true : ui.woie.checked = false;
         ui.setScreenMetrics.checked = (setting.坐标 ? true : false);
         setting.震动 ? ui.vibration.checked = true : ui.vibration.checked = false;
-        ui.home.checked = (setting.end_action.home ? true : false);
+        ui._home.checked = (setting.end_action && setting.end_action.home ? true : false);
         setting.start ? ui.games.checked = true : ui.games.checked = false;
         setting.音量 ? ui.gmvp.checked = true : ui.gmvp.checked = false;
         //加不加()无所谓,看起来好看一些..

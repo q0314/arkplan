@@ -24,6 +24,10 @@ setInterval(function () {
 }, 400);
 let _proj_def_n = 'arkplan';
 let path = context.getExternalFilesDir(null).getAbsolutePath() + '/';
+console.setGlobalLogConfig({
+    "file": path+"/"+_proj_def_n+"_log.txt"
+});
+
 threads.start(function () {
     if (device.sdkInt < 24) {
         engines.execScriptFile("./activity/device_usage.js");

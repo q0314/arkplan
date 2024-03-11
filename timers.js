@@ -251,7 +251,7 @@ function 判断() {
                     execution[i].forceStop();
                 }
             }
-            engines.execScript("Screen operation", "if(files.exists(files.path('./module/screen.js'))){require('./module/screen.js').mask()}else{require('./screen.js').mask()}");
+            engines.execScript("Screen operation", "if(files.exists(files.path('./modules/screen.js'))){require('./modules/screen.js').mask()}else{require('./screen.js').mask()}");
         };
     }, 5000)
     setTimeout(function () {
