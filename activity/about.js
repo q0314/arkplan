@@ -510,7 +510,9 @@ ui.juanzeng.on("click", () => {
 ui.banben.on("click", () => {
     threads.start(function () {
         toupdate.showProgress();
-        toupdate.updata(ui.frame)
+        toupdate.updata(ui.frame).then((value)=>{
+           value && toupdate.showProgress();
+        })
     });
 });
 

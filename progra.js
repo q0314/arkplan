@@ -22,11 +22,11 @@ let agent = 0,
     recruit_tag = [];
 let height = getWidthHeight()[1],
     width = getWidthHeight()[0];
-    console.info("宽："+width+"，高："+height+"。是否横屏："+isHorizontalScreen())
+console.info("宽：" + width + "，高：" + height + "。是否横屏：" + isHorizontalScreen())
 
-    if (setting.坐标) {
-        setScreenMetrics(width, height);
-    };
+if (setting.坐标) {
+    setScreenMetrics(width, height);
+};
 
 
 
@@ -490,12 +490,12 @@ let collection = {
                     action: 0,
                     timing: 1000,
                     similar: 1,
-                    area: levelName.indexOf("1") ? 13 : 24,
+                    area: (levelName.indexOf("1") != -1) ? 13 : 24,
                 }) || ITimg.ocr(levelName, {
                     action: 0,
                     timing: 1000,
                     similar: 1,
-                    area: levelName.indexOf("1") ? 13 : 24,
+                    area: (levelName.indexOf("1") != -1) ? 13 : 24,
                 })) {
                 return true;
             }
@@ -979,6 +979,109 @@ let 唤醒 = {
         return true;
 
     },
+    检查更新(test) {
+        if(!setting.update||!setting.update.checked){
+            console.warn("自动进行游戏更新："+(setting.update&&setting.update.checked))
+            return false;
+        }
+        tool.Floaty_emit("展示文本", "状态", "状态：检查是否需要更新");
+        if (setting.update.usingTraffic) {
+            //用于确认方舟流量热更新
+            ITimg.picture("基建_离开", {
+                timing: 5000,
+                action: 0,
+                area: "右半屏",
+            });
+            return
+        }
+        if (test || ITimg.ocr(displayText["当前"], {
+                area: 12,
+                action: 1,
+                part: true,
+            }) || ITimg.ocr(displayText["客户端"], {
+                area: 12,
+                action: 1,
+                part: true,
+                refresh: false,
+            }) || ITimg.ocr(displayText["已过时"], {
+                area: 12,
+                action: 1,
+                part: true,
+            })) {
+            tool.Floaty_emit("展示文本", "状态", "状态：客户端已过时");
+            textContains(displayText["更新"]).waitFor();
+            tool.Floaty_emit("展示文本", "状态", "状态：从TapTap更新明日方舟");
+            //查找点击Tap更新应用按钮
+            let update_app = (textMatches(displayText["更新"] + '.*?(MB|G)').findOne(2000) || textStartsWith(displayText["更新"]).findOne(2000));
+            if (update_app) {
+                if (!update_app.clickable() || !update_app.click()) {
+                    update_app = update_app.bounds();
+                    click(update_app.centerX(), update_app.centerY());
+
+                };
+            };
+            console.info("更新App按钮参数：\n" + update_app)
+            if (setting.update.usingTraffic) {
+                let usingTraffic = textStartsWith(displayText["立即下载"]).findOne(3000);
+                if (usingTraffic) {
+                    if (!usingTraffic.clickable() || !usingTraffic.click()) {
+                        usingTraffic = usingTraffic.bounds();
+                        click(usingTraffic.centerX(), usingTraffic.centerY())
+                    }
+                }
+                console.info("使用流量下载按钮参数：\n" + usingTraffic);
+            }
+            desc(displayText["安装"]).waitFor();
+            let install_app = desc(displayText["安装"]).findOne();
+            if (!install_app.clickable() || !install_app.click()) {
+                install_app = install_app.bounds();
+                click(install_app.centerX(), install_app.centerY());
+            };
+
+            console.info("安装应用按钮参数：\n" + install_app);
+            //使用系统应用管理组件安装
+            sleep(1000);
+            let assembly = id("android:id/text1").className("android.widget.TextView").findOne(1000);
+            if (!assembly.clickable() || !assembly.click()) {
+                assembly = assembly.bounds();
+                click(assembly.centerX(), assembly.centerY());
+            };
+
+            sleep(3000);
+            textMatches(displayText["确认安装合集"]).waitFor();
+            let ii = 1;
+            while (true) {
+
+                install_app = textMatches(displayText["确认安装合集"]).findOne();
+                if (!install_app.clickable() || !install_app.click()) {
+                    install_app = install_app.bounds();
+                    click(install_app.centerX(), install_app.centerY());
+                };
+                if (install_app) {
+                    console.info("安装应用第" + ii + "步按钮:\n" + install_app);
+                    ii++;
+
+                };
+                install_app = (textMatches(displayText["安装完成合集"]).classNameMatches("(android.widget.Button|android.widget.TextView|android.view.View)").findOne(500) || descMatches(displayText["安装完成合集"]).classNameMatches("(android.widget.Button|android.widget.TextView|android.view.View)").findOne(500));
+                if (install_app) {
+                    if (!install_app.clickable() || !install_app.click()) {
+                        install_app = install_app.bounds();
+                        click(install_app.centerX(), install_app.centerY());
+                    };
+                    break;
+                }
+
+            }
+
+            console.warn("更新安装应用完成");
+            启动应用(true);
+            return true;
+
+        };
+
+
+
+    },
     确认返回主页() {
         tool.Floaty_emit("展示文本", "状态", "状态：确认主界面并重连");
         if (ITimg.picture("终端", {
@@ -1050,12 +1153,13 @@ let 唤醒 = {
                     action: 0,
                     area: "下半屏",
                 })) {
-                //用于确认方舟流量热更新
-                ITimg.picture("基建_离开", {
-                    timing: 5000,
-                    action: 0,
-                    area: "右半屏",
-                });
+                this.检查更新();
+                //防止特殊情况下，检查更新未识别到客户端已过时，下面的点击命令又执行了，跳转到商店要更新的情况
+                if (textContains(displayText["更新"]).findOne(500)) {
+                    this.检查更新(true);
+                    continue;
+                };
+
                 click(height / 2, width - 100);
                 sleep(1000);
                 getpackage = tool.currentPackage();

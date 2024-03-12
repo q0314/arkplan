@@ -192,7 +192,28 @@ ui.layout(
                                     <img id="gamestxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
                                 </frame>
                             </card>
+                         <horizontal margin="10 0" padding="15 5 1 5" id="automaticUpdate_" gravity="center">
+                                <vertical layout_weight="1" >
+                                    <text text="{{language['automaticUpdate']}}" textColor="black" textSize="18sp" />
+                                      <text text="{{language['automaticUpdate-explain']}}" textColor="#95000000" textSize="10sp" marginTop="2" />
+                            
+                                </vertical>
+                                <widget-switch-se7en id="automaticUpdate" layout_gravity="center" padding="5 5"
+                                    margin="10 0" thumbSize='24' radius='24' />
 
+                            </horizontal>
+                       
+                           <horizontal margin="10 0" padding="15 5 1 5" id="usingTraffic_" gravity="center" >
+                                <vertical layout_weight="1" >
+                                    <text text="{{language['usingTraffic']}}" textColor="black" textSize="18sp" />
+                            
+                                </vertical>
+                                <widget-switch-se7en id="usingTraffic" layout_gravity="center" padding="5 5"
+                                    margin="10 0" thumbSize='24' radius='24' />
+
+                            </horizontal>
+                            
+                            
                             <horizontal margin="10 0" padding="15 5 1 5" gravity="center">
                                 <vertical layout_weight="2" >
                                     <text text="{{language['OCRExtensions-type']}}" textColor="black" textSize="18sp" />
@@ -870,6 +891,27 @@ ui.games.on("click", (checked) => {
 ui.gamestxt.on("click", () => {
     提示(ui.games);
 });
+
+ui.automaticUpdate.on("click",(view)=>{
+     ui.usingTraffic_.setVisibility(view.checked ? 0:8);
+    if(!setting.update){
+        setting.update = {};
+    }
+    setting.update.checked = view.checked;
+    tool.writeJSON("update",setting.update);
+})
+ui.automaticUpdate_.on("click",(view)=>{
+    ui.automaticUpdate.performClick();
+});
+
+ui.usingTraffic.on("click",(view)=>{
+        setting.update.usingTraffic = view.checked;
+    tool.writeJSON("update",setting.update);
+});
+ui.usingTraffic_.on("click",()=>{
+    ui.usingTraffic.performClick();
+});
+
 //桌面
 ui._home.on("click", (view) => {
     setting.end_action.home = view.checked
@@ -1794,7 +1836,11 @@ function update_ui() {
     ui.run(() => {
         ui.button_pause.setText(setting.监听键);
         ui.button_pause.setBackground(createShape(5, 0, 0, [2, theme.bar]));
-
+       
+       ui.automaticUpdate.checked =(setting.update && setting.update.checked ? true : false)
+        ui.usingTraffic_.setVisibility(setting.update && setting.update.checked ? 0 : 8);
+        ui.usingTraffic.checked = (setting.update && setting.update.usingTraffic ? true : false);
+        
         ui.OCRExtensions_type.setText(setting.defaultOcr ? setting.defaultOcr : 'undefined');
         ui.OCRExtensions_type.setBackground(createShape(5, 0, 0, [2, theme.bar]));
         ui.OCRCorrection_rules.setBackground(createShape(5, 0, 0, [2, theme.bar]));
@@ -1821,7 +1867,7 @@ function update_ui() {
         ui.indxj.setVisibility(setting.企鹅统计 ? 0 : 8)
         ui.jsjt.checked = setting.汇报上传 ? true : false;
         ui.offset.checked = setting.offset ? true : false;
-
+       
         try {
             let appOpsManager = context.getSystemService(context.APP_OPS_SERVICE);
             ui.PROJECT_MEDIA.checked = (appOpsManager.checkOpNoThrow(appOpsManager.OPSTR_PROJECT_MEDIA, android.os.Process.myUid(), packageName) == appOpsManager.MODE_ALLOWED);
