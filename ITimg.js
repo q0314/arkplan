@@ -672,11 +672,11 @@ function ocr文字识别(words, list) {
 
         }
 
-
-        if (!list.gather) ITimg.results = ITimg[list.ocr_type + "_module"].detect((list.picture || captureScreen_()), {
+        if (!list.gather) ITimg.results = ITimg[list.ocr_type + "_module"].detect((list.picture || bnn), {
             "region": list.area,
             "rectify_json_path": list.correction_path,
         });
+        
         if (list.action == 6) {
             return ITimg.results;
         }

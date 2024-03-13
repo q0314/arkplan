@@ -2,16 +2,16 @@ importClass(android.content.ComponentName);
 runtime.unloadDex('./lib/java/nlp-hanzi-similar-1.3.0.dex');
 runtime.loadDex('./lib/java/nlp-hanzi-similar-1.3.0.dex');
 
-let tool = require("./modules/tool.js");
-let setting = tool.readJSON("configure");
+var tool = require("./modules/tool.js");
+var setting = tool.readJSON("configure");
 let path_ = context.getExternalFilesDir(null).getAbsolutePath();
-let {
+var {
     getWidthHeight,
     iStatusBarHeight,
     isHorizontalScreen,
 } = require('./modules/__util__.js');
 //保存对比图后的返回值,保存当前线程
-let agent = 0,
+var agent = 0,
     /**
      * 在线程中运行重要逻辑可以避免events无法监听通知
      */
@@ -20,9 +20,9 @@ let agent = 0,
     Material_data,
     Material_await,
     recruit_tag = [];
-let height = getWidthHeight()[1],
-    width = getWidthHeight()[0];
-console.info("宽：" + width + "，高：" + height + "。是否横屏：" + isHorizontalScreen())
+var height = getWidthHeight()[0],
+    width = getWidthHeight()[1];
+console.info("宽：" + width + "，高：" + height + "。是否横屏：" + isHorizontalScreen());
 
 if (setting.坐标) {
     setScreenMetrics(width, height);
@@ -30,7 +30,7 @@ if (setting.坐标) {
 
 
 
-let zox = (value) => {
+var zox = (value) => {
         return Math.floor((height / 2340) * value);
     },
     zoy = (value) => {
@@ -70,7 +70,7 @@ if (setting.image_memory_manage) {
 
 
 log("加载图片识别程序");
-let ITimg = require("./ITimg.js"); //读取识图库
+var ITimg = require("./ITimg.js"); //读取识图库
 
 new ITimg.Prepare({}, {
     correction_path: "通用"
