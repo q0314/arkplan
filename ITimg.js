@@ -672,7 +672,7 @@ function ocr文字识别(words, list) {
 
         }
 
-        if (!list.gather) ITimg.results = ITimg[list.ocr_type + "_module"].detect((list.picture || bnn), {
+        if (!list.gather) ITimg.results = ITimg[list.ocr_type + "_module"].detect((list.picture || captureScreen_()), {
             "region": list.area,
             "rectify_json_path": list.correction_path,
         });
