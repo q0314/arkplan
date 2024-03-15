@@ -61,16 +61,20 @@ module.exports = {
         /**
          * 返回分辨率宽，高
          * 跟随屏幕方向变化
+         * 不好用，在某些系统上获取到的分辨率与测试机获取到的完全相反
+         * 其次，也有些系统获取到的状态栏高度好像是0，
          */
         function() {
             //方法1
             let wPixel = _resources_.getDisplayMetrics().widthPixels;
             let hPixel = _resources_.getDisplayMetrics().heightPixels;
+            
             if (wPixel > hPixel) {
                 wPixel += this.iStatusBarHeight;
             } else {
                 hPixel += this.iStatusBarHeight;
-            }
+            };
+            
             return [wPixel, hPixel];
 
         },

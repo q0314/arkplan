@@ -3021,14 +3021,22 @@ threads.start(function () {
     sleep(500);
     switch (web_set.homepage) {
         case 1:
-            Update_UI(1)
-            Update_UI(2)
+            try{
+            Update_UI(1);
+            Update_UI(2);
+            }catch(e){
+                console.error(e);
+            };
             break
-        case 2:
-            Update_UI(2)
-            Update_UI(1)
-            break
-    }
+        case 2:;
+            try{
+            Update_UI(2);
+            Update_UI(1);
+            }catch(e){
+                console.error(e);
+            };
+            break;
+    };
 
     setInterval(function () {
 

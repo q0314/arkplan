@@ -10,7 +10,7 @@ var {
     iStatusBarHeight,
     isHorizontalScreen,
 } = require('./modules/__util__.js');
-//保存对比图后的返回值,保存当前线程
+
 var agent = 0,
     /**
      * 在线程中运行重要逻辑可以避免events无法监听通知
@@ -20,21 +20,25 @@ var agent = 0,
     Material_data,
     Material_await,
     recruit_tag = [];
-var height = getWidthHeight()[0],
-    width = getWidthHeight()[1];
-console.info("宽：" + width + "，高：" + height + "。是否横屏：" + isHorizontalScreen());
+var height = device.height,
+    width = device.width;
 
-if (setting.坐标) {
-    setScreenMetrics(width, height);
+if (height < width || setting.模拟器) {
+    height = device.width,
+        width = device.height;
+} else {
+    if (setting.坐标) {
+        setScreenMetrics(width, height);
+    };
 };
 
 
 
 var zox = (value) => {
-        return Math.floor((height / 2340) * value);
+        return Math.floor((height / 2712) * value);
     },
     zoy = (value) => {
-        return Math.floor((width / 1080) * value);
+        return Math.floor((width / 1220) * value);
     };
 var displayText = JSON.parse(
     files.read("./lib/game_data/displayText.json", (encoding = "utf-8"))
@@ -60,6 +64,8 @@ events.on("暂停", function(words) {
     threads.shutDownAll();
     exit();
 });
+
+console.info("设备宽：" + width + "，高：" + height + "。是否横屏：" + isHorizontalScreen());
 
 let Combat_report = require("./subview/Combat_report.js");
 if (setting.image_memory_manage) {
@@ -294,27 +300,33 @@ let collection = {
 
 
                 if (this.staging) {
+                    if (setting.调试) {
+                        tool.pointerPositionDisplay(true)
+                    }
+
                     switch (affairs) {
                         case displayText["主题曲"]:
-                            click(this.staging.right + zox(150), this.staging.bottom);
-                            click(this.staging.right + zox(150) * 1, this.staging.bottom);
+                            click(this.staging.right + zox(180), this.staging.bottom);
+                            click(this.staging.right + zox(180) * 1, this.staging.bottom);
                             break;
                         case "插曲":
-                            click(this.staging.right + zox(150) * 3, this.staging.bottom);
-                            click(this.staging.right + zox(150) * 4, this.staging.bottom);
+                            click(this.staging.right + zox(180) * 3, this.staging.bottom);
+                            click(this.staging.right + zox(180) * 4, this.staging.bottom);
                             break;
                         case displayText["资源收集"]:
-                            click(this.staging.right + zox(150) * 7, this.staging.bottom);
-                            click(this.staging.right + zox(150) * 8, this.staging.bottom);
-                            log(this.staging.right + zox(150) * 7)
+                            click(this.staging.right + zox(180) * 7, this.staging.bottom);
+                           click(this.staging.right + zox(180) * 8, this.staging.bottom);
+                          //  log((this.staging.right + zox(180) * 7));
+                           // log(this.staging.right + zox(180) * 8);
+
                             break;
                         case displayText["常态事务"]:
-                            click(this.staging.right + zox(150) * 9, this.staging.bottom);
-                            //   click(this.staging.right + zox(150) * 10, this.staging.bottom);
+                            click(this.staging.right + zox(180) * 9, this.staging.bottom);
+                          click(this.staging.right + zox(180) * 10, this.staging.bottom);
                             break;
                         case displayText["长期探索"]:
-                            click(this.staging.right + zox(150) * 11, this.staging.bottom);
-                            //  click(this.staging.right + zox(150) * 12, this.staging.bottom);
+                            click(this.staging.right + zox(180) * 11, this.staging.bottom);
+                             click(this.staging.right + zox(180) * 12, this.staging.bottom);
                             break;
                     }
                 } else {
@@ -330,6 +342,9 @@ let collection = {
                             break;
                     }
                 };
+                if (setting.调试) {
+                    tool.pointerPositionDisplay(false)
+                }
                 sleep(1000);
                 console.info("尝试退出事务切换");
                 // if(this.staging&&ITimg.results.length <= 0){
@@ -546,14 +561,14 @@ let collection = {
                     timing: 2000,
                     area: "右半屏",
                 })) {
-                click(height - 60, width - 30);
+                click(height - zox(60), width - zoy(30));
                 sleep(1000);
                 if (!ITimg.picture("上次_龙门外环", {
                         action: 0,
                         timing: 2000,
                         area: "右半屏",
                     })) {
-                    click(height - 120, width - 30);
+                    click(height - zox(120), width - zoy(30));
                     sleep(1000);
 
                     if (!ITimg.picture("上次_龙门外环", {
@@ -967,10 +982,9 @@ let 唤醒 = {
         if (this.确认返回主页()) {
             this.取消公告();
             return true;
-        }
+        };
         启动应用(true);
         click(height / 2, width - 100);
-
         sleep(2000);
         this.开始唤醒();
         sleep(500);
@@ -980,8 +994,8 @@ let 唤醒 = {
 
     },
     检查更新(test) {
-        if(!setting.update||!setting.update.checked){
-            console.warn("自动进行游戏更新："+(setting.update&&setting.update.checked))
+        if (!setting.update || !setting.update.checked) {
+            console.warn("自动进行游戏更新：" + (setting.update && setting.update.checked))
             return false;
         }
         tool.Floaty_emit("展示文本", "状态", "状态：检查是否需要更新");
@@ -994,15 +1008,10 @@ let 唤醒 = {
             });
             return
         }
-        if (test || ITimg.ocr(displayText["当前"], {
+        if (test || ITimg.ocr(displayText["客户端"], {
                 area: 12,
                 action: 1,
                 part: true,
-            }) || ITimg.ocr(displayText["客户端"], {
-                area: 12,
-                action: 1,
-                part: true,
-                refresh: false,
             }) || ITimg.ocr(displayText["已过时"], {
                 area: 12,
                 action: 1,
@@ -1111,11 +1120,18 @@ let 唤醒 = {
                 }
             }
             if (setting.调试) {
-                images.save(ITimg.captureScreen_(), path_ + "/captureScreen/唤醒主页.png");
+                let pngPtah = path_ + "/captureScreen/唤醒主页.png";
+                files.ensureDir(pngPtah);
+                images.save(ITimg.captureScreen_(), pngPtah);
                 console.verbose("已进入主页,无需重复.");
             }
             return true;
         };
+        ITimg.picture("关闭公告", {
+            timing: 2000,
+            action: 0,
+            area: "上半屏",
+        });
         //返回到主页
         if (ITimg.picture("导航", {
                 timing: 1500,
@@ -1137,7 +1153,9 @@ let 唤醒 = {
                 });
             };
             if (setting.调试) {
-                images.save(ITimg.captureScreen_(), path_ + "/captureScreen/唤醒主页.png");
+                let pngPtah = path_ + "/captureScreen/唤醒主页.png";
+                files.ensureDir(pngPtah);
+                images.save(ITimg.captureScreen_(), pngPtah);
                 console.verbose("已进入主页,无需重复..");
             }
             return true;
@@ -1159,7 +1177,6 @@ let 唤醒 = {
                     this.检查更新(true);
                     continue;
                 };
-
                 click(height / 2, width - 100);
                 sleep(1000);
                 getpackage = tool.currentPackage();
@@ -1176,7 +1193,8 @@ let 唤醒 = {
                     sleep(2000);
                     click(height / 2, width - 100);
                     break;
-                }
+                };
+
                 if (this.确认返回主页()) {
                     break
                 };

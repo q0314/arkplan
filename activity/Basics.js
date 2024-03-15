@@ -524,6 +524,14 @@ ui.layout(
                                 gravity="center|left" textSize='16sp' textColor='{{theme.bar}}'>
                             </text>
 
+                            <horizontal margin="10 0" padding="15 5 1 5" id="debugging_" >
+                                <vertical layout_weight="1" >
+                                    <text text="调试信息" textColor="black" textSize="18sp" />
+                                </vertical>
+                                <widget-switch-se7en id="debugging" layout_gravity="center" padding="5 5" textSize="18sp"
+                                    margin="10 0" thumbSize='24' radius='24' />
+                            </horizontal>
+                            
                             <card w="*" id="cett" h="40" foreground="?selectableItemBackground">
                                 <text text="开发人员代码测试" padding="15 8 15 5" textSize="18sp"
                                     margin="10 0" textColor="#000000" />
@@ -1830,6 +1838,10 @@ ui.OCRCorrection_rules.on('click', (view) => {
         }
     })
 });
+
+ui.debugging.click((view)=>{
+    tool.writeJSON("调试",view.checked);
+})
 update_ui()
 
 function update_ui() {
@@ -1867,7 +1879,7 @@ function update_ui() {
         ui.indxj.setVisibility(setting.企鹅统计 ? 0 : 8)
         ui.jsjt.checked = setting.汇报上传 ? true : false;
         ui.offset.checked = setting.offset ? true : false;
-       
+       ui.debugging.checked = setting.调试 ? true : false;
         try {
             let appOpsManager = context.getSystemService(context.APP_OPS_SERVICE);
             ui.PROJECT_MEDIA.checked = (appOpsManager.checkOpNoThrow(appOpsManager.OPSTR_PROJECT_MEDIA, android.os.Process.myUid(), packageName) == appOpsManager.MODE_ALLOWED);

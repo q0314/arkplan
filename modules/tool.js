@@ -12,7 +12,7 @@ var wuzhangai = false;
 importClass(android.content.pm.PackageManager);
 try {
     importClass(android.provider.Settings);
-} catch (err) { }
+} catch (err) {}
 
 
 /**
@@ -292,12 +292,12 @@ function checkPermission(permission) {
 
 
 /**
-* 设置对话框背景颜色,圆角
-* @param {object} view - 视图对象
-* @param {object} list 
-* @param {number} [list.radius = 30] - 对话框圆角
-* @param {string} [list.bg = "#eff0f4"] - 对话框背景色
-*/
+ * 设置对话框背景颜色,圆角
+ * @param {object} view - 视图对象
+ * @param {object} list 
+ * @param {number} [list.radius = 30] - 对话框圆角
+ * @param {string} [list.bg = "#eff0f4"] - 对话框背景色
+ */
 function setBackgroundRoundRounded(view, list) {
     if (list == undefined) {
         list = {}
@@ -321,7 +321,7 @@ function dialog_tips(title, text, src) {
             <linear orientation="horizontal" align="left" margin="0" paddingTop="0">
                 <img src="@drawable/ic_info_outline_black_48dp" id="src" w="25" h="25" margin="18 0 2 0" tint="#000000" gravity="left" />
                 <text text="" id="title" textSize="15sp" textStyle="bold"
-                    layout_gravity="center" margin="0 0 0 0" textColor="#000000" />
+                layout_gravity="center" margin="0 0 0 0" textColor="#000000" />
             </linear>
             <text id="tip" textSize="12sp" margin="20 5 20 10" textColor="#000000" autoLink="all" />
         </vertical>, null, false);
@@ -483,9 +483,9 @@ function launchPackage(package) {
 }
 
 /**
-  * 过滤非法文件名字符
-  * @param {string} - 文件名
-  */
+ * 过滤非法文件名字符
+ * @param {string} - 文件名
+ */
 function formatFileName(fileName) {
     //importClass(java.util.regex.Pattern);
     let pattern = Pattern.compile("[\\s\\\\/:\\*\\?\\\"<>\\|]");
@@ -494,6 +494,7 @@ function formatFileName(fileName) {
 };
 
 let hanZiSimilarBridge = null;
+
 function nlpSimilarity(s1, s2) {
     if (!hanZiSimilarBridge) {
         // @ts-expect-error dex包
@@ -505,14 +506,34 @@ function nlpSimilarity(s1, s2) {
             files.read(files.cwd() + '/lib/java/nlp/sijiao.txt'),
             files.read(files.cwd() + '/lib/java/nlp/userdefine.txt')
         );
-      //  log(files.cwd())
+        //  log(files.cwd())
         log("初始化字形计算\n字符串1：" + s1 + "\n字符串2：" + s2 + "\n相似度：" + hanZiSimilarBridge.similarity(s1, s2));
     }
-    /*let result =*/ return hanZiSimilarBridge.similarity(s1, s2);
+    /*let result =*/
+    return hanZiSimilarBridge.similarity(s1, s2);
     //console.log('result=${result}');
     // return result;
 };
 
+function pointerPositionDisplay(open) {
+    let state;
+    try {
+        state = Settings.System.getInt(context.getContentResolver(), Settings.System.POINTER_LOCATION)
+    } catch (e) {
+        console.error(e)
+        state = shell("su -c 'settings get system pointer_location'", {
+            adb: $shell.checkAccess("adb")
+        }).result;
+        log(state);
+    };
+    if (open && state) return true;
+    if (open===false && !state) return true;
+    if (shell("su -c 'settings put system pointer_location " + (state ? "0" : "1") + "'", {
+            adb: $shell.checkAccess("adb")
+        }).code == 0) {
+        return true;
+    }
+}
 let tool = {}
 tool.nlpSimilarity = nlpSimilarity;
 tool.Floaty_emit = Floaty_emit;
@@ -527,6 +548,7 @@ tool.currentPackage = getPackage;
 tool.launchPackage = launchPackage;
 tool.formatFileName = formatFileName;
 tool.checkPermission = checkPermission;
+tool.pointerPositionDisplay = pointerPositionDisplay;
 try {
     module.exports = tool;
 } catch (e) {
