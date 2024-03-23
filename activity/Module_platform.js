@@ -746,8 +746,8 @@ function modular_id(file) {
                 //    tool.writeJSON("关闭应用", file);
                 break;
             case '基建换班':
-                tool.writeJSON("基建换班", true);
-                //  tool.writeJSON("换班路径", file);
+               // tool.writeJSON("基建换班", true);
+               //   tool.writeJSON("换班路径", file);
                 break;
             default:
                 snakebar("未匹配到相应模块id，非标准插件模块，请参考其他相关示例模块修改")

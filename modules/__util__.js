@@ -40,7 +40,7 @@ module.exports = {
             let ori;
 
             try {
-                ori = context.getSystemService(context.WINDOW_SERVICE).getDefaultDisplay().getRotation();
+                ori = this.getRotation();
                 //0竖屏 1横屏
                 return ori
             } catch (e) {
@@ -57,6 +57,9 @@ module.exports = {
 
 
         },
+    getRotation: function() {
+        return context.getSystemService(context.WINDOW_SERVICE).getDefaultDisplay().getRotation();
+    },
     getWidthHeight:
         /**
          * 返回分辨率宽，高
@@ -66,15 +69,15 @@ module.exports = {
          */
         function() {
             //方法1
-            let wPixel = _resources_.getDisplayMetrics().widthPixels;
-            let hPixel = _resources_.getDisplayMetrics().heightPixels;
-            
+            let wPixel = this.getWidthPixels();
+            let hPixel = this.getHeightPixels();
+
             if (wPixel > hPixel) {
-                wPixel += this.iStatusBarHeight;
+                wPixel += this.iStatusBarHeight();
             } else {
-                hPixel += this.iStatusBarHeight;
+                hPixel += this.iStatusBarHeight();
             };
-            
+
             return [wPixel, hPixel];
 
         },
@@ -113,10 +116,17 @@ module.exports = {
     resources: _resources_,
     // log(context.getDisplay)
     //context.getSystemService(context.WINDOW_SERVICE).getDefaultDisplay().getHeight();
+    // getRotation:activity.getWindowManager().getDefaultDisplay().getRotation(),
 
-    getWidthPixels: _resources_.getDisplayMetrics().widthPixels,
-    getHeightPixels: _resources_.getDisplayMetrics().heightPixels,
-    iStatusBarHeight: _resources_.getDimensionPixelSize(_resources_.getIdentifier("status_bar_height", "dimen", "android")),
+    getWidthPixels() {
+        return _resources_.getDisplayMetrics().widthPixels;
+    },
+    getHeightPixels() {
+        return _resources_.getDisplayMetrics().heightPixels;
+    },
+    iStatusBarHeight() {
+        return _resources_.getDimensionPixelSize(_resources_.getIdentifier("status_bar_height", "dimen", "android"));
+    },
 };
 
 /**

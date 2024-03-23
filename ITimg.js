@@ -182,8 +182,17 @@ function 申请截图() {
 
         sleep(200);
         try {
-            console.warn("开始请求辅助截图权限\n----------如一直卡住请打开后台弹出界面权限")
-            if (!requestScreenCapture(isHorizontalScreen() ?  width < height:height > width)) {
+            function direction() {
+                let WidthHeight = getWidthHeight();
+                console.warn("屏幕宽:" + WidthHeight[0] + "屏幕高:" + WidthHeight[1] + "\n----------------开始请求辅助截图权限\n--------------如一直卡住请打开后台弹出界面权限");
+                if (getRotation() == 0) {
+                    return WidthHeight[0] < WidthHeight[1];
+                } else {
+                    return WidthHeight[0] > WidthHeight[1];
+                }
+
+            }
+            if (!requestScreenCapture(direction())) {
 
                 //if (!requestScreenCapture({
                 //    orientation: setting.模拟器 ? 1 : 2,
@@ -370,7 +379,7 @@ function scaleSet(splitScreen, tuku_de, value) {
  * @param {string | number | ObjectArray} [list.area = "全屏"] - 找图识别区域, 全屏从中划分四角, 1:左上角,2:右上角,3左下角,4:右下角, 可组合
  * @param {number} [list.nods = 0] - 找不到后等待时间
  * @param {object} [list.picture = ITimg.captureScreen_()] - 在指定大图中识别
- * @param {boolean} [list.grayscale = undefined] - 灰度化图片
+ * @param {number|boolean} [list.grayscale = undefined] - 灰度化图片,1为大图，2为小图
  * @param {boolean|string} [list.log_policy = undefined] - 识别结果日志打印策略 - true:不显示
  * @param {Number} [list.threshold = 0.8] - 图片相似度 - 0.8
  * @param {boolean} [list.resolution = false] - 使用多分辨率兼容找图 - false
@@ -397,9 +406,9 @@ function 图像匹配(picture, list) {
         matchTemplate_max: list.matchTemplate_max,
     }
 
-    var img;
+    let img;
 
-    var imgList = list.picture || captureScreen_();
+    let imgList = list.picture || captureScreen_();
 
     let img_small;
     let small_image_catalog = (list.small_image_catalog || ITimg.default_list.picture.small_image_catalog) + picture + ".png";
@@ -424,11 +433,21 @@ function 图像匹配(picture, list) {
 
     if (list.grayscale) {
         // 灰度化
-        let gray = images.grayscale(img_small);
-        img_small.recycle()
+        let gray = images.grayscale((list.grayscale == 1 ? imgList : img_small));
+        (list.grayscale == 1 ? imgList : img_small).recycle();
         // 重要！灰度化后，图片从argb四通道变成了单通道
         //因此，需要转换为四通道才能用于找图
-        img_small = images.cvtColor(gray, "GRAY2BGRA");
+        if (list.grayscale == 1) {
+            imgList = images.cvtColor(gray, "GRAY2BGRA");
+        } else {
+            img_small = images.cvtColor(gray, "GRAY2BGRA");
+        };
+
+        if (setting.调试) {
+            let pngPtah = path_ + "/captureScreen/灰度化-" + list.grayscale + "-" + picture + ".png";
+            files.ensureDir(pngPtah);
+            images.save((list.grayscale == 1 ? imgList : img_small), pngPtah);
+        }
         gray.recycle();
     }
 
@@ -676,7 +695,7 @@ function ocr文字识别(words, list) {
             "region": list.area,
             "rectify_json_path": list.correction_path,
         });
-        
+
         if (list.action == 6) {
             return ITimg.results;
         }

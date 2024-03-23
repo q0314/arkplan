@@ -334,7 +334,7 @@ let gallery = {
             tukuui.dwh.setVisibility(0);
             tukuui.Tips.setText(" 请更换与设备分辨率较为接近的图库\n 例：设备分辨率2160x1080可用2340x1080图库 ");
 
-            tukuui.tukulb.setDataSource(tukuss);
+            if(tukuss) tukuui.tukulb.setDataSource(tukuss);
         } catch (e) {
             console.error(e)
             //tukuds.dismiss()

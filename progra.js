@@ -6,6 +6,7 @@ var tool = require("./modules/tool.js");
 var setting = tool.readJSON("configure");
 let path_ = context.getExternalFilesDir(null).getAbsolutePath();
 var {
+    getRotation,
     getWidthHeight,
     iStatusBarHeight,
     isHorizontalScreen,
@@ -23,7 +24,7 @@ var agent = 0,
 var height = device.height,
     width = device.width;
 
-if (height < width || setting.模拟器) {
+if (width > height || setting.模拟器) {
     height = device.width,
         width = device.height;
 } else {
@@ -31,7 +32,7 @@ if (height < width || setting.模拟器) {
         setScreenMetrics(width, height);
     };
 };
-
+console.info("设备宽：" + width + "，高：" + height + "。是否横屏：" + isHorizontalScreen());
 
 
 var zox = (value) => {
@@ -65,7 +66,6 @@ events.on("暂停", function(words) {
     exit();
 });
 
-console.info("设备宽：" + width + "，高：" + height + "。是否横屏：" + isHorizontalScreen());
 
 let Combat_report = require("./subview/Combat_report.js");
 if (setting.image_memory_manage) {
@@ -81,6 +81,9 @@ var ITimg = require("./ITimg.js"); //读取识图库
 new ITimg.Prepare({}, {
     correction_path: "通用"
 });
+
+
+
 //images.save(ITimg.captureScreen_(),"./nn.png");
 
 var taglb;
@@ -315,18 +318,18 @@ let collection = {
                             break;
                         case displayText["资源收集"]:
                             click(this.staging.right + zox(180) * 7, this.staging.bottom);
-                           click(this.staging.right + zox(180) * 8, this.staging.bottom);
-                          //  log((this.staging.right + zox(180) * 7));
-                           // log(this.staging.right + zox(180) * 8);
+                            click(this.staging.right + zox(180) * 8, this.staging.bottom);
+                            //  log((this.staging.right + zox(180) * 7));
+                            // log(this.staging.right + zox(180) * 8);
 
                             break;
                         case displayText["常态事务"]:
                             click(this.staging.right + zox(180) * 9, this.staging.bottom);
-                          click(this.staging.right + zox(180) * 10, this.staging.bottom);
+                            click(this.staging.right + zox(180) * 10, this.staging.bottom);
                             break;
                         case displayText["长期探索"]:
                             click(this.staging.right + zox(180) * 11, this.staging.bottom);
-                             click(this.staging.right + zox(180) * 12, this.staging.bottom);
+                            click(this.staging.right + zox(180) * 12, this.staging.bottom);
                             break;
                     }
                 } else {
@@ -882,12 +885,17 @@ function 自定义() {
 }
 
 function 关闭应用(getmode, getstate) {
-    tool.Floaty_emit("展示文本", "状态", "状态：执行关闭应用中");
     let mod_data = storages.create("modular").get("modular", []);
     try {
 
-        let gbyyan = mod_data.find((item) => item.id == "关闭应用")
+        let gbyyan = mod_data.find((item) => item.id == "关闭应用");
         if (gbyyan) {
+            if (gbyyan.suspend) {
+                console.warn("已暂时停止运行关闭应用模块")
+                return false
+            }
+            tool.Floaty_emit("展示文本", "状态", "状态：执行关闭应用中");
+
             require(gbyyan.path).main_entrance({
                 'cwd': gbyyan.path.replace(files.getName(gbyyan.path), ""),
                 'getSource': gbyyan.path,
@@ -915,26 +923,29 @@ function 关闭应用(getmode, getstate) {
 }
 
 function 基建换班(fatigue_state) {
-    if (setting.基建换班) {
+    let mod_data = storages.create("modular").get("modular", []);
+    let shift = mod_data.find((item) => item.id == "基建换班");
+    if (shift) {
+        if (shift.suspend) {
+            console.warn("已暂停运行基建换班模块")
+            return false;
+        }
         click(height / 2, 50)
         tool.Floaty_emit("展示文本", "状态", "状态：执行基建换班中")
         try {
             ITimg.重置计时器(false);
-            let mod_data = storages.create("modular").get("modular", []);
-            let shift = mod_data.find((item) => item.id == "基建换班");
-            if (shift) {
-                require(shift.path).main_entrance({
-                    //'start_position':value,
-                    'cwd': shift.path.replace(files.getName(shift.path), ""),
-                    'getSource': shift.path,
-                    'ITimg': ITimg,
-                    'get_onstage_package': tool.currentPackage,
-                    'startup_app': 启动应用,
-                    // 'startup_mode':程序,
-                    'fatigue_worker': fatigue_state,
-                });
-                toastLog("基建换班执行完成");
-            }
+            require(shift.path).main_entrance({
+                //'start_position':value,
+                'cwd': shift.path.replace(files.getName(shift.path), ""),
+                'getSource': shift.path,
+                'ITimg': ITimg,
+                'get_onstage_package': tool.currentPackage,
+                'startup_app': 启动应用,
+                // 'startup_mode':程序,
+                'fatigue_worker': fatigue_state,
+            });
+            toastLog("基建换班执行完成");
+
             ITimg.重置计时器(true);
             jijian = null;
 
@@ -948,27 +959,24 @@ function 基建换班(fatigue_state) {
             toast(tips);
             sleep(2000)
         }
-
-        if (!ITimg.picture("导航", {
-                action: 0,
-                timing: 1500,
-                area: "左半屏",
-            })) {
-            ITimg.picture("导航2", {
-                action: 0,
-                timing: 1500,
-                area: "左半屏",
-            })
-        }
-        ITimg.picture("导航_基建", {
-            action: 0,
-            timing: 500,
-            area: "上半屏",
-        });
-    } else {
-        console.info("基建换班" + setting.基建换班)
-
     }
+    if (!ITimg.picture("导航", {
+            action: 0,
+            timing: 1500,
+            area: "左半屏",
+        })) {
+        ITimg.picture("导航2", {
+            action: 0,
+            timing: 1500,
+            area: "左半屏",
+        })
+    }
+    ITimg.picture("导航_基建", {
+        action: 0,
+        timing: 500,
+        area: "上半屏",
+    });
+
 }
 
 /**
@@ -1320,7 +1328,6 @@ function 行动() {
                 break;
                 //   }
             };
-
             if (ITimg.picture("行动_编队确认开始", {
                     action: 5,
                     timing: 1000,
@@ -1910,9 +1917,7 @@ function 跳转_暂停(suspended, status, literals) {
 }
 
 function end_task(status, literals) {
-    if (setting.公告 == true) {
-        关闭应用(setting.执行, status);
-    } else {
+    if (!关闭应用(setting.执行, status)) {
         tool.Floaty_emit("展示文本", "状态", "状态：" + literals);
     }
 
@@ -3338,10 +3343,13 @@ function 基建() {
                 action: 0,
                 timing: 8000,
                 nods: 1500,
+                grayscale: 1,
             }) && !ITimg.picture("访问基建", {
                 action: 0,
+                area: 34,
                 timing: 8000,
                 nods: 1500,
+                grayscale: 1,
             }) && !ITimg.picture("访问基建", {
                 action: 0,
                 timing: 8000
@@ -3886,7 +3894,7 @@ function 等待提交反馈至神经() {
     for (let i in to_match) {
         if (ITimg.ocr(to_match[i], {
                 action: 5,
-                part: true,
+                part: i ? true : false,
                 refresh: false,
                 log_policy: true,
                 timing: 1000,
@@ -4846,6 +4854,12 @@ function 任务() {
                 timing: 1500,
             })) {
             toastLog("找不到返回键");
+        } else {
+            ITimg.picture("基建_离开", {
+                action: 0,
+                area: 4,
+                timing: 6000,
+            });
         }
         toastLog("任务奖励:" + setting.任务奖励)
     }

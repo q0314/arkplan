@@ -39,6 +39,7 @@ if (!files.exists("../c_main.js")) {
 } else {
     edition = "f_"
 }
+
 function zoom(x) {
     return Math.floor((device.width / 1080) * x);
 };
@@ -50,419 +51,419 @@ ui.layout(
     <vertical id='exit'>
         <appbar>
             <toolbar id='toolbar' title='高级设置' bg='{{theme.bar}}' w="*">
-
-
+                
+                
             </toolbar>
-
+            
         </appbar>
         <frame>
             <ScrollView>
                 <vertical>
                     <card w="*" id="indx2" margin="10 3 10 3" h="*" cardCornerRadius="10"
-                        cardElevation="5dp" gravity="center_vertical"  >
-                        <vertical>
-                            <text text='运行配置' margin="10 5 10 0" h="35dp" id="text_bg"
-                                gravity="center|left" textSize='16sp' textColor='{{theme.bar}}'>
-                            </text>
-
-
-
-                            <horizontal margin="10 0" padding="15 5 1 5" gravity="center">
-                                <vertical layout_weight="1" >
-                                    <text text="{{language['button-pause']}}" textColor="black" textSize="18sp" />
-                                    <text text="{{language['button-pause-explain']}}" textColor="#95000000" textSize="10sp" marginTop="2" />
-                                </vertical>
-                                <TextView id="button_pause" padding="5 5" textSize="15sp"
-                                    margin="10 0" textColor="black" />
-                            </horizontal>
-
-                            <horizontal margin="10 0" padding="15 5 1 5" id="auto_allow_screenshots_" >
-                                <vertical layout_weight="1" >
-                                    <text text="{{language['auto-allow-screenshots']}}" textColor="black" textSize="18sp" />
-                                    <text text="{{language['auto-allow-screenshots-explain']}}" textColor="#95000000" textSize="10sp" marginTop="2" />
-                                </vertical>
-                                <widget-switch-se7en id="auto_allow_screenshots" checked="{{setting.autoAllowScreen}}" layout_gravity="center"
-                                    padding="5 5" textSize="18sp" margin="10 0" thumbSize='24' radius='24' />
-                            </horizontal>
-
-
-                            <horizontal margin="10 0" padding="15 5 1 5" id="identify_unusual_pauses_" >
-                                <vertical layout_weight="1" >
-                                    <text text="识别异常超时暂停" textColor="black" textSize="18sp" />
-                                    <text text="程序在6分钟内,剿灭为35分钟.无法判断识别当前前面,或在当前界面连续识别到同一内容50次则暂停程序并返回桌面，有效防止突发意外情况使程序无法识别判断界面，导致设备一直亮屏，温度过高" textColor="#95000000" textSize="10sp" marginTop="2" />
-                                </vertical>
-                                <widget-switch-se7en id="identify_unusual_pauses" layout_gravity="center" padding="5 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                            </horizontal>
-                            <horizontal margin="10 0" padding="15 5 1 5" id="reset_proxy_frequency_" >
-                                <vertical layout_weight="1" >
-                                    <text text="{{language['reset-proxy-frequency']}}" textColor="black" textSize="18sp" />
-                                    <text text="{{language['reset-proxy-frequency-explain']}}" textColor="#95000000" textSize="10sp" marginTop="2" />
-                                </vertical>
-                                <widget-switch-se7en id="reset_proxy_frequency" checked="{{setting.重置代理次数}}" layout_gravity="center" padding="5 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                            </horizontal>
-                            <card w="*" id="indx2" h="40" gravity="center_vertical"  >
-                                <widget-switch-se7en id="agent" text="代理失误放弃行动" checked="false" padding="15 5 15 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                                <frame layout_gravity="right" w="{{zoom(330)}}px" >
-                                    <img id="agenttxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
-                                </frame>
-                            </card>
-
-                            <card w="*" id="indx2" h="40" gravity="center_vertical"  >
-                                <widget-switch-se7en id="gmvp" text="自动关闭媒体音量" checked="false" padding="15 5 15 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                                <frame layout_gravity="right" w="{{zoom(330)}}px" >
-                                    <img id="gmvptxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
-                                </frame>
-                            </card>
-                            <card w="*" id="indx2" h="40" gravity="center_vertical"  >
-                                <widget-switch-se7en id="woie" text="启用剿灭基建收菜" checked="false" padding="15 5 15 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                                <frame layout_gravity="right" w="{{zoom(330)}}px" >
-                                    <img id="woietxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
-                                </frame>
-                            </card>
-                            <card w="*" id="indx2" h="40" gravity="center_vertical"  >
-                                <widget-switch-se7en id="proxy_card_check" text="剿灭优先使用代理卡" checked="false" padding="15 5 15 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-
-                            </card>
-                            <card w="*" id="indx2" h="40" gravity="center_vertical"  >
-                                <widget-switch-se7en id="olrs" text="PRTS辅助记录汇报" checked="false" padding="15 5 15 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                                <frame layout_gravity="right" w="{{zoom(330)}}px" >
-                                    <img id="olrstxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
-                                </frame>
-                            </card>
-
-                            <card w="*" id="indx2" h="40" gravity="center_vertical"  >
-                                <widget-switch-se7en id="qetj" text="企鹅物流数据统计" checked="false" padding="15 5 15 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                                <frame layout_gravity="right" w="{{zoom(330)}}px" >
-                                    <img id="qetjtxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
-                                </frame>
-                            </card>
-                            <card w="*" id="indxj" h="40" gravity="center_vertical"  >
-                                <widget-switch-se7en id="jsjt" text="汇报上传企鹅物流" checked="false" padding="15 5 15 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                                <frame layout_gravity="right" w="{{zoom(330)}}px" >
-                                    <img id="jsjttxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
-                                </frame>
-                            </card>
-                            <card w="*" id="indx7" h="40" foreground="?selectableItemBackground">
-                                <widget-switch-se7en id="dili" text="低电量暂停辅助" checked="false" padding="15 10 15 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' gravity="top|center_vertical"
-                                    radius='24' layout_weight="1" />
-                                <frame layout_gravity="right|center_horizontal" w="{{zoom(330)}}px" h="35" marginTop="5">
-                                    <img id="electrictxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
-                                </frame>
-                                <linear>
-                                    <input id="electric" inputType="number" hint="" lines="1" w="*" margin="30 35 30 0" />
-                                </linear>
-                            </card>
-
-
-
-
-                            <card w="*" id="indx2" h="40" gravity="center_vertical"  >
-                                <widget-switch-se7en id="_home" text="任务结束后返回桌面" checked="false" padding="15 5 15 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-
-                            </card>
-                            <card w="*" id="indx2" h="40" gravity="center_vertical"  >
-                                <widget-switch-se7en id="gfcm" text="确认防沉迷框" checked="false" padding="15 5 15 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                                <frame layout_gravity="right" w="{{zoom(330)}}px" >
-                                    <img id="gfcmtxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
-                                </frame>
-                            </card>
-                            <card w="*" id="indx2" h="40" gravity="center_vertical"  >
-                                <widget-switch-se7en id="vibration" text="启用震动反馈" checked="false" padding="15 5 15 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                                <frame layout_gravity="right" w="{{zoom(330)}}px" >
-                                    <img id="vibrationtxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
-                                </frame>
-                            </card>
-                            <card w="*" id="indx2" h="40" gravity="center_vertical"  >
-                                <widget-switch-se7en id="games" text="自动启动方舟" checked="false" padding="15 5 15 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                                <frame layout_gravity="right" w="{{zoom(330)}}px" >
-                                    <img id="gamestxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
-                                </frame>
-                            </card>
-                         <horizontal margin="10 0" padding="15 5 1 5" id="automaticUpdate_" gravity="center">
-                                <vertical layout_weight="1" >
-                                    <text text="{{language['automaticUpdate']}}" textColor="black" textSize="18sp" />
-                                      <text text="{{language['automaticUpdate-explain']}}" textColor="#95000000" textSize="10sp" marginTop="2" />
-                            
-                                </vertical>
-                                <widget-switch-se7en id="automaticUpdate" layout_gravity="center" padding="5 5"
-                                    margin="10 0" thumbSize='24' radius='24' />
-
-                            </horizontal>
-                       
-                           <horizontal margin="10 0" padding="15 5 1 5" id="usingTraffic_" gravity="center" >
-                                <vertical layout_weight="1" >
-                                    <text text="{{language['usingTraffic']}}" textColor="black" textSize="18sp" />
-                            
-                                </vertical>
-                                <widget-switch-se7en id="usingTraffic" layout_gravity="center" padding="5 5"
-                                    margin="10 0" thumbSize='24' radius='24' />
-
-                            </horizontal>
-                            
-                            
-                            <horizontal margin="10 0" padding="15 5 1 5" gravity="center">
-                                <vertical layout_weight="2" >
-                                    <text text="{{language['OCRExtensions-type']}}" textColor="black" textSize="18sp" />
-                                    <text text="{{language['OCRExtensions-explain']}}" textColor="#95000000" textSize="10sp" marginTop="2" />
-                                </vertical>
-                                <vertical >
-                                    <TextView id="OCRExtensions_type" padding="5 5" textSize="15sp"
-                                        margin="10" textColor="black" lines="1" />
-                                    <TextView id="OCRCorrection_rules" text="{{language['OCRCorrection-rules']}}" padding="5 5" textSize="15sp"
-                                        margin="10 5 10 0" textColor="black" lines="1" gravity="center" />
-                                </vertical>
-                            </horizontal>
-                            <horizontal margin="10 0" padding="15 5 1 5" id="OCRExtensions_" gravity="center">
-                                <vertical layout_weight="1" >
-                                    <text text="{{language['OCRExtensions']}}" textColor="black" textSize="18sp" />
-                                </vertical>
-                                <widget-switch-se7en id="OCRExtensions" layout_gravity="center" padding="5 5"
-                                    margin="10 0" thumbSize='24' radius='24' />
-
-                            </horizontal>
-
-
+                    cardElevation="5dp" gravity="center_vertical"  >
+                    <vertical>
+                        <text text='运行配置' margin="10 5 10 0" h="35dp" id="text_bg"
+                        gravity="center|left" textSize='16sp' textColor='{{theme.bar}}'>
+                    </text>
+                    
+                    
+                    
+                    <horizontal margin="10 0" padding="15 5 1 5" gravity="center">
+                        <vertical layout_weight="1" >
+                            <text text="{{language['button-pause']}}" textColor="black" textSize="18sp" />
+                            <text text="{{language['button-pause-explain']}}" textColor="#95000000" textSize="10sp" marginTop="2" />
                         </vertical>
-                    </card>
-
-
-                    <card w="*" id="indx2" margin="10 3 10 3" h="*" cardCornerRadius="10"
-                        cardElevation="5dp" gravity="center_vertical"  >
-                        <vertical>
-                            <text text='高级功能' margin="10 5 10 0" h="35dp" id="text_bg"
-                                gravity="center|left" textSize='16sp' textColor='{{theme.bar}}'>
-                            </text>
-                            <card w="*" id="indx2" h="40" gravity="center_vertical"  >
-                                <widget-switch-se7en id="sysm" text="自启动无障碍服务" checked="false" padding="15 5 15 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                            </card>
-
-                            <card w="*" id="indxu" h="40" gravity="center_vertical"  >
-                                <widget-switch-se7en id="getu" text="使用高级权限截图" checked="false"
-                                    padding="25 10 25 5" textSize="18sp"
-                                    thumbSize='24' radius='24' gravity="top|center_vertical" />
-                                <frame layout_gravity="right|center_horizontal" w="{{zoom(330)}}px" h="35" marginTop="5">
-                                    <img id="getutxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
-                                </frame>
-                                <radiogroup margin="25 0 10 0" id="gets" visibility="gone"
-                                    gravity="bottom" orientation="horizontal">
-                                    <radio id="Shizuku" text="Shizuku授权" w="auto" />
-                                    <radio id="root" text="root授权" w="auto" h="auto" />
-                                </radiogroup>
-                            </card>
-
-                            <card w="*" id="indxu" h="40" gravity="center_vertical"  >
-                                <widget-switch-se7en id="xpyx" text="启用熄屏运行模块" checked="false"
-                                    padding="25 10 25 5" textSize="18sp"
-                                    thumbSize='24' radius='24' gravity="top|center_vertical" />
-                                <frame layout_gravity="right|center_horizontal" w="{{zoom(330)}}px" h="35" marginTop="5">
-                                    <img id="xpyxtxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
-                                </frame>
-
-                            </card>
-
-                            <card w="*" id="indxc" h="40" foreground="?selectableItemBackground">
-                                <widget-switch-se7en id="custom" text="导入自定义执行模块" checked="false" padding="15 10 15 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' gravity="top|center_vertical"
-                                    radius='24' layout_weight="1" />
-                                <frame layout_gravity="right|center_horizontal" w="{{zoom(330)}}px" h="35" marginTop="5">
-                                    <img id="customtxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
-                                </frame>
-                                <linear>
-                                    <input id="input_c" gravity="bottom" visibility="gone" hint="输入主js模块路径，回车  或→" lines="1" margin="30 35 0 0" layout_weight="1" />
-                                    <button id="input_file3" text="选择文件" margin="0 35 5 0" style="Widget.AppCompat.Button.Borderless.Colored" />
-                                </linear>
-                            </card>
-                            <card w="*" id="indx6" h="40" foreground="?selectableItemBackground">
-                                <widget-switch-se7en id="gbyy" text="导入关闭应用模块" checked="false" padding="15 10 15 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' gravity="top|center_vertical"
-                                    radius='24' layout_weight="1" />
-                                <frame layout_gravity="right|center_horizontal" w="{{zoom(330)}}px" h="35" marginTop="5">
-                                    <img id="gbyytxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
-                                </frame>
-                                <linear>
-                                    <input id="inputgb" gravity="bottom" visibility="gone" hint="输入主js模块路径，回车  或→" lines="1" margin="30 35 0 0" layout_weight="1" />
-                                    <button id="input_file" text="选择文件" margin="0 35 5 0" style="Widget.AppCompat.Button.Borderless.Colored" />
-                                </linear>
-                            </card>
-                            <card w="*" id="indx4" h="40" foreground="?selectableItemBackground">
-                                <widget-switch-se7en id="jjhb" text="导入基建换班模块" checked="false" padding="15 10 15 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' gravity="top|center_vertical"
-                                    radius='24' layout_weight="1" />
-                                <frame layout_gravity="right|center_horizontal" w="{{zoom(330)}}px" h="35" marginTop="5">
-                                    <img id="jjhbtxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
-                                </frame>
-                                <linear>
-                                    <input id="inputd2" gravity="bottom" visibility="gone" hint="输入主js模块路径，回车  或→" lines="1" margin="30 35 0 0" layout_weight="1" />
-                                    <button id="input_file2" text="选择文件" margin="0 35 5 0" style="Widget.AppCompat.Button.Borderless.Colored" />
-                                </linear>
-                            </card>
-
-
+                        <TextView id="button_pause" padding="5 5" textSize="15sp"
+                        margin="10 0" textColor="black" />
+                    </horizontal>
+                    
+                    <horizontal margin="10 0" padding="15 5 1 5" id="auto_allow_screenshots_" >
+                        <vertical layout_weight="1" >
+                            <text text="{{language['auto-allow-screenshots']}}" textColor="black" textSize="18sp" />
+                            <text text="{{language['auto-allow-screenshots-explain']}}" textColor="#95000000" textSize="10sp" marginTop="2" />
                         </vertical>
-                    </card>
-
-
-
-                    <card w="*" id="indx2" margin="10 3 10 3" h="*" cardCornerRadius="10"
-                        cardElevation="5dp" gravity="center_vertical"  >
-                        <vertical>
-                            <text text='界面设置' margin="10 5 10 0" h="35dp" id="text_bg2"
-                                gravity="center|left" textSize='16sp' textColor='{{theme.bar}}'>
-                            </text>
-
-                            <horizontal margin="10 0" padding="15 5 1 5" id="xlkz_" >
-                                <vertical layout_weight="1" >
-                                    <text text="主页设置行动理智" textColor="black" textSize="18sp" />
-                                    <text text="在主页PRTS辅助配置界面显示设置行动理智次数设置输入框，重启应用后生效" textColor="#95000000" textSize="10sp" marginTop="2" />
-                                </vertical>
-                                <widget-switch-se7en id="xlkz" layout_gravity="center" padding="5 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                            </horizontal>
-
-
-                            <horizontal margin="10 0" padding="15 5 1 5" id="page_theme_" >
-                                <vertical layout_weight="1" >
-                                    <text text="自定义页面主题色" textColor="black" textSize="18sp" />
-                                    <text text="关闭开关还原页面默认主题色" textColor="#95000000" textSize="10sp" marginTop="2" />
-                                </vertical>
-                                <widget-switch-se7en id="page_theme" layout_gravity="center" padding="5 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                            </horizontal>
-
-                            <linear id="inputd_tecr_list" visibility="gone" marginTop="-5" >
-                                <input id="inputd_tecr" gravity="bottom" hint="输入16进制颜色码，回车  或→" marginLeft="30" layout_weight="1" />
-                                <button id="inputd_tecr_b" text="颜色列表" style="Widget.AppCompat.Button.Borderless.Colored" />
-                            </linear>
-
-
-                            <horizontal margin="10 0" padding="15 5 1 5" id="floating_theme_" >
-                                <vertical layout_weight="1" >
-                                    <text text="设置悬浮窗主题色" textColor="black" textSize="18sp" />
-                                    <text text="左边为悬浮窗背景色，中间为悬浮窗图标颜色，右边为悬浮窗字体颜色，手动关闭可还原初始状态,不懂具体如何输入请百度十六进制颜色码" textColor="#95000000" textSize="10sp" marginTop="2" />
-                                </vertical>
-                                <widget-switch-se7en id="floating_theme" layout_gravity="center" padding="5 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                            </horizontal>
-
-                            <horizontal id="floating_theme_list" margin="30 -5 30 0" gravity="bottom" visibility="gone">
-                                <input id="bg" hint="#dcdcdc" lines="1" layout_weight="1" />
-                                <input id="theme" hint="#dcdcdc" lines="1" layout_weight="1" />
-                                <input id="toast" hint="#dcdcdc" lines="1" layout_weight="1" />
-                            </horizontal>
-
-                            <horizontal margin="10 0" padding="15 5 1 5" id="offset_" >
-                                <vertical layout_weight="1" >
-                                    <text text="悬浮窗随机偏移" textColor="black" textSize="18sp" />
-                                    <text text="在一定范围内随机移动位置(尽量不挡到图标,影响PRTS辅助识别屏幕),重启悬浮窗生效,主要用于防止OLED屏烧屏,不过还是建议使用熄屏运行模块" textColor="#95000000" textSize="10sp" marginTop="2" />
-                                </vertical>
-                                <widget-switch-se7en id="offset" layout_gravity="center" padding="5 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                            </horizontal>
-
-                            <horizontal margin="10 0" padding="15 5 1 5" id="front_display_check_" >
-                                <vertical layout_weight="1" >
-                                    <text text="悬浮窗前台显示白名单" textColor="black" textSize="18sp" />
-                                    <text text="悬浮窗操作面板仅在已配置的应用中显示,未配置的一律视为黑名单,悬浮窗操作面板不会显示在黑名单应用中,建议添加系统桌面包名方便使用" textColor="#95000000" textSize="10sp" marginTop="2" />
-                                </vertical>
-                                <text id="front_display_add" text="增加" textColor="#00ff00" padding="6 4" textSize="10" layout_gravity="center" marginLeft="10" />
-
-                                <widget-switch-se7en id="front_display_check" layout_gravity="center" padding="5 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                            </horizontal>
-
-                            <list id="front_display_list" visibility="gone" bg="#00000000"   >
-                                <vertical h="auto" w="*" margin="15 0" padding="15 5" >
-                                    <text text="{{this.app_name}}" textSize="16" maxLines="1" />
-                                    <text text="{{this.app_package}}" textSize="14" maxLines="1" />
-                                    <View bg="#dcdcdc" h="1" w="auto" layout_gravity="bottom" />
-                                </vertical>
-
-
-                            </list>
-
-                            <horizontal margin="10 0" h="40">
-                                <text id="valueB" w="auto" layout_gravity="center" text="设置悬浮窗大小 75" padding="15 5 1 5" textColor="black" textSize="18sp" />
-                                <seekbar id="seekbar" paddingLeft="-120" w="*" h="*" max="100" progress="75" secondaryProgress="75" />
-                            </horizontal>
-
-
-
-
+                        <widget-switch-se7en id="auto_allow_screenshots" checked="{{setting.autoAllowScreen}}" layout_gravity="center"
+                        padding="5 5" textSize="18sp" margin="10 0" thumbSize='24' radius='24' />
+                    </horizontal>
+                    
+                    
+                    <horizontal margin="10 0" padding="15 5 1 5" id="identify_unusual_pauses_" >
+                        <vertical layout_weight="1" >
+                            <text text="识别异常超时暂停" textColor="black" textSize="18sp" />
+                            <text text="程序在6分钟内,剿灭为35分钟.无法判断识别当前前面,或在当前界面连续识别到同一内容50次则暂停程序并返回桌面，有效防止突发意外情况使程序无法识别判断界面，导致设备一直亮屏，温度过高" textColor="#95000000" textSize="10sp" marginTop="2" />
                         </vertical>
-                    </card>
-
-                    <card w="*" id="indx2" margin="10 3 10 3" h="*" cardCornerRadius="10"
-                        cardElevation="5dp" gravity="center_vertical"  >
-                        <vertical>
-                            <text text='BUG修复' margin="10 5 10 0" h="35dp" id="text_bg3"
-                                gravity="center|left" textSize='16sp' textColor='{{theme.bar}}'>
-                            </text>
-
-                            <horizontal margin="10 0" padding="15 5 1 5" id="setScreenMetrics_" >
-                                <vertical layout_weight="1" >
-                                    <text text="自动放缩坐标" textColor="black" textSize="18sp" />
-                                    <text text="显示代理点击成功但没有任何操作时，可以关闭试试，小米华为手机请重启系统再来尝试。原理是使用Autojs的setScreenMetrics()设置脚本坐标点击所适合的屏幕宽高。 如果脚本运行时，屏幕宽度不一致会自动放缩坐标。 这个功能可以设置屏幕上坐标点击的等比缩放效果。好像是没啥作用的，我要不要删除这个功能呢" textColor="#95000000" textSize="10sp" marginTop="2" />
-                                </vertical>
-                                <widget-switch-se7en id="setScreenMetrics" layout_gravity="center" padding="5 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                            </horizontal>
-
-                            <horizontal margin="10 0" padding="15 5 1 5" id="image_monitor_" >
-                                <vertical layout_weight="1" >
-                                    <text text="{{language['image-monitoring']}}" textColor="black" textSize="18sp" />
-                                    <text text="{{language['image-monitoring-explain']}}" textColor="#95000000" textSize="10sp" marginTop="2" />
-                                </vertical>
-                                <widget-switch-se7en id="image_monitor" checked="{{setting.image_monitor}}" layout_gravity="center" padding="5 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                            </horizontal>
-
-                            <horizontal margin="10 0" padding="15 5 1 5" id="image_memory_manage_" >
-                                <vertical layout_weight="1" >
-                                    <text text="图片内存管理" textColor="black" textSize="18sp" />
-                                    <text text="图片内存资源管理，尽可能防止图片未回收导致内存泄露。应用崩溃" textColor="#95000000" textSize="10sp" marginTop="2" />
-                                </vertical>
-                                <widget-switch-se7en id="image_memory_manage" checked="{{setting.image_memory_manage}}"
-                                    layout_gravity="center" padding="5 5" textSize="18sp" margin="10 0" thumbSize='24' radius='24' />
-                            </horizontal>
-
-                            <horizontal margin="10 0" padding="15 5 1 5" id="volume_fixes_" >
-                                <vertical layout_weight="1" >
-                                    <text text="修复音量异常" textColor="black" textSize="18sp" />
-                                    <text text="修复部分机型使用自启动方舟后音量异常" textColor="#95000000" textSize="10sp" marginTop="2" />
-                                </vertical>
-                                <widget-switch-se7en id="volume_fixes" layout_gravity="center" padding="5 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                            </horizontal>
-
-
-
-                            <horizontal margin="10 0" padding="15 5 1 5" id="compatible_simulator_tablet_" >
-                                <vertical layout_weight="1" >
-                                    <text text="兼容模拟器平板版" textColor="black" textSize="18sp" />
-                                    <text text="兼容模拟器平板版分辨率, 需选择设备分辨率与图库分辨率相近的，例：720x1280用图库1280x720，1080x1920用图库1920x1080,使用与设备分辨率相反的图库分辨率即可。（推荐雷电、MuMu12、逍遥、夜神）模拟器. 出现悬浮窗过大的问题请关闭该功能" textColor="#95000000" textSize="10sp" marginTop="2" />
-                                </vertical>
-                                <widget-switch-se7en id="compatible_simulator_tablet" layout_gravity="center" padding="5 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                            </horizontal>
+                        <widget-switch-se7en id="identify_unusual_pauses" layout_gravity="center" padding="5 5" textSize="18sp"
+                        margin="10 0" thumbSize='24' radius='24' />
+                    </horizontal>
+                    <horizontal margin="10 0" padding="15 5 1 5" id="reset_proxy_frequency_" >
+                        <vertical layout_weight="1" >
+                            <text text="{{language['reset-proxy-frequency']}}" textColor="black" textSize="18sp" />
+                            <text text="{{language['reset-proxy-frequency-explain']}}" textColor="#95000000" textSize="10sp" marginTop="2" />
                         </vertical>
+                        <widget-switch-se7en id="reset_proxy_frequency" checked="{{setting.重置代理次数}}" layout_gravity="center" padding="5 5" textSize="18sp"
+                        margin="10 0" thumbSize='24' radius='24' />
+                    </horizontal>
+                    <card w="*" id="indx2" h="40" gravity="center_vertical"  >
+                        <widget-switch-se7en id="agent" text="代理失误放弃行动" checked="false" padding="15 5 15 5" textSize="18sp"
+                        margin="10 0" thumbSize='24' radius='24' />
+                        <frame layout_gravity="right" w="{{zoom(330)}}px" >
+                            <img id="agenttxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
+                        </frame>
                     </card>
-
-                    {/*  <card w="*" id="indx2" margin="10 3 10 3" h="45" cardCornerRadius="10"
+                    
+                    <card w="*" id="indx2" h="40" gravity="center_vertical"  >
+                        <widget-switch-se7en id="gmvp" text="自动关闭媒体音量" checked="false" padding="15 5 15 5" textSize="18sp"
+                        margin="10 0" thumbSize='24' radius='24' />
+                        <frame layout_gravity="right" w="{{zoom(330)}}px" >
+                            <img id="gmvptxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
+                        </frame>
+                    </card>
+                    <card w="*" id="indx2" h="40" gravity="center_vertical"  >
+                        <widget-switch-se7en id="woie" text="启用剿灭基建收菜" checked="false" padding="15 5 15 5" textSize="18sp"
+                        margin="10 0" thumbSize='24' radius='24' />
+                        <frame layout_gravity="right" w="{{zoom(330)}}px" >
+                            <img id="woietxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
+                        </frame>
+                    </card>
+                    <card w="*" id="indx2" h="40" gravity="center_vertical"  >
+                        <widget-switch-se7en id="proxy_card_check" text="剿灭优先使用代理卡" checked="false" padding="15 5 15 5" textSize="18sp"
+                        margin="10 0" thumbSize='24' radius='24' />
+                        
+                    </card>
+                    <card w="*" id="indx2" h="40" gravity="center_vertical"  >
+                        <widget-switch-se7en id="olrs" text="PRTS辅助记录汇报" checked="false" padding="15 5 15 5" textSize="18sp"
+                        margin="10 0" thumbSize='24' radius='24' />
+                        <frame layout_gravity="right" w="{{zoom(330)}}px" >
+                            <img id="olrstxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
+                        </frame>
+                    </card>
+                    
+                    <card w="*" id="indx2" h="40" gravity="center_vertical"  >
+                        <widget-switch-se7en id="qetj" text="企鹅物流数据统计" checked="false" padding="15 5 15 5" textSize="18sp"
+                        margin="10 0" thumbSize='24' radius='24' />
+                        <frame layout_gravity="right" w="{{zoom(330)}}px" >
+                            <img id="qetjtxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
+                        </frame>
+                    </card>
+                    <card w="*" id="indxj" h="40" gravity="center_vertical"  >
+                        <widget-switch-se7en id="jsjt" text="汇报上传企鹅物流" checked="false" padding="15 5 15 5" textSize="18sp"
+                        margin="10 0" thumbSize='24' radius='24' />
+                        <frame layout_gravity="right" w="{{zoom(330)}}px" >
+                            <img id="jsjttxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
+                        </frame>
+                    </card>
+                    <card w="*" id="indx7" h="40" foreground="?selectableItemBackground">
+                        <widget-switch-se7en id="dili" text="低电量暂停辅助" checked="false" padding="15 10 15 5" textSize="18sp"
+                        margin="10 0" thumbSize='24' gravity="top|center_vertical"
+                        radius='24' layout_weight="1" />
+                        <frame layout_gravity="right|center_horizontal" w="{{zoom(330)}}px" h="35" marginTop="5">
+                            <img id="electrictxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
+                        </frame>
+                        <linear>
+                            <input id="electric" inputType="number" hint="" lines="1" w="*" margin="30 35 30 0" />
+                        </linear>
+                    </card>
+                    
+                    
+                    
+                    
+                    <card w="*" id="indx2" h="40" gravity="center_vertical"  >
+                        <widget-switch-se7en id="_home" text="任务结束后返回桌面" checked="false" padding="15 5 15 5" textSize="18sp"
+                        margin="10 0" thumbSize='24' radius='24' />
+                        
+                    </card>
+                    <card w="*" id="indx2" h="40" gravity="center_vertical"  >
+                        <widget-switch-se7en id="gfcm" text="确认防沉迷框" checked="false" padding="15 5 15 5" textSize="18sp"
+                        margin="10 0" thumbSize='24' radius='24' />
+                        <frame layout_gravity="right" w="{{zoom(330)}}px" >
+                            <img id="gfcmtxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
+                        </frame>
+                    </card>
+                    <card w="*" id="indx2" h="40" gravity="center_vertical"  >
+                        <widget-switch-se7en id="vibration" text="启用震动反馈" checked="false" padding="15 5 15 5" textSize="18sp"
+                        margin="10 0" thumbSize='24' radius='24' />
+                        <frame layout_gravity="right" w="{{zoom(330)}}px" >
+                            <img id="vibrationtxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
+                        </frame>
+                    </card>
+                    <card w="*" id="indx2" h="40" gravity="center_vertical"  >
+                        <widget-switch-se7en id="games" text="自动启动方舟" checked="false" padding="15 5 15 5" textSize="18sp"
+                        margin="10 0" thumbSize='24' radius='24' />
+                        <frame layout_gravity="right" w="{{zoom(330)}}px" >
+                            <img id="gamestxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
+                        </frame>
+                    </card>
+                    <horizontal margin="10 0" padding="15 5 1 5" id="automaticUpdate_" gravity="center">
+                        <vertical layout_weight="1" >
+                            <text text="{{language['automaticUpdate']}}" textColor="black" textSize="18sp" />
+                            <text text="{{language['automaticUpdate-explain']}}" textColor="#95000000" textSize="10sp" marginTop="2" />
+                            
+                        </vertical>
+                        <widget-switch-se7en id="automaticUpdate" layout_gravity="center" padding="5 5"
+                        margin="10 0" thumbSize='24' radius='24' />
+                        
+                    </horizontal>
+                    
+                    <horizontal margin="10 0" padding="15 5 1 5" id="usingTraffic_" gravity="center" >
+                        <vertical layout_weight="1" >
+                            <text text="{{language['usingTraffic']}}" textColor="black" textSize="18sp" />
+                            
+                        </vertical>
+                        <widget-switch-se7en id="usingTraffic" layout_gravity="center" padding="5 5"
+                        margin="10 0" thumbSize='24' radius='24' />
+                        
+                    </horizontal>
+                    
+                    
+                    <horizontal margin="10 0" padding="15 5 1 5" gravity="center">
+                        <vertical layout_weight="2" >
+                            <text text="{{language['OCRExtensions-type']}}" textColor="black" textSize="18sp" />
+                            <text text="{{language['OCRExtensions-explain']}}" textColor="#95000000" textSize="10sp" marginTop="2" />
+                        </vertical>
+                        <vertical >
+                            <TextView id="OCRExtensions_type" padding="5 5" textSize="15sp"
+                            margin="10" textColor="black" lines="1" />
+                            <TextView id="OCRCorrection_rules" text="{{language['OCRCorrection-rules']}}" padding="5 5" textSize="15sp"
+                            margin="10 5 10 0" textColor="black" lines="1" gravity="center" />
+                        </vertical>
+                    </horizontal>
+                    <horizontal margin="10 0" padding="15 5 1 5" id="OCRExtensions_" gravity="center">
+                        <vertical layout_weight="1" >
+                            <text text="{{language['OCRExtensions']}}" textColor="black" textSize="18sp" />
+                        </vertical>
+                        <widget-switch-se7en id="OCRExtensions" layout_gravity="center" padding="5 5"
+                        margin="10 0" thumbSize='24' radius='24' />
+                        
+                    </horizontal>
+                    
+                    
+                </vertical>
+            </card>
+            
+            
+            <card w="*" id="indx2" margin="10 3 10 3" h="*" cardCornerRadius="10"
+            cardElevation="5dp" gravity="center_vertical"  >
+            <vertical>
+                <text text='高级功能' margin="10 5 10 0" h="35dp" id="text_bg"
+                gravity="center|left" textSize='16sp' textColor='{{theme.bar}}'>
+            </text>
+            <card w="*" id="indx2" h="40" gravity="center_vertical"  >
+                <widget-switch-se7en id="sysm" text="自启动无障碍服务" checked="false" padding="15 5 15 5" textSize="18sp"
+                margin="10 0" thumbSize='24' radius='24' />
+            </card>
+            
+            <card w="*" id="indxu" h="40" gravity="center_vertical"  >
+                <widget-switch-se7en id="getu" text="使用高级权限截图" checked="false"
+                padding="25 10 25 5" textSize="18sp"
+                thumbSize='24' radius='24' gravity="top|center_vertical" />
+                <frame layout_gravity="right|center_horizontal" w="{{zoom(330)}}px" h="35" marginTop="5">
+                    <img id="getutxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
+                </frame>
+                <radiogroup margin="25 0 10 0" id="gets" visibility="gone"
+                gravity="bottom" orientation="horizontal">
+                <radio id="Shizuku" text="Shizuku授权" w="auto" />
+                <radio id="root" text="root授权" w="auto" h="auto" />
+            </radiogroup>
+        </card>
+        
+        <card w="*" id="indxu" h="40" gravity="center_vertical"  >
+            <widget-switch-se7en id="xpyx" text="启用熄屏运行模块" checked="false"
+            padding="25 10 25 5" textSize="18sp"
+            thumbSize='24' radius='24' gravity="top|center_vertical" />
+            <frame layout_gravity="right|center_horizontal" w="{{zoom(330)}}px" h="35" marginTop="5">
+                <img id="xpyxtxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
+            </frame>
+            
+        </card>
+        
+        <card w="*" id="indxc" h="40" foreground="?selectableItemBackground">
+            <widget-switch-se7en id="custom" text="导入自定义执行模块" checked="false" padding="15 10 15 5" textSize="18sp"
+            margin="10 0" thumbSize='24' gravity="top|center_vertical"
+            radius='24' layout_weight="1" />
+            <frame layout_gravity="right|center_horizontal" w="{{zoom(330)}}px" h="35" marginTop="5">
+                <img id="customtxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
+            </frame>
+            <linear>
+                <input id="input_c" gravity="bottom" visibility="gone" hint="输入主js模块路径，回车  或→" lines="1" margin="30 35 0 0" layout_weight="1" />
+                <button id="input_file3" text="选择文件" margin="0 35 5 0" style="Widget.AppCompat.Button.Borderless.Colored" />
+            </linear>
+        </card>
+        <card w="*" id="indx6" h="40" foreground="?selectableItemBackground">
+            <widget-switch-se7en id="gbyy" text="导入关闭应用模块" checked="false" padding="15 10 15 5" textSize="18sp"
+            margin="10 0" thumbSize='24' gravity="top|center_vertical"
+            radius='24' layout_weight="1" />
+            <frame layout_gravity="right|center_horizontal" w="{{zoom(330)}}px" h="35" marginTop="5">
+                <img id="gbyytxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
+            </frame>
+            <linear>
+                <input id="inputgb" gravity="bottom" visibility="gone" hint="输入主js模块路径，回车  或→" lines="1" margin="30 35 0 0" layout_weight="1" />
+                <button id="input_file" text="选择文件" margin="0 35 5 0" style="Widget.AppCompat.Button.Borderless.Colored" />
+            </linear>
+        </card>
+        <card w="*" id="indx4" h="40" foreground="?selectableItemBackground">
+            <widget-switch-se7en id="jjhb" text="导入基建换班模块" checked="false" padding="15 10 15 5" textSize="18sp"
+            margin="10 0" thumbSize='24' gravity="top|center_vertical"
+            radius='24' layout_weight="1" />
+            <frame layout_gravity="right|center_horizontal" w="{{zoom(330)}}px" h="35" marginTop="5">
+                <img id="jjhbtxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9" />
+            </frame>
+            <linear>
+                <input id="inputd2" gravity="bottom" visibility="gone" hint="输入主js模块路径，回车  或→" lines="1" margin="30 35 0 0" layout_weight="1" />
+                <button id="input_file2" text="选择文件" margin="0 35 5 0" style="Widget.AppCompat.Button.Borderless.Colored" />
+            </linear>
+        </card>
+        
+        
+    </vertical>
+    </card>
+    
+    
+    
+    <card w="*" id="indx2" margin="10 3 10 3" h="*" cardCornerRadius="10"
+    cardElevation="5dp" gravity="center_vertical"  >
+    <vertical>
+        <text text='界面设置' margin="10 5 10 0" h="35dp" id="text_bg2"
+        gravity="center|left" textSize='16sp' textColor='{{theme.bar}}'>
+    </text>
+    
+    <horizontal margin="10 0" padding="15 5 1 5" id="xlkz_" >
+        <vertical layout_weight="1" >
+            <text text="主页设置行动理智" textColor="black" textSize="18sp" />
+            <text text="在主页PRTS辅助配置界面显示设置行动理智次数设置输入框，重启应用后生效" textColor="#95000000" textSize="10sp" marginTop="2" />
+        </vertical>
+        <widget-switch-se7en id="xlkz" layout_gravity="center" padding="5 5" textSize="18sp"
+        margin="10 0" thumbSize='24' radius='24' />
+    </horizontal>
+    
+    
+    <horizontal margin="10 0" padding="15 5 1 5" id="page_theme_" >
+        <vertical layout_weight="1" >
+            <text text="自定义页面主题色" textColor="black" textSize="18sp" />
+            <text text="关闭开关还原页面默认主题色" textColor="#95000000" textSize="10sp" marginTop="2" />
+        </vertical>
+        <widget-switch-se7en id="page_theme" layout_gravity="center" padding="5 5" textSize="18sp"
+        margin="10 0" thumbSize='24' radius='24' />
+    </horizontal>
+    
+    <linear id="inputd_tecr_list" visibility="gone" marginTop="-5" >
+        <input id="inputd_tecr" gravity="bottom" hint="输入16进制颜色码，回车  或→" marginLeft="30" layout_weight="1" />
+        <button id="inputd_tecr_b" text="颜色列表" style="Widget.AppCompat.Button.Borderless.Colored" />
+    </linear>
+    
+    
+    <horizontal margin="10 0" padding="15 5 1 5" id="floating_theme_" >
+        <vertical layout_weight="1" >
+            <text text="设置悬浮窗主题色" textColor="black" textSize="18sp" />
+            <text text="左边为悬浮窗背景色，中间为悬浮窗图标颜色，右边为悬浮窗字体颜色，手动关闭可还原初始状态,不懂具体如何输入请百度十六进制颜色码" textColor="#95000000" textSize="10sp" marginTop="2" />
+        </vertical>
+        <widget-switch-se7en id="floating_theme" layout_gravity="center" padding="5 5" textSize="18sp"
+        margin="10 0" thumbSize='24' radius='24' />
+    </horizontal>
+    
+    <horizontal id="floating_theme_list" margin="30 -5 30 0" gravity="bottom" visibility="gone">
+        <input id="bg" hint="#dcdcdc" lines="1" layout_weight="1" />
+        <input id="theme" hint="#dcdcdc" lines="1" layout_weight="1" />
+        <input id="toast" hint="#dcdcdc" lines="1" layout_weight="1" />
+    </horizontal>
+    
+    <horizontal margin="10 0" padding="15 5 1 5" id="offset_" >
+        <vertical layout_weight="1" >
+            <text text="悬浮窗随机偏移" textColor="black" textSize="18sp" />
+            <text text="在一定范围内随机移动位置(尽量不挡到图标,影响PRTS辅助识别屏幕),重启悬浮窗生效,主要用于防止OLED屏烧屏,不过还是建议使用熄屏运行模块" textColor="#95000000" textSize="10sp" marginTop="2" />
+        </vertical>
+        <widget-switch-se7en id="offset" layout_gravity="center" padding="5 5" textSize="18sp"
+        margin="10 0" thumbSize='24' radius='24' />
+    </horizontal>
+    
+    <horizontal margin="10 0" padding="15 5 1 5" id="front_display_check_" >
+        <vertical layout_weight="1" >
+            <text text="悬浮窗前台显示白名单" textColor="black" textSize="18sp" />
+            <text text="悬浮窗操作面板仅在已配置的应用中显示,未配置的一律视为黑名单,悬浮窗操作面板不会显示在黑名单应用中,建议添加系统桌面包名方便使用" textColor="#95000000" textSize="10sp" marginTop="2" />
+        </vertical>
+        <text id="front_display_add" text="增加" textColor="#00ff00" padding="6 4" textSize="10" layout_gravity="center" marginLeft="10" />
+        
+        <widget-switch-se7en id="front_display_check" layout_gravity="center" padding="5 5" textSize="18sp"
+        margin="10 0" thumbSize='24' radius='24' />
+    </horizontal>
+    
+    <list id="front_display_list" visibility="gone" bg="#00000000"   >
+        <vertical h="auto" w="*" margin="15 0" padding="15 5" >
+            <text text="{{this.app_name}}" textSize="16" maxLines="1" />
+            <text text="{{this.app_package}}" textSize="14" maxLines="1" />
+            <View bg="#dcdcdc" h="1" w="auto" layout_gravity="bottom" />
+        </vertical>
+        
+        
+    </list>
+    
+    <horizontal margin="10 0" h="40">
+        <text id="valueB" w="auto" layout_gravity="center" text="设置悬浮窗大小 75" padding="15 5 1 5" textColor="black" textSize="18sp" />
+        <seekbar id="seekbar" paddingLeft="-120" w="*" h="*" max="100" progress="75" secondaryProgress="75" />
+    </horizontal>
+    
+    
+    
+    
+    </vertical>
+    </card>
+    
+    <card w="*" id="indx2" margin="10 3 10 3" h="*" cardCornerRadius="10"
+    cardElevation="5dp" gravity="center_vertical"  >
+    <vertical>
+        <text text='BUG修复' margin="10 5 10 0" h="35dp" id="text_bg3"
+        gravity="center|left" textSize='16sp' textColor='{{theme.bar}}'>
+    </text>
+    
+    <horizontal margin="10 0" padding="15 5 1 5" id="setScreenMetrics_" >
+        <vertical layout_weight="1" >
+            <text text="自动放缩坐标" textColor="black" textSize="18sp" />
+            <text text="显示代理点击成功但没有任何操作时，可以关闭试试，小米华为手机请重启系统再来尝试。原理是使用Autojs的setScreenMetrics()设置脚本坐标点击所适合的屏幕宽高。 如果脚本运行时，屏幕宽度不一致会自动放缩坐标。 这个功能可以设置屏幕上坐标点击的等比缩放效果。好像是没啥作用的，我要不要删除这个功能呢" textColor="#95000000" textSize="10sp" marginTop="2" />
+        </vertical>
+        <widget-switch-se7en id="setScreenMetrics" layout_gravity="center" padding="5 5" textSize="18sp"
+        margin="10 0" thumbSize='24' radius='24' />
+    </horizontal>
+    
+    <horizontal margin="10 0" padding="15 5 1 5" id="image_monitor_" >
+        <vertical layout_weight="1" >
+            <text text="{{language['image-monitoring']}}" textColor="black" textSize="18sp" />
+            <text text="{{language['image-monitoring-explain']}}" textColor="#95000000" textSize="10sp" marginTop="2" />
+        </vertical>
+        <widget-switch-se7en id="image_monitor" checked="{{setting.image_monitor}}" layout_gravity="center" padding="5 5" textSize="18sp"
+        margin="10 0" thumbSize='24' radius='24' />
+    </horizontal>
+    
+    <horizontal margin="10 0" padding="15 5 1 5" id="image_memory_manage_" >
+        <vertical layout_weight="1" >
+            <text text="图片内存管理" textColor="black" textSize="18sp" />
+            <text text="图片内存资源管理，尽可能防止图片未回收导致内存泄露。应用崩溃" textColor="#95000000" textSize="10sp" marginTop="2" />
+        </vertical>
+        <widget-switch-se7en id="image_memory_manage" checked="{{setting.image_memory_manage}}"
+        layout_gravity="center" padding="5 5" textSize="18sp" margin="10 0" thumbSize='24' radius='24' />
+    </horizontal>
+    
+    <horizontal margin="10 0" padding="15 5 1 5" id="volume_fixes_" >
+        <vertical layout_weight="1" >
+            <text text="修复音量异常" textColor="black" textSize="18sp" />
+            <text text="修复部分机型使用自启动方舟后音量异常" textColor="#95000000" textSize="10sp" marginTop="2" />
+        </vertical>
+        <widget-switch-se7en id="volume_fixes" layout_gravity="center" padding="5 5" textSize="18sp"
+        margin="10 0" thumbSize='24' radius='24' />
+    </horizontal>
+    
+    
+    
+    <horizontal margin="10 0" padding="15 5 1 5" id="compatible_simulator_tablet_" >
+        <vertical layout_weight="1" >
+            <text text="兼容模拟器平板版" textColor="black" textSize="18sp" />
+            <text text="兼容模拟器平板版分辨率, 需选择设备分辨率与图库分辨率相近的，例：720x1280用图库1280x720，1080x1920用图库1920x1080,使用与设备分辨率相反的图库分辨率即可。（推荐雷电、MuMu12、逍遥、夜神）模拟器. 出现悬浮窗过大的问题请关闭该功能" textColor="#95000000" textSize="10sp" marginTop="2" />
+        </vertical>
+        <widget-switch-se7en id="compatible_simulator_tablet" layout_gravity="center" padding="5 5" textSize="18sp"
+        margin="10 0" thumbSize='24' radius='24' />
+    </horizontal>
+    </vertical>
+    </card>
+    
+    {/*  <card w="*" id="indx2" margin="10 3 10 3" h="45" cardCornerRadius="10"
     cardElevation="5dp" gravity="center_vertical"  >
     <widget-switch-se7en id="syqk" text="查看使用情况" checked="false" padding="15 5 15 5" textSize="18sp"
     thumbSize='24'
@@ -471,93 +472,93 @@ ui.layout(
         <img id="syqktxt" src="@drawable/ic_error_black_48dp" w="28sp" tint="#A9a9a9"/>
     </frame>
     </card>*/}
-
-                    <card w="*" id="indx2" margin="10 3 10 3" h="*" cardCornerRadius="10"
-                        cardElevation="5dp" gravity="center_vertical"  >
-                        <vertical>
-                            <text text='应用权限' margin="10 5 10 0" h="35dp" id="text_bg4"
-                                gravity="center|left" textSize='16sp' textColor='{{theme.bar}}'>
-                            </text>
-
-                            <horizontal margin="10 0" padding="15 5 1 5" id="PROJECT_MEDIA_" >
-                                <vertical layout_weight="1" >
-                                    <text text="{{language['PROJECT_MEDIA']}}" textColor="black" textSize="18sp" />
-                                    <text text="{{language['PROJECT_MEDIA-expiain'].replace('%packageName%',packageName)}}" textColor="#95000000" textSize="10sp" marginTop="2" />
-                                </vertical>
-                                <widget-switch-se7en id="PROJECT_MEDIA" layout_gravity="center" padding="5 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                            </horizontal>
-
-                            <horizontal margin="10 0" padding="15 5 1 5" id="front_desk_service_" >
-                                <vertical layout_weight="1" >
-                                    <text text="前台通知服务" textColor="black" textSize="18sp" />
-                                    <text text="必要权限，用于保持应用在后台运行，需要时会自动开关,无需关心" textColor="#95000000" textSize="10sp" marginTop="2" />
-                                </vertical>
-                                <widget-switch-se7en id="front_desk_service" layout_gravity="center" padding="5 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' checked="{{$settings.isEnabled('foreground_service')}}" />
-                            </horizontal>
-
-                            <horizontal margin="10 0" padding="15 5 1 5" id="ignore_battery_ptimization_" >
-                                <vertical layout_weight="1" >
-                                    <text text="忽略电池优化" textColor="black" textSize="18sp" />
-                                    <text text="为保障应用可以在后台运行,点击进入电池优化界面,选择无限制,并且在多任务界面锁定本应用(后台任务上锁),有无障碍异常/系统杀应用/应用闪退的情况时，请尝试" textColor="#95000000" textSize="10sp" marginTop="2" />
-                                </vertical>
-                                <widget-switch-se7en id="ignore_battery_ptimization" layout_gravity="center" padding="5 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' checked="{{$power_manager.isIgnoringBatteryOptimizations()}}" />
-                            </horizontal>
-                            <horizontal margin="10 0" padding="15 5 1 5" id="self_starting_" >
-                                <vertical layout_weight="1" >
-                                    <text text="允许自启动" textColor="black" textSize="18sp" />
-                                    <text text="有无障碍异常/杀应用/应用闪退的情况时，请打开尝试, 是否已开启请以系统设置显示为准,程序暂无方法校验是否已打开" textColor="#95000000" textSize="10sp" marginTop="2" />
-                                </vertical>
-                                <widget-switch-se7en id="self_starting" layout_gravity="center" padding="5 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                            </horizontal>
-
-                        </vertical>
-                    </card>
-
-                    <card w="*" id="indx2" margin="10 3 10 3" h="*" cardCornerRadius="10"
-                        cardElevation="5dp" gravity="center_vertical"  >
-                        <vertical>
-                            <text text='开发相关' margin="10 5 10 0" h="35dp" id="text_bg4"
-                                gravity="center|left" textSize='16sp' textColor='{{theme.bar}}'>
-                            </text>
-
-                            <horizontal margin="10 0" padding="15 5 1 5" id="debugging_" >
-                                <vertical layout_weight="1" >
-                                    <text text="调试信息" textColor="black" textSize="18sp" />
-                                </vertical>
-                                <widget-switch-se7en id="debugging" layout_gravity="center" padding="5 5" textSize="18sp"
-                                    margin="10 0" thumbSize='24' radius='24' />
-                            </horizontal>
-                            
-                            <card w="*" id="cett" h="40" foreground="?selectableItemBackground">
-                                <text text="开发人员代码测试" padding="15 8 15 5" textSize="18sp"
-                                    margin="10 0" textColor="#000000" />
-                            </card>
-                            <card w="*" id="gljb" h="40" foreground="?selectableItemBackground">
-                                <text text="管理运行脚本" padding="15 8 15 5" textSize="18sp"
-                                    margin="10 0" textColor="#000000" />
-                            </card>
-
-
-                        </vertical>
-                    </card>
-                    {/*<card w="*" id="indx2" margin="10 3 10 3" h="45" cardCornerRadius="10"
+    
+    <card w="*" id="indx2" margin="10 3 10 3" h="*" cardCornerRadius="10"
+    cardElevation="5dp" gravity="center_vertical"  >
+    <vertical>
+        <text text='应用权限' margin="10 5 10 0" h="35dp" id="text_bg4"
+        gravity="center|left" textSize='16sp' textColor='{{theme.bar}}'>
+    </text>
+    
+    <horizontal margin="10 0" padding="15 5 1 5" id="PROJECT_MEDIA_" >
+        <vertical layout_weight="1" >
+            <text text="{{language['PROJECT_MEDIA']}}" textColor="black" textSize="18sp" />
+            <text text="{{language['PROJECT_MEDIA-expiain'].replace('%packageName%',packageName)}}" textColor="#95000000" textSize="10sp" marginTop="2" />
+        </vertical>
+        <widget-switch-se7en id="PROJECT_MEDIA" layout_gravity="center" padding="5 5" textSize="18sp"
+        margin="10 0" thumbSize='24' radius='24' />
+    </horizontal>
+    
+    <horizontal margin="10 0" padding="15 5 1 5" id="front_desk_service_" >
+        <vertical layout_weight="1" >
+            <text text="前台通知服务" textColor="black" textSize="18sp" />
+            <text text="必要权限，用于保持应用在后台运行，需要时会自动开关,无需关心" textColor="#95000000" textSize="10sp" marginTop="2" />
+        </vertical>
+        <widget-switch-se7en id="front_desk_service" layout_gravity="center" padding="5 5" textSize="18sp"
+        margin="10 0" thumbSize='24' radius='24' checked="{{$settings.isEnabled('foreground_service')}}" />
+    </horizontal>
+    
+    <horizontal margin="10 0" padding="15 5 1 5" id="ignore_battery_ptimization_" >
+        <vertical layout_weight="1" >
+            <text text="忽略电池优化" textColor="black" textSize="18sp" />
+            <text text="为保障应用可以在后台运行,点击进入电池优化界面,选择无限制,并且在多任务界面锁定本应用(后台任务上锁),有无障碍异常/系统杀应用/应用闪退的情况时，请尝试" textColor="#95000000" textSize="10sp" marginTop="2" />
+        </vertical>
+        <widget-switch-se7en id="ignore_battery_ptimization" layout_gravity="center" padding="5 5" textSize="18sp"
+        margin="10 0" thumbSize='24' radius='24' checked="{{$power_manager.isIgnoringBatteryOptimizations()}}" />
+    </horizontal>
+    <horizontal margin="10 0" padding="15 5 1 5" id="self_starting_" >
+        <vertical layout_weight="1" >
+            <text text="允许自启动" textColor="black" textSize="18sp" />
+            <text text="有无障碍异常/杀应用/应用闪退的情况时，请打开尝试, 是否已开启请以系统设置显示为准,程序暂无方法校验是否已打开" textColor="#95000000" textSize="10sp" marginTop="2" />
+        </vertical>
+        <widget-switch-se7en id="self_starting" layout_gravity="center" padding="5 5" textSize="18sp"
+        margin="10 0" thumbSize='24' radius='24' />
+    </horizontal>
+    
+    </vertical>
+    </card>
+    
+    <card w="*" id="indx2" margin="10 3 10 3" h="*" cardCornerRadius="10"
+    cardElevation="5dp" gravity="center_vertical"  >
+    <vertical>
+        <text text='开发相关' margin="10 5 10 0" h="35dp" id="text_bg4"
+        gravity="center|left" textSize='16sp' textColor='{{theme.bar}}'>
+    </text>
+    
+    <horizontal margin="10 0" padding="15 5 1 5" id="debugging_" >
+        <vertical layout_weight="1" >
+            <text text="调试信息" textColor="black" textSize="18sp" />
+        </vertical>
+        <widget-switch-se7en id="debugging" layout_gravity="center" padding="5 5" textSize="18sp"
+        margin="10 0" thumbSize='24' radius='24' />
+    </horizontal>
+    
+    <card w="*" id="cett" h="40" foreground="?selectableItemBackground">
+        <text text="开发人员代码测试" padding="15 8 15 5" textSize="18sp"
+        margin="10 0" textColor="#000000" />
+    </card>
+    <card w="*" id="gljb" h="40" foreground="?selectableItemBackground">
+        <text text="管理运行脚本" padding="15 8 15 5" textSize="18sp"
+        margin="10 0" textColor="#000000" />
+    </card>
+    
+    
+    </vertical>
+    </card>
+    {/*<card w="*" id="indx2" margin="10 3 10 3" h="45" cardCornerRadius="10"
     cardElevation="5dp" gravity="center_vertical"  >
     <widget-switch-se7en id="adbc" text="启用ADB点击" checked="false" padding="15 5 15 5" textSize="18sp"
     thumbSize='24'
     radius='24'/>
     <text padding="15 0 0 0" textSize="12" gravity="bottom" text="显示代理点击成功但是没有任何操作时启用" textColor="#808080"/>
     </card>*/}
-
-                    <vertical padding="0 15">
-                    </vertical>
-                </vertical>
-            </ScrollView>
-
-        </frame>
+    
+    <vertical padding="0 15">
+    </vertical>
+    </vertical>
+    </ScrollView>
+    
+    </frame>
     </vertical>
 )
 
@@ -587,7 +588,7 @@ ui.front_display_check.click((view) => {
     tool.writeJSON("front_display", view.checked);
 })
 
-ui.front_display_list.on("item_long_click", function (e, item, i, itemView, listView) {
+ui.front_display_list.on("item_long_click", function(e, item, i, itemView, listView) {
     dialogs.build({
         type: "app",
         title: "确定要删除 " + item.app_package + " 吗？",
@@ -604,33 +605,33 @@ ui.front_display_list.on("item_long_click", function (e, item, i, itemView, list
 ui.front_display_add.click((view) => {
     var front_display_add_view = ui.inflate(
         <frame bg="#00eff0f4" >
-            <vertical id="c" >
-
-
-                <horizontal margin="25 20">
-
-                    <text id="title" w="auto" h="auto" lines="1" text="新增应用白名单" textSize="20sp" textColor="#000000" layout_gravity="center|left" />
-                    <text id="select_from_installed" w="auto" h="auto" lines="1" text="从已安装的列表中选择" textSize="10sp" padding="6 3" marginLeft="10" layout_gravity="center|left" />
-
-                </horizontal>
-                <vertical id="input" margin="35 0 35 10">
-                    <com.google.android.material.textfield.TextInputLayout
-                        id="app_name"
-                        layout_width="match_parent"
-                        layout_height="wrap_content"
-                    >
-                        <EditText layout_width="match_parent" layout_height="wrap_content" textSize="18sp"
+                    <vertical id="c" >
+                        
+                        
+                        <horizontal margin="25 20">
+                            
+                            <text id="title" w="auto" h="auto" lines="1" text="新增应用白名单" textSize="20sp" textColor="#000000" layout_gravity="center|left" />
+                            <text id="select_from_installed" w="auto" h="auto" lines="1" text="从已安装的列表中选择" textSize="10sp" padding="6 3" marginLeft="10" layout_gravity="center|left" />
+                            
+                        </horizontal>
+                        <vertical id="input" margin="35 0 35 10">
+                            <com.google.android.material.textfield.TextInputLayout
+                            id="app_name"
+                            layout_width="match_parent"
+                            layout_height="wrap_content"
+                            >
+                            <EditText layout_width="match_parent" layout_height="wrap_content" textSize="18sp"
                             singleLine="true"
-                        />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
+                            />
+                        </com.google.android.material.textfield.TextInputLayout>
+                        
+                        <com.google.android.material.textfield.TextInputLayout
                         id="app_package"
                         layout_width="match_parent"
                         layout_height="wrap_content"
-                    >
+                        >
                         <EditText layout_width="match_parent" layout_height="wrap_content" textSize="18sp"
-                            singleLine="true"
+                        singleLine="true"
                         />
                     </com.google.android.material.textfield.TextInputLayout>
                 </vertical>
@@ -638,9 +639,9 @@ ui.front_display_add.click((view) => {
                     <button id="no" text="取消" style="Widget.AppCompat.Button.Borderless" w="auto" />
                     <button id="ok" text="确认" style="Widget.AppCompat.Button.Borderless" w="auto" />
                 </horizontal>
-            </vertical>
-
-        </frame>
+                </vertical>
+                
+                </frame>
     );
     var front_display_add_dialog = dialogs.build({
         type: "app",
@@ -702,55 +703,55 @@ ui.agenttxt.on("click", () => {
 ui.sysm.click((view) => {
     let sysmui = ui.inflate(
         <vertical id="parent">
-            <frame>
-                <ScrollView>
-                    <vertical>
-                        <horizontal margin="0" bg="#00000000">
-                            <img src="file://res/icon.png" w="50" h="30" margin="0 5" />
-                            <text text="安全系统设置权限管理" layout_gravity="left|center_vertical" textColor="#000000" />
-                            <horizontal w="*" h="*" gravity="right" clickable="true" >
-                                <img id="exit" src="@drawable/ic_clear_black_48dp" layout_gravity="center" w="35" height="35" padding="5" marginRight="5" foreground="?selectableItemBackground" />
-                            </horizontal>
-                        </horizontal>
-                        <linear gravity="center" margin="0 -2">
-                            <View bg="#f5f5f5" w="*" h="2" />
-                        </linear>
-                        <vertical padding="10 0" >
-                            <text id="wxts" typeface="sans" textColor="#000000" textSize="13sp" />
-                            <text id="wxts_s" w="*" h="*" padding="5" typeface="sans" textColor="#3282fa" textSize="13sp" enabled="true" focusable="true" longClickable="true" />
-                        </vertical >
-
-
-                        <vertical id="grant" marginBottom="5">
-                            <card w="*" id="root" h="*" cardElevation="5" cardCornerRadius="5" margin="10 5" foreground="?selectableItemBackground" >
-                                <vertical margin="10 5" >
-                                    <text text="ROOT授权" textSize="22sp" textColor="#000000" />
-                                    <text id="root_txt" text="使用root权限获取安全系统设置权限" textSize="13sp" />
-                                </vertical>
-                            </card>
-                            <card w="*" id="Shizuku" h="*" cardElevation="5" cardCornerRadius="5" margin="10 5" foreground="?selectableItemBackground" >
-                                <vertical margin="10 5" >
-                                    <text text="Shizuku授权" textSize="22sp" textColor="#000000" />
-                                    <text id="Shizuku_txt" text="使用Shizuku应用获取安全系统设置权限，详情查看官网：https://shizuku.rikka.app/zh-hans/" autoLink="web" textSize="13sp" enabled="true" textIsSelectable="true" focusable="true" longClickable="true" />
-                                </vertical>
-                            </card>
-
-                            <card w="*" id="indx2" h="*" cardElevation="5" cardCornerRadius="5" margin="10 5" >
-                                <vertical margin="10 5" >
-                                    <horizontal>
-                                        <text id="adb" text="ADB授权" textSize="22sp" textColor="#000000" />
-                                        <horizontal w="*" h="*" gravity="right|center_vertical">
-                                            <text id="adb_s" text="推荐" textColor="#00ff00" padding="6 4" textSize="12" marginRight="10" />
-                                        </horizontal>
+                    <frame>
+                        <ScrollView>
+                            <vertical>
+                                <horizontal margin="0" bg="#00000000">
+                                    <img src="file://res/icon.png" w="50" h="30" margin="0 5" />
+                                    <text text="安全系统设置权限管理" layout_gravity="left|center_vertical" textColor="#000000" />
+                                    <horizontal w="*" h="*" gravity="right" clickable="true" >
+                                        <img id="exit" src="@drawable/ic_clear_black_48dp" layout_gravity="center" w="35" height="35" padding="5" marginRight="5" foreground="?selectableItemBackground" />
                                     </horizontal>
-                                    <text id="adb_txt" autoLink="web" text="使用adb执行相关命令获取安全系统设置权限，ADB调试方式多种多样，详情B站/百度 ADB使用。或查看qq频道 https://pd.qq.com/s/2k84bkyzr?shareSource=5 /B站 https://b23.tv/utHN8cE 关于自启动无障碍教程视频。安卓11 / OTG均可授权" textSize="13sp" textIsSelectable="true" focusable="true" />
+                                </horizontal>
+                                <linear gravity="center" margin="0 -2">
+                                    <View bg="#f5f5f5" w="*" h="2" />
+                                </linear>
+                                <vertical padding="10 0" >
+                                    <text id="wxts" typeface="sans" textColor="#000000" textSize="13sp" />
+                                    <text id="wxts_s" w="*" h="*" padding="5" typeface="sans" textColor="#3282fa" textSize="13sp" enabled="true" focusable="true" longClickable="true" />
+                                </vertical >
+                                
+                                
+                                <vertical id="grant" marginBottom="5">
+                                    <card w="*" id="root" h="*" cardElevation="5" cardCornerRadius="5" margin="10 5" foreground="?selectableItemBackground" >
+                                        <vertical margin="10 5" >
+                                            <text text="ROOT授权" textSize="22sp" textColor="#000000" />
+                                            <text id="root_txt" text="使用root权限获取安全系统设置权限" textSize="13sp" />
+                                        </vertical>
+                                    </card>
+                                    <card w="*" id="Shizuku" h="*" cardElevation="5" cardCornerRadius="5" margin="10 5" foreground="?selectableItemBackground" >
+                                        <vertical margin="10 5" >
+                                            <text text="Shizuku授权" textSize="22sp" textColor="#000000" />
+                                            <text id="Shizuku_txt" text="使用Shizuku应用获取安全系统设置权限，详情查看官网：https://shizuku.rikka.app/zh-hans/" autoLink="web" textSize="13sp" enabled="true" textIsSelectable="true" focusable="true" longClickable="true" />
+                                        </vertical>
+                                    </card>
+                                    
+                                    <card w="*" id="indx2" h="*" cardElevation="5" cardCornerRadius="5" margin="10 5" >
+                                        <vertical margin="10 5" >
+                                            <horizontal>
+                                                <text id="adb" text="ADB授权" textSize="22sp" textColor="#000000" />
+                                                <horizontal w="*" h="*" gravity="right|center_vertical">
+                                                    <text id="adb_s" text="推荐" textColor="#00ff00" padding="6 4" textSize="12" marginRight="10" />
+                                                </horizontal>
+                                            </horizontal>
+                                            <text id="adb_txt" autoLink="web" text="使用adb执行相关命令获取安全系统设置权限，ADB调试方式多种多样，详情B站/百度 ADB使用。或查看qq频道 https://pd.qq.com/s/2k84bkyzr?shareSource=5 /B站 https://b23.tv/utHN8cE 关于自启动无障碍教程视频。安卓11 / OTG均可授权" textSize="13sp" textIsSelectable="true" focusable="true" />
+                                        </vertical>
+                                    </card>
                                 </vertical>
-                            </card>
-                        </vertical>
-                    </vertical>
-                </ScrollView>
-            </frame>
-        </vertical>);
+                            </vertical>
+                        </ScrollView>
+                    </frame>
+                </vertical>);
 
     var sysm_b = dialogs.build({
         type: "app",
@@ -778,8 +779,8 @@ ui.sysm.click((view) => {
     sysmui.root.click(() => {
         if ($shell.checkAccess("root")) {
             if (shell("pm grant " + packageName + " android.permission.WRITE_SECURE_SETTINGS", {
-                root: true,
-            }).code == 0) {
+                    root: true,
+                }).code == 0) {
                 toastLog("root授权安全系统设置权限成功");
 
             } else {
@@ -813,7 +814,7 @@ ui.dili.on("check", (checked) => {
 
 });
 
-ui.electric.on("key", function (keyCode, event) {
+ui.electric.on("key", function(keyCode, event) {
     if (event.getAction() == 0 && keyCode == 66) {
         let text = ui.electric.getText().toString()
         if (text.length < 1) {
@@ -827,7 +828,7 @@ ui.electric.on("key", function (keyCode, event) {
     }
 });
 
-ui.electrictxt.on("click", function (view) {
+ui.electrictxt.on("click", function(view) {
     提示(ui.dili)
 })
 
@@ -900,23 +901,23 @@ ui.gamestxt.on("click", () => {
     提示(ui.games);
 });
 
-ui.automaticUpdate.on("click",(view)=>{
-     ui.usingTraffic_.setVisibility(view.checked ? 0:8);
-    if(!setting.update){
+ui.automaticUpdate.on("click", (view) => {
+    ui.usingTraffic_.setVisibility(view.checked ? 0 : 8);
+    if (!setting.update) {
         setting.update = {};
     }
     setting.update.checked = view.checked;
-    tool.writeJSON("update",setting.update);
+    tool.writeJSON("update", setting.update);
 })
-ui.automaticUpdate_.on("click",(view)=>{
+ui.automaticUpdate_.on("click", (view) => {
     ui.automaticUpdate.performClick();
 });
 
-ui.usingTraffic.on("click",(view)=>{
-        setting.update.usingTraffic = view.checked;
-    tool.writeJSON("update",setting.update);
+ui.usingTraffic.on("click", (view) => {
+    setting.update.usingTraffic = view.checked;
+    tool.writeJSON("update", setting.update);
 });
-ui.usingTraffic_.on("click",()=>{
+ui.usingTraffic_.on("click", () => {
     ui.usingTraffic.performClick();
 });
 
@@ -982,7 +983,7 @@ ui.PROJECT_MEDIA.click((view) => {
 })
 ui.PROJECT_MEDIA_.on("click", () => {
     ui.PROJECT_MEDIA.performClick();
-})
+});
 ui.root.on("click", () => {
     $shell.setDefaultOptions({
         adb: false
@@ -1174,7 +1175,7 @@ ui.floating_theme_.on("click", () => {
 })
 //悬浮窗大小
 var seekbarListener = new android.widget.SeekBar.OnSeekBarChangeListener({
-    onProgressChanged: function (v, progress, fromUser) {
+    onProgressChanged: function(v, progress, fromUser) {
         try {
             if (v == ui.seekbar) {
                 if (progress <= 50) {
@@ -1314,8 +1315,8 @@ ui.gmvp.on("click", (view) => {
             return
         }
     }
-      tool.writeJSON("音量", view.checked);
-  
+    tool.writeJSON("音量", view.checked);
+
 });
 ui.gmvptxt.on("click", () => {
     提示(ui.gmvp)
@@ -1382,7 +1383,7 @@ ui.custom.on("click", (view) => {
             ui.input_c.attr("visibility", "visible");
             ui.input_file3.attr("visibility", "visible")
             try {
-                if (setting.自定义模块&&setting.自定义模块.length > 5) {
+                if (setting.自定义模块 && setting.自定义模块.length > 5) {
                     ui.input_c.setHint(setting.自定义模块);
                 }
             } catch (err) {
@@ -1407,15 +1408,15 @@ ui.customtxt.on("click", () => {
 //暂停后关闭应用
 ui.gbyy.on("click", (view) => {
     // log(setting.公告)
-    tool.writeJSON("公告", view.checked);
+    let gbyyan = mod_data.find((item) => item.id == "关闭应用");
+    if(gbyyan) gbyyan.suspend = !view.checked;
     if (view.checked) {
         ui.run(() => {
             ui.indx6.attr("h", "80")
             ui.inputgb.attr("visibility", "visible");
             ui.input_file.attr("visibility", "visible")
-            if (setting.关闭应用.length > 5) {
-                ui.inputgb.setHint(setting.关闭应用);
-            }
+            gbyyan && ui.inputgb.setHint(gbyyan.path);
+
         })
     } else {
         ui.run(() => {
@@ -1430,16 +1431,18 @@ ui.gbyytxt.on("click", () => {
 })
 
 //基建换班
-ui.jjhb.on("click", (checked) => {
-    tool.writeJSON("基建换班", ui.jjhb.checked);
-    if (ui.jjhb.checked) {
+ui.jjhb.on("click", (view) => {
+  
+    let shift = mod_data.find((item) => item.id == "基建换班");
+   if(shift) shift.suspend = !view.checked;
+ 
+    if (view.checked) {
         ui.run(() => {
             ui.indx4.attr("h", "80")
             ui.inputd2.attr("visibility", "visible");
             ui.input_file2.attr("visibility", "visible")
-            if (setting.换班路径.length > 5) {
-                ui.inputd2.setHint(setting.换班路径)
-            };
+            shift && ui.inputd2.setHint(shift.path);
+
         })
     } else {
         ui.run(() => {
@@ -1450,6 +1453,7 @@ ui.jjhb.on("click", (checked) => {
     }
 
 });
+
 ui.jjhbtxt.on("click", () => {
     提示(ui.jjhb)
 })
@@ -1492,7 +1496,7 @@ ui.compatible_simulator_tablet_.on("click", () => {
 }*/
 
 
-ui.inputd_tecr.on("key", function (keyCode, event) {
+ui.inputd_tecr.on("key", function(keyCode, event) {
     if (event.getAction() == 0 && keyCode == 66) {
         颜色码(ui.inputd_tecr, "theme_colors");
         event.consumed = true;
@@ -1502,7 +1506,7 @@ ui.inputd_tecr.on("key", function (keyCode, event) {
 ui.inputd_tecr_b.on("click", () => {
     engines.execScript("Color_selector_ui", java.lang.String.format("'ui';require('../activity/Colour_list.js');"));
 });
-ui.emitter.on("resume", function () {
+ui.emitter.on("resume", function() {
     let themes = theme.bar
     theme = storages.create('themes').get('theme')
     if (themes.bar != theme.bar) {
@@ -1515,20 +1519,20 @@ ui.emitter.on("resume", function () {
         ui.text_bg4.setTextColor(bar);
     }
 })
-ui.bg.on("key", function (keyCode, event) {
+ui.bg.on("key", function(keyCode, event) {
     if (event.getAction() == 0 && keyCode == 66) {
         颜色码(ui.bg, "bg");
         event.consumed = true;
     }
 });
 
-ui.theme.on("key", function (keyCode, event) {
+ui.theme.on("key", function(keyCode, event) {
     if (event.getAction() == 0 && keyCode == 66) {
         颜色码(ui.theme, "theme")
         event.consumed = true;
     }
 });
-ui.toast.on("key", function (keyCode, event) {
+ui.toast.on("key", function(keyCode, event) {
     if (event.getAction() == 0 && keyCode == 66) {
         颜色码(ui.toast, "toast");
         event.consumed = true;
@@ -1598,7 +1602,7 @@ function File_selector(mime_Type, fun) {
 
 }
 
-ui.input_c.on("key", function (keyCode, event) {
+ui.input_c.on("key", function(keyCode, event) {
     if (event.getAction() == 0 && keyCode == 66) {
         if (ui.input_c.text().length > 5 && files.exists(ui.input_c.text())) {
             modular_id(ui.input_c.text())
@@ -1608,7 +1612,7 @@ ui.input_c.on("key", function (keyCode, event) {
         event.consumed = true;
     }
 });
-ui.inputgb.on("key", function (keyCode, event) {
+ui.inputgb.on("key", function(keyCode, event) {
     if (event.getAction() == 0 && keyCode == 66) {
         if (ui.inputgb.text().length > 5 && files.exists(ui.inputgb.text() + "关闭应用.js")) {
             modular_id(ui.inputgb.text());
@@ -1619,7 +1623,7 @@ ui.inputgb.on("key", function (keyCode, event) {
     }
 });
 
-ui.inputd2.on("key", function (keyCode, event) {
+ui.inputd2.on("key", function(keyCode, event) {
     if (event.getAction() == 0 && keyCode == 66) {
         if (ui.inputd2.text().length > 5 && files.exists(ui.inputd2.text() + "基建换班.js")) {
             modular_id(ui.inputd2.text())
@@ -1633,7 +1637,7 @@ ui.inputd2.on("key", function (keyCode, event) {
 activity.setSupportActionBar(ui.toolbar);
 activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 ui.toolbar.setNavigationOnClickListener({
-    onClick: function () {
+    onClick: function() {
         ui.finish();
     }
 });
@@ -1656,7 +1660,7 @@ ui.emitter.on('options_item_selected', (e, item) => {
 })
 
 function modular_id(file) {
-    threads.start(function () {
+    threads.start(function() {
         if (files.getExtension(file) != "js") {
             toast("不是后缀为.js的文件");
             console.error("不是后缀为.js的文件");
@@ -1698,8 +1702,8 @@ function modular_id(file) {
                 //    tool.writeJSON("关闭应用", file);
                 break;
             case '基建换班':
-                tool.writeJSON("基建换班", true);
-                //  tool.writeJSON("换班路径", file);
+              //  tool.writeJSON("基建换班", true);
+                //   tool.writeJSON("换班路径", file);
                 break;
             case '熄屏运行':
 
@@ -1733,13 +1737,15 @@ function modular_id(file) {
                 path: file
             });
         }
-        sto_mod.put("modular", mod_data)
+      //  sto_mod.put("modular", mod_data)
         snakebar("确认ID完成，" + route_c.id + "模块导入成功!");
     })
 }
 //当离开本界面时保存
 ui.emitter.on("pause", () => {
     setting = tool.readJSON("./mrfz/setting.json");
+     sto_mod.put("modular", mod_data)
+         
     let txt;
     if (ui.bg.text().length >= 1) {
         if (ui.bg.text().indexOf("0x") > -1) {
@@ -1815,10 +1821,10 @@ ui.OCRExtensions_type.on('click', (view) => {
 ui.OCRExtensions.on("click", (view) => {
     if (view.checked) {
         ocr_plugin[ui.OCRExtensions_type.getText().toString()].install({
-            successCallback: function () {
+            successCallback: function() {
                 tool.writeJSON("ocrExtend", true);
             },
-            failCallback: function () {
+            failCallback: function() {
                 tool.writeJSON("ocrExtend", false);
             },
         });
@@ -1839,8 +1845,8 @@ ui.OCRCorrection_rules.on('click', (view) => {
     })
 });
 
-ui.debugging.click((view)=>{
-    tool.writeJSON("调试",view.checked);
+ui.debugging.click((view) => {
+    tool.writeJSON("调试", view.checked);
 })
 update_ui()
 
@@ -1848,11 +1854,11 @@ function update_ui() {
     ui.run(() => {
         ui.button_pause.setText(setting.监听键);
         ui.button_pause.setBackground(createShape(5, 0, 0, [2, theme.bar]));
-       
-       ui.automaticUpdate.checked =(setting.update && setting.update.checked ? true : false)
+
+        ui.automaticUpdate.checked = (setting.update && setting.update.checked ? true : false)
         ui.usingTraffic_.setVisibility(setting.update && setting.update.checked ? 0 : 8);
         ui.usingTraffic.checked = (setting.update && setting.update.usingTraffic ? true : false);
-        
+
         ui.OCRExtensions_type.setText(setting.defaultOcr ? setting.defaultOcr : 'undefined');
         ui.OCRExtensions_type.setBackground(createShape(5, 0, 0, [2, theme.bar]));
         ui.OCRCorrection_rules.setBackground(createShape(5, 0, 0, [2, theme.bar]));
@@ -1879,7 +1885,7 @@ function update_ui() {
         ui.indxj.setVisibility(setting.企鹅统计 ? 0 : 8)
         ui.jsjt.checked = setting.汇报上传 ? true : false;
         ui.offset.checked = setting.offset ? true : false;
-       ui.debugging.checked = setting.调试 ? true : false;
+        ui.debugging.checked = setting.调试 ? true : false;
         try {
             let appOpsManager = context.getSystemService(context.APP_OPS_SERVICE);
             ui.PROJECT_MEDIA.checked = (appOpsManager.checkOpNoThrow(appOpsManager.OPSTR_PROJECT_MEDIA, android.os.Process.myUid(), packageName) == appOpsManager.MODE_ALLOWED);
@@ -1907,14 +1913,7 @@ function update_ui() {
         }
 
 
-        if (setting.自定义模块&&setting.自定义模块.length > 5) {
-                ui.custom.checked = true;
-                ui.indxc.attr("h", "80")
-                ui.input_c.attr("visibility", "visible");
-                ui.input_file3.attr("visibility", "visible");
-                ui.input_c.setHint(setting.自定义模块);
-            }
-        
+
         if (setting.截图 == "root" || setting.截图 == "Shizuku") {
             ui.getu.checked = true;
             ui.indxu.attr("h", "70")
@@ -1937,38 +1936,41 @@ function update_ui() {
         ui.theme.setHint(setting.theme);
         ui.toast.setHint(setting.toast);
 
+
+        if (setting.自定义模块 && setting.自定义模块.length > 5) {
+            ui.custom.checked = true;
+            ui.indxc.attr("h", "80")
+            ui.input_c.attr("visibility", "visible");
+            ui.input_file3.attr("visibility", "visible");
+            ui.input_c.setHint(setting.自定义模块);
+        }
         //关闭应用
-        if (setting.公告) {
-            if (setting.关闭应用.length < 3) {
-                ui.gbyy.checked = false
-                tool.writeJSON("公告", false);
-            } else {
-                ui.gbyy.checked = true;
-                ui.indx6.attr("h", "80");
-                ui.inputgb.attr("visibility", "visible");
-                ui.input_file.attr("visibility", "visible");
-                ui.inputgb.setHint(setting.关闭应用)
-            }
-        } else if (setting.公告 == false) {
+        let gbyyan = mod_data.find((item) => item.id == "关闭应用");
+        if (!gbyyan || gbyyan.suspend) {
             ui.gbyy.checked = false;
+
+        } else {
+            ui.gbyy.checked = true;
+            ui.indx6.attr("h", "80");
+            ui.inputgb.attr("visibility", "visible");
+            ui.input_file.attr("visibility", "visible");
+            ui.inputgb.setHint(gbyyan.path)
         }
 
-        if (setting.基建换班) {
-            if (setting.换班路径.length < 3) {
-                ui.jjhb.checked = false;
-                tool.writeJSON("基建换班", false);
-            } else {
-                ui.jjhb.checked = true;
-                ui.run(() => {
-                    ui.indx4.attr("h", "80")
-                    ui.inputd2.attr("visibility", "visible");
-                    ui.input_file2.attr("visibility", "visible")
-                })
-                ui.inputd2.setHint(setting.换班路径)
-            }
-        } else {
+        //基建换班
+        let shift = mod_data.find((item) => item.id == "基建换班");
+        if (!shift || shift.suspend) {
             ui.jjhb.checked = false;
+        } else {
+            ui.jjhb.checked = true;
+            ui.run(() => {
+                ui.indx4.attr("h", "80")
+                ui.inputd2.attr("visibility", "visible");
+                ui.input_file2.attr("visibility", "visible")
+            })
+            ui.inputd2.setHint(shift.path)
         }
+
 
         /* if (是否有查看使用情况的权限()) {
              ui.syqk.checked = true;
@@ -1979,6 +1981,10 @@ function update_ui() {
     })
 }
 
+function snakebar(text, second) {
+    second = second || 3000;
+    com.google.android.material.snackbar.Snackbar.make(ui.exit, text, second).show();
+}
 
 function 提示(id, txt) {
     //初始位置，展示的位置，文本
@@ -1989,16 +1995,16 @@ function 提示(id, txt) {
             txt = "关闭开关还原默认页面主题色";
             break
 
-        //关闭应用
+            //关闭应用
         case ui.gbyy:
             txt = "PRTS辅助暂停前执行相关js模块以关闭指定应用";
             break
 
-        //作战汇报
+            //作战汇报
         case ui.olrs:
             txt = "将替换掉悬浮窗上的快捷基建图标\n点击新的图标会显示PRTS辅助记录内容";
             break
-        //自定义执行
+            //自定义执行
         case ui.custom:
             txt = "唔...嗯？"
             break
@@ -2007,21 +2013,21 @@ function 提示(id, txt) {
             txt = "程序自启动游戏后关闭媒体音量，程序主动暂停后恢复";
             break
 
-        //企鹅物流
+            //企鹅物流
         case ui.jsjt:
             txt = "行动完成后自动截取结算页面识别并上传所有掉落结果，汇报详情。\n企鹅物流数据统计：https://penguin-stats.cn/";
             break
-        //数据统计
+            //数据统计
         case ui.qetj:
             txt = "*统计关卡掉落物信息！该功能会使用较多的运存，数据来源：企鹅物流数据统计，由于企鹅物流自身原因，请在使用本功能时关闭其它悬浮窗，否则识别出错。";
             break
         case ui.gfcm:
             txt = "开启后程序将检测防沉迷确认框自动退出游戏，不过目前嘛，几乎名存实亡...";
-        //使用高级权限截图
+            //使用高级权限截图
         case ui.getu:
             txt = "使用相关高级权限来进行截图\n不需要请求录屏权限，可以免受其困扰\n相应的，截图速度也会低于辅助录屏权限\n电脑模拟器竖屏打开此功能可修复";
             break
-        //熄屏
+            //熄屏
         case ui.xpyx:
             txt = "使用root或adb权限关闭背光，实现熄屏运行。不知道什么是root，adb？搜索一下root，adb，shizuku。\n启动熄屏模块方式：\n-----1：悬浮窗-点击执行模式文本\n-----2：主页-右下角-模块配置\n关闭熄屏状态方式:\n-----1：按下音量键关闭\n-----2：按电源键锁屏，再按电源键解锁\n-----3.长按音量键停止脚本并关闭\n说明：息屏运行期间，系统不会自动休眠，一切APP都会和亮屏时一样继续工作。直到您按下电源键才会真正的息屏。" +
                 "\n\n小部分设备在息屏运行之后会屏蔽按键，所以音量键亮屏在这些设备(已知华为鸿蒙的某些手机、Origin OS的某些手机)上无效" +
@@ -2032,7 +2038,7 @@ function 提示(id, txt) {
         case ui.vibration:
             txt = "振动？震动？"
             break
-        //低电量自动暂停
+            //低电量自动暂停
         case ui.dili:
             txt = "*每代理完一关，都会判断当前电量是否低于设定值，是则暂停并返回桌面处理(不受暂停后返回桌面功能影响)。"
             break
