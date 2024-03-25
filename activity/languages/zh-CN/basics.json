@@ -1,4 +1,5 @@
 {
+    "operation-mode":"点击/滑动模式",
     "button-pause": "音量暂停PRTS辅助",
     "button-pause-explain": "按下相关音量键暂停PRTS辅助程序\n相关音量键在PRTS辅助运行时不能调节音量",
     "auto-allow-screenshots": "自动允许截图权限",

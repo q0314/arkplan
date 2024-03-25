@@ -233,5 +233,5 @@ ui.emitter.on("pause", () => {
 })
 
 if (banben) {
-    ui.ban.setText("* 使用 Auto.js Pro v9.3.7 rhino脚本引擎")
+    ui.ban.setText("* 使用 Auto.js Pro v9.3.11 rhino脚本引擎")
 }

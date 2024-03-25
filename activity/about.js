@@ -334,9 +334,19 @@ ui.Help_list.setDataSource([
             app.openUrl("https://github.com/blueskybone/ArkScreen");
         }
     }, {
-        title: "GitHub:SuperMonster003/Ant-Forest/",
+        title: "GitHub:SuperMonster003/Ant-Forest",
         action() {
             app.openUrl("https://github.com/SuperMonster003/Ant-Forest");
+        }
+    }, {
+        title: "GitHub:zzliux/assttyys_autojs",
+        action() {
+            app.openUrl("https://github.com/zzliux/assttyys_autojs");
+        }
+    }, {
+        title: "GitHub:houbb/nlp-hanzi-similar",
+        action() {
+            app.openUrl("https://github.com/houbb/nlp-hanzi-similar");
         }
     }
 ]);
