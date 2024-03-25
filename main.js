@@ -84,6 +84,8 @@ var setting = tool.readJSON("configure", {
     "指定关卡": {
         levelAbbreviation: "当前"
     },
+    "重置代理次数":true,
+    "operation_mode":"无障碍",
     //剿灭代理_全权委托
     "proxy_card": true,
     "agent": true,
@@ -185,13 +187,10 @@ if (setting.start == undefined || setting == null) {
 
 try {
     setting.defaultOcr.length;
-    setting.重置代理次数.length;
+    setting["operation_mode"].length;
 } catch (err) {
-    setting.指定关卡 = {
-        levelAbbreviation: "当前",
-    };
-    tool.writeJSON("指定关卡", setting.指定关卡);
-    tool.writeJSON("重置代理次数", true);
+
+    tool.writeJSON("operation_mode", "无障碍");
     tool.writeJSON("defaultOcr", 'MlkitOCR');
     setting = tool.readJSON("configure");
 }

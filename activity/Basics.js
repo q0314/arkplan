@@ -66,7 +66,16 @@ ui.layout(
                         gravity="center|left" textSize='16sp' textColor='{{theme.bar}}'>
                     </text>
                     
-                    
+                    <horizontal margin="10 0" padding="15 5 1 5" gravity="center">
+                        <vertical layout_weight="2" >
+                            <text text="{{language['operation-mode']}}" textColor="black" textSize="18sp" />
+                            {/*  <text text="{{language['operation-mode-explain']}}" textColor="#95000000" textSize="10sp" marginTop="2" />*/}
+                        </vertical>
+                        <vertical >
+                            <TextView id="operation-mode" padding="5 5" textSize="15sp"
+                            margin="10" textColor="black" lines="1" gravity="center" />
+                        </vertical>
+                    </horizontal>
                     
                     <horizontal margin="10 0" padding="15 5 1 5" gravity="center">
                         <vertical layout_weight="1" >
@@ -222,7 +231,7 @@ ui.layout(
                         </vertical>
                         <vertical >
                             <TextView id="OCRExtensions_type" padding="5 5" textSize="15sp"
-                            margin="10" textColor="black" lines="1" />
+                            margin="10" textColor="black" lines="1" gravity="center" />
                             <TextView id="OCRCorrection_rules" text="{{language['OCRCorrection-rules']}}" padding="5 5" textSize="15sp"
                             margin="10 5 10 0" textColor="black" lines="1" gravity="center" />
                         </vertical>
@@ -561,6 +570,22 @@ ui.layout(
     </frame>
     </vertical>
 )
+
+
+
+ui["operation-mode"].on('click', (view) => {
+    BottomWheelPicker.setData(Object.keys({
+            '无障碍': 0,
+            'RootAutomator': 1,
+            'Shell': 2,
+            'Root': 3
+        }))
+        .show().then(result => {
+            view.setText(result.text);
+            tool.writeJSON("operation_mode", result.text);
+           // view.setBackground(createShape(5, 0, 0, [2, theme.bar]));
+        })
+});
 
 ui.proxy_card_check.click((view) => {
     tool.writeJSON("proxy_card", view.checked)
@@ -1409,7 +1434,7 @@ ui.customtxt.on("click", () => {
 ui.gbyy.on("click", (view) => {
     // log(setting.公告)
     let gbyyan = mod_data.find((item) => item.id == "关闭应用");
-    if(gbyyan) gbyyan.suspend = !view.checked;
+    if (gbyyan) gbyyan.suspend = !view.checked;
     if (view.checked) {
         ui.run(() => {
             ui.indx6.attr("h", "80")
@@ -1432,10 +1457,10 @@ ui.gbyytxt.on("click", () => {
 
 //基建换班
 ui.jjhb.on("click", (view) => {
-  
+
     let shift = mod_data.find((item) => item.id == "基建换班");
-   if(shift) shift.suspend = !view.checked;
- 
+    if (shift) shift.suspend = !view.checked;
+
     if (view.checked) {
         ui.run(() => {
             ui.indx4.attr("h", "80")
@@ -1702,7 +1727,7 @@ function modular_id(file) {
                 //    tool.writeJSON("关闭应用", file);
                 break;
             case '基建换班':
-              //  tool.writeJSON("基建换班", true);
+                //  tool.writeJSON("基建换班", true);
                 //   tool.writeJSON("换班路径", file);
                 break;
             case '熄屏运行':
@@ -1737,15 +1762,15 @@ function modular_id(file) {
                 path: file
             });
         }
-      //  sto_mod.put("modular", mod_data)
+        //  sto_mod.put("modular", mod_data)
         snakebar("确认ID完成，" + route_c.id + "模块导入成功!");
     })
 }
 //当离开本界面时保存
 ui.emitter.on("pause", () => {
     setting = tool.readJSON("./mrfz/setting.json");
-     sto_mod.put("modular", mod_data)
-         
+    sto_mod.put("modular", mod_data)
+
     let txt;
     if (ui.bg.text().length >= 1) {
         if (ui.bg.text().indexOf("0x") > -1) {
@@ -1833,6 +1858,7 @@ ui.OCRExtensions.on("click", (view) => {
         view.checked = true;
     }
 });
+
 ui.OCRCorrection_rules.on('click', (view) => {
     engines.execScriptFile("./ocrfix.js", {
         arguments: {
@@ -1854,7 +1880,8 @@ function update_ui() {
     ui.run(() => {
         ui.button_pause.setText(setting.监听键);
         ui.button_pause.setBackground(createShape(5, 0, 0, [2, theme.bar]));
-
+        ui["operation-mode"].setText(setting["operation_mode"] || "无障碍");
+        ui["operation-mode"].setBackground(createShape(5, 0, 0, [2, theme.bar]));
         ui.automaticUpdate.checked = (setting.update && setting.update.checked ? true : false)
         ui.usingTraffic_.setVisibility(setting.update && setting.update.checked ? 0 : 8);
         ui.usingTraffic.checked = (setting.update && setting.update.usingTraffic ? true : false);

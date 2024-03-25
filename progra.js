@@ -11,6 +11,9 @@ var {
     iStatusBarHeight,
     isHorizontalScreen,
 } = require('./modules/__util__.js');
+//不能使用{function} = 导入方式，否则press会循环无效执行，
+var MyAutomator = require("./modules/MyAutomator.js");
+MyAutomator.setTapType(setting["operation_mode"])
 
 var agent = 0,
     /**
@@ -309,39 +312,39 @@ let collection = {
 
                     switch (affairs) {
                         case displayText["主题曲"]:
-                            click(this.staging.right + zox(180), this.staging.bottom);
-                            click(this.staging.right + zox(180) * 1, this.staging.bottom);
+                            MyAutomator.click(this.staging.right + zox(180), this.staging.bottom);
+                            MyAutomator.click(this.staging.right + zox(180) * 1, this.staging.bottom);
                             break;
                         case "插曲":
-                            click(this.staging.right + zox(180) * 3, this.staging.bottom);
-                            click(this.staging.right + zox(180) * 4, this.staging.bottom);
+                            MyAutomator.click(this.staging.right + zox(180) * 3, this.staging.bottom);
+                            MyAutomator.click(this.staging.right + zox(180) * 4, this.staging.bottom);
                             break;
                         case displayText["资源收集"]:
-                            click(this.staging.right + zox(180) * 7, this.staging.bottom);
-                            click(this.staging.right + zox(180) * 8, this.staging.bottom);
+                            MyAutomator.click(this.staging.right + zox(180) * 7, this.staging.bottom);
+                            MyAutomator.click(this.staging.right + zox(180) * 8, this.staging.bottom);
                             //  log((this.staging.right + zox(180) * 7));
                             // log(this.staging.right + zox(180) * 8);
 
                             break;
                         case displayText["常态事务"]:
-                            click(this.staging.right + zox(180) * 9, this.staging.bottom);
-                            click(this.staging.right + zox(180) * 10, this.staging.bottom);
+                            MyAutomator.click(this.staging.right + zox(180) * 9, this.staging.bottom);
+                            MyAutomator.click(this.staging.right + zox(180) * 10, this.staging.bottom);
                             break;
                         case displayText["长期探索"]:
-                            click(this.staging.right + zox(180) * 11, this.staging.bottom);
-                            click(this.staging.right + zox(180) * 12, this.staging.bottom);
+                            MyAutomator.click(this.staging.right + zox(180) * 11, this.staging.bottom);
+                            MyAutomator.click(this.staging.right + zox(180) * 12, this.staging.bottom);
                             break;
                     }
                 } else {
                     switch (affairs) {
                         case displayText["主题曲"]:
-                            click(zox(505), width - zoy(80));
+                            MyAutomator.click(zox(505), width - zoy(80));
                             break;
                         case displayText["资源收集"]:
-                            click(zox(1520), width - zoy(80));
+                            MyAutomator.click(zox(1520), width - zoy(80));
                             break;
                         case "长期探索":
-                            click(zox(2200), width - zoy(80));
+                            MyAutomator.click(zox(2200), width - zoy(80));
                             break;
                     }
                 };
@@ -369,23 +372,34 @@ let collection = {
         this.终端事务(displayText["主题曲"]);
         tool.Floaty_emit("面板", "隐藏");
         tool.Floaty_emit("展示文本", "状态", "状态: 正在进入固源岩关卡");
-        while (true) {
+        let cumulative = 5;
+        while (cumulative) {
             sleep(500);
-            if (this.staging = (ITimg.ocr(displayText["残阳"], {
+            if (this.staging = (ITimg.ocr(displayText["EPISODE"], {
                     action: 5,
                     area: 13,
-                }) || ITimg.ocr(displayText["EPISODE"], {
+                    similar: 0.85,
+                })) || ITimg.ocr(displayText["残阳"], {
                     action: 5,
                     area: 13,
                     log_policy: true,
                     refresh: false,
-                }))) {
-                swipe(this.staging.left, this.staging.bottom, this.staging.right, width, 500);
+                })) {
+                swipe(this.staging.left, this.staging.bottom, this.staging.right, width-zoy(100), 500);
                 sleep(500);
-                swipe(this.staging.left, this.staging.bottom, this.staging.right, width, 500);
+                swipe(this.staging.left, this.staging.bottom, this.staging.right, width-zoy(100), 500);
                 sleep(500);
                 break;
             };
+            cumulative--;
+            if (!cumulative) {
+                console.warn("多次无法识别EPISODE，改用固定坐标滑动");
+                swipe(zox(300), zoy(350), zox(300), width - zoy(200), 500);
+                sleep(500);
+                swipe(zox(300), zoy(350), zox(300), width - zoy(200), 500);
+                sleep(500);
+            }
+
         };
         sleep(500);
         tool.Floaty_emit("面板", "展开");
@@ -399,7 +413,7 @@ let collection = {
                 area: 34,
                 part: true
             }))) {
-            click(this.staging.right, this.staging.top);
+            MyAutomator.click(this.staging.right, this.staging.top);
             sleep(1000);
         };
 
@@ -555,23 +569,23 @@ let collection = {
         };
         if (龙门外环) {
 
-            click(height / 2, 25);
+            MyAutomator.click(height / 2, 25);
             sleep(1000);
-            click(height, width - 30);
+            MyAutomator.click(height, width - 30);
             sleep(1000);
             if (!ITimg.picture("上次_龙门外环", {
                     action: 0,
                     timing: 2000,
                     area: "右半屏",
                 })) {
-                click(height - zox(60), width - zoy(30));
+                MyAutomator.click(height - zox(60), width - zoy(30));
                 sleep(1000);
                 if (!ITimg.picture("上次_龙门外环", {
                         action: 0,
                         timing: 2000,
                         area: "右半屏",
                     })) {
-                    click(height - zox(120), width - zoy(30));
+                    MyAutomator.click(height - zox(120), width - zoy(30));
                     sleep(1000);
 
                     if (!ITimg.picture("上次_龙门外环", {
@@ -579,7 +593,7 @@ let collection = {
                             timing: 2000,
                             area: "右半屏",
                         })) {
-                        click(height - 180, width - 30);
+                        MyAutomator.click(height - 180, width - 30);
                         sleep(1000);
                         if (!ITimg.picture("上次_龙门外环", {
                                 action: 0,
@@ -930,7 +944,7 @@ function 基建换班(fatigue_state) {
             console.warn("已暂停运行基建换班模块")
             return false;
         }
-        click(height / 2, 50)
+        MyAutomator.click(height / 2, 50)
         tool.Floaty_emit("展示文本", "状态", "状态：执行基建换班中")
         try {
             ITimg.重置计时器(false);
@@ -992,7 +1006,12 @@ let 唤醒 = {
             return true;
         };
         启动应用(true);
-        click(height / 2, width - 100);
+        try {
+            press(height / 2, width - 100, 100);
+        } catch (e) {
+
+            console.error(e)
+        }
         sleep(2000);
         this.开始唤醒();
         sleep(500);
@@ -1033,7 +1052,7 @@ let 唤醒 = {
             if (update_app) {
                 if (!update_app.clickable() || !update_app.click()) {
                     update_app = update_app.bounds();
-                    click(update_app.centerX(), update_app.centerY());
+                    MyAutomator.click(update_app.centerX(), update_app.centerY());
 
                 };
             };
@@ -1043,7 +1062,7 @@ let 唤醒 = {
                 if (usingTraffic) {
                     if (!usingTraffic.clickable() || !usingTraffic.click()) {
                         usingTraffic = usingTraffic.bounds();
-                        click(usingTraffic.centerX(), usingTraffic.centerY())
+                        MyAutomator.click(usingTraffic.centerX(), usingTraffic.centerY())
                     }
                 }
                 console.info("使用流量下载按钮参数：\n" + usingTraffic);
@@ -1052,7 +1071,7 @@ let 唤醒 = {
             let install_app = desc(displayText["安装"]).findOne();
             if (!install_app.clickable() || !install_app.click()) {
                 install_app = install_app.bounds();
-                click(install_app.centerX(), install_app.centerY());
+                MyAutomator.click(install_app.centerX(), install_app.centerY());
             };
 
             console.info("安装应用按钮参数：\n" + install_app);
@@ -1061,7 +1080,7 @@ let 唤醒 = {
             let assembly = id("android:id/text1").className("android.widget.TextView").findOne(1000);
             if (!assembly.clickable() || !assembly.click()) {
                 assembly = assembly.bounds();
-                click(assembly.centerX(), assembly.centerY());
+                MyAutomator.click(assembly.centerX(), assembly.centerY());
             };
 
             sleep(3000);
@@ -1072,7 +1091,7 @@ let 唤醒 = {
                 install_app = textMatches(displayText["确认安装合集"]).findOne();
                 if (!install_app.clickable() || !install_app.click()) {
                     install_app = install_app.bounds();
-                    click(install_app.centerX(), install_app.centerY());
+                    MyAutomator.click(install_app.centerX(), install_app.centerY());
                 };
                 if (install_app) {
                     console.info("安装应用第" + ii + "步按钮:\n" + install_app);
@@ -1083,7 +1102,7 @@ let 唤醒 = {
                 if (install_app) {
                     if (!install_app.clickable() || !install_app.click()) {
                         install_app = install_app.bounds();
-                        click(install_app.centerX(), install_app.centerY());
+                        MyAutomator.click(install_app.centerX(), install_app.centerY());
                     };
                     break;
                 }
@@ -1185,7 +1204,7 @@ let 唤醒 = {
                     this.检查更新(true);
                     continue;
                 };
-                click(height / 2, width - 100);
+                MyAutomator.click(height / 2, width - 100);
                 sleep(1000);
                 getpackage = tool.currentPackage();
                 log("前台包名：" + getpackage);
@@ -1193,13 +1212,13 @@ let 唤醒 = {
                     tool.Floaty_emit("展示文本", "状态", "状态：当前渠道为B服，等待");
                     toastLog("当前渠道为B服，请等待")
                     sleep(3000);
-                    click(height / 2, width - 100);
+                    MyAutomator.click(height / 2, width - 100);
                     sleep(3000);
-                    click(height / 2, width - 100);
+                    MyAutomator.click(height / 2, width - 100);
                     sleep(2000)
-                    click(height / 2, width - 100);
+                    MyAutomator.click(height / 2, width - 100);
                     sleep(2000);
-                    click(height / 2, width - 100);
+                    MyAutomator.click(height / 2, width - 100);
                     break;
                 };
 
@@ -1252,7 +1271,7 @@ let 唤醒 = {
                 };
             } else {
                 //点击边缘位置来取消取消按钮不一样的公告
-                click(height / 2, width - zoy(100));
+                MyAutomator.click(height / 2, width - zoy(100));
                 if (ITimg.picture("终端", {
                         area: 2,
                         //        action:5,
@@ -1370,9 +1389,9 @@ function 行动() {
                         }))) {
                         if (setting.重置代理次数) {
 
-                            click(staging.left - zox(70), staging.y + staging.h / 2);
+                            MyAutomator.click(staging.left - zox(70), staging.y + staging.h / 2);
                             sleep(500);
-                            click(staging.left - zox(70), staging.y + staging.h / 2 - zoy(80));
+                            MyAutomator.click(staging.left - zox(70), staging.y + staging.h / 2 - zoy(80));
                             sleep(200);
                             delete staging;
                         }
@@ -1588,12 +1607,12 @@ function 行动() {
                 agent++;
                 if (setting.agent) {
                     for (let i = 0; i < 10; i++) {
-                        click(temporary_xy.x + random(-15, 15), temporary_xy.y + random(-10, 10))
+                        MyAutomator.click(temporary_xy.x + random(-15, 15), temporary_xy.y + random(-10, 10))
                         sleep(200)
                     }
                     break
                 } else {
-                    click(temporary_xy.x + random(-15, 15), temporary_xy.y + random(-10, 10))
+                    MyAutomator.click(temporary_xy.x + random(-15, 15), temporary_xy.y + random(-10, 10))
                 }
 
             }
@@ -1669,7 +1688,7 @@ function 行动() {
                         threshold: 0.75,
                     }))
                     if (temporary_xy) {
-                        click(temporary_xy.x, temporary_xy.y);
+                        MyAutomator.click(temporary_xy.x, temporary_xy.y);
                         sleep(1500);
                     }
                     if (!ITimg.picture("等级_提升", {
@@ -1801,7 +1820,7 @@ function 理智处理() {
             } else {
                 toast("木有理智，更木有理智兑换次数");
                 console.warn("木有理智，更木有理智兑换次数");
-                click(height / 2, width - zox(50));
+                MyAutomator.click(height / 2, width - zox(50));
                 return false;
             }
 
@@ -1855,7 +1874,7 @@ function 理智处理() {
         toast("木有理智药剂，更木有源石可供恢复理智");
         console.warn("木有理智药剂，更木有源石可供恢复理智");
         tool.Floaty_emit("展示文本", "状态", "状态：没有方法恢复");
-        click(height / 2, width - zox(50));
+        MyAutomator.click(height / 2, width - zox(50));
         return false;
     };
     return true;
@@ -1909,7 +1928,7 @@ function 跳转_暂停(suspended, status, literals) {
 
     } else {
         sleep(800);
-        click(height / 2, width / 2);
+        MyAutomator.click(height / 2, width / 2);
         threadMain.interrupt();
         threadMain = threads.start(基建);
     }
@@ -2072,7 +2091,7 @@ function 剿灭() {
                     统计("行动", undefined, true)
                     if (this.xy_) {
                         while (true) {
-                            click(this.xy_.x, this.xy_.y);
+                            MyAutomator.click(this.xy_.x, this.xy_.y);
                             sleep(1500);
                             if (ITimg.picture("行动_普通", {
                                     area: "右半屏",
@@ -2242,12 +2261,12 @@ function 剿灭() {
                 agent++;
                 if (setting.agent) {
                     for (let i = 0; i < 10; i++) {
-                        click(temporary_xy.x + random(-15, 15), temporary_xy.y + random(-10, 10))
+                        MyAutomator.click(temporary_xy.x + random(-15, 15), temporary_xy.y + random(-10, 10))
                         sleep(200)
                     }
                     break
                 } else {
-                    click(temporary_xy.x + random(-15, 15), temporary_xy.y + random(-10, 10))
+                    MyAutomator.click(temporary_xy.x + random(-15, 15), temporary_xy.y + random(-10, 10))
                 }
 
             }
@@ -2949,10 +2968,10 @@ function 基建() {
                     }
                 }
                 sleep(500)
-                click(height - 72, 50)
-                click(height - 72 * 2, 50)
-                click(height - 72 * 3, 50)
-                click(height - 72 * 4, 50)
+                MyAutomator.click(height - 72, 50)
+                MyAutomator.click(height - 72 * 2, 50)
+                MyAutomator.click(height - 72 * 3, 50)
+                MyAutomator.click(height - 72 * 4, 50)
 
                 if (ITimg.ocr("传递奖励", {
                         action: 5,
@@ -2967,10 +2986,10 @@ function 基建() {
                         correction_path: "信用",
                     })) {
                     sleep(500)
-                    click(height - 72, 50)
-                    click(height - 72 * 2, 50)
-                    click(height - 72 * 3, 50)
-                    click(height - 72 * 4, 50)
+                    MyAutomator.click(height - 72, 50)
+                    MyAutomator.click(height - 72 * 2, 50)
+                    MyAutomator.click(height - 72 * 3, 50)
+                    MyAutomator.click(height - 72 * 4, 50)
                 }
             } else {
                 let tips = "无法匹配到 线索_传递.png 小图，请确认图库是否匹配设备分辨率,或当前界面是否是会客室界面";
@@ -3030,10 +3049,10 @@ function 基建() {
             };
 
             //点击new可领取新的
-            click((temporary_xy.x + temporary_xy.w / 2) - 15, temporary_xy.bottom);
-            click((temporary_xy.x + temporary_xy.w / 2) - 25, temporary_xy.bottom);
-            click((temporary_xy.x + temporary_xy.w / 2) - 40, temporary_xy.bottom);
-            click((temporary_xy.x + temporary_xy.w / 2) - 60, temporary_xy.bottom);
+            MyAutomator.click((temporary_xy.x + temporary_xy.w / 2) - 15, temporary_xy.bottom);
+            MyAutomator.click((temporary_xy.x + temporary_xy.w / 2) - 25, temporary_xy.bottom);
+            MyAutomator.click((temporary_xy.x + temporary_xy.w / 2) - 40, temporary_xy.bottom);
+            MyAutomator.click((temporary_xy.x + temporary_xy.w / 2) - 60, temporary_xy.bottom);
 
             sleep(2000);
             if (ITimg.picture("线索_全部收取", {
@@ -3042,7 +3061,7 @@ function 基建() {
                     area: "下半屏",
                 })) {
                 sleep(100);
-                click(height / 2 + random(-10, 10), 50 + random(-5, 5));
+                MyAutomator.click(height / 2 + random(-10, 10), 50 + random(-5, 5));
                 sleep(500);
             } else {
 
@@ -3158,7 +3177,7 @@ function 基建() {
         } catch (e) {};
         console.info(point)
         if (point) {
-            click(Math.floor((height / 2340) * 2000), point.y)
+            MyAutomator.click(Math.floor((height / 2340) * 2000), point.y)
             Combat_report.record("传递线索：" + xs, undefined, "info")
 
             sleep(500)
@@ -3299,11 +3318,11 @@ function 基建() {
         }
         log("点击 导航_任务转导航_好友, x:" + (temporary_xy.x + temporary_xy.w) + "y:" + temporary_xy.y)
         sleep(10);
-        click((temporary_xy.x + temporary_xy.w) + 100, temporary_xy.y);
+        MyAutomator.click((temporary_xy.x + temporary_xy.w) + 100, temporary_xy.y);
         sleep(100)
-        click((temporary_xy.x + temporary_xy.w) + 50, temporary_xy.y);
+        MyAutomator.click((temporary_xy.x + temporary_xy.w) + 50, temporary_xy.y);
         sleep(100)
-        click(temporary_xy.x + temporary_xy.w, temporary_xy.y);
+        MyAutomator.click(temporary_xy.x + temporary_xy.w, temporary_xy.y);
         sleep(600);
         (ITimg.picture("基建_离开", {
             action: 0,
@@ -3570,7 +3589,7 @@ function 采购() {
 
 function 购买信用物品() {
     sleep(1000);
-    click(height / 2 + random(-10, 10), 25 + random(-5, 5));
+    MyAutomator.click(height / 2 + random(-10, 10), 25 + random(-5, 5));
     if (ITimg.language == "简中服") {
         sleep(500);
         if (!ITimg.initocr()) {
@@ -3629,7 +3648,7 @@ function 购买信用物品() {
                 }
                 //购买
 
-                click(goods.left + random(5, 10), goods.top + random(30, 40))
+                MyAutomator.click(goods.left + random(5, 10), goods.top + random(30, 40))
                 sleep(800)
                 let img = ITimg.captureScreen_()
                 let point = findColor(img, "#ff6800", {
@@ -3640,7 +3659,7 @@ function 购买信用物品() {
                     img.recycle();
                 } catch (e) {};
                 if (point) {
-                    click(point.x + 50, point.y + 20);
+                    MyAutomator.click(point.x + 50, point.y + 20);
                     sleep(1500)
                     if (!ITimg.picture("获得物资", {
                             action: 0,
@@ -3653,7 +3672,7 @@ function 购买信用物品() {
                                 action: 0,
                                 timing: 1000,
                             })) {
-                            click(height / 2, 50);
+                            MyAutomator.click(height / 2, 50);
                             sleep(500)
                             toastLog("没有足够的信用点购买 " + setting.信用处理.购买列表[i])
                             break
@@ -3711,7 +3730,7 @@ function 购买信用物品() {
                         part: true,
                         correction_path: "信用",
                     })) {
-                    click(goods.right, goods.bottom);
+                    MyAutomator.click(goods.right, goods.bottom);
                     //判断物品名是否在购买列表
                     sleep(500)
                     let shangpinming = ITimg.ocr("购买的物品名", {
@@ -3723,7 +3742,7 @@ function 购买信用物品() {
                         if (setting.信用处理.购买列表.indexOf(shangpinming[l].text) == -1) {
                             if ((shangpinming.length - 1) == l) {
                                 toastLog(shangpinming[l].text + " 不是需要购买的物品")
-                                click(height / 2, 50);
+                                MyAutomator.click(height / 2, 50);
                                 sleep(500)
                                 //移除此物品
                                 taglb.forEach((item, index, taglb) => {
@@ -3745,7 +3764,7 @@ function 购买信用物品() {
                                 img.recycle();
                             } catch (e) {};
                             if (point) {
-                                click(point.x + 50, point.y + 20);
+                                MyAutomator.click(point.x + 50, point.y + 20);
                                 sleep(1000)
                                 if (!ITimg.picture("获得物资", {
                                         action: 0,
@@ -3758,7 +3777,7 @@ function 购买信用物品() {
                                             action: 0,
                                             timing: 1000,
                                         })) {
-                                        click(height / 2, 50);
+                                        MyAutomator.click(height / 2, 50);
                                         sleep(500)
                                         toastLog("没有足够的信用点购买 " + setting.信用处理.购买列表[i])
                                         break
@@ -3808,13 +3827,13 @@ function 购买信用物品() {
                 } catch (e) {};
 
                 if (point) {
-                    click(point.x + 50, point.y + 20);
+                    MyAutomator.click(point.x + 50, point.y + 20);
                     sleep(1500)
                     if (!ITimg.picture("获得物资", {
                             action: 0,
                             timing: 1000,
                         })) {
-                        click(height / 2, 50);
+                        MyAutomator.click(height / 2, 50);
                         Combat_report.record("购买了信用商品");
                         sleep(500)
                     };
@@ -3949,7 +3968,7 @@ function 公招(Manual) {
                 area: "左半屏",
                 action: 5,
             })) {
-            click(height / 3 + random(-10, 10), 5 + random(5, 10));
+            MyAutomator.click(height / 3 + random(-10, 10), 5 + random(5, 10));
             sleep(1000);
         }
 
@@ -4041,7 +4060,7 @@ function 公招(Manual) {
                                     })) {
                                     break;
                                 } else {
-                                    click(500 + random(-10, 10), 500 + random(-10, 10));
+                                    MyAutomator.click(500 + random(-10, 10), 500 + random(-10, 10));
                                     sleep(300);
                                 }
                             }
@@ -4114,7 +4133,7 @@ function 公招(Manual) {
         sleep(300)
         switch (shu) {
             case 1:
-                click(height / 3 + random(-10, 10), width / 3 + random(-10, 10));
+                MyAutomator.click(height / 3 + random(-10, 10), width / 3 + random(-10, 10));
                 sleep(800);
                 position = 1;
                 return (ITimg.picture("公招_确认", {
@@ -4134,7 +4153,7 @@ function 公招(Manual) {
                     threshold: 0.7,
                 }));
             case 2:
-                click(height / 1.4 + random(-10, 10), width / 3 + random(-10, 10))
+                MyAutomator.click(height / 1.4 + random(-10, 10), width / 3 + random(-10, 10))
                 sleep(800)
                 position = 2;
                 return (ITimg.picture("公招_确认", {
@@ -4154,7 +4173,7 @@ function 公招(Manual) {
                     threshold: 0.7,
                 }));
             case 3:
-                click(height / 3 + random(-10, 10), width / 1.4 + random(-10, 10));
+                MyAutomator.click(height / 3 + random(-10, 10), width / 1.4 + random(-10, 10));
                 sleep(800)
                 position = 3
                 return (ITimg.picture("公招_确认", {
@@ -4174,7 +4193,7 @@ function 公招(Manual) {
                     threshold: 0.7,
                 }));
             case 4:
-                click(height / 1.4 + random(-10, 10), width / 1.4 + random(-10, 10));
+                MyAutomator.click(height / 1.4 + random(-10, 10), width / 1.4 + random(-10, 10));
                 sleep(800)
                 position = 4;
                 return (ITimg.picture("公招_确认", {
@@ -4263,9 +4282,9 @@ function 公招(Manual) {
                         })
                         if (taglb) {
 
-                            click(taglb.x + taglb.w / 2 + random(-10, 10), taglb.y + taglb.h / 2 + random(-10, 10))
+                            MyAutomator.click(taglb.x + taglb.w / 2 + random(-10, 10), taglb.y + taglb.h / 2 + random(-10, 10))
                             sleep(random(500, 600));
-                            click(taglb.x + taglb.w / 2 + random(-10, 10), taglb.y + taglb.h / 2 - random(-10, 10));
+                            MyAutomator.click(taglb.x + taglb.w / 2 + random(-10, 10), taglb.y + taglb.h / 2 - random(-10, 10));
                             if (ITimg.picture("公招_确认", {
                                     action: 0,
                                     timing: 1000,
@@ -4337,7 +4356,7 @@ function 公招(Manual) {
             for (let i = 0; i < result[0].add_tags.length; i++) {
                 bon = taglb.find(ele => ele.text == result[0].add_tags[i]);
                 if (bon) {
-                    click(bon.left, bon.top);
+                    MyAutomator.click(bon.left, bon.top);
                     tag_bon.push(bon.text);
                     sleep(100);
                 }
@@ -4776,12 +4795,12 @@ function 任务() {
             if (temporary_xy) {
                 console.verbose("周常任务位置数据:\n" + JSON.stringify(temporary_xy));
                 if (i == 1) {
-                    click(temporary_xy.x - 150, temporary_xy.y);
+                    MyAutomator.click(temporary_xy.x - 150, temporary_xy.y);
                     sleep(100);
-                    click(temporary_xy.x - 200, temporary_xy.y);
+                    MyAutomator.click(temporary_xy.x - 200, temporary_xy.y);
                     sleep(600);
                 } else {
-                    click(temporary_xy.x + temporary_xy.w / 2, temporary_xy.y + temporary_xy.h / 2);
+                    MyAutomator.click(temporary_xy.x + temporary_xy.w / 2, temporary_xy.y + temporary_xy.h / 2);
                 }
             }
 

@@ -265,17 +265,6 @@ function 申请截图() {
 };
 
 /*
-function click_s(x, y) {
-    //强制停止微信
-    if (setting.ADB) {
-        log("6668")
-      let shhh = shell("input tap " + 450 + " " + 100);
-        toastLog(shhh+"@@@")
-    } else {
-        click(x, y)
-    }
-}*/
-/*
 function rootgetScreen() {
 console.time('rootScreenCapture');
 let img = rootScreenCapture();
@@ -544,19 +533,19 @@ function 图像匹配(picture, list) {
             case 0:
                 sleep(50);
                 //click_s(cx,cy)
-                click(ITimg.results.x + img_small_xy.w / 2, ITimg.results.y + img_small_xy.h / 2);
+                MyAutomator.click(ITimg.results.x + img_small_xy.w / 2, ITimg.results.y + img_small_xy.h / 2);
                 break;
             case 1:
-                click(ITimg.results.x + 10, ITimg.results.y + 10);
+                MyAutomator.click(ITimg.results.x + 10, ITimg.results.y + 10);
                 break
             case 2:
-                click(ITimg.results.x + img_small_xy.w, ITimg.results.y)
+                MyAutomator.click(ITimg.results.x + img_small_xy.w, ITimg.results.y)
                 break
             case 3:
-                click(ITimg.results.x, ITimg.results.y + img_small_xy.h);
+                MyAutomator.click(ITimg.results.x, ITimg.results.y + img_small_xy.h);
                 break
             case 4:
-                click(ITimg.results.x + img_small_xy.w, ITimg.results.y + img_small_xy.h);
+                MyAutomator.click(ITimg.results.x + img_small_xy.w, ITimg.results.y + img_small_xy.h);
                 break
 
             case 5:
@@ -748,21 +737,21 @@ function ocr文字识别(words, list) {
                 break
             case 0:
 
-                click(query_.left + Math.floor((query_.right - query_.left) / 2), query_.top + Math.floor((query_.bottom - query_.top) / 2))
+                MyAutomator.click(query_.left + Math.floor((query_.right - query_.left) / 2), query_.top + Math.floor((query_.bottom - query_.top) / 2))
                 break;
 
                 //点击文字左上角
             case 1:
-                click(query_.left, query_.top);
+                MyAutomator.click(query_.left, query_.top);
                 break
             case 2:
-                click(query_.right, query_.top);
+                MyAutomator.click(query_.right, query_.top);
                 break
             case 3:
-                click(query_.left, query_.bottom);
+                MyAutomator.click(query_.left, query_.bottom);
                 break
             case 4:
-                click(query_.right, query_.bottom);
+                MyAutomator.click(query_.right, query_.bottom);
                 break
             case 5:
                 return query_;
