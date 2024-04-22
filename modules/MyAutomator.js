@@ -36,7 +36,6 @@ let MyAutomator = {
         }
     },
     click(x, y) {
-        log("666")
        return MyAutomator.press(x, y, random(149,160));
        
     },

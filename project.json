@@ -5,17 +5,17 @@
   ],
   "assets": [],
   "build": {
-    "build_id": "F0BEF4D1-1225",
-    "build_number": 1225,
-    "build_time": 1705072038424,
+    "build_id": "F14E8389-1228",
+    "build_number": 1228,
+    "build_time": 1711373239486,
     "release": false
   },
-  "encryptLevel": 3,
+  "encryptLevel": 0,
   "features": {
     "activityIntentTasks": false,
     "nodejs": "auto"
   },
-  "icon": "res/icon.png",
+  "icon": "images/ic_app_logo.png",
   "launchConfig": {
     "displaySplash": true,
     "hideLogs": false,
@@ -85,7 +85,7 @@
   "signingConfig": {
     "alias": "qiao0314",
     "keystore": "/storage/emulated/0/脚本/.keystore/桥2.jks",
-    "uuid": "0d9d596d-ce42-49e6-99d2-d7387fb33d87"
+    "uuid": "30e8349e-b7be-4217-a506-6072dedc75df"
   },
   "useFeatures": [],
   "versionCode": 2024032545,

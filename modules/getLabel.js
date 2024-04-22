@@ -2,10 +2,11 @@ var gz = [];
 var gzgy = eval(files.read("./lib/game_data/RecruitData.json"));
 var gzget = {
     //聘用的干员
-    get_t: function (arr) {
+    get_t: function(arr) {
         log("获取聘用干员名");
         let name_;
         for (let i = 0; i < gzgy.length; i++) {
+            // console.info(arr.find(ele => ele.text.indexOf(gzgy[i].name) != -1))
             name_ = arr.find(ele => ele.text.indexOf(gzgy[i].name) != -1) ? gzgy[i] : undefined;
             if (!name_) {
                 continue;
@@ -20,7 +21,7 @@ var gzget = {
                     name_ = false;
                     continue;
                 }
-
+                break;
             }
 
         }
@@ -29,7 +30,7 @@ var gzget = {
         }
         return name_;
     },
-    get_r: function (tags, filter) {
+    get_r: function(tags, filter) {
         log("检验tag词条,返回可招募的干员组合");
         gz = [];
         gzgy = eval(files.read("./lib/game_data/RecruitData.json"));
@@ -102,7 +103,7 @@ var gzget = {
         }
         return delete_m;
     },
-    check_e_tag: function (tags_check, above_four, filter) {
+    check_e_tag: function(tags_check, above_four, filter) {
         //校验tag,过滤出包含该tag的干员
         let tmp_arr = [];
         let is_add = true,

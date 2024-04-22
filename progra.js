@@ -385,9 +385,9 @@ let collection = {
                     log_policy: true,
                     refresh: false,
                 })) {
-                swipe(this.staging.left, this.staging.bottom, this.staging.right, width-zoy(100), 500);
+                swipe(this.staging.left, this.staging.bottom, this.staging.right, width - zoy(100), 500);
                 sleep(500);
-                swipe(this.staging.left, this.staging.bottom, this.staging.right, width-zoy(100), 500);
+                swipe(this.staging.left, this.staging.bottom, this.staging.right, width - zoy(100), 500);
                 sleep(500);
                 break;
             };
@@ -1026,15 +1026,7 @@ let 唤醒 = {
             return false;
         }
         tool.Floaty_emit("展示文本", "状态", "状态：检查是否需要更新");
-        if (setting.update.usingTraffic) {
-            //用于确认方舟流量热更新
-            ITimg.picture("基建_离开", {
-                timing: 5000,
-                action: 0,
-                area: "右半屏",
-            });
-            return
-        }
+
         if (test || ITimg.ocr(displayText["客户端"], {
                 area: 12,
                 action: 1,
@@ -1044,18 +1036,23 @@ let 唤醒 = {
                 action: 1,
                 part: true,
             })) {
+            sleep(500);
+            click(height / 2, width / 2);
             tool.Floaty_emit("展示文本", "状态", "状态：客户端已过时");
             textContains(displayText["更新"]).waitFor();
             tool.Floaty_emit("展示文本", "状态", "状态：从TapTap更新明日方舟");
             //查找点击Tap更新应用按钮
-            let update_app = (textMatches(displayText["更新"] + '.*?(MB|G)').findOne(2000) || textStartsWith(displayText["更新"]).findOne(2000));
-            if (update_app) {
-                if (!update_app.clickable() || !update_app.click()) {
-                    update_app = update_app.bounds();
-                    MyAutomator.click(update_app.centerX(), update_app.centerY());
-
+            while (true) {
+                let update_app = (textMatches(displayText["更新"] + '.*?(MB|G)').findOne(2000) || textStartsWith(displayText["更新"]).findOne(2000));
+                if (update_app) {
+                    if (!update_app.clickable() || !update_app.click()) {
+                        update_app = update_app.bounds();
+                        MyAutomator.click(update_app.centerX(), update_app.centerY());
+                        break;
+                    };
                 };
             };
+            
             console.info("更新App按钮参数：\n" + update_app)
             if (setting.update.usingTraffic) {
                 let usingTraffic = textStartsWith(displayText["立即下载"]).findOne(3000);
@@ -1076,8 +1073,8 @@ let 唤醒 = {
 
             console.info("安装应用按钮参数：\n" + install_app);
             //使用系统应用管理组件安装
-            sleep(1000);
-            let assembly = id("android:id/text1").className("android.widget.TextView").findOne(1000);
+            sleep(1500);
+            let assembly = id("android:id/text1").className("android.widget.TextView").findOne(5000);
             if (!assembly.clickable() || !assembly.click()) {
                 assembly = assembly.bounds();
                 MyAutomator.click(assembly.centerX(), assembly.centerY());
@@ -1088,7 +1085,7 @@ let 唤醒 = {
             let ii = 1;
             while (true) {
 
-                install_app = textMatches(displayText["确认安装合集"]).findOne();
+                install_app = textMatches(displayText["确认安装合集"]).findOne(500);
                 if (!install_app.clickable() || !install_app.click()) {
                     install_app = install_app.bounds();
                     MyAutomator.click(install_app.centerX(), install_app.centerY());
@@ -1113,7 +1110,15 @@ let 唤醒 = {
             启动应用(true);
             return true;
 
-        };
+        } else if (setting.update.usingTraffic) {
+            //用于确认方舟流量热更新
+            ITimg.picture("基建_离开", {
+                timing: 5000,
+                action: 0,
+                area: 24,
+            });
+            return
+        }
 
 
 
@@ -1388,7 +1393,7 @@ function 行动() {
                             area: 4,
                         }))) {
                         if (setting.重置代理次数) {
-
+                            console.info("重置代理次数")
                             MyAutomator.click(staging.left - zox(70), staging.y + staging.h / 2);
                             sleep(500);
                             MyAutomator.click(staging.left - zox(70), staging.y + staging.h / 2 - zoy(80));
@@ -2059,7 +2064,7 @@ function 剿灭() {
                 threshold: 0.75,
             }))
             if (ITimg.picture("行动_普通", {
-                    action: 0,
+                    action: 5,
                     timing: 1000,
                     area: "右半屏",
                     nods: 3000,
@@ -2381,12 +2386,13 @@ function 基建() {
                     timing: 1500,
                     threshold: 0.7,
                 })) {
-                toastLog("没有匹配到基建_铃铛, 点击返回重试");
+               /* toastLog("没有匹配到基建_铃铛, 点击返回重试");
                 ITimg.picture("返回", {
                     action: 4,
                     timing: 1500,
                     area: "左上半屏",
                 });
+                */
                 if (!ITimg.picture("基建_铃铛", {
                         action: 0,
                         area: "右上半屏",
