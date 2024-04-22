@@ -1664,7 +1664,9 @@ function 主页设置() {
     } else {
         setupView.raw2.checked = true;
     }
-    if (setting.换班路径.length >= 5) {
+    let shift = mod_data.find((item) => item.id == "基建换班");
+    if (shift) {
+        if (!shift.suspend) setupView.jjhb.checked = true;
         setupView.jjhb.attr("visibility", "visible");
     } else {
         setupView.jjhb.attr("visibility", "gone");
