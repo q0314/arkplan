@@ -4,11 +4,16 @@ activity.getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
 if (device.sdkInt >= 23) {
     activity.getWindow().getDecorView().setSystemUiVisibility(android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 }
+let icon = "file://./images/ic_app_logo.png"
+
+if (app.autojs.versionCode < 8082200 || !files.exists(icon)) {
+    icon = "file://./res/icon.png"
+}
 ui.layout(
     <frame>
         <vertical w="*" h="*" layout_gravity="center">
             <vertical id="script" h="*" gravity="center"  >
-                <img src="file://./res/icon.png" w="120" h="120" scaleType="fitXY" />
+                <img src="{{icon}}" w="120" h="120" scaleType="fitXY" />
                 <horizontal gravity="center" margin="25">
                     <text id="loadingtext">加载中，请稍后</text>
                 </horizontal>
@@ -77,7 +82,7 @@ threads.start(function() {
             path: path + _proj_def_n + '/'
         });
         setTimeout(function() {
-                ui.finish();
+            ui.finish();
         }, 1500);
     }
 });

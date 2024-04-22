@@ -498,13 +498,14 @@ let hanZiSimilarBridge = null;
 function nlpSimilarity(s1, s2) {
     if (!hanZiSimilarBridge) {
         // @ts-expect-error dex包
+        let path = files.path("./");
         hanZiSimilarBridge = new Packages.cn.zzliux.HanZiSimilarBridge();
         hanZiSimilarBridge.init(
-            files.read(files.cwd() + '/lib/java/nlp/bihuashu.txt'),
-            files.read(files.cwd() + '/lib/java/nlp/bushou.txt'),
-            files.read(files.cwd() + '/lib/java/nlp/jiegou.txt'),
-            files.read(files.cwd() + '/lib/java/nlp/sijiao.txt'),
-            files.read(files.cwd() + '/lib/java/nlp/userdefine.txt')
+            files.read(path + '/lib/java/nlp/bihuashu.txt'),
+            files.read(path + '/lib/java/nlp/bushou.txt'),
+            files.read(path + '/lib/java/nlp/jiegou.txt'),
+            files.read(path + '/lib/java/nlp/sijiao.txt'),
+            files.read(path + '/lib/java/nlp/userdefine.txt')
         );
         //  log(files.cwd())
         log("初始化字形计算\n字符串1：" + s1 + "\n字符串2：" + s2 + "\n相似度：" + hanZiSimilarBridge.similarity(s1, s2));
@@ -552,7 +553,8 @@ tool.pointerPositionDisplay = pointerPositionDisplay;
 try {
     module.exports = tool;
 } catch (e) {
-    console.verbose(autoService(false));
+  //  console.verbose(autoService(false));
     sleep(500)
-    console.info(autoService(true))
+    //console.info(autoService(true))    files.cwd = files.cwd =
+    nlpSimilarity("好的","。好的")
 }

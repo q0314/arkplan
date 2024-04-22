@@ -1963,9 +1963,15 @@ function 程序(implem) {
         switch (implem) {
             case "常规":
                 window.name.setText("行动基建");
+                if (setting.指定关卡.levelAbbreviation == "上次") {
+                    window.name.setText("上次作战");
+                }
                 break;
             case "行动":
                 window.name.setText("行动作战");
+                if (setting.指定关卡.levelAbbreviation == "上次") {
+                    window.name.setText("上次作战");
+                }
                 break;
             case "基建":
                 window.name.setText("基建收菜");
@@ -1983,9 +1989,6 @@ function 程序(implem) {
                 window.name.setText("明日计划");
                 break;
         };
-        if (setting.指定关卡.levelAbbreviation == "上次") {
-            window.name.setText("上次作战");
-        }
     });
     if (setting.侧边 == "悬浮窗") {
         threads.start(暂停);

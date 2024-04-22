@@ -15,95 +15,95 @@ ui.layout(
             <toolbar id="toolbar" title="ocr字符矫正配置" />
         </appbar>
         <ScrollView>
-
+            
             <vertical >
-
+                
                 <text id="tips" margin="10 0" />
                 <card w="*" id="indx2" margin="10 3 10 3" h="*" cardCornerRadius="10"
-                    cardElevation="5dp" gravity="center_vertical"  >
-                    <vertical>
-                        <text text='错误部分字符替换' margin="10 5 10 0" h="35dp" id="text_bg"
-                            gravity="center|left" textSize='16sp' textColor="#000000" >
-                        </text>
-                        <View bg="#eeeeee" h="1" w="*" />
-                        <text id="tips1" margin="10 0" />
-                        <horizontal>
-                            <button text="添加一个新的" id="add" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
-                            <button text="查看运行日志" id="journal" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
-
-                        </horizontal>
-                        <vertical id="replace_some_characters" margin="5 0" >
-
-
-                        </vertical>
-                    </vertical>
-                </card>
-                <card w="*" id="indx2" margin="10 3 10 3" h="*" cardCornerRadius="10"
-                    cardElevation="5dp" gravity="center_vertical"  >
-                    <vertical>
-                        <text text='错误完整字符替换' margin="10 5 10 0" h="35dp" id="text_bg"
-                            gravity="center|left" textSize='16sp' textColor="#000000" >
-                        </text>
-                        <View bg="#eeeeee" h="1" w="*" />
-                        <text id="tips2" margin="10 0" />
-                        <horizontal>
-                            <button text="添加一个新的" id="add" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
-                            <button text="查看运行日志" id="journal" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
-
-                        </horizontal>
-                        <vertical id="replace_full_character" margin="5 0" >
-
-
-                        </vertical>
-                    </vertical>
-                </card>
-                <card w="*" id="indx2" margin="10 3 10 3" h="*" cardCornerRadius="10"
-                    cardElevation="5dp" gravity="center_vertical"  >
-                    <vertical>
-                        <text text='过滤包含部分字符(文字)' margin="10 5 10 0" h="35dp" id="text_bg"
-                            gravity="center|left" textSize='16sp' textColor="#000000" >
-                        </text>
-                        <View bg="#eeeeee" h="1" w="*" />
-                        <text id="tips3" margin="10 0" />
-                        <horizontal>
-                            <button text="添加一个新的" id="add" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
-                            <button text="查看运行日志" id="journal" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
-
-                        </horizontal>
-                        <vertical id="filter_partial_characters" margin="5 0" >
-
-
-                        </vertical>
-                    </vertical>
-                </card>
-
-                <card w="*" id="indx2" margin="10 3 10 3" h="*" cardCornerRadius="10"
-                    cardElevation="5dp" gravity="center_vertical"  >
-                    <vertical>
-                        <text text='过滤完整字符(文字)' margin="10 5 10 0" h="35dp" id="text_bg"
-                            gravity="center|left" textSize='16sp' textColor="#000000" >
-                        </text>
-                        <View bg="#eeeeee" h="1" w="*" />
-                        <text id="tips4" margin="10 0" />
-                        <horizontal>
-                            <button text="添加一个新的" id="add" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
-                            <button text="查看运行日志" id="journal" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
-
-                        </horizontal>
-                        <vertical id="filter_full_characters" margin="5 0" >
-
-
-                        </vertical>
-                    </vertical>
-                </card>
-
-                <vertical marginBottom='50'>
+                cardElevation="5dp" gravity="center_vertical"  >
+                <vertical>
+                    <text text='错误部分字符替换' margin="10 5 10 0" h="35dp" id="text_bg"
+                    gravity="center|left" textSize='16sp' textColor="#000000" >
+                </text>
+                <View bg="#eeeeee" h="1" w="*" />
+                <text id="tips1" margin="10 0" />
+                <horizontal>
+                    <button text="添加一个新的" id="add1" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
+                    <button text="查看运行日志" id="journal1" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
+                    
+                </horizontal>
+                <vertical id="replace_some_characters" margin="5 0" >
+                    
+                    
                 </vertical>
-
             </vertical>
-
-        </ScrollView>
-
+        </card>
+        <card w="*" id="indx2" margin="10 3 10 3" h="*" cardCornerRadius="10"
+        cardElevation="5dp" gravity="center_vertical"  >
+        <vertical>
+            <text text='错误完整字符替换' margin="10 5 10 0" h="35dp" id="text_bg"
+            gravity="center|left" textSize='16sp' textColor="#000000" >
+        </text>
+        <View bg="#eeeeee" h="1" w="*" />
+        <text id="tips2" margin="10 0" />
+        <horizontal>
+            <button text="添加一个新的" id="add2" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
+            <button text="查看运行日志" id="journal2" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
+            
+        </horizontal>
+        <vertical id="replace_full_character" margin="5 0" >
+            
+            
+        </vertical>
+    </vertical>
+    </card>
+    <card w="*" id="indx2" margin="10 3 10 3" h="*" cardCornerRadius="10"
+    cardElevation="5dp" gravity="center_vertical"  >
+    <vertical>
+        <text text='过滤包含部分字符(文字)' margin="10 5 10 0" h="35dp" id="text_bg"
+        gravity="center|left" textSize='16sp' textColor="#000000" >
+    </text>
+    <View bg="#eeeeee" h="1" w="*" />
+    <text id="tips3" margin="10 0" />
+    <horizontal>
+        <button text="添加一个新的" id="add3" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
+        <button text="查看运行日志" id="journal3" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
+        
+    </horizontal>
+    <vertical id="filter_partial_characters" margin="5 0" >
+        
+        
+    </vertical>
+    </vertical>
+    </card>
+    
+    <card w="*" id="indx2" margin="10 3 10 3" h="*" cardCornerRadius="10"
+    cardElevation="5dp" gravity="center_vertical"  >
+    <vertical>
+        <text text='过滤完整字符(文字)' margin="10 5 10 0" h="35dp" id="text_bg"
+        gravity="center|left" textSize='16sp' textColor="#000000" >
+    </text>
+    <View bg="#eeeeee" h="1" w="*" />
+    <text id="tips4" margin="10 0" />
+    <horizontal>
+        <button text="添加一个新的" id="add4" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
+        <button text="查看运行日志" id="journal4" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
+        
+    </horizontal>
+    <vertical id="filter_full_characters" margin="5 0" >
+        
+        
+    </vertical>
+    </vertical>
+    </card>
+    
+    <vertical marginBottom='50'>
+    </vertical>
+    
+    </vertical>
+    
+    </ScrollView>
+    
     </vertical>
 );
 
@@ -122,7 +122,7 @@ if (typeof execArgv.json_path == "object") {
         fix = JSON.parse(files.read(json_path));
         for (let id of Object.keys(fix)) {
             if (fix[id] && ui[id]) {
-                update(fix[id], ui[id]);
+                 update(fix[id], ui[id]);
             };
         }
     }
@@ -170,14 +170,22 @@ ui.tips1.setText("注释: (ocr识别到的文字)错误字符: 快婕编队 → 
 ui.tips3.setText("注释: (ocr识别到的文字)在一组字符中如果包含该文字,将不会显示在运行日志的OCR识别结果信息中。慎重考虑，这将会影响开发人员的判断。");
 ui.tips4.setText("注释: (ocr识别到的文字)一组字符如果完全等于该文字,将不会显示在运行日志的OCR识别结果信息中。慎重考虑，这将会影响开发人员的判断。");
 
-ui.add.click(() => {
-    AddMaterial({})
+for(let i=1;i<=4;i++){
+ui["add"+i].click((view) => {
+    let parent = view.getParent();
+    let index = parent.getParent().indexOfChild(parent);
+    AddMaterial({
+        'AddText_error': '',
+        'AddText_correct': '',
+        "regular": false,
+        'position': false,
+    }, parent.getParent().getChildAt(index + 1))
 
 })
-ui.journal.click(() => {
+ui["journal"+i].click(() => {
     app.startActivity("console");
 });
-
+}
 
 
 
@@ -213,20 +221,20 @@ function update(coord, view) {
 }
 
 function AddMaterial(item, view) {
-
     AddText_error = item.AddText_error || '';
     AddText_correct = item.AddText_correct;
     regular = item.regular || false;
     let AddText = ui.inflate(
-        '\<horizontal w="*" h="auto" layout_weight="1">\
-            <text text='+ ((AddText_correct === false) ? '"文字:"' : '"错误:"') + '/>\
-            <input id="error" layout_weight="3" lines="1" text="{{AddText_error}}" />'+
+        '\<horizontal layout_weight="1">\
+            <text text=' + ((AddText_correct === false) ? '"文字:"' : '"错误:"') + '/>\
+            <input id="error" layout_weight="3" lines="1" text="{{AddText_error}}" />' +
         ((AddText_correct === false) ? '' : '<text text="正确:" />\
             <input id="correct" layout_weight="3" lines="1" text="{{AddText_correct}}" />') +
         '<checkbox id="regular" text="正则匹配" checked="{{regular}}" w="auto" />\
         </horizontal>',
         view
     );
+
     ui.run(() => {
         if (item.position == true) {
             view.addView(AddText);
@@ -242,7 +250,7 @@ function AddMaterial(item, view) {
 activity.setSupportActionBar(ui.toolbar);
 activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 ui.toolbar.setNavigationOnClickListener({
-    onClick: function () {
+    onClick: function() {
         if (stockpile()) {
             return;
         };
@@ -262,7 +270,7 @@ ui.emitter.on("back_pressed", (e) => {
 
 function stockpile(value) {
     for (let id of Object.keys(fix)) {
-        log(id);
+       // log(id);
 
         for (let i = 0; i < (ui[id] ? ui[id].getChildCount() : 0); i++) {
             let error = ui[id].getChildAt(i).getChildAt(1).getText().toString();

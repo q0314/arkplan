@@ -84,8 +84,8 @@ var setting = tool.readJSON("configure", {
     "指定关卡": {
         levelAbbreviation: "当前"
     },
-    "重置代理次数":true,
-    "operation_mode":"无障碍",
+    "重置代理次数": true,
+    "operation_mode": "无障碍",
     //剿灭代理_全权委托
     "proxy_card": true,
     "agent": true,
@@ -174,6 +174,16 @@ var morikujima_setting = tool.readJSON("morikujima_setting", {
 
 });
 
+var sto_mod = storages.create("modular");
+//sto_mod.clear()
+var mod_data = sto_mod.get("modular", []);
+
+var SystemUiVisibility = (ve) => {
+    let option =
+        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+        (ve ? View.SYSTEM_UI_FLAG_LAYOUT_STABLE : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+    activity.getWindow().getDecorView().setSystemUiVisibility(option);
+};
 
 if (!files.exists(path_ + "/html/built_in.html")) {
     $zip.unzip("./lib/html/html.zip", path_ + "/");
@@ -257,16 +267,7 @@ threads.start(function() {
 
 });
 
-var sto_mod = storages.create("modular");
-//sto_mod.clear()
-var mod_data = sto_mod.get("modular", []);
 
-var SystemUiVisibility = (ve) => {
-    let option =
-        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-        (ve ? View.SYSTEM_UI_FLAG_LAYOUT_STABLE : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-    activity.getWindow().getDecorView().setSystemUiVisibility(option);
-};
 SystemUiVisibility(false);
 
 //背景色#426e6d
@@ -476,7 +477,7 @@ ui.layout(
         
         
         <vertical id="jijianquyu" >
-            <widget-switch-se7en id="jjhb" text="基建换班模块" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
+            <widget-switch-se7en id="jjhb" text="基建换班模块"  padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
             
             <widget-switch-se7en
             id="uav_acceleration"
@@ -1953,7 +1954,9 @@ ui.drawerList.on("item_click", (item) => {
             new_ui("关于");
             break;
         case "模块仓库":
-            engines.execScriptFile('./activity/Module_platform.js');
+            engines.execScriptFile('./activity/Module_platform.js', {
+                path: files.path("./")
+            });
             break
     }
 });
@@ -2356,7 +2359,13 @@ ui.manufacturing.on("check", (checked) => {
     tool.writeJSON("加速生产", checked);
 });
 ui.jjhb.on("check", (checked) => {
-    tool.writeJSON("基建换班", checked);
+    let shift = mod_data.findIndex((item) => item.id == "基建换班");
+    if (shift) {
+        mod_data[shift].suspend = true;
+         sto_mod.put("modular", mod_data);
+               
+    }
+    // tool.writeJSON("基建换班", checked);
 });
 ui.hyfw.on("check", (checked) => {
     tool.writeJSON("好友访问", checked)
@@ -2872,107 +2881,107 @@ function 开始运行jk(jk, tips_) {
         let tuku_de = [];
         tuku_de[0] = gallery.gallery_info.分辨率.h;
         tuku_de[1] = gallery.gallery_info.分辨率.w;
-    /*    if (tuku_de[0] == width && tuku_de[1] == height) {
-            if (!setting.模拟器) {
-                dialogs.build({
-                    type: "app-or-overlay",
-                    title: "兼容模拟器平板版",
-                    content: "检测到你的设备可能是模拟器平板版分辨率,是否启用设置-兼容模拟器平板版？\n如果不是，请不要启用，这将导致悬浮窗过大。如果是误报请在竖屏下打开明日计划，这是因为部分设备，应用在横屏下获取到的分辨率与竖屏的相反（我猜的，应该是）\n可在侧边栏-设置中关闭",
-                    positive: "启用",
-                    positiveColor: "#FF8C00",
-                    negative: "取消",
-                    canceledOnTouchOutside: false
-                }).on("positive", () => {
-                    tool.writeJSON("模拟器", true);
-                }).show()
+        /*    if (tuku_de[0] == width && tuku_de[1] == height) {
+                if (!setting.模拟器) {
+                    dialogs.build({
+                        type: "app-or-overlay",
+                        title: "兼容模拟器平板版",
+                        content: "检测到你的设备可能是模拟器平板版分辨率,是否启用设置-兼容模拟器平板版？\n如果不是，请不要启用，这将导致悬浮窗过大。如果是误报请在竖屏下打开明日计划，这是因为部分设备，应用在横屏下获取到的分辨率与竖屏的相反（我猜的，应该是）\n可在侧边栏-设置中关闭",
+                        positive: "启用",
+                        positiveColor: "#FF8C00",
+                        negative: "取消",
+                        canceledOnTouchOutside: false
+                    }).on("positive", () => {
+                        tool.writeJSON("模拟器", true);
+                    }).show()
 
-                return
-            }
-        } else {
-            */
+                    return
+                }
+            } else {
+                */
 
-            tuku_de[0] = (tuku_de[0] - height).toString();
-            tuku_de[1] = (tuku_de[1] - width).toString();
-            if (tuku_de[0].replace(/[^\d]/g, "") > 220 || tuku_de[1].replace(/[^\d]/g, "") > 170) {
-                console.error("设备分辨率与图库分辨率相差过大，可能无法正常使用")
-                let Tips_tuku_ui = ui.inflate(
-                    <vertical id="parent">
+        tuku_de[0] = (tuku_de[0] - height).toString();
+        tuku_de[1] = (tuku_de[1] - width).toString();
+        if (tuku_de[0].replace(/[^\d]/g, "") > 220 || tuku_de[1].replace(/[^\d]/g, "") > 170) {
+            console.error("设备分辨率与图库分辨率相差过大，可能无法正常使用")
+            let Tips_tuku_ui = ui.inflate(
+                <vertical id="parent">
+                    
+                    <card gravity="center_vertical" cardElevation="0dp" margin="0">
+                        <img src="file://res/icon.png" w="50" h="30" margin="0" />
+                        <text text="无法使用PRTS辅助" padding="5" textSize="20" gravity="center|left" textColor="#f03752" marginLeft="50" />
                         
-                        <card gravity="center_vertical" cardElevation="0dp" margin="0">
-                            <img src="file://res/icon.png" w="50" h="30" margin="0" />
-                            <text text="无法使用PRTS辅助" padding="5" textSize="20" gravity="center|left" textColor="#f03752" marginLeft="50" />
-                            
-                            
-                        </card>
                         
-                        <ScrollView>
-                            <vertical>
-                                <vertical padding="10 0" >
-                                    <View bg="#f5f5f5" w="*" h="2" />
-                                    <text id="Device_resolution" text="加载中" />
-                                    <text id="dwh" text="加载中" />
-                                    <text id="Tips" textStyle="italic" textColor="#f03752" />
-                                    
-                                    <text id="wxts" autoLink="web" text="温馨" typeface="sans" padding="5" textColor="#000000" textSize="15sp" layout_gravity="center" />
-                                </vertical>
-                                <horizontal w="*" padding="-3" gravity="center_vertical">
-                                    <button text="退出(5s)" id="exit" textColor="#dbdbdb" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
-                                    <button text="执意启动" id="ok" textColor="#dbdbdb" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
-                                </horizontal>
+                    </card>
+                    
+                    <ScrollView>
+                        <vertical>
+                            <vertical padding="10 0" >
+                                <View bg="#f5f5f5" w="*" h="2" />
+                                <text id="Device_resolution" text="加载中" />
+                                <text id="dwh" text="加载中" />
+                                <text id="Tips" textStyle="italic" textColor="#f03752" />
+                                
+                                <text id="wxts" autoLink="web" text="温馨" typeface="sans" padding="5" textColor="#000000" textSize="15sp" layout_gravity="center" />
                             </vertical>
-                        </ScrollView>
-                        
-                    </vertical>);
+                            <horizontal w="*" padding="-3" gravity="center_vertical">
+                                <button text="退出(5s)" id="exit" textColor="#dbdbdb" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
+                                <button text="执意启动" id="ok" textColor="#dbdbdb" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
+                            </horizontal>
+                        </vertical>
+                    </ScrollView>
+                    
+                </vertical>);
 
-                let Tips_tuku = dialogs.build({
-                    type: "app",
-                    customView: Tips_tuku_ui,
-                    wrapInScrollView: false,
-                    cancelable: false,
-                    canceledOnTouchOutside: false
-                })
-                tool.setBackgroundRoundRounded(Tips_tuku.getWindow(), {
-                    radius: 0,
-                })
-                Tips_tuku.show();
-                Tips_tuku_ui.exit.on("click", function() {
-                    Tips_tuku.dismiss();
-                })
-                Tips_tuku_ui.ok.on("click", function() {
-                    Tips_tuku.dismiss()
-                    开始运行jk(false, true)
+            let Tips_tuku = dialogs.build({
+                type: "app",
+                customView: Tips_tuku_ui,
+                wrapInScrollView: false,
+                cancelable: false,
+                canceledOnTouchOutside: false
+            })
+            tool.setBackgroundRoundRounded(Tips_tuku.getWindow(), {
+                radius: 0,
+            })
+            Tips_tuku.show();
+            Tips_tuku_ui.exit.on("click", function() {
+                Tips_tuku.dismiss();
+            })
+            Tips_tuku_ui.ok.on("click", function() {
+                Tips_tuku.dismiss()
+                开始运行jk(false, true)
 
-                })
+            })
 
-                Tips_tuku_ui.wxts.setText("1. 没有适合你的图库？\n参考以下教程动手制作 https://mrjh.flowus.cn，或使用虚拟机、模拟器等自调适合的分辨率，左边高度×右边宽度，DPI随意" +
-                    "\n2. 分辨率反的？ \n请在竖屏下启动悬浮窗。华为：更改屏幕分辨率-为对应图库。模拟器：说明设置的是平板版分辨率(更换与设备分辨率相反的图库分辨率即可)。 注：更换设备分辨率后都需要到应用内更换相符合的图库")
-                Tips_tuku_ui.Device_resolution.setText("当前设备分辨率{ 'w':" + width + ", 'h': " + height + "}")
+            Tips_tuku_ui.wxts.setText("1. 没有适合你的图库？\n参考以下教程动手制作 https://mrjh.flowus.cn，或使用虚拟机、模拟器等自调适合的分辨率，左边高度×右边宽度，DPI随意" +
+                "\n2. 分辨率反的？ \n请在竖屏下启动悬浮窗。华为：更改屏幕分辨率-为对应图库。模拟器：说明设置的是平板版分辨率(更换与设备分辨率相反的图库分辨率即可)。 注：更换设备分辨率后都需要到应用内更换相符合的图库")
+            Tips_tuku_ui.Device_resolution.setText("当前设备分辨率{ 'w':" + width + ", 'h': " + height + "}")
 
-                Tips_tuku_ui.dwh.setText("当前使用图库名称：" + gallery.gallery_info.名称);
+            Tips_tuku_ui.dwh.setText("当前使用图库名称：" + gallery.gallery_info.名称);
 
-                Tips_tuku_ui.Tips.setText("请在软件主页面-左边侧滑栏-更换图库\n更换设备分辨率相近的图库，否则将无法正常使用本应用-PRTS辅助。\n目前，图库与设备分辨率宽度一致，而高度误差不超过230左右，或高度一致，而宽度误差不超过170左右，基本上是可以使用的，但不排除某些小图片在你的设备上无法匹配，导致某功能失效")
-                Tips_tuku_ui.exit.setEnabled(false);
-                let i_tnter = 5;
-                let id_tnter = setInterval(function() {
-                    if (i_tnter >= 0) {
-                        i_tnter--;
+            Tips_tuku_ui.Tips.setText("请在软件主页面-左边侧滑栏-更换图库\n更换设备分辨率相近的图库，否则将无法正常使用本应用-PRTS辅助。\n目前，图库与设备分辨率宽度一致，而高度误差不超过230左右，或高度一致，而宽度误差不超过170左右，基本上是可以使用的，但不排除某些小图片在你的设备上无法匹配，导致某功能失效")
+            Tips_tuku_ui.exit.setEnabled(false);
+            let i_tnter = 5;
+            let id_tnter = setInterval(function() {
+                if (i_tnter >= 0) {
+                    i_tnter--;
+                }
+                ui.run(() => {
+                    if (i_tnter == 0) {
+                        Tips_tuku_ui.exit.setEnabled(true);
+                        Tips_tuku_ui.exit.setText("退出")
+                        Tips_tuku_ui.exit.setTextColor(colors.parseColor("#F4A460"))
+                        clearInterval(id_tnter);
+                    } else {
+                        Tips_tuku_ui.exit.setText("退出(" + i_tnter + "s)")
                     }
-                    ui.run(() => {
-                        if (i_tnter == 0) {
-                            Tips_tuku_ui.exit.setEnabled(true);
-                            Tips_tuku_ui.exit.setText("退出")
-                            Tips_tuku_ui.exit.setTextColor(colors.parseColor("#F4A460"))
-                            clearInterval(id_tnter);
-                        } else {
-                            Tips_tuku_ui.exit.setText("退出(" + i_tnter + "s)")
-                        }
 
-                    })
-                }, 1000)
+                })
+            }, 1000)
 
-                return
-            }
-      //  }
+            return
+        }
+        //  }
     }
 
     if (Counter <= 2) {
