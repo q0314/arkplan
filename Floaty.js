@@ -1653,7 +1653,12 @@ function 主页设置() {
     });
 
     setupView.jjhb.on("check", (checked) => {
-        tool.writeJSON("基建换班", checked);
+let shift = mod_data.findIndex((item) => item.id == "基建换班");
+    if (shift) {
+        mod_data[shift].suspend = !checked;
+         sto_mod.put("modular", mod_data);
+               
+    }
     });
     //判断是否显示无人机加速、加速那个
     if (!setting.无人机加速) setupView.rawrj.attr("visibility", "gone");

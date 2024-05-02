@@ -5,9 +5,9 @@
   ],
   "assets": [],
   "build": {
-    "build_id": "F14E8389-1228",
-    "build_number": 1228,
-    "build_time": 1711373239486,
+    "build_id": "47C47E06-1230",
+    "build_number": 1230,
+    "build_time": 1713836015971,
     "release": false
   },
   "encryptLevel": 0,
@@ -34,6 +34,7 @@
   "packageName": "com.mrfz.qiao",
   "permissionConfig": {
     "manifestPermissions": [
+      "android.permission.MANAGE_EXTERNAL_STORAGE",
       "android.permission.FOREGROUND_SERVICE",
       "android.permission.INTERNET",
       "android.permission.PACKAGE_USAGE_STATS",
@@ -55,8 +56,7 @@
       "moe.shizuku.manager.permission.API_V23",
       "android.permission.ACCESS_NETWORK_STATE",
       "android.permission.RECEIVE_BOOT_COMPLETED",
-      "android.permission.READ_PHONE_STATE",
-      "android.permission.MANAGE_EXTERNAL_STORAGE"
+      "android.permission.READ_PHONE_STATE"
     ],
     "requestListOnStartup": [
       "android.permission.FOREGROUND_SERVICE",
@@ -88,6 +88,6 @@
     "uuid": "30e8349e-b7be-4217-a506-6072dedc75df"
   },
   "useFeatures": [],
-  "versionCode": 2024032545,
-  "versionName": "4.5.1-ga.0"
+  "versionCode": 2024042345,
+  "versionName": "4.5.1"
 }

@@ -2361,7 +2361,7 @@ ui.manufacturing.on("check", (checked) => {
 ui.jjhb.on("check", (checked) => {
     let shift = mod_data.findIndex((item) => item.id == "基建换班");
     if (shift) {
-        mod_data[shift].suspend = true;
+        mod_data[shift].suspend = !checked;
          sto_mod.put("modular", mod_data);
                
     }

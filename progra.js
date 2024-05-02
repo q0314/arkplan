@@ -1029,21 +1029,23 @@ let 唤醒 = {
 
         if (test || ITimg.ocr(displayText["客户端"], {
                 area: 12,
-                action: 1,
+                action: 0,
                 part: true,
             }) || ITimg.ocr(displayText["已过时"], {
                 area: 12,
-                action: 1,
+                action: 0,
                 part: true,
             })) {
             sleep(500);
-            click(height / 2, width / 2);
+            click(height / 2, width - zoy(50));
+            click(height / 2, zoy(50));
             tool.Floaty_emit("展示文本", "状态", "状态：客户端已过时");
             textContains(displayText["更新"]).waitFor();
             tool.Floaty_emit("展示文本", "状态", "状态：从TapTap更新明日方舟");
             //查找点击Tap更新应用按钮
+            let update_app;
             while (true) {
-                let update_app = (textMatches(displayText["更新"] + '.*?(MB|G)').findOne(2000) || textStartsWith(displayText["更新"]).findOne(2000));
+                update_app = (textMatches(displayText["更新"] + '.*?(MB|G)').findOne(2000) || textStartsWith(displayText["更新"]).findOne(2000));
                 if (update_app) {
                     if (!update_app.clickable() || !update_app.click()) {
                         update_app = update_app.bounds();
@@ -1052,9 +1054,9 @@ let 唤醒 = {
                     };
                 };
             };
-            
+
             console.info("更新App按钮参数：\n" + update_app)
-            if (setting.update.usingTraffic) {
+            if (setting.update && setting.update.usingTraffic) {
                 let usingTraffic = textStartsWith(displayText["立即下载"]).findOne(3000);
                 if (usingTraffic) {
                     if (!usingTraffic.clickable() || !usingTraffic.click()) {
@@ -1064,10 +1066,15 @@ let 唤醒 = {
                 }
                 console.info("使用流量下载按钮参数：\n" + usingTraffic);
             }
+            tool.Floaty_emit("展示文本", "状态", "状态：等待下载完成");
+
             desc(displayText["安装"]).waitFor();
+            tool.Floaty_emit("展示文本", "状态", "状态：进行安装");
+
             let install_app = desc(displayText["安装"]).findOne();
             if (!install_app.clickable() || !install_app.click()) {
                 install_app = install_app.bounds();
+                log(install_app)
                 MyAutomator.click(install_app.centerX(), install_app.centerY());
             };
 
@@ -1075,22 +1082,25 @@ let 唤醒 = {
             //使用系统应用管理组件安装
             sleep(1500);
             let assembly = id("android:id/text1").className("android.widget.TextView").findOne(5000);
-            if (!assembly.clickable() || !assembly.click()) {
+            if (assembly && (!assembly.clickable() || !assembly.click())) {
                 assembly = assembly.bounds();
                 MyAutomator.click(assembly.centerX(), assembly.centerY());
             };
 
             sleep(3000);
             textMatches(displayText["确认安装合集"]).waitFor();
+            tool.Floaty_emit("展示文本", "状态", "状态：逐步安装");
+
             let ii = 1;
             while (true) {
 
                 install_app = textMatches(displayText["确认安装合集"]).findOne(500);
-                if (!install_app.clickable() || !install_app.click()) {
-                    install_app = install_app.bounds();
-                    MyAutomator.click(install_app.centerX(), install_app.centerY());
-                };
+
                 if (install_app) {
+                    if (!install_app.clickable() || !install_app.click()) {
+                        install_app = install_app.bounds();
+                        MyAutomator.click(install_app.centerX(), install_app.centerY());
+                    };
                     console.info("安装应用第" + ii + "步按钮:\n" + install_app);
                     ii++;
 
@@ -2386,13 +2396,13 @@ function 基建() {
                     timing: 1500,
                     threshold: 0.7,
                 })) {
-               /* toastLog("没有匹配到基建_铃铛, 点击返回重试");
-                ITimg.picture("返回", {
-                    action: 4,
-                    timing: 1500,
-                    area: "左上半屏",
-                });
-                */
+                /* toastLog("没有匹配到基建_铃铛, 点击返回重试");
+                 ITimg.picture("返回", {
+                     action: 4,
+                     timing: 1500,
+                     area: "左上半屏",
+                 });
+                 */
                 if (!ITimg.picture("基建_铃铛", {
                         action: 0,
                         area: "右上半屏",
