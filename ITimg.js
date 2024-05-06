@@ -743,7 +743,7 @@ function binary_outline(list) {
         picture: list.picture,
         threshold: list.threshold || 100,
         type: list.type || ITimg.default_list.outline.type,
-        size: list.size || ITimg.default_list.outline.size,
+        size: list.size,
         isdilate: list.isdilate || ITimg.default_list.outline.isdilate,
         filter_w: list.filter_w,
         filter_h: list.filter_h,
@@ -770,7 +770,7 @@ function binary_outline(list) {
 
     // 二值化图像
     Imgproc.threshold(mat, mat, list.threshold, 255, Imgproc["THRESH_" + list.type]);
-
+if(list.size){
     // 创建一个结构元素 15
     let kernelSize = list.size; // 结构元素的大小
     let element = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(kernelSize, kernelSize));
@@ -781,7 +781,7 @@ function binary_outline(list) {
         // 执行膨胀操作
         Imgproc.dilate(mat, mat, element);
     }
-
+}
     //查找直边界矩形
     ITimg.results = new java.util.ArrayList();
     let hierarchy = new Mat();
@@ -1219,20 +1219,20 @@ try {
     new ITimg.Prepare();
 
 
-  //  let picture = images.read("/storage/emulated/0/DCIM/Screenshots/作战4.jpg");
+    let picture = images.read("/storage/emulated/0/DCIM/Screenshots/福利.jpg");
    // let picture = images.read("/sdcard/Pictures/QQ/存档.jpg");
-let picture = images.read("/storage/emulated/0/脚本/script-module-warehouse/自定义执行模块/script_file/生息演算速刷/cc.jpg")
+//let picture = images.read("/storage/emulated/0/脚本/script-module-warehouse/自定义执行模块/script_file/生息演算速刷/cc.jpg")
    // height = 2560;
    // width = 1600;
     binary_outline({
         canvas: true,
         picture: picture,
-        area:[height / 2, width / 1.1, height / 2, width - width / 1.1],
+      //  area:[height / 2, width / 1.1, height / 2, width - width / 1.1],
        //  area:[0,0,2560,1600],
      //   area: [0, 0, height/4, width /4],
         isdilate: true,
-        threshold: 150,
-        size: 25,
+        threshold: 90,
+        size: 0,
         type: "BINARY",
         filter_w: 15,
         filter_h: 15,

@@ -1037,7 +1037,7 @@ let 唤醒 = {
                 part: true,
             })) {
             sleep(500);
-            click(height / 2, width - zoy(50));
+            click(height / 2, width - zoy(60));
             click(height / 2, zoy(50));
             tool.Floaty_emit("展示文本", "状态", "状态：客户端已过时");
             textContains(displayText["更新"]).waitFor();
