@@ -321,18 +321,18 @@ let collection = {
                             break;
                         case displayText["资源收集"]:
                             MyAutomator.click(this.staging.right + zox(180) * 7, this.staging.bottom);
-                            MyAutomator.click(this.staging.right + zox(180) * 8, this.staging.bottom);
+                       //     MyAutomator.click(this.staging.right + zox(180) * 8, this.staging.bottom);
                             //  log((this.staging.right + zox(180) * 7));
                             // log(this.staging.right + zox(180) * 8);
 
                             break;
                         case displayText["常态事务"]:
                             MyAutomator.click(this.staging.right + zox(180) * 9, this.staging.bottom);
-                            MyAutomator.click(this.staging.right + zox(180) * 10, this.staging.bottom);
+                         //   MyAutomator.click(this.staging.right + zox(180) * 10, this.staging.bottom);
                             break;
                         case displayText["长期探索"]:
                             MyAutomator.click(this.staging.right + zox(180) * 11, this.staging.bottom);
-                            MyAutomator.click(this.staging.right + zox(180) * 12, this.staging.bottom);
+                        //    MyAutomator.click(this.staging.right + zox(180) * 12, this.staging.bottom);
                             break;
                     }
                 } else {
@@ -1105,7 +1105,7 @@ let 唤醒 = {
                     ii++;
 
                 };
-                install_app = (textMatches(displayText["安装完成合集"]).classNameMatches("(android.widget.Button|android.widget.TextView|android.view.View)").findOne(500) || descMatches(displayText["安装完成合集"]).classNameMatches("(android.widget.Button|android.widget.TextView|android.view.View)").findOne(500));
+                install_app = (textMatches(displayText["安装完成合集"]).classNameMatches("(android.widget.Button|android.widget.TextView|android.view.View)").findOne(500) || descMatches(displayText["安装完成合集"]).classNameMatches("android.widget.Button|android.widget.TextView|android.view.View)").findOne(500));
                 if (install_app) {
                     if (!install_app.clickable() || !install_app.click()) {
                         install_app = install_app.bounds();
@@ -1285,8 +1285,18 @@ let 唤醒 = {
                     };
                 };
             } else {
+                (ITimg.ocr("立即领取",{
+                    action:0,
+                    similar:0.7,
+                })||ITimg.ocr("领取",{
+                    action:0,
+                    similar:0.9,
+                    refresh:false,
+                    log_policy:false,
+                }));
                 //点击边缘位置来取消取消按钮不一样的公告
-                MyAutomator.click(height / 2, width - zoy(100));
+                MyAutomator.click(height / 2, width - zoy(50));
+                
                 if (ITimg.picture("终端", {
                         area: 2,
                         //        action:5,
