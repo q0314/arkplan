@@ -731,7 +731,7 @@ function ocr文字识别(words, list) {
 
 }
 //二值化图像并查找轮廓
-function binary_outline(list) {
+function binarized_contour(list) {
 
     if (!list) {
         list = {};
@@ -767,21 +767,25 @@ function binary_outline(list) {
     // img.recycle();
     // 转换为灰度图像
     Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGR2GRAY);
-
+    /*// 降噪
+    let imgBlur = mat.clone();
+    Imgproc.GaussianBlur(mat, imgBlur, Size(3, 3), 0);
+    mat.release();
+    */
     // 二值化图像
     Imgproc.threshold(mat, mat, list.threshold, 255, Imgproc["THRESH_" + list.type]);
-if(list.size){
-    // 创建一个结构元素 15
-    let kernelSize = list.size; // 结构元素的大小
-    let element = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(kernelSize, kernelSize));
-    if (!list.isdilate) {
-        //执行图像腐蚀
-        Imgproc.erode(mat, mat, element);
-    } else {
-        // 执行膨胀操作
-        Imgproc.dilate(mat, mat, element);
+    if (list.size) {
+        // 创建一个结构元素 15
+        let kernelSize = list.size; // 结构元素的大小
+        let element = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(kernelSize, kernelSize));
+        if (!list.isdilate) {
+            //执行图像腐蚀
+            Imgproc.erode(mat, mat, element);
+        } else {
+            // 执行膨胀操作
+            Imgproc.dilate(mat, mat, element);
+        }
     }
-}
     //查找直边界矩形
     ITimg.results = new java.util.ArrayList();
     let hierarchy = new Mat();
@@ -803,7 +807,7 @@ if(list.size){
         list.canvas.drawBitmap(roiBitmap, list.area[0], list.area[1], rectPaint)
 
     }
-  query_ = [];
+    query_ = [];
     // 循环处理每个轮廓
     for (let i = 0; i < ITimg.results.size(); i++) {
         let contour = ITimg.results.get(i);
@@ -850,7 +854,6 @@ if(list.size){
 
 
         query_.push({
-            id: query_.length ? query_.length : 0,
             shape: message,
             x: outline_x,
             y: outline_y,
@@ -860,10 +863,10 @@ if(list.size){
             right: outline_x + outline_width,
             top: outline_y,
             bottom: outline_y + outline_height,
-
+            vertices: vertices.length,
         });
 
-        console.info("矩阵：" + query_[query_.length - 1].id + "，形状：" + query_[query_.length - 1].shape + "，数据：" + outline_x, outline_y, outline_width, outline_height);
+        //  console.info("矩阵：" + query_.length + "，形状：" + query_[query_.length - 1].shape + "，数据：" + outline_x, outline_y, outline_width, outline_height,vertices.length);
         if (list.canvas) {
 
             list.canvas.drawText(
@@ -875,8 +878,8 @@ if(list.size){
             flattenedPoints = []
             // 计算坐标，绘制轮廓
             vertices.map(function(vertex) {
-                vertex.x = vertex.x+list.area[0];
-                vertex.y = vertex.y+list.area[1];
+                vertex.x = vertex.x + list.area[0];
+                vertex.y = vertex.y + list.area[1];
                 flattenedPoints.push(vertex.x)
                 flattenedPoints.push(vertex.y)
                 if (flattenedPoints.length % 4 == 0) {
@@ -896,9 +899,12 @@ if(list.size){
     if (list.canvas) {
 
         list.canvas = list.canvas.toImage();
-        images.save(list.canvas, "./binary_outline_visualization.jpg", "jpg", 50);
+        let pngPtah = path_ + "/binarized_contour_visualization.jpg";
+        files.ensureDir(pngPtah);
+
+        images.save(list.canvas, pngPtah, "jpg", 50);
         list.canvas.recycle();
-        //app.viewFile("./binary_outline_visualization.png");
+        //app.viewFile(pngPtah);
     }
 
     if (list.action == 6) {
@@ -1191,7 +1197,7 @@ ITimg.XiaoYueOCR = function(words, list) {
 ITimg.Prepare = Prepare;
 ITimg.initocr = initocr;
 ITimg.picture = 图像匹配;
-ITimg.outline = binary_outline;
+ITimg.contour = binarized_contour;
 ITimg.scaleSet = scaleSet;
 ITimg.申请截图 = 申请截图;
 ITimg.重置计时器 = 重置计时器;
@@ -1199,6 +1205,7 @@ ITimg.captureScreen_ = captureScreen_;
 try {
     module.exports = ITimg;
 } catch (e) {
+    var path_ = context.getExternalFilesDir(null).getAbsolutePath();
 
     var tool = require("./modules/tool.js");
     var setting = tool.readJSON("configure");
@@ -1220,25 +1227,29 @@ try {
 
 
     let picture = images.read("/storage/emulated/0/DCIM/Screenshots/福利.jpg");
-   // let picture = images.read("/sdcard/Pictures/QQ/存档.jpg");
-//let picture = images.read("/storage/emulated/0/脚本/script-module-warehouse/自定义执行模块/script_file/生息演算速刷/cc.jpg")
-   // height = 2560;
-   // width = 1600;
-    binary_outline({
+    // let picture = images.read("/sdcard/Pictures/QQ/存档.jpg");
+    //let picture = images.read("/storage/emulated/0/脚本/script-module-warehouse/自定义执行模块/script_file/生息演算速刷/cc.jpg")
+    // height = 2560;
+    // width = 1600;
+    let rec = binarized_contour({
         canvas: true,
         picture: picture,
-      //  area:[height / 2, width / 1.1, height / 2, width - width / 1.1],
-       //  area:[0,0,2560,1600],
-     //   area: [0, 0, height/4, width /4],
-        isdilate: true,
-        threshold: 90,
+        action: 5,
+        area: [height / 3, width / 4, height - height / 3, width - width / 4],
+        //  area:[0,0,2560,1600],
+        //   area: [0, 0, height/4, width /4],
+        //isdilate: true,
+        threshold: 100,
         size: 0,
         type: "BINARY",
-        filter_w: 15,
-        filter_h: 15,
+        filter_w: 200,
+        filter_h: 400,
     })
+    
     picture.recycle()
-    app.viewFile("./binary_outline_visualization.jpg")
+    let pngPtah = path_ + "/binarized_contour_visualization.jpg";
+
+    app.viewFile(pngPtah)
 
     exit();
 }
