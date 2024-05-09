@@ -126,6 +126,11 @@ var setting = tool.readJSON("configure", {
         "购买列表": false,
         "优先顺序": true
     },
+    "claim_rewards": {
+        "daily": true,
+        "celebration_sign": false,
+        "mining_operations": false
+    },
     "行动理智": true,
     "ADB提醒": false,
     "异常超时": true,
@@ -198,8 +203,13 @@ if (setting.start == undefined || setting == null) {
 try {
     setting.defaultOcr.length;
     setting["operation_mode"].length;
+    setting.claim_rewards.celebration_sign.length;
 } catch (err) {
-
+    tool.writeJSON("claim_rewards", {
+        "daily": true,
+        "celebration_sign": false,
+        "mining_operations": false,
+    });
     tool.writeJSON("operation_mode", "无障碍");
     tool.writeJSON("defaultOcr", 'MlkitOCR');
     setting = tool.readJSON("configure");
@@ -505,19 +515,31 @@ ui.layout(
                 
                 <checkbox id="tag2" text="聘用候选人" checked="{{setting.自动聘用}}" w="auto" textColor="{{theme.text}}" />
             </radiogroup>
-            <widget-switch-se7en id="rwjl" checked="{{setting.任务奖励}}" text="领取任务奖励" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
+            {/*  <widget-switch-se7en id="rwjl" checked="{{setting.claim_rewards&&setting.claim_rewards}}" text="领取任务奖励" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
+            */}
             
-        </vertical>
+            <card w="*"  h="*" cardCornerRadius="1"
+            cardElevation="0dp" gravity="center_vertical" cardBackgroundColor="#00000000" >
+            <vertical>
+                <horizontal id="claim_rewards" clipChildren="false" elevation="0" gravity="center_vertical" margin="6 0" bg="#00000000" h="40">
+                    <text  gravity="center" textSize="16" text="领取任务奖励" textColor="{{theme.text}}" />
+                    <text layout_weight="1" />
+                    <img id="claim_rewards_img" src="@drawable/ic_keyboard_arrow_down_black_48dp" layout_gravity="right|center_vertical" w="{{px2dp(120)}}" h="*" padding="-3 -8" tint="{{theme.text}}" />
+                </horizontal>
+            </vertical>
+        </card>
         
-        
-        <card w="*" id="indt" visibility="visible" margin="0 0 0 1" h="40" cardCornerRadius="1"
-        cardElevation="0dp" gravity="center_vertical" cardBackgroundColor="#00000000" >
-        <linear clipChildren="false" elevation="0" gravity="center_vertical" margin="8 0 8 0" bg="#00000000">
-            <img id="timetu" src="@drawable/ic_alarm_black_48dp" layout_gravity="top|center_vertical" w="25dp" h="*" tint="{{theme.text}}" />
-            <text id="timetxt" margin="10 0 0 0" gravity="center" textSize="16" text="定时任务" textColor="{{theme.text}}" />
-            <text layout_weight="1" />
-            <img id="down" src="@drawable/ic_keyboard_arrow_down_black_48dp" layout_gravity="right|center_vertical" w="25dp" h="*" tint="{{theme.text}}" />
-        </linear>
+    </vertical>
+    
+    
+    <card w="*" id="indt" visibility="visible" margin="0 0 0 1" h="40" cardCornerRadius="1"
+    cardElevation="0dp" gravity="center_vertical" cardBackgroundColor="#00000000" >
+    <linear clipChildren="false" elevation="0" gravity="center_vertical" margin="6 0" bg="#00000000">
+        <img id="timetu" src="@drawable/ic_alarm_black_48dp" layout_gravity="top|center_vertical" w="25dp" h="*" tint="{{theme.text}}" />
+        <text id="timetxt" margin="10 0 0 0" gravity="center" textSize="16" text="定时任务" textColor="{{theme.text}}" />
+        <text layout_weight="1" />
+        <img id="down"  src="@drawable/ic_keyboard_arrow_down_black_48dp" layout_gravity="right|center_vertical" w="{{px2dp(120)}}" h="*" padding="-3 -8" tint="{{theme.text}}" />
+    </linear>
     </card>
     <list id="timed_tasks_list" visibility="gone" bg="#00000000" >
         <card w="*" h="40" margin="5 0 5 0" cardCornerRadius="2dp"
@@ -2362,8 +2384,8 @@ ui.jjhb.on("check", (checked) => {
     let shift = mod_data.findIndex((item) => item.id == "基建换班");
     if (shift) {
         mod_data[shift].suspend = !checked;
-         sto_mod.put("modular", mod_data);
-               
+        sto_mod.put("modular", mod_data);
+
     }
     // tool.writeJSON("基建换班", checked);
 });
@@ -2476,11 +2498,41 @@ ui.tag1.on("check", (checked) => {
 ui.tag2.on("check", (checked) => {
     tool.writeJSON("自动聘用", checked);
 })
+ui.claim_rewards.click(function(view) {
+    // let index = parent.getParent().indexOfChild(0);
+    let imgview = view.getChildAt(2);
+    let fatherview = view.getParent();
+    if (imgview.attr("src") != "@drawable/ic_keyboard_arrow_up_black_48dp") {
+        imgview.attr("src", "@drawable/ic_keyboard_arrow_up_black_48dp");
+        for (let i in setting.claim_rewards) {
+            log(i)
+            let addview = ui.inflate(
+                '\ <widget-switch-se7en checked="' + setting.claim_rewards[i] + '" hint="' + i + '" text="' + language[i] + '"  textSize="16" textColor="{{theme.text}}" padding="6 6 6 6" />', fatherview)
+            fatherview.addView(addview, fatherview.getChildCount());
+            fatherview.getChildAt(fatherview.getChildCount() - 1).click((view) => {
+                setting.claim_rewards[view.getHint()] = view.checked;
+                tool.writeJSON("claim_rewards", setting.claim_rewards);
 
+            })
+        }
+        
+        fatherview.getParent().setCardElevation(1);
+        //        log(fatherview.getChildAt(1).getChildAt(0))
+    } else {
+        for (let i in setting.claim_rewards) {
+            fatherview.getChildAt(fatherview.getChildCount() - 1).removeAllListeners()
+            fatherview.removeView(fatherview.getChildAt(fatherview.getChildCount() - 1));
+        }
+        fatherview.getParent().setCardElevation(0);
+        imgview.attr("src", "@drawable/ic_keyboard_arrow_down_black_48dp");
+    }
+
+});
+/*
 ui.rwjl.on("check", (checked) => {
     tool.writeJSON("任务奖励", checked)
 })
-
+*/
 ui.input_ordinary.on("key", function(keyCode, event) {
     if (event.getAction() == 0 && keyCode == 66) {
         输入框(ui.input_ordinary, ui.input_ordinary.text())

@@ -4,7 +4,7 @@ runtime.loadDex('./lib/java/nlp-hanzi-similar-1.3.0.dex');
 
 var tool = require("./modules/tool.js");
 var setting = tool.readJSON("configure");
-let path_ = context.getExternalFilesDir(null).getAbsolutePath();
+var path_ = context.getExternalFilesDir(null).getAbsolutePath();
 var {
     getRotation,
     getWidthHeight,
@@ -321,18 +321,18 @@ let collection = {
                             break;
                         case displayText["资源收集"]:
                             MyAutomator.click(this.staging.right + zox(180) * 7, this.staging.bottom);
-                       //     MyAutomator.click(this.staging.right + zox(180) * 8, this.staging.bottom);
+                            //     MyAutomator.click(this.staging.right + zox(180) * 8, this.staging.bottom);
                             //  log((this.staging.right + zox(180) * 7));
                             // log(this.staging.right + zox(180) * 8);
 
                             break;
                         case displayText["常态事务"]:
                             MyAutomator.click(this.staging.right + zox(180) * 9, this.staging.bottom);
-                         //   MyAutomator.click(this.staging.right + zox(180) * 10, this.staging.bottom);
+                            //   MyAutomator.click(this.staging.right + zox(180) * 10, this.staging.bottom);
                             break;
                         case displayText["长期探索"]:
                             MyAutomator.click(this.staging.right + zox(180) * 11, this.staging.bottom);
-                        //    MyAutomator.click(this.staging.right + zox(180) * 12, this.staging.bottom);
+                            //    MyAutomator.click(this.staging.right + zox(180) * 12, this.staging.bottom);
                             break;
                     }
                 } else {
@@ -1258,15 +1258,104 @@ let 唤醒 = {
         tool.Floaty_emit("展示文本", "状态", "状态：取消公告签到通知");
         console.info("取消公告");
         while (true) {
+            //长时间持有图片.需手动释放
+            let rewardimg = images.copy(ITimg.captureScreen_(), true);
+            if (setting.claim_rewards) {
+                let date_reward;
 
+                if (setting.claim_rewards.celebration_sign) {
+                    //庆典日期签到活动
+                    if (ITimg.ocr("签到活动", {
+                            area: 13,
+                            picture: images.copy(rewardimg),
+                            similar: 0.80,
+                        }) || ITimg.ocr("首日领取", {
+                            area: 13,
+                            refresh: false,
+                            similar: 0.80,
+                            log_policy: "简短",
+                        })) {
+                        //轮廓
+                        date_reward = ITimg.contour({
+                            action: 5,
+                            picture: images.copy(rewardimg),
+                            area: [height / 3, width / 4, height - height / 3, width - width / 4],
+                            threshold: 100,
+                            type: "BINARY",
+                            canvas: true,
+                            filter_w: zox(200),
+                            filter_h: zoy(400),
+                        });
+                        if (date_reward) {
+                            //重新排序，left最小的在前面
+                            date_reward.sort((obj1, obj2) => obj1.left - obj2.left)
+                            for (let i of date_reward) {
+                                //根据轮廓顶点数量，进一步减少非符合轮廓
+                                if (i.vertices > 8) {
+                                    continue;
+                                }
+
+                                click(i.x + i.w / 2, i.y + i.h / 4);
+                                sleep(100);
+                            }
+                            sleep(1000);
+                            while (!ITimg.picture("关闭公告", {
+                                    timing: 2000,
+                                    action: 0,
+                                    picture: images.copy(rewardimg),
+                                    area: "上半屏",
+                                })) {
+                                ITimg.picture("获得物资", {
+                                    timing: 1000,
+                                    action: 1,
+                                    area: 12,
+                                });
+
+                            }
+                        }
+                    }
+                }
+                if (setting.claim_rewards.mining_operations && !date_reward) {
+                    //矿区作业
+                    if (ITimg.ocr("限时开放许可", {
+                            area: 24,
+                            picture: images.copy(rewardimg),
+                            similar: 0.80,
+                        }) || ITimg.ocr("矿脉概率", {
+                            refresh: false,
+                            similar: 0.80,
+                            log_policy: "简短",
+                        }) || ITimg.ocr("源石矿脉", {
+                            refresh: false,
+                            similar: 0.80,
+                            log_policy: "简短",
+                        }) || ITimg.ocr("PROVISIONAL MINING PERMIT", {
+                            refresh: false,
+                            similar: 0.80,
+                            log_policy: "简短",
+                        })) {
+                        ITimg.ocr("开始作业", {
+                            action: 1,
+                            timing: 2000,
+                            refresh: false,
+                            similar: 0.80,
+                        });
+                    }
+                }
+            }
             if (ITimg.picture("关闭公告", {
                     timing: 2000,
                     action: 0,
+                    picture: images.copy(rewardimg),
                     area: "上半屏",
                 }) || ITimg.picture("获得物资", {
                     timing: 1000,
+                    picture: images.copy(rewardimg),
                     action: 1,
+                    area: 12,
                 })) {
+                //
+                rewardimg.recycle();
                 if (ITimg.picture("终端", {
                         timing: 1500,
                         area: "右半屏"
@@ -1281,22 +1370,25 @@ let 唤醒 = {
                             timing: 1500,
                             area: 24,
                         })) {
+
                         break;
                     };
                 };
             } else {
-                (ITimg.ocr("立即领取",{
-                    action:0,
-                    similar:0.7,
-                })||ITimg.ocr("领取",{
-                    action:0,
-                    similar:0.9,
-                    refresh:false,
-                    log_policy:false,
+                (ITimg.ocr("立即领取", {
+                    action: 0,
+                    similar: 0.7,
+                    picture: images.copy(rewardimg),
+                }) || ITimg.ocr("领取", {
+                    action: 0,
+                    similar: 0.9,
+                    refresh: false,
+                    log_policy: false,
                 }));
+                rewardimg.recycle();
                 //点击边缘位置来取消取消按钮不一样的公告
-                MyAutomator.click(height / 2, width - zoy(50));
-                
+                MyAutomator.click(height / 2, width - zoy(60));
+
                 if (ITimg.picture("终端", {
                         area: 2,
                         //        action:5,
@@ -1333,7 +1425,6 @@ function 行动() {
         threads.shutDownAll();
         exit();
     }
-
     setInterval(function() {
         device.keepScreenDim(240 * 1000);
         setting = tool.readJSON("configure");
@@ -4768,7 +4859,7 @@ function 任务() {
     sleep(50)
     threadMain.setName("任务领奖");
     tool.Floaty_emit("面板", "展开");
-    if (setting.任务奖励) {
+    if (setting.claim_rewards && setting.claim_rewards.daily) {
         tool.Floaty_emit("展示文本", "状态", "状态：领取任务奖励");
         //toastLog("2秒后启动任务领取奖励程序");
         sleep(2000);
@@ -4906,7 +4997,7 @@ function 任务() {
                 timing: 6000,
             });
         }
-        toastLog("任务奖励:" + setting.任务奖励)
+        toastLog("任务奖励:" + setting.claim_rewards.daily)
     }
 
     if (recruit_tag[0] && recruit_tag[0].星级) {
