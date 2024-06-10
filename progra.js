@@ -2162,7 +2162,7 @@ function 跳转_暂停(suspended, status, literals) {
 
     } else {
         sleep(800);
-        MyAutomator.click(height / 2, width / 2);
+        MyAutomator.click(height / 2, zoy(100));
         threadMain.interrupt();
         threadMain = threads.start(基建);
     }
