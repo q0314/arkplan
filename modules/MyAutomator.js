@@ -36,31 +36,31 @@ let MyAutomator = {
         }
     },
     click(x, y) {
-       return MyAutomator.press(x, y, random(149,160));
-       
+        return MyAutomator.press(x, y, random(129, 159));
+
     },
     press(x, y, delay) {
-        
-            if (MyAutomator.dirctionReverse) {
 
-                const dm = context.getResources().getDisplayMetrics();
-                const wm = context.getSystemService(context.WINDOW_SERVICE);
-                wm.getDefaultDisplay().getRealMetrics(dm);
-                const tmpx = dm.heightPixels - y;
-                y = x;
-                x = tmpx;
-            }
-            if (MyAutomator.tapType == 0) {
-                return press(x, y, delay);
-           
-            } else if (MyAutomator.tapType == 1) {
-                return MyAutomator.RA.press(x, y, delay);
-            } else if (MyAutomator.tapType == 2) {
-                return (MyAutomator.shell.execAndWaitFor('input swipe ' + x + ' ' + y + ' ' + x + ' ' + y + ' ' + delay).code == 0);
-            } else if (MyAutomator.tapType == 3) {
-                return Tap(x, y); // 忽略点击时长, 官方不支持
-            }
-        
+        if (MyAutomator.dirctionReverse) {
+
+            const dm = context.getResources().getDisplayMetrics();
+            const wm = context.getSystemService(context.WINDOW_SERVICE);
+            wm.getDefaultDisplay().getRealMetrics(dm);
+            const tmpx = dm.heightPixels - y;
+            y = x;
+            x = tmpx;
+        }
+        if (MyAutomator.tapType == 0) {
+            return press(x, y, delay);
+
+        } else if (MyAutomator.tapType == 1) {
+            return MyAutomator.RA.press(x, y, delay);
+        } else if (MyAutomator.tapType == 2) {
+            return (MyAutomator.shell.execAndWaitFor('input swipe ' + x + ' ' + y + ' ' + x + ' ' + y + ' ' + delay).code == 0);
+        } else if (MyAutomator.tapType == 3) {
+            return Tap(x, y); // 忽略点击时长, 官方不支持
+        }
+
     },
 
     swipe(x0, y0, x1, y1, delay) {
@@ -91,5 +91,65 @@ let MyAutomator = {
 
 
 }
+try {
+    module.exports = MyAutomator;
+} catch (e) {
+    var height = device.height;
+    var width = device.width;
+    var zox = (value) => {
+            return Math.floor((height / 2712) * value);
+        },
+        zoy = (value) => {
+            return Math.floor((width / 1220) * value);
+        };
+    let gesturexy = [
+        [height / 2, width / 2, zox(300), width / 2,800],
+        [height / 2, width / 2, height - zox(500), width / 2, 800]
+    ];
+   // gesturexy = gesturexy[1]
+  //  swipe.apply(swipe,gesturexy)
+    //[0], gesturexy[1], gesturexy[2], gesturexy[3], gesturexy[4]);
+// 分辨率
+// 分辨率
+let h = 2712;
+let w = 1220;
 
-module.exports = MyAutomator;
+// 已知按钮坐标
+let button1X = 163;
+let button8X = 2540;
+
+// 计算按钮间隔
+let interval = (button8X - button1X) / (8 - 1); // 计算按钮间隔
+
+// 获取线上的按钮坐标
+function getButtonCoordinates(yPosition) {
+    let buttons = [];
+
+    // 循环添加按钮坐标
+    for (let i = 1; i <= 8; i++) {
+        let buttonX = Math.floor(button1X + (i - 1) * interval); // 使用间隔计算按钮 X 坐标
+        let buttonY = yPosition;
+        buttons.push([buttonX, buttonY]);
+    }
+
+    return buttons;
+}
+
+// 使用例子
+let yPosition = 1140; // 线上的y轴坐标
+let buttonCoords = getButtonCoordinates(yPosition);
+log(buttonCoords);
+log(parseInt(h/1.068))
+sleep(500)
+let v = "拟战场域|作战补给|后勤保养|军备突破|成员特训|螺母大作战|战技演习|辅助加装";
+let newArray = v.split("|");
+console.log(newArray)
+
+MyAutomator.tapType =0
+MyAutomator.click.apply(MyAutomator,buttonCoords[0])
+for(let i of buttonCoords){
+   // click(i[0],i[1]);
+   // sleep(800);
+}
+    
+}

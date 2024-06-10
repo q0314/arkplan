@@ -92,7 +92,7 @@ var setting = tool.readJSON("configure", {
     "autoAllowScreen": true,
     "image_monitor": true,
     "image_memory_manage": true,
-    "defaultOcr": "MlkitOCR",
+    "defaultOcr": "XiaoYueOCR",
     "ocrExtend": false,
     "公告": "公告",
     "截图": "辅助",
@@ -204,14 +204,18 @@ try {
     setting.defaultOcr.length;
     setting["operation_mode"].length;
     setting.claim_rewards.celebration_sign.length;
+    setting.指定关卡.length
 } catch (err) {
     tool.writeJSON("claim_rewards", {
         "daily": true,
         "celebration_sign": false,
         "mining_operations": false,
     });
+    tool.writeJSON("指定关卡", {
+        levelAbbreviation: "当前"
+    })
     tool.writeJSON("operation_mode", "无障碍");
-    tool.writeJSON("defaultOcr", 'MlkitOCR');
+    tool.writeJSON("defaultOcr", 'XiaoYueOCR');
     setting = tool.readJSON("configure");
 }
 

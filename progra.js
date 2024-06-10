@@ -33,8 +33,8 @@ if (width > height || setting.模拟器) {
 } else {
     if (setting.坐标) {
         setScreenMetrics(width, height);
-    };
-};
+    }
+}
 console.info("设备宽：" + width + "，高：" + height + "。是否横屏：" + isHorizontalScreen());
 
 
@@ -298,56 +298,59 @@ let collection = {
                     area: 34,
                 })) {
                 tool.Floaty_emit("展示文本", "状态", "状态: 切换事务");
-                //以左下角的终端做坐标点击
-                this.staging = ITimg.ocr(displayText["终端"], {
-                    action: 5,
-                    area: 34,
-                });
+                // 分辨率
 
+                // 已知按钮坐标
+                let button1X = Math.floor(height / 16.4);
+                let button8X = parseInt(height / 1.068);
 
-                if (this.staging) {
-                    if (setting.调试) {
-                        tool.pointerPositionDisplay(true)
+                // 计算按钮间隔
+                let interval = (button8X - button1X) / (8 - 1); // 计算按钮间隔
+
+                // 获取线上的按钮坐标
+                function getButtonCoordinates(yPosition) {
+                    let buttons = [];
+
+                    // 循环添加按钮坐标
+                    for (let i = 1; i <= 8; i++) {
+                        let buttonX = button1X + (i - 1) * interval; // 使用间隔计算按钮 X 坐标
+                        let buttonY = yPosition;
+                        buttons.push([buttonX, buttonY]);
                     }
 
-                    switch (affairs) {
-                        case displayText["主题曲"]:
-                            MyAutomator.click(this.staging.right + zox(180), this.staging.bottom);
-                            MyAutomator.click(this.staging.right + zox(180) * 1, this.staging.bottom);
-                            break;
-                        case "插曲":
-                            MyAutomator.click(this.staging.right + zox(180) * 3, this.staging.bottom);
-                            MyAutomator.click(this.staging.right + zox(180) * 4, this.staging.bottom);
-                            break;
-                        case displayText["资源收集"]:
-                            MyAutomator.click(this.staging.right + zox(180) * 7, this.staging.bottom);
-                            //     MyAutomator.click(this.staging.right + zox(180) * 8, this.staging.bottom);
-                            //  log((this.staging.right + zox(180) * 7));
-                            // log(this.staging.right + zox(180) * 8);
+                    return buttons;
+                }
 
-                            break;
-                        case displayText["常态事务"]:
-                            MyAutomator.click(this.staging.right + zox(180) * 9, this.staging.bottom);
-                            //   MyAutomator.click(this.staging.right + zox(180) * 10, this.staging.bottom);
-                            break;
-                        case displayText["长期探索"]:
-                            MyAutomator.click(this.staging.right + zox(180) * 11, this.staging.bottom);
-                            //    MyAutomator.click(this.staging.right + zox(180) * 12, this.staging.bottom);
-                            break;
-                    }
-                } else {
-                    switch (affairs) {
-                        case displayText["主题曲"]:
-                            MyAutomator.click(zox(505), width - zoy(80));
-                            break;
-                        case displayText["资源收集"]:
-                            MyAutomator.click(zox(1520), width - zoy(80));
-                            break;
-                        case "长期探索":
-                            MyAutomator.click(zox(2200), width - zoy(80));
-                            break;
-                    }
-                };
+
+                let buttonCoords = getButtonCoordinates(width - zoy(80));
+
+                if (setting.调试) {
+                    tool.pointerPositionDisplay(true)
+                }
+
+                switch (affairs) {
+                    case displayText["主题曲"]:
+                        MyAutomator.click.apply(MyAutomator, buttonCoords[1]);
+                        break;
+                    case displayText["插曲"]:
+                        MyAutomator.click.apply(MyAutomator, buttonCoords[2]);
+                        break;
+                    case displayText["别传"]:
+                        MyAutomator.click.apply(MyAutomator, buttonCoords[3]);
+                        break
+                    case displayText["资源收集"]:
+                        MyAutomator.click.apply(MyAutomator, buttonCoords[4]);
+                        break;
+                    case displayText["常态事务"]:
+                        MyAutomator.click.apply(MyAutomator, buttonCoords[5]);
+                        break;
+                    case displayText["长期探索"]:
+                        MyAutomator.click.apply(MyAutomator, buttonCoords[6])
+                        break;
+                    case displayText["周期挑战"]:
+                        MyAutomator.click.apply(MyAutomator, buttonCoords[7]);
+                        break;
+                }
                 if (setting.调试) {
                     tool.pointerPositionDisplay(false)
                 }
@@ -416,30 +419,87 @@ let collection = {
             MyAutomator.click(this.staging.right, this.staging.top);
             sleep(1000);
         };
+        cumulative = 5;
+        while (cumulative) {
 
-        (ITimg.ocr("O1", {
-            action: 0,
-            timing: 1000,
-            area: 4,
-            similar: 1,
-        }) || ITimg.ocr("01", {
-            action: 0,
-            timing: 1000,
-            area: 4,
-            similar: 1,
-            refresh: false,
-            log_policy: "brief",
-        }));
+            this.staging = (ITimg.ocr("集合文本", {
+                action: 6,
+            }));
+            if (this.staging && this.staging.length) {
+                (ITimg.ocr("O1", {
+                    action: 0,
+                    timing: 1000,
+                    area: 4,
+                    similar: 1,
+                    gather: this.staging,
+                }) || ITimg.ocr("01", {
+                    action: 0,
+                    timing: 1000,
+                    area: 4,
+                    similar: 1,
+                    refresh: false,
+                    log_policy: "brief",
+                    gather: this.staging,
+                }));
+                let gesturexy = [
+                    [height / 2, width / 2, height - zox(100), width / 2, 800],
+                    [height / 2, width / 2, zox(100), width / 2, 800]
+                ];
 
-        if (ITimg.ocr("1-7", {
-                action: 0,
-                timing: 1000,
-                area: 12,
-                similar: 1,
-            })) {
-            return true;
+                if (ITimg.ocr("1-3", {
+                        action: 5,
+                        similar: 1,
+                        area: 24,
+                        gather: this.staging,
+                    }) || ITimg.ocr("1-2", {
+                        action: 5,
+                        similar: 1,
+                        area: 13,
+                        gather: this.staging,
+                    })) {
+
+                    gesturexy[0][2] = height - zox(100);
+                    MyAutomator.swipe.apply(MyAutomator, gesturexy[0]);
+
+                } else if (ITimg.ocr("1-3", {
+                        action: 5,
+                        similar: 1,
+                        area: 13,
+                        gather: this.staging,
+                    })) {
+
+                    gesturexy[0][2] = height - zox(300);
+                    MyAutomator.swipe.apply(MyAutomator, gesturexy[0]);
+
+                } else if (ITimg.ocr("1-12", {
+                        action: 5,
+                        similar: 1,
+                        gather: this.staging,
+                    })) {
+
+                    MyAutomator.swipe.apply(MyAutomator, gesturexy[1]);
+
+                }
+
+                sleep(500);
+
+                if (ITimg.ocr("1-7", {
+                        action: 0,
+                        timing: 1000,
+                        similar: 1,
+                    })) {
+                    break;
+                    // return true;
+                } else {
+                    cumulative--;
+                    if (!cumulative) {
+                        console.error("多次无法选中1-7关卡");
+                        break
+                    }
+                }
+            }
         }
-
+        return (cumulative ? true : false)
 
     },
     /**
@@ -721,7 +781,7 @@ function 程序(implem) {
 
         // Combat_report.record("开始运行PRTS辅助，执行模式：" + implem);
     });
-};
+}
 
 /**
  * 进入终端,并检验上一次作战类型,选中非剿灭关卡
@@ -1040,11 +1100,33 @@ let 唤醒 = {
             click(height / 2, width - zoy(60));
             click(height / 2, zoy(50));
             tool.Floaty_emit("展示文本", "状态", "状态：客户端已过时");
-            textContains(displayText["更新"]).waitFor();
             tool.Floaty_emit("展示文本", "状态", "状态：从TapTap更新明日方舟");
             //查找点击Tap更新应用按钮
+            /* auto.setWindowFilter(function(window) {
+                 // 对于应用窗口，他的title属性就是应用的名称，因此可以通过title属性来判断一个应用
+                 return window.title == "TapTap";
+             });*/
+
             let update_app;
             while (true) {
+                //   tool.Floaty_emit("展示文本", "状态", "状态：确认可在TapTap更新");
+
+                if (!textContains(displayText["更新"]).findOne(2000)) {
+                    console.verbose("等待更新按钮出现")
+                    sleep(1500);
+                    continue;
+                }
+                sleep(500);
+
+                update_app = id("com.taptap.app.middle:id/btn_container").findOne(2000);
+                if (update_app) {
+                    if (!update_app.clickable() || !update_app.click()) {
+                        update_app = update_app.bounds();
+                        MyAutomator.click(update_app.centerX(), update_app.centerY());
+                        sleep(500);
+                    }
+                }
+                sleep(500);
                 update_app = (textMatches(displayText["更新"] + '.*?(MB|G)').findOne(2000) || textStartsWith(displayText["更新"]).findOne(2000));
                 if (update_app) {
                     if (!update_app.clickable() || !update_app.click()) {
@@ -1052,12 +1134,19 @@ let 唤醒 = {
                         MyAutomator.click(update_app.centerX(), update_app.centerY());
                         break;
                     };
-                };
-            };
 
-            console.info("更新App按钮参数：\n" + update_app)
+                }
+            }
+            console.info("更新App按钮参数：\n" + update_app);
+
             if (setting.update && setting.update.usingTraffic) {
-                let usingTraffic = textStartsWith(displayText["立即下载"]).findOne(3000);
+                tool.Floaty_emit("展示文本", "状态", "状态：检索使用流量更新");
+
+                sleep(1500);
+                let usingTraffic = textStartsWith(displayText["立即下载"]).findOne(3500);
+                if (!usingTraffic) {
+                    usingTraffic = id("com.taptap.app.middle:id/dialog_btn_top").findOne(5000);
+                }
                 if (usingTraffic) {
                     if (!usingTraffic.clickable() || !usingTraffic.click()) {
                         usingTraffic = usingTraffic.bounds();
@@ -1067,12 +1156,19 @@ let 唤醒 = {
                 console.info("使用流量下载按钮参数：\n" + usingTraffic);
             }
             tool.Floaty_emit("展示文本", "状态", "状态：等待下载完成");
+            while (true) {
+                if (desc(displayText["安装"]).findOne(2000)) {
 
-            desc(displayText["安装"]).waitFor();
+                    break
+                }
+                sleep(500);
+            }
+
+            log("安装");
             tool.Floaty_emit("展示文本", "状态", "状态：进行安装");
 
-            let install_app = desc(displayText["安装"]).findOne();
-            if (!install_app.clickable() || !install_app.click()) {
+            let install_app = desc(displayText["安装"]).findOne(3000);
+            if (install_app && (!install_app.clickable() || !install_app.click())) {
                 install_app = install_app.bounds();
                 log(install_app)
                 MyAutomator.click(install_app.centerX(), install_app.centerY());
@@ -1088,7 +1184,13 @@ let 唤醒 = {
             };
 
             sleep(3000);
-            textMatches(displayText["确认安装合集"]).waitFor();
+            while (true) {
+                if (textMatches(displayText["确认安装合集"]).findOne(2000)) {
+
+                    break;
+                }
+                sleep(500);
+            }
             tool.Floaty_emit("展示文本", "状态", "状态：逐步安装");
 
             let ii = 1;
@@ -1223,6 +1325,10 @@ let 唤醒 = {
                 sleep(1000);
                 getpackage = tool.currentPackage();
                 log("前台包名：" + getpackage);
+                if (getpackage == "com.taptap") {
+                    this.检查更新(true);
+                    break;
+                }
                 if (getpackage == "com.hypergryph.arknights.bilibili") {
                     tool.Floaty_emit("展示文本", "状态", "状态：当前渠道为B服，等待");
                     toastLog("当前渠道为B服，请等待")
@@ -1269,12 +1375,23 @@ let 唤醒 = {
                             area: 13,
                             picture: images.copy(rewardimg),
                             similar: 0.80,
+                            refresh: true,
                         }) || ITimg.ocr("首日领取", {
                             area: 13,
                             refresh: false,
                             similar: 0.80,
                             log_policy: "简短",
-                        })) {
+                        }) || (ITimg.ocr("本活动", {
+                            area: 13,
+                            refresh: false,
+                            similar: 0.80,
+                            log_policy: true,
+                        }) && ITimg.ocr("DAY", {
+                            area: 13,
+                            refresh: false,
+                            similar: 0.80,
+                            log_policy: true,
+                        }))) {
                         //轮廓
                         date_reward = ITimg.contour({
                             action: 5,
@@ -1936,7 +2053,8 @@ function 理智处理() {
             } else {
                 toast("木有理智，更木有理智兑换次数");
                 console.warn("木有理智，更木有理智兑换次数");
-                MyAutomator.click(height / 2, width - zox(50));
+                console.verbose("取消理智界面，点击，x:" + height / 2 + "，y:" + (width - zoy(50)))
+                MyAutomator.click(height / 2, (width - zoy(50)));
                 return false;
             }
 
@@ -1990,7 +2108,7 @@ function 理智处理() {
         toast("木有理智药剂，更木有源石可供恢复理智");
         console.warn("木有理智药剂，更木有源石可供恢复理智");
         tool.Floaty_emit("展示文本", "状态", "状态：没有方法恢复");
-        MyAutomator.click(height / 2, width - zox(50));
+        MyAutomator.click(height / 2, (width - zoy(50)));
         return false;
     };
     return true;
@@ -3484,15 +3602,49 @@ function 基建() {
                 action: 0,
                 area: 34,
                 timing: 8000,
-                nods: 1500,
                 grayscale: 1,
             }) && !ITimg.picture("访问基建", {
                 action: 0,
                 timing: 8000
             })) {
-            toast("没有找到访问基建，无法执行好友访问");
-            console.error("没有找到访问基建，无法执行好友访问");
-            return false
+            function obtain_access_infrastructure() {
+                let button_list = ITimg.ocr({
+                    canvas: "访问基建",
+                    action: 6,
+                    area: 4,
+                    isdilate: true,
+                    threshold: 240,
+                    size: 10,
+                    type: "BINARY",
+                    filter_w: zox(50),
+                    filter_h: zoy(20),
+                });
+                if (button_list && button_list.length) {
+                    let access_infrastructure;
+                    for (let asie of button_list) {
+                        if (asie.shape == "长方形") {
+                            if (!access_infrastructure || access_infrastructure.y < asie.y) {
+                                access_infrastructure = asie;
+                            }
+                        }
+                    }
+                    if (access_infrastructure) {
+                        return [access_infrastructure.x, access_infrastructure.y];
+                    }
+                    return false;
+                }
+                return false;
+            };
+            let asie_ = obtain_access_infrastructure();
+
+            if (asie_) {
+                MyAutomator.click.apply(MyAutomator, asie_);
+                sleep(8000);
+            } else {
+                toast("没有找到访问基建，无法执行好友访问");
+                console.error("没有找到访问基建，无法执行好友访问");
+                return false;
+            }
         }
         tool.Floaty_emit("面板", "展开");
         if (!setting.好友限制) {
@@ -4578,6 +4730,7 @@ function 公招(Manual) {
                 text="随便选吧，反正没有四星及以上"
                 visibility="gone"
                 textSize="15sp"
+                textColor="#808080"
                 layout_gravity="center"
                 w="*" />
                 
@@ -4650,6 +4803,7 @@ function 公招(Manual) {
                         <text id="add_tags"
                         margin="0"
                         textSize="15sp"
+                        textColor="#808080"
                         layout_gravity="center"
                         w="*" />
                     </horizontal>,

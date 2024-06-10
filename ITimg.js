@@ -609,37 +609,54 @@ function ocr文字识别(words, list) {
     }
     list.area = regional_division(list.area);
 
+    if (!list.gather) {
 
+        if (list.refresh === undefined || list.refresh == true) {
+            //多分辨率兼容
+            if (list.resolution) {
+                try {
+                    if (typeof list.resolution == "object") {
+                        list.picture = images.resize(captureScreen_(), [list.resolution.h, list.resolution.w])
+                    } else {
+                        list.picture = images.resize(captureScreen_(), [height, width])
+                    }
+                } catch (e) {
+                    console.error("缩放失败" + e);
 
-    if (list.refresh === undefined || list.refresh == true) {
-        //多分辨率兼容
-        if (list.resolution) {
-            try {
-                if (typeof list.resolution == "object") {
-                    list.picture = images.resize(captureScreen_(), [list.resolution.h, list.resolution.w])
-                } else {
-                    list.picture = images.resize(captureScreen_(), [height, width])
                 }
-            } catch (e) {
-                console.error("缩放失败" + e);
 
             }
 
-        }
+            ITimg.results = ITimg[list.ocr_type + "_module"].detect((list.picture || captureScreen_()), {
+                "region": list.area,
+                "rectify_json_path": list.correction_path,
+            });
 
-        if (!list.gather) ITimg.results = ITimg[list.ocr_type + "_module"].detect((list.picture || captureScreen_()), {
-            "region": list.area,
-            "rectify_json_path": list.correction_path,
-        });
-
-        if (list.action == 6) {
-            return ITimg.results;
+            if (list.action == 6) {
+                return ITimg.results;
+            }
         }
     }
     query_ = undefined;
     //true=匹配部分文字
     if (list.part) {
-        query_ = (list.gather || ITimg.results).find(ele => ele.text.indexOf(words) != -1);
+        query_ = (list.gather || ITimg.results).find(ele => {
+            if (ele.text.indexOf(words) != -1) {
+                if (list.gather) {
+                    if (ele.left >= list.area[0] &&
+                        ele.left < list.area[0] + list.area[2] && // 修正：判断 left 是否在指定范围内
+                        ele.top >= list.area[1] &&
+                        ele.top < list.area[1] + list.area[3] && // 修正：判断 top 是否在指定范围内
+                        ele.right - ele.left <= list.area[2] &&
+                        ele.bottom - ele.top <= list.area[3]) { // 保持原来的宽度和高度判断
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+
+            }
+        });
         list.similar = undefined;
     } else {
         //模糊匹配
@@ -647,13 +664,25 @@ function ocr文字识别(words, list) {
             let similar = list.similar;
             list.similar = tool.nlpSimilarity(ele.text, words);
             if (list.similar >= similar) {
-                return true;
+                if (list.gather) {
+
+                    if (ele.left >= list.area[0] &&
+                        ele.left < list.area[0] + list.area[2] && // 修正：判断 left 是否在指定范围内
+                        ele.top >= list.area[1] &&
+                        ele.top < list.area[1] + list.area[3] && // 修正：判断 top 是否在指定范围内
+                        ele.right - ele.left <= list.area[2] &&
+                        ele.bottom - ele.top <= list.area[3]) { // 保持原来的宽度和高度判断
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
             } else {
                 list.similar = similar;
                 return false;
-            };
+            }
         });
-    };
+    }
 
     list.picture ? list.picture = "隐藏" : undefined;
     if (query_ != undefined) {
@@ -713,7 +742,7 @@ function ocr文字识别(words, list) {
         switch (list.log_policy) {
             case undefined:
             case false:
-                console.error("-" + words + " 未匹配到\n--ocr配置：" + JSON.stringify(list) + "\n---识别结果：" + JSON.stringify(ITimg.results));
+                console.error("-" + words + " 未匹配到\n--ocr配置：" + JSON.stringify(list) + "\n---识别结果：" + JSON.stringify((list.gather || ITimg.results)));
                 break
             case true:
                 break
@@ -747,15 +776,25 @@ function binarized_contour(list) {
         isdilate: list.isdilate || ITimg.default_list.outline.isdilate,
         filter_w: list.filter_w,
         filter_h: list.filter_h,
+        filter_vertices: list.filter_vertices,
         area: list.area || ITimg.default_list.outline.area,
         nods: list.nods || ITimg.default_list.outline.nods,
         log_policy: list.log_policy,
     }
     list.area = regional_division(list.area);
 
-    let img = list.picture || ITimg.captureScreen_();
-
-    let roiBitmap = Bitmap.createBitmap(img.bitmap, list.area[0], list.area[1], list.area[2], list.area[3]);
+    let img_ = list.picture || ITimg.captureScreen_();
+    //长时间持有图片
+    let img = images.copy(img_, true);
+    !img_.isRecycled() && img_.recycle();
+    let roiBitmap;
+    try {
+        roiBitmap = Bitmap.createBitmap(img.bitmap, list.area[0], list.area[1], list.area[2], list.area[3]);
+    } catch (e) {
+        console.error(e)
+        img = ITimg.captureScreen_();
+        roiBitmap = Bitmap.createBitmap(img.bitmap, list.area[0], list.area[1], list.area[2], list.area[3]);
+    }
     if (roiBitmap.width == height && roiBitmap.height == width) {
         console.verbose("全屏查找矩形")
         roiBitmap = Bitmap.createBitmap(list.area[2], list.area[3], Bitmap.Config.ARGB_8888);
@@ -786,10 +825,10 @@ function binarized_contour(list) {
             Imgproc.dilate(mat, mat, element);
         }
     }
-    //查找直边界矩形
-    ITimg.results = new java.util.ArrayList();
+    //查找直边界矩形，多线程的情况下ITimg.results容易和ocr的冲突，所以就改名
+    ITimg.results_contour = new java.util.ArrayList();
     let hierarchy = new Mat();
-    Imgproc.findContours(mat, ITimg.results, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+    Imgproc.findContours(mat, ITimg.results_contour, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
     if (list.canvas) {
         // 在原始图像上绘制直边界矩形
         rectPaint = new Paint();
@@ -801,16 +840,29 @@ function binarized_contour(list) {
         rectPaint.setTextAlign(Paint.Align.CENTER);
 
         // img = images.matToImage(mat);
-        list.canvas = new Canvas(img);
-        img.recycle();
+        if (typeof list.canvas == "string") {
+            list.canvas = {
+                name: list.canvas
+            }
+        } else {
+            list.canvas = {};
+
+        }
+        list.canvas.img = new Canvas(img);
+        !img.isRecycled() && img.recycle();
         Utils.matToBitmap(mat, roiBitmap);
-        list.canvas.drawBitmap(roiBitmap, list.area[0], list.area[1], rectPaint)
+        list.canvas.img.drawBitmap(roiBitmap, list.area[0], list.area[1], rectPaint)
+
+    } else {
+        !img.isRecycled() && img.recycle();
 
     }
-    query_ = [];
+    roiBitmap && roiBitmap.recycle();
+    let query_contour = [];
+
     // 循环处理每个轮廓
-    for (let i = 0; i < ITimg.results.size(); i++) {
-        let contour = ITimg.results.get(i);
+    for (let i = 0; i < ITimg.results_contour.size(); i++) {
+        let contour = ITimg.results_contour.get(i);
         let boundingRect = Imgproc.boundingRect(contour);
 
         let outline_x = boundingRect.x + list.area[0];
@@ -825,36 +877,40 @@ function binarized_contour(list) {
         let epsilon = 0.02 * Imgproc.arcLength(contour2f, true);
         Imgproc.approxPolyDP(contour2f, approxCurve, epsilon, true);
         let vertices = approxCurve.toArray();
-        let message;
+        let shape, circularity_;
+        if (list.filter_vertices && vertices < list.filter_vertices) {
+            continue;
+        }
         // 根据轮廓顶点数量判断形状
         if (vertices.length == 3) {
             // 三角形
-            message = "三角形"
+            shape = "三角形"
         } else if (vertices.length == 4) {
             // 矩形或正方形
             //  let rect = Imgproc.boundingRect(new MatOfPoint(contour.toArray()));
             let aspectRatio = outline_width / outline_height;
             if (aspectRatio >= 0.95 && aspectRatio <= 1.05) {
-                message = "正方形"
+                shape = "正方形"
             } else {
-                message = "长方形"
+                shape = "长方形"
             }
         } else {
             // 圆形或其他形状
             let area = Imgproc.contourArea(contour);
             let perimeter = Imgproc.arcLength(new MatOfPoint2f(contour.toArray()), true);
             let circularity = 4 * Math.PI * area / (perimeter * perimeter);
+            circularity_ = circularity.toFixed(2)
+
             if (circularity >= 0.85) {
-                message == "圆形"
+                shape = "圆形"
             } else {
-                message = "其他形状"
+                shape = "其他形状"
             }
         }
 
 
 
-        query_.push({
-            shape: message,
+        query_contour.push({
             x: outline_x,
             y: outline_y,
             w: outline_width,
@@ -863,14 +919,17 @@ function binarized_contour(list) {
             right: outline_x + outline_width,
             top: outline_y,
             bottom: outline_y + outline_height,
+            shape: shape,
             vertices: vertices.length,
+            circularity: circularity_
         });
 
-        //  console.info("矩阵：" + query_.length + "，形状：" + query_[query_.length - 1].shape + "，数据：" + outline_x, outline_y, outline_width, outline_height,vertices.length);
+
+        // console.info("矩阵：" + query_contour.length + "，形状：" + query_contour[query_contour.length - 1].shape + "，数据：xy:" + outline_x, outline_y + "，wh:" + outline_width, outline_height + "，顶点：" + vertices.length);
         if (list.canvas) {
 
-            list.canvas.drawText(
-                query_[query_.length - 1].shape,
+            list.canvas.img.drawText(
+                query_contour[query_contour.length - 1].shape,
                 outline_x + outline_width / 2,
                 outline_y + outline_height + Math.abs(rectPaint.getFontMetrics().top - 10),
                 rectPaint
@@ -892,29 +951,32 @@ function binarized_contour(list) {
             });
             flattenedPoints.push(flattenedPoints[0]);
             flattenedPoints.push(flattenedPoints[1]);
-            list.canvas.drawLines(flattenedPoints, rectPaint)
+            list.canvas.img.drawLines(flattenedPoints, rectPaint)
             //list.canvas && list.canvas.drawRect(outline_x, outline_y, outline_x + outline_width, outline_y + outline_height, rectPaint);
         }
     }
     if (list.canvas) {
 
-        list.canvas = list.canvas.toImage();
-        let pngPtah = path_ + "/binarized_contour_visualization.jpg";
+        list.canvas.img = list.canvas.img.toImage();
+        let pngPtah = path_ + "/binarized_contour/" + (list.canvas.name || "") + "_visualization.jpg";
         files.ensureDir(pngPtah);
 
-        images.save(list.canvas, pngPtah, "jpg", 50);
-        list.canvas.recycle();
+        images.save(list.canvas.img, pngPtah, "jpg", 50);
+        list.canvas.img.recycle();
         //app.viewFile(pngPtah);
     }
 
     if (list.action == 6) {
-        return ITimg.results;
+        return ITimg.results_contour;
     }
 
-    list.canvas ? list.canvas = undefined : undefined;
-    list.picture ? list.picture = "隐藏" : undefined;
+    list.canvas ? list.canvas = list.canvas.name : undefined;
+    if (list.picture) {
+        !list.picture.isRecycled() && list.picture.recycle()
+        list.picture = "隐藏"
+    }
 
-    if (query_.length > 0) {
+    if (query_contour.length > 0) {
         ITimg.elements = {
             "content": null,
             "number": 0
@@ -923,39 +985,38 @@ function binarized_contour(list) {
         switch (list.log_policy) {
             case undefined:
             case false:
-                console.info("-匹配到矩阵数量：" + query_.length + "，总数：" + ITimg.results.size() + "\n--矩阵配置：" + JSON.stringify(list) + "\n---内容：" + JSON.stringify(query_));
+                console.info("-匹配到矩阵数量：" + query_contour.length + "，总数：" + ITimg.results_contour.size() + "\n--矩阵配置：" + JSON.stringify(list) + "\n---内容：" + JSON.stringify(query_contour));
 
                 break
             case true:
                 break
             case "brief":
             case "简短":
-                console.info("-匹配到矩阵数量：" + query_.length + "，总数：" + ITimg.results.size());
+                console.info("-匹配到矩阵数量：" + query_contour.length + "，总数：" + ITimg.results_contour.size());
                 break
         }
         switch (list.action) {
-            case undefined:
-                break
             case 0:
 
-                MyAutomator.click(query_[0].left + Math.floor(query_[0].w / 2), query_.top + Math.floor(query_[0].h / 2));
+                MyAutomator.click(query_contour[0].left + Math.floor(query_contour[0].w / 2), query_contour.top + Math.floor(query_contour[0].h / 2));
                 break;
 
                 //点击文字左上角
             case 1:
-                MyAutomator.click(query_[0].left, query_[0].top);
+                MyAutomator.click(query_contour[0].left, query_contour[0].top);
                 break
             case 2:
-                MyAutomator.click(query_[0].right, query_[0].top);
+                MyAutomator.click(query_contour[0].right, query_contour[0].top);
                 break
             case 3:
-                MyAutomator.click(query_[0].left, query_[0].bottom);
+                MyAutomator.click(query_contour[0].left, query_contour[0].bottom);
                 break
             case 4:
-                MyAutomator.click(query_[0].right, query_[0].bottom);
+                MyAutomator.click(query_contour[0].right, query_contour[0].bottom);
                 break
+            case undefined:
             case 5:
-                return query_;
+                return query_contour;
         }
         sleep(list.timing);
         return true;
@@ -964,7 +1025,7 @@ function binarized_contour(list) {
         switch (list.log_policy) {
             case undefined:
             case false:
-                console.error("-未匹配到矩阵，总数：" + ITimg.results.size() + "\n--矩阵配置：" + JSON.stringify(list));
+                console.error("-未匹配到矩阵，总数：" + ITimg.results_contour.size() + "\n--矩阵配置：" + JSON.stringify(list));
                 break
             case true:
                 break
@@ -1123,7 +1184,7 @@ function initocr(value) {
             ocr = require("./modules/xiaoyueocr.js");
             if (!ocr.isInstalled()) {
                 toastLog("未安装OCR扩展，无法使用对应功能\n请打开侧边栏-设置,获取OCR扩展下载安装");
-                tool.Floaty_emit("展示文本", "状态", "状态：未安装OCR扩展，无法使用对应功能");
+                tool.Floaty_emit("展示文本", "状态", "状态：未打开设置-OCR扩展，无法使用对应功能");
                 return false;
             }
 
@@ -1140,7 +1201,7 @@ function initocr(value) {
             ocr = require("./modules/mlkitocr.js");
             if (!ocr.isInstalled()) {
                 toastLog("未安装OCR扩展，无法使用对应功能\n请打开侧边栏-设置,获取OCR扩展下载安装");
-                tool.Floaty_emit("展示文本", "状态", "状态：未安装OCR扩展，无法使用对应功能");
+                tool.Floaty_emit("展示文本", "状态", "状态：未打开设置-OCR扩展，无法使用对应功能");
                 return false;
             }
 
@@ -1205,6 +1266,9 @@ ITimg.captureScreen_ = captureScreen_;
 try {
     module.exports = ITimg;
 } catch (e) {
+    log("加载图片代理程序")
+    require('./lib/ResourceMonitor.js')(runtime, this)
+
     var path_ = context.getExternalFilesDir(null).getAbsolutePath();
 
     var tool = require("./modules/tool.js");
@@ -1225,30 +1289,35 @@ try {
     setting.截图 = null;
     new ITimg.Prepare();
 
-
-    let picture = images.read("/storage/emulated/0/DCIM/Screenshots/福利.jpg");
-    // let picture = images.read("/sdcard/Pictures/QQ/存档.jpg");
+    let name = {
+        picture_name: "0182",
+        canvas_name: "节点"
+    }
+    let picture = images.read("/storage/emulated/0/DCIM/Screenshots/" + name.picture_name + ".jpg");
+    //let picture = images.read("/sdcard/Pictures/QQ/测试.jpg");
     //let picture = images.read("/storage/emulated/0/脚本/script-module-warehouse/自定义执行模块/script_file/生息演算速刷/cc.jpg")
-    // height = 2560;
-    // width = 1600;
+    // height = 1920;
+    // width = 1200;
     let rec = binarized_contour({
-        canvas: true,
+        canvas: name.canvas_name,
         picture: picture,
         action: 5,
-        area: [height / 3, width / 4, height - height / 3, width - width / 4],
+        area:4,
+        //   area: [0, 0,  height / 4,  width / 4],
         //  area:[0,0,2560,1600],
         //   area: [0, 0, height/4, width /4],
-        //isdilate: true,
-        threshold: 100,
-        size: 0,
+        isdilate: true,
+        threshold: 240,
+        size: 10,
         type: "BINARY",
-        filter_w: 200,
-        filter_h: 400,
+        filter_w: 50,
+        filter_h: 30,
     })
-    
+    rec.sort((a, b) => a.x - b.x);
+    log(rec)
     picture.recycle()
-    let pngPtah = path_ + "/binarized_contour_visualization.jpg";
-
+    let pngPtah = path_ + "/binarized_contour/" + name.canvas_name + "_visualization.jpg";
+let vbb = 
     app.viewFile(pngPtah)
 
     exit();

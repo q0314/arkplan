@@ -1550,6 +1550,9 @@ function 主页设置() {
         setupView.home.performClick();
     });
     setupView.home.on("click", (view) => {
+        if (!setting.end_action) {
+            setting.end_action = {};
+        }
         setting.end_action.home = view.checked;
         tool.writeJSON("end_action", setting.end_action);
     });
@@ -1653,12 +1656,12 @@ function 主页设置() {
     });
 
     setupView.jjhb.on("check", (checked) => {
-let shift = mod_data.findIndex((item) => item.id == "基建换班");
-    if (shift) {
-        mod_data[shift].suspend = !checked;
-         sto_mod.put("modular", mod_data);
-               
-    }
+        let shift = mod_data.findIndex((item) => item.id == "基建换班");
+        if (shift) {
+            mod_data[shift].suspend = !checked;
+            sto_mod.put("modular", mod_data);
+
+        }
     });
     //判断是否显示无人机加速、加速那个
     if (!setting.无人机加速) setupView.rawrj.attr("visibility", "gone");
@@ -2070,6 +2073,12 @@ threads.start(function() {
                 return
             }
             switch (words) {
+                case "名称":
+                case "id":
+                    ui.run(function() {
+                        window.name.setText(text);
+                    });
+                    break
                 case "状态":
                     ui.run(function() {
                         window.tos.setText(text);

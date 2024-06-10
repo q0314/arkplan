@@ -12,24 +12,26 @@ events.on("exit", function() {
         screen(false);
         toastLog("监听到停止运行，退出熄屏运行状态")
     }
+    storages.create("rest_screen").put("rest_screen", set_up);
+
 })
 
 function suspension() {
     if (set_up.volume != false) {
-        try { 
+        try {
             threads.start(function() {
-           
+
                 events.observeKey();
                 events.setKeyInterceptionEnabled(set_up.volume == "下" ? "volume_down" : "volume_up", true);
-                events.onKeyDown(set_up.volume == "下" ? "volume_down" : "volume_up", function (event) {
-                    timeoutId = setTimeout(function () {
+                events.onKeyDown(set_up.volume == "下" ? "volume_down" : "volume_up", function(event) {
+                    timeoutId = setTimeout(function() {
                         exit();
                     }, 500);
 
                 });
                 //音量键弹下
-                events.onKeyUp(set_up.volume == "下" ? "volume_down" : "volume_up", function (event) {
-                    if(timeoutId) clearTimeout(timeoutId);
+                events.onKeyUp(set_up.volume == "下" ? "volume_down" : "volume_up", function(event) {
+                    if (timeoutId) clearTimeout(timeoutId);
                     if (set_up.volume == "上" && event.keyCode == 24) {
                         sign_out("音量上键")
                         return
@@ -44,55 +46,67 @@ function suspension() {
             console.error(e)
         }
     }
-       try {
-        if(set_up.control_volume&&set_up.control_volumesize){
+    try {
+        if (set_up.control_volume && set_up.control_volumesize) {
             device.setMusicVolume(Number(set_up.control_volumesize));
-               
-            }
-        } catch (err) {
-            console.error("修改音量失败" + err+"\n可能是没有授权修改系统设置权限")
+
         }
-      
+    } catch (err) {
+        console.error("修改音量失败" + err + "\n可能是没有授权修改系统设置权限")
+    }
+
     screen(true);
 }
 // 设备是否锁屏
-function is_locked () {
+function is_locked() {
     const _km = context.getSystemService(context.KEYGUARD_SERVICE)
     return _km.inKeyguardRestrictedInputMode();
 }
+
 function screen(value) {
-   // set_up.exit = value;
-   if (is_locked()) {
-       device.wakeUp();
+    // set_up.exit = value;
+    if (is_locked()) {
+        device.wakeUp();
         exit()
     }
     device.vibrate(30)
     let cmd = "export CLASSPATH=" + dex_path + ";app_process /system/bin screenoff.only.Control " + (value ? "off" : "on")
-
-    try {
-        let sh_result1 = shell(cmd, true)
-        if (sh_result1.code != 0) {
-            toastLog("root权限" + (value ? "关闭" : "打开") + "屏幕失败,\n请检查是否有并授权该权限\n错误信息:" + sh_result1)
-        } else {
-            return true;
+    if (!$shell.checkAccess("root")) {
+        toastLog("未检查到应用已被授权ROOT");
+    } else {
+        try {
+            let sh_result1 = shell(cmd, true)
+            if (sh_result1.code != 0) {
+                toastLog("root权限" + (value ? "关闭" : "打开") + "屏幕失败,\n请检查是否有并授权该权限\n错误信息:" + sh_result1)
+            } else {
+                set_up.mode = "root";
+                return true;
+            }
+        } catch (e) {
+            toastLog("root权限错误：\n" + e)
         }
-    } catch (e) {
-        toastLog("root权限错误：\n" + e)
     }
+    
+    if (!$shell.checkAccess("adb")) {
+        toastLog("未检查到应用已被授权ADB");
+    } else {
 
-    try {
-        let sh_result = shell(cmd, {
-            adb: true,
-        })
-        if (sh_result.code != 0) {
-            toastLog("adb权限" + (value ? "关闭" : "打开") + "屏幕失败,\n请检查是否有并授权该权限\n错误信息:" + sh_result)
-        } else {
-            return true;
+        try {
+            let sh_result = shell(cmd, {
+                adb: true,
+            })
+            if (sh_result.code != 0) {
+                toastLog("adb权限" + (value ? "关闭" : "打开") + "屏幕失败,\n请检查是否有并授权该权限\n错误信息:" + sh_result)
+            } else {
+                set_up.mode = "adb";
+
+                return true;
+            }
+
+        } catch (e) {
+            toastLog("adb权限错误：\n" + e)
+
         }
-
-    } catch (e) {
-        toastLog("adb权限错误：\n" + e)
-
     }
 }
 
@@ -102,8 +116,8 @@ function sign_out(value) {
     screen(set_up.exit);
     set_up.exit = set_up.exit ? false : true;
     // console.verbose(value)
-    if(set_up.exit) toastLog(value+"关闭熄屏运行状态");
-   // exit()
+    if (set_up.exit) toastLog(value + "关闭熄屏运行状态");
+    // exit()
 }
 
 function mask() {
@@ -114,13 +128,13 @@ function mask() {
             <card gravity="center_vertical" cardElevation="0dp" margin="0">
                 <img src="file://res/icon.png" w="50" h="30" margin="0" />
                 <text text="熄屏运行" padding="5" textSize="20" gravity="center|left" textColor="#000000" marginLeft="50" />
-                    <horizontal w="*" h="*" gravity="right|center_vertical" clickable="true" >
-
-                        <linear marginLeft="5">
-                            <img id="sett" marginRight="8" src="@drawable/ic_help_outline_black_48dp" w="30" h="30" tint="#000000" foreground="?attr/selectableItemBackground" clickable="true" />
-                        </linear>
-                    </horizontal>
-
+                <horizontal w="*" h="*" gravity="right|center_vertical" clickable="true" >
+                    
+                    <linear marginLeft="5">
+                        <img id="sett" marginRight="8" src="@drawable/ic_help_outline_black_48dp" w="30" h="30" tint="#000000" foreground="?attr/selectableItemBackground" clickable="true" />
+                    </linear>
+                </horizontal>
+                
                 
             </card>
             
@@ -128,18 +142,18 @@ function mask() {
                 <vertical>
                     <View bg="#f5f5f5" w="*" h="2" />
                     
-                <vertical padding="10 0" >
-                    <View bg="#f5f5f5" w="*" h="2" />
-                    <text id="Tips" text="" visibility="gone" />
-                    <text id="Device_resolution" text="当前熄屏运行关闭方式：" marginTop="5" />
-                    
-                    <text id="wxts" text="无" typeface="sans" padding="0 5" textColor="#000000" textSize="15sp" layout_gravity="center" />
-                </vertical>
-                     <vertical id="set_content" visibility="gone">
+                    <vertical padding="10 0" >
+                        <View bg="#f5f5f5" w="*" h="2" />
+                        <text id="Tips" text="" visibility="gone" />
+                        <text id="Device_resolution" text="当前熄屏运行关闭方式：" marginTop="5" />
+                        
+                        <text id="wxts" text="无" typeface="sans" padding="0 5" textColor="#000000" textSize="15sp" layout_gravity="center" />
+                    </vertical>
+                    <vertical id="set_content" visibility="gone">
                         <Switch id="volume_control" text="按下音量?键打开/关闭熄屏" checked="false"
                         padding="25 10 25 5" textSize="18sp"
                         gravity="top|center_vertical" />
-                        <radiogroup margin="25 0 10 0" id="volume_total" 
+                        <radiogroup margin="25 0 10 0" id="volume_total"
                         gravity="bottom" orientation="horizontal">
                         <radio id="volume_upper" text="音量上键" w="auto" />
                         
@@ -154,7 +168,7 @@ function mask() {
                     </frame>
                     
                 </vertical>
-               
+                
                 <horizontal w="*" padding="-3" gravity="center_vertical">
                     <button text="终止" id="exit" textColor="#F4A460" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" w="50" />
                     <button text="设置" id="set" textColor="#0d84ff" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" w="50" />
@@ -196,7 +210,7 @@ function mask() {
     Tips_tuku_ui.control_volume.checked = set_up.control_volume ? true : false;
     set_up.volume == "上" ? Tips_tuku_ui.volume_upper.checked = true : "";
     set_up.volume == "下" ? Tips_tuku_ui.volume_lower.checked = true : "";
-    if(set_up.control_volumesize) Tips_tuku_ui.input_volume.setText(set_up.control_volumesize);
+    if (set_up.control_volumesize) Tips_tuku_ui.input_volume.setText(set_up.control_volumesize);
     //.checked = true;
     var id_tnter = setInterval(function() {
         if (set_up.set == "no") {
@@ -227,10 +241,10 @@ function mask() {
             suspension();
         }, 500)
     })
-    Tips_tuku_ui.sett.click(()=>{
-        Tips_tuku_ui.Tips.setVisibility(Tips_tuku_ui.Tips.getVisibility()?0:8);
+    Tips_tuku_ui.sett.click(() => {
+        Tips_tuku_ui.Tips.setVisibility(Tips_tuku_ui.Tips.getVisibility() ? 0 : 8);
     })
-    
+
     Tips_tuku_ui.set.on("click", function(view) {
         if (view.getText() == "设置") {
             set_up.set = "no";

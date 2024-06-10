@@ -948,6 +948,9 @@ ui.usingTraffic_.on("click", () => {
 
 //桌面
 ui._home.on("click", (view) => {
+    if(!setting.end_action){
+        setting.end_action = {};
+    }
     setting.end_action.home = view.checked
     tool.writeJSON("end_action", setting.end_action);
 
