@@ -3608,7 +3608,7 @@ function 基建() {
                 timing: 8000
             })) {
             function obtain_access_infrastructure() {
-                let button_list = ITimg.ocr({
+                let button_list = ITimg.contour({
                     canvas: "访问基建",
                     action: 6,
                     area: 4,
