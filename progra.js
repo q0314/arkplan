@@ -1270,7 +1270,9 @@ let 唤醒 = {
                 console.verbose("已进入主页,无需重复.");
             }
             return true;
-        };
+        } else {
+            this.topic_tips();
+        }
         ITimg.picture("关闭公告", {
             timing: 2000,
             action: 0,
@@ -1361,6 +1363,7 @@ let 唤醒 = {
     },
     取消公告() {
         this.frequency = 0;
+
         tool.Floaty_emit("展示文本", "状态", "状态：取消公告签到通知");
         console.info("取消公告");
         while (true) {
@@ -1490,7 +1493,9 @@ let 唤醒 = {
 
                         break;
                     };
-                };
+                } else {
+                    this.topic_tips();
+                }
             } else {
                 (ITimg.ocr("立即领取", {
                     action: 0,
@@ -1524,7 +1529,42 @@ let 唤醒 = {
 
         }
     },
+    topic_tips() {
+        if (!this.abnormal_themes) {
+            this.abnormal_themes = 3;
+        }
+        if (ITimg.ocr("采购中心", {
+                area: 4,
+                action: 5,
+            }) && ITimg.ocr("公开招募", {
+                action: 5,
+                refresh: false,
+            }) || ITimg.ocr("好友", {
+                area: 3,
+                action: 5,
+            }) && ITimg.ocr("档案", {
+                action: 5,
+                refresh: false,
+            })) {
+            this.abnormal_themes--;
+            if (!this.abnormal_themes) {
 
+                dialogs.build({
+                    title: "警告",
+                    titleColor: "#FF4500",
+                    content: "明日计划所选图库似乎不支持识别当前明日方舟-界面主题。请更换回日间尝试",
+                    positive: "确定",
+                    canceledOnTouchOutside: false,
+                }).on("positive", () => {
+                    tool.Floaty_emit("暂停", "结束程序");
+                }).show();
+
+                sleep(1000 * 60 * 5);
+                跳转_暂停(true, "不支持识别主题", "暂停，不支持识别主题");
+
+            }
+        }
+    }
 }
 
 function 行动() {
@@ -1553,7 +1593,7 @@ function 行动() {
                 Combat_report.record("电量低于设定值" + setting.电量 + "且未充电，主程序已退出并返回桌面");
                 console.error("电量低于设定值" + setting.电量 + "且未充电,主程序已退出并返回桌面");
 
-                跳转_暂停(true, "电量低于设定值且未充电", "状态：暂停，电量低且未充电");
+                跳转_暂停(true, "电量低于设定值且未充电", "暂停，电量低且未充电");
                 home();
                 sleep(5000);
             };
@@ -1575,7 +1615,7 @@ function 行动() {
 
                 toast("行动完毕，退出行动程序\n注：已执行动 >= 上限时不会执行基建收菜");
                 console.warn("行动完毕，退出行动程序，注：已执行动 >= 上限时不会执行基建收菜");
-                跳转_暂停(true, "行动刷图上限结束后", "状态：暂停，行动已完成");
+                跳转_暂停(true, "行动刷图上限结束后", "暂停，行动已完成");
                 setting = null;
                 break;
                 //   }
@@ -1754,7 +1794,7 @@ function 行动() {
 
             } else {
                 if (!理智处理()) {
-                    跳转_暂停(false, "行动刷图且没有理智结束后", "状态：暂停，木有理智");
+                    跳转_暂停(false, "行动刷图且没有理智结束后", "暂停，木有理智");
                 }
 
                 sleep(500);
@@ -2266,7 +2306,7 @@ function 剿灭() {
                 Combat_report.record("电量低于设定值" + setting.电量 + "且未充电，主程序已退出并返回桌面");
                 console.error("电量低于设定值" + setting.电量 + "且未充电,主程序已退出并返回桌面");
 
-                跳转_暂停(true, "电量低于设定值且未充电", "状态：暂停，电量低且未充电");
+                跳转_暂停(true, "电量低于设定值且未充电", "暂停，电量低且未充电");
                 home();
             };
         };
@@ -2443,7 +2483,7 @@ function 剿灭() {
                 }
             } else {
                 if (!理智处理()) {
-                    跳转_暂停(setting.woie, "剿灭刷图且没有理智结束后", "状态：暂停，木有理智");
+                    跳转_暂停(setting.woie, "剿灭刷图且没有理智结束后", "暂停，木有理智");
                 }
                 sleep(500);
                 if (ITimg.picture("行动_普通", {
