@@ -83,7 +83,8 @@ var ITimg = require("./ITimg.js"); //读取识图库
 
 new ITimg.Prepare({}, {
     correction_path: "通用"
-});
+}, {}, {}, setting);
+
 
 
 
@@ -262,6 +263,7 @@ let collection = {
                 if (selectResult) {
                     if (id.id == "指定剿灭") {
                         setting.执行 = "剿灭";
+                        ITimg.setting.执行 = "剿灭"
                     }
                 }
                 break
@@ -3656,17 +3658,16 @@ function 基建() {
                     threshold: 240,
                     size: 10,
                     type: "BINARY",
-                    filter_w: zox(50),
-                    filter_h: zoy(20),
+                    filter_w: zox(30),
+                    filter_h: zoy(30),
                 });
                 if (button_list && button_list.length) {
                     let access_infrastructure;
                     for (let asie of button_list) {
-                        if (asie.shape == "长方形") {
-                            if (!access_infrastructure || access_infrastructure.y < asie.y) {
-                                access_infrastructure = asie;
-                            }
+                        if (!access_infrastructure || access_infrastructure.y < asie.y) {
+                            access_infrastructure = asie;
                         }
+
                     }
                     if (access_infrastructure) {
                         return [access_infrastructure.x, access_infrastructure.y];
@@ -4888,6 +4889,9 @@ function 公招(Manual) {
         });
         tag_result.show();
         tool.Floaty_emit("展示文本", "状态", "状态：识别完成，等待中");
+        if (ITimg.setting) {
+            ITimg.setting.侧边 = "123";
+        }
         tool.writeJSON("侧边", "123");
 
         while (true) {

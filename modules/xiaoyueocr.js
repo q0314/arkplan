@@ -1,10 +1,10 @@
 importClass(android.content.Context);
 
 
-let XiaoYueOcrDetector = function (OCR) {
+let XiaoYueOcrDetector = function(OCR) {
     /**
-    * ocr实例
-    */
+     * ocr实例
+     */
     //for(let i of OCR.xiaoyue.getClass().getDeclaredFields()){
     // log(i+"\n");
     //}
@@ -23,7 +23,7 @@ let XiaoYueOcrDetector = function (OCR) {
             rectify_key = Object.keys(rectify_json.replace_some_characters);
 
             for (let t = 0; t < rectify_key.length; t++) {
-                // console.verbose(rectify_key[t])
+              //  console.verbose(rectify_key[t]);
                 if (rectify_json.replace_some_characters[rectify_key[t]].regular) {
                     let tool = content.match(new RegExp(rectify_key[t], "g"));
                     if (tool) {
@@ -35,6 +35,8 @@ let XiaoYueOcrDetector = function (OCR) {
                         content = content.replace(rectify_key[t], rectify_json.replace_some_characters[rectify_key[t]].correct)
                     }
                 }
+                // console.warn(rectify_key[t],content)
+
 
             }
         }
@@ -101,7 +103,7 @@ let XiaoYueOcrDetector = function (OCR) {
      * 初始化模型文件
      * @returns 
      */
-    this.init = function () {
+    this.init = function() {
         // this.instance.cpuThreadNum = 4; //可以自定义使用CPU的线程数
         // this.instance.checkModelLoaded =false; // 可以自定义是否需要校验模型是否成功加载 默认开启 使用内置Base64图片进行校验 识别测试文本来校验模型是否加载成功
 
@@ -128,12 +130,12 @@ let XiaoYueOcrDetector = function (OCR) {
         }
     }
     /**
-        * ocr识别
-        * @param {*} img 
-        * @param {object} options 
-        * @returns 
-        */
-    this.detect = function (img, options) {
+     * ocr识别
+     * @param {*} img 
+     * @param {object} options 
+     * @returns 
+     */
+    this.detect = function(img, options) {
 
         options = options || {};
         this.resultList = null;
@@ -204,14 +206,14 @@ let XiaoYueOcrDetector = function (OCR) {
         }
     }
     /**
-         * 释放模型 用于释放native内存, 非必需
-         */
-    this.destroy = function () {
+     * 释放模型 用于释放native内存, 非必需
+     */
+    this.destroy = function() {
         OCR = null;
         this.instance.releaseModel();
     }
 
-    this.矫正规则测试 = function (path, retext) {
+    this.矫正规则测试 = function(path, retext) {
         if (!files.exists(path)) {
             toastLog("规则文件不存在,路径:" + path)
             return
@@ -264,7 +266,7 @@ let XiaoYueOcr = {
         let url = 'https://flowus.cn/share/2a01a8fc-6013-4d8e-ae69-73a35073dc07';
         con_ = "请打开链接跳转到浏览器下载安装xiaoyue ocr 文字识别插件，请注意版本架构是否符合明日计划,否则无法使用\n\n" + url +
             "\n\n当前明日计划架构：" + Build.CPU_ABI + "，\n建议下载安装" + (self.is64 ? "OCR 64位包" : "OCR 32位包") + "，\n\n安装错误的OCR版本会导致OCR无法识别卡住，应用崩溃。关于应用-明日计划32位只能使用32位OCR插件"
-       
+
 
         if (con_ != undefined) {
             dialogs.build({

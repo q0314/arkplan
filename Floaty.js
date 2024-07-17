@@ -740,7 +740,7 @@ function web_initialization() {
         settings.setJavaScriptEnabled(true); // 设置是否支持js
         settings.setJavaScriptCanOpenWindowsAutomatically(true); // 设置是否允许js自动打开新窗口, window.open
         settings.setSupportZoom(true); // 是否支持页面缩放
-        settings.setBuiltInZoomControls(true); // 是否出现缩放工具
+        settings.setBuiltInZoomControls(false); // 是否出现缩放工具
         settings.setUseWideViewPort(true); // 容器超过页面大小时, 是否将页面放大到塞满容器宽度的尺寸
         settings.setLoadWithOverviewMode(true); // 页面超过容器大小时, 是否将页面缩小到容器能够装下的尺寸
 
@@ -2073,12 +2073,6 @@ threads.start(function() {
                 return
             }
             switch (words) {
-                case "名称":
-                case "id":
-                    ui.run(function() {
-                        window.name.setText(text);
-                    });
-                    break
                 case "状态":
                     ui.run(function() {
                         window.tos.setText(text);
@@ -2107,6 +2101,12 @@ threads.start(function() {
         events.on("面板", function(words, xy) {
 
             switch (words) {
+                case "名称":
+                case "id":
+                    ui.run(function() {
+                        window.name.setText(xy);
+                    });
+                    break
                 case "展开":
                     threads.start(function() {
 

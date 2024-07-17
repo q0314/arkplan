@@ -14,9 +14,10 @@ ui.layout(
         <vertical w="*" h="*" layout_gravity="center">
             <vertical id="script" h="*" gravity="center"  >
                 <img src="{{icon}}" w="120" h="120" scaleType="fitXY" />
-                <horizontal gravity="center" margin="25">
+                <horizontal gravity="center" margin="0 25 0 5" >
                     <text id="loadingtext">加载中，请稍后</text>
                 </horizontal>
+                <text gravity="center" id="lostext" text="" />
             </vertical>
         </vertical>
     </frame>
@@ -70,14 +71,38 @@ threads.start(function() {
     } else {
 
         if (!files.exists(path + _proj_def_n + '/')) {
+            ui.lostext.setText("复制项目文件到Android/data/");
             let {
                 filesx
             } = require('./modules/ext-files');
 
             filesx.copy(files.path('./'), path);
+            ui.lostext.setText("重命名项目文件名");
+
             files.rename(path + 'project/', _proj_def_n);
 
-        };
+        } else if (files.path("./").indexOf("storage") == -1 && files.path("./").indexOf("sdcard") == -1) {
+            ui.lostext.setText("检验项目版本");
+
+            let local_config = JSON.parse(files.read("./project.json"));
+            let last_version_info = JSON.parse(files.read(path + _proj_def_n + '/project.json'));
+
+            if (local_config["versionCode"] > last_version_info["versionCode"] || local_config["versionName"] > last_version_info["versionName"]) {
+                // files.removeDir(path+_proj_def_n)
+                let {
+                    filesx
+                } = require('./modules/ext-files');
+                ui.lostext.setText("复制项目文件到Android/data/");
+
+                files.rename(files.path('./'), _proj_def_n);
+                filesx.copy(files.path('../' + _proj_def_n), path);
+                ui.lostext.setText("重命名项目文件名");
+
+                files.rename(files.path('../' + _proj_def_n), "project");
+
+            }
+        }
+        ui.lostext.setText("运行项目");
         engines.execScriptFile(path + _proj_def_n + '/main.js', {
             path: path + _proj_def_n + '/'
         });

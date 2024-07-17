@@ -73,7 +73,7 @@ var Combat_report = {
             // view.mRootScrollView.fullScroll(ScrollView.FOCUS_DOWN);
         }
         //        view.text.setText(files.read("../lib/logs/Reporting_records.txt"));
-        view.text.setText(files.read("./lib/logs/Reporting_records.txt"));
+        view.text.setText(files.read("./lib/data/Reporting_records.txt"));
         setTimeout(function() {
             ui.run(function() {
                 // view.ScrollView.scrollTo(0, 600);
@@ -201,7 +201,8 @@ var Combat_report = {
         let nd = de.getDate().toString(); //日期
         let nh = de.getHours().toString(); //小时
         let ns = de.getMinutes().toString(); //分钟
-        let path = files.path("./lib/logs/Reporting_records.txt");
+        let path = files.path("./lib/data/Reporting_records.txt");
+        files.create(path)
         switch (text) {
             case null:
             case undefined:

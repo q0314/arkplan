@@ -5,9 +5,9 @@
   ],
   "assets": [],
   "build": {
-    "build_id": "47C47E06-1230",
-    "build_number": 1230,
-    "build_time": 1713836015971,
+    "build_id": "CD61799F-1231",
+    "build_number": 1231,
+    "build_time": 1721180715020,
     "release": false
   },
   "encryptLevel": 0,
@@ -88,6 +88,6 @@
     "uuid": "30e8349e-b7be-4217-a506-6072dedc75df"
   },
   "useFeatures": [],
-  "versionCode": 2024061145,
-  "versionName": "4.5.1-ga.5"
+  "versionCode": 2024071745,
+  "versionName": "4.5.2-rc.0"
 }

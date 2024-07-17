@@ -15,7 +15,7 @@ server = $crypto.decrypt(server, key, "AES", {
     "output": "string"
 });
 try {
-    jlink_mian
+    jlink_mian;
 } catch (e) {
     threads.start(function () {
 
