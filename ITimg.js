@@ -46,7 +46,7 @@ ITimg.setting = {
  */
 function Prepare(picture_default, ocr_default, outline_default, matchFeatures_default, setting) {
     let context;
-    (function() {
+    (function () {
         context = this;
     }());
     if (this === context) {
@@ -106,6 +106,7 @@ function Prepare(picture_default, ocr_default, outline_default, matchFeatures_de
         threshold: matchFeatures_default.threshold || 0.8,
         filter_w: matchFeatures_default.filter_w || 10,
         filter_h: matchFeatures_default.filter_h || 10,
+        scale: matchFeatures_default.scale || 0.5,
         matcher: matchFeatures_default.matcher || "BRUTEFORCE_L1",
         visualization: matchFeatures_default.visualization || true,
         saveSmallImg: matchFeatures_default.saveSmallImg,
@@ -145,7 +146,7 @@ function Prepare(picture_default, ocr_default, outline_default, matchFeatures_de
 
     if (ITimg.setting.image_monitor && (app.autojs.versionCode > 8082200)) {
         ITimg.permission_detection = false;
-        setTimeout(function() {
+        setTimeout(function () {
             ITimg.permission_detection = true;
         }, 60000 * 15);
     }
@@ -167,7 +168,7 @@ function Prepare(picture_default, ocr_default, outline_default, matchFeatures_de
                 break;
         }
         if (ITimg.setting.异常超时) {
-            threads.start(function() {
+            threads.start(function () {
                 let is;
 
                 if (ITimg.setting.执行.indexOf("剿灭") >= 0) {
@@ -177,7 +178,7 @@ function Prepare(picture_default, ocr_default, outline_default, matchFeatures_de
                     is = 12;
                     console.info("异常界面超时暂停处理：6分钟。" + ITimg.setting.执行);
                 }
-                fn = function() {
+                fn = function () {
                     if (ITimg.timer_lock == is) {
 
                         toast("程序在" + (is / 2) + "分钟内未能判断当前界面，状态异常，将暂停并返回桌面")
@@ -226,7 +227,7 @@ function 申请截图() {
                 sleep(20)
                 console.verbose("确认线程启动中");
                 sleep(30)
-                threads.start(function() {
+                threads.start(function () {
                     if (device.brand != "HUAWEI") {
                         if (device.release != 11) {
                             //  if (files.read("./lib/prototype/Capture.txt") != "true") {
@@ -493,7 +494,7 @@ function 图像匹配(picture, list) {
         }
         try {
             img.recycle()
-        } catch (e) {};
+        } catch (e) { };
     } else {
         img_small = images.read(small_image_catalog);
     }
@@ -543,13 +544,13 @@ function 图像匹配(picture, list) {
         try {
             imgList.recycle()
             img_small.recycle()
-        } catch (e) {}
+        } catch (e) { }
 
         return false
     }
     try {
         !imgList.isRecycled() && imgList.recycle();
-    } catch (e) {}
+    } catch (e) { }
     if (ITimg.results) {
         let img_small_xy = {
             w: img_small.getWidth(),
@@ -640,6 +641,7 @@ function matchFeatures(picture, list) {
         imageFeatures: list.imageFeatures || ITimg.default_list.matchFeatures.imageFeatures,
         visualization: list.visualization || ITimg.default_list.matchFeatures.visualization,
         saveSmallImg: list.saveSmallImg,
+        scale: list.scale || ITimg.default_list.matchFeatures.scale,
         log_policy: list.log_policy,
         small_image_catalog: list.small_image_catalog || ITimg.default_list.matchFeatures.small_image_catalog,
     }
@@ -682,8 +684,8 @@ function matchFeatures(picture, list) {
             small_image_save_catalog += picture_name + ".png";
         }
     }
-    if(!files.exists(small_image_catalog)){
-        console.error("小图不存在,无法匹配：",small_image_catalog);
+    if (!files.exists(small_image_catalog)) {
+        console.error("小图不存在,无法匹配：", small_image_catalog);
         return false;
     }
     console.time("特征找图总时长");
@@ -701,6 +703,7 @@ function matchFeatures(picture, list) {
     let sceneFeatures = $images.detectAndComputeFeatures(img, {
         region: list.area,
         grayscale: list.grayscale,
+        scale: list.scale,
     });
     if (list.picture) {
         !list.picture.isRecycled() && list.picture.recycle()
@@ -708,7 +711,7 @@ function matchFeatures(picture, list) {
     }
 
     let img_small = images.read(small_image_catalog);
-  
+
     // 计算小图特征
     let objectFeatures = $images.detectAndComputeFeatures(img_small, {
         grayscale: list.grayscale,
@@ -1068,7 +1071,7 @@ function ocr文字识别(words, list) {
                 click(query_.left + Math.floor((query_.right - query_.left) / 2), query_.top + Math.floor((query_.bottom - query_.top) / 2))
                 break;
 
-                //点击文字左上角
+            //点击文字左上角
             case 1:
                 click(query_.left, query_.top);
                 break
@@ -1296,7 +1299,7 @@ function binarized_contour(list) {
             );
             flattenedPoints = []
             // 计算坐标，绘制轮廓
-            vertices.map(function(vertex) {
+            vertices.map(function (vertex) {
                 vertex.x = vertex.x + list.area[0];
                 vertex.y = vertex.y + list.area[1];
                 flattenedPoints.push(vertex.x)
@@ -1362,7 +1365,7 @@ function binarized_contour(list) {
                 MyAutomator.click(query_contour[0].left + Math.floor(query_contour[0].w / 2), query_contour.top + Math.floor(query_contour[0].h / 2));
                 break;
 
-                //点击文字左上角
+            //点击文字左上角
             case 1:
                 MyAutomator.click(query_contour[0].left, query_contour[0].top);
                 break
@@ -1490,7 +1493,7 @@ function captureScreen_(way) {
                                 break;
                         }
                         ITimg.permission_detection = false;
-                        setTimeout(function() {
+                        setTimeout(function () {
                             ITimg.permission_detection = true;
                         }, 60000 * 15);
 
@@ -1510,7 +1513,7 @@ function captureScreen_(way) {
                         console.error("图片似乎已被回收，重新申请辅助截图权限");
                         try {
                             imgList.recycle()
-                        } catch (err) {}
+                        } catch (err) { }
                         $images.stopScreenCapture();
                         sleep(100);
                         try {
@@ -1596,7 +1599,7 @@ function 重置计时器(i) {
 }
 
 ITimg.ocr = ocr文字识别;
-ITimg.MlkitOCR = function(words, list) {
+ITimg.MlkitOCR = function (words, list) {
     if (!ITimg.MlkitOCR_module) {
         if (!initocr("MlkitOCR")) {
             return false;
@@ -1608,7 +1611,7 @@ ITimg.MlkitOCR = function(words, list) {
     list.ocr_type = "MlkitOCR";
     return ocr文字识别(words, list);
 }
-ITimg.XiaoYueOCR = function(words, list) {
+ITimg.XiaoYueOCR = function (words, list) {
     if (!ITimg.XiaoYueOCR_module) {
         if (!initocr("XiaoYueOCR")) {
             return false;
