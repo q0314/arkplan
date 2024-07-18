@@ -552,6 +552,9 @@ function 图像匹配(picture, list) {
         !imgList.isRecycled() && imgList.recycle();
     } catch (e) { }
     if (ITimg.results) {
+        if (list.action==6) {
+            return ITimg.results;
+        }
         let img_small_xy = {
             w: img_small.getWidth(),
             h: img_small.getHeight()
@@ -600,9 +603,7 @@ function 图像匹配(picture, list) {
                     "right": ITimg.results.x + img_small_xy.w,
                     "bottom": ITimg.results.y + img_small_xy.h,
                 };
-            case 6:
-                return ITimg.results;
-
+   
         };
         (list.log_policy || ITimg.default_list.picture.log_policy) ? "" : console.info(picture + " 匹配成功 " + ITimg.results);
 
