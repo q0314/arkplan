@@ -27,7 +27,7 @@ ITimg.timer_lock = threads.atomic(0);
 ITimg.setting = {
     "image_monitor": true,
     "full_resolution": false,
-    "defaultOcr": "MlkitOCR",
+    "defaultOcr": "XiaoYueOCR",
     "截图": "辅助",
     "侧边": "123",
     "异常超时": true,
@@ -36,8 +36,6 @@ ITimg.setting = {
     "image_memory_manage": true,
     "autoAllowScreen": true,
 }
-
-
 
 /**
  * 初始化ITimg识别函数的一些参数默认值,申请截图权限,设置异常超时
@@ -52,7 +50,14 @@ function Prepare(picture_default, ocr_default, outline_default, matchFeatures_de
     if (this === context) {
         return new Prepare(picture_default, ocr_default, outline_default, matchFeatures_default);
     }
-
+    if (setting) {
+        console.verbose("更新ITimg设置值");
+        for (let setup in ITimg.setting) {
+            if (setting.hasOwnProperty(setup)) {
+                ITimg.setting[setup] = setting[setup];
+            }
+        }
+    }
     if (!picture_default) {
         picture_default = {};
     }
@@ -119,14 +124,7 @@ function Prepare(picture_default, ocr_default, outline_default, matchFeatures_de
     files.ensureDir(path_ + "/logs/captureScreen/");
     files.ensureDir(path_ + "/logs/matchFeatures/");
     files.create(path_ + "/logs/matchFeatures/.nomedia")
-    if (setting) {
-        console.verbose("更新ITimg设置值");
-        for (let setup in ITimg.setting) {
-            if (setting.hasOwnProperty(setup)) {
-                ITimg.setting[setup] = setting[setup];
-            }
-        }
-    }
+  
     try {
         ITimg.gallery_info = JSON.parse(files.read(path_ + "/mrfz/tuku/gallery_info.json"), (encoding = "utf-8"));
     } catch (e) {
@@ -552,7 +550,7 @@ function 图像匹配(picture, list) {
         !imgList.isRecycled() && imgList.recycle();
     } catch (e) { }
     if (ITimg.results) {
-        if (list.action==6) {
+        if (list.action == 6) {
             return ITimg.results;
         }
         let img_small_xy = {
@@ -603,7 +601,7 @@ function 图像匹配(picture, list) {
                     "right": ITimg.results.x + img_small_xy.w,
                     "bottom": ITimg.results.y + img_small_xy.h,
                 };
-   
+
         };
         (list.log_policy || ITimg.default_list.picture.log_policy) ? "" : console.info(picture + " 匹配成功 " + ITimg.results);
 
@@ -769,9 +767,14 @@ function matchFeatures(picture, list) {
     if (list.saveSmallImg) {
 
         console.verbose("缓存小图到：" + small_image_save_catalog);
-        let submat = images.clip(img, ITimg.results.x, ITimg.results.y, ITimg.results.w, ITimg.results.h)
-        images.save(submat, small_image_save_catalog);
-        submat.recycle();
+        if (ITimg.results.x >= 0 && ITimg.results.y >= 0 && ITimg.results.x + ITimg.results.w <= img.width && ITimg.results.y + ITimg.results.h <= img.height) {
+            let submat = images.clip(img, ITimg.results.x, ITimg.results.y, ITimg.results.w, ITimg.results.h)
+            images.save(submat, small_image_save_catalog);
+            submat.recycle();
+        } else {
+            console.error("特征匹配坐标越界，无法裁剪")
+        }
+
     }
 
     !img.isRecycled() && img.recycle();
@@ -867,7 +870,7 @@ function ocr文字识别(words, list) {
         ocr_type: list.ocr_type || ITimg.default_list.ocr.ocr_type,
         correction_path: list.correction_path || ITimg.default_list.ocr.correction_path
     }
-    if (!ITimg.MlkitOCR_module && !ITimg.XiaoYueOCR_module) {
+    if (!ITimg[list.ocr_type+"module"]) {
         if (!initocr(list.ocr_type)) {
             return false;
         }
