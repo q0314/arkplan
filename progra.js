@@ -82,7 +82,8 @@ log("加载图片识别程序");
 var ITimg = require("./ITimg.js"); //读取识图库
 
 new ITimg.Prepare({}, {
-    correction_path: "通用"
+    correction_path: "通用",
+    picture_failed_further:true,
 }, {}, {}, setting);
 
 

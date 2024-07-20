@@ -155,7 +155,6 @@ let exp = {
     build(props) {
         let builder = Object.create(runtime.dialogs.newBuilder());
         builder.thread = threads.currentThread();
-
         Object.keys(props).forEach(n => applyDialogProperty.call(this, builder, n, props[n]));
 
         applyOtherDialogProperties(builder, props);
@@ -184,8 +183,8 @@ let exp = {
                 cancelable: null,
                 canceledOnTouchOutside: null,
                 autoDismiss: null,
+                type: { method: 'setType' },
             };
-
             if (propertySetters.hasOwnProperty(name)) {
                 let propertySetter = propertySetters[name] || {};
                 if (propertySetter.method === undefined) {
@@ -194,7 +193,6 @@ let exp = {
                 if (propertySetter.adapter) {
                     value = propertySetter.adapter(value);
                 }
-
                 builder[propertySetter.method].call(builder, value);
             }
         }
@@ -283,10 +281,10 @@ let exp = {
         let [
             $tt, $cnt, $neu, $neg, $pos, $obstinate, $cbx,
         ] = typeof props === 'string' ? [props] : props;
-
+//log(props, ext)
         let _props = {
             autoDismiss: !$obstinate,
-            type: "foreground-or-overlay",
+            type: "app",
             canceledOnTouchOutside: !$obstinate,
             checkBoxPrompt: $cbx ? typeof $cbx === 'string'
                 ? $cbx : this.text.no_more_prompt : undefined,
@@ -314,7 +312,6 @@ let exp = {
                 _props[k] = String(_props[k]);
             }
         });
-
         let _diag = this.build(_props);
 
         if (_ext.linkify) {
@@ -1132,7 +1129,7 @@ let exp = {
                     _diag.removeAllListeners('positive');
                     _diag.setActionButton('positive', "重启应用");
                     _diag.on('positive', d => {
-                        let Process =android.os.Process;
+                        let Process = android.os.Process;
                         Process.killProcess(Process.myPid());
                         d.dismiss();
                         exit();

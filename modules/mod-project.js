@@ -111,6 +111,7 @@ let exp = {
             main: { name: _main_name, path: _main_path },
             path: _path,
         };
+
         if (files.exists(_json_path)) {
             try {
                 let _o = JSON.parse(filesx.read(_json_path, '{}'));
@@ -234,9 +235,13 @@ let exp = {
             let _per_page = _opt.per_page || 30; // 100
             let _min_ver = _opt.min_version_name || 'v0.0.0'; // 'v2.0.1'
             let _max = 3;
+            _.urlapi = 'https://api.github.com';
             while (_max--) {
+                if (_max == 2) {
+                    _.urlapi = 'https://api.kkgithub.com';
+                }
                 try {
-                    let _items = http.get('https://api.github.com/repos/' +
+                    let _items = http.get(_.urlapi + '/repos/' +
                         //'SuperMonster003/Ant-Forest/releases' +
                         'q0314/arkplan/releases' +
                         '?per_page=' + _per_page + '&page=' + _cur_page++)
@@ -582,7 +587,8 @@ let exp = {
         // maybe 'tar' will be supported some day
         let _file_ext = 'zip';
         // like: 'https://api.github.com/.../zipball/v2.0.4'
-        let _url = version[_file_ext + 'ball_url'];
+        // like: 'https://api.kkgithub.com/.../zipball/v2.0.4'
+        let _url = version[_file_ext + 'ball_url'].replace("https://api.github.com", _.urlapi);
         // like: 'v2.0.4'
         let _file_name = _url.slice(_url.lastIndexOf(filesx.sep) + 1);
         // like: 'v2.0.4.zip'
@@ -600,7 +606,7 @@ let exp = {
             success_title: _opt.success_title || '部署完成',
             on_interrupt_btn_text: _opt.on_interrupt_btn_text || 'B',
             show_min_max: true,
-            type:"foreground-or-overlay",
+            type: "app",
             onStart(v, d) {
                 _onStart();
                 dialogsx.setProgressColorTheme(d, 'download');
@@ -615,27 +621,46 @@ let exp = {
             steps: [{
                 desc: _steps.download,
                 action: (v, d) => new Promise((resolve, reject) => {
-                    httpx.okhttp3Request(_url, {
-                        onStart() {
-                            let _l = _cont_len / 1024;
-                            let _p = _l < 0 ? '' : '0KB/' + _l.toFixed(1) + 'KB';
-                            dialogsx.setProgressNumberFormat(d, _p);
-                        },
-                        onDownloadProgress(o) {
-                            o.total = Math.max(o.total, _cont_len);
-                            let _t = o.total / 1024;
-                            let _p = o.processed / 1024;
-                            dialogsx.setProgressNumberFormat(d, '%.1fKB/%.1fKB', [_p, _t]);
-                            d.setProgressData(o);
-                        },
-                        onDownloadSuccess(r) {
-                            resolve(r);
-                            dialogsx.clearProgressNumberFormat(d);
-                        },
-                        onDownloadFailure(e) {
-                            reject(e);
-                        },
-                    }, { is_async: true, path: _full_path });
+                    let _max = 3;
+                    //原:https://api.kkgithub.com/repos/q0314/arkplan/zipball/v4.5.2-rc.1
+                    //mumu模拟器环境会变成:https://codeload.github.com/q0314/arkplan/legacy.zip/refs/tags/v4.5.2-rc.1
+                    //mumu正常可下载:https://codeload.kkgithub.com/q0314/arkplan/zip/refs/tags/v4.5.2-rc.1
+                    getzip()
+                    function getzip() {
+                        log("源码url:", _url);
+                        httpx.okhttp3Request(_url, {
+                            onStart() {
+                                let _l = _cont_len / 1024;
+                                let _p = _l < 0 ? '' : '0KB/' + _l.toFixed(1) + 'KB';
+                                dialogsx.setProgressNumberFormat(d, _p);
+                            },
+                            onDownloadProgress(o) {
+                                o.total = Math.max(o.total, _cont_len);
+                                let _t = o.total / 1024;
+                                let _p = o.processed / 1024;
+                                dialogsx.setProgressNumberFormat(d, '%.1fKB/%.1fKB', [_p, _t]);
+                                d.setProgressData(o);
+                            },
+                            onDownloadSuccess(r) {
+                                resolve(r);
+                                dialogsx.clearProgressNumberFormat(d);
+                            },
+                            onDownloadFailure(e) {
+                                _max--;
+                                if (_max <= 1) {
+                                    reject(e);
+                                } else {
+                                    if (_max <= 2) {
+                                        if (_url.indexOf("api.kkgithub.com/repos") != -1) {
+                                            _url = _url.replace("api.kkgithub.com/repos", "codeload.kkgithub.com");
+                                            _url = _url.replace("/zipball/", "/zip/refs/tags/");
+                                        }
+                                        getzip();
+                                    }
+                                }
+                            },
+                        }, { is_async: true, path: _full_path });
+                    }
                 }),
             }, {
                 desc: _steps.decompress,
