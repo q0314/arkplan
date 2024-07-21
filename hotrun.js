@@ -46,6 +46,12 @@ setInterval(function() {
 }, 400);
 let _proj_def_n = 'arkplan';
 let path = context.getExternalFilesDir(null).getAbsolutePath() + '/';
+engines.execScriptFile(path + _proj_def_n + '/main.js', {
+    path: path + _proj_def_n + '/'
+});
+setTimeout(function() {
+    ui.finish();
+}, 1500);
 console.setGlobalLogConfig({
     "file": path + _proj_def_n + "_log.txt"
 });
@@ -77,13 +83,15 @@ threads.start(function() {
             } = require('./modules/ext-files');
 
             filesx.copy(files.path('./'), path);
+            ui.run(() => {
             ui.lostext.setText("重命名项目文件名");
-
+            })
             files.rename(path + 'project/', _proj_def_n);
 
         } else if (files.path("./").indexOf("storage") == -1 && files.path("./").indexOf("sdcard") == -1) {
+            ui.run(() => {
             ui.lostext.setText("检验项目版本");
-
+            })
             let local_config = JSON.parse(files.read("./project.json"));
             let last_version_info = JSON.parse(files.read(path + _proj_def_n + '/project.json'));
 
@@ -92,17 +100,21 @@ threads.start(function() {
                 let {
                     filesx
                 } = require('./modules/ext-files');
+                ui.run(() => {
                 ui.lostext.setText("复制项目文件到Android/data/");
-
+                })
                 files.rename(files.path('./'), _proj_def_n);
                 filesx.copy(files.path('../' + _proj_def_n), path);
+                ui.run(() => {
                 ui.lostext.setText("重命名项目文件名");
-
+                })
                 files.rename(files.path('../' + _proj_def_n), "project");
 
             }
         }
+        ui.run(() => {
         ui.lostext.setText("运行项目");
+        });
         engines.execScriptFile(path + _proj_def_n + '/main.js', {
             path: path + _proj_def_n + '/'
         });

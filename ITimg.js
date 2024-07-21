@@ -184,7 +184,7 @@ function Prepare(picture_default, ocr_default, outline_default, matchFeatures_de
                         console.error("程序在" + (is / 2) + "分钟内未能判断当前界面，状态异常，将暂停并返回桌面")
 
                         tool.Floaty_emit("暂停", "状态异常");
-                    } else if (ITimg.elements.number > 50) {
+                    } else if (ITimg.elements.number > 150) {
                         toast("程序在当前界面连续识别到同一内容" + ITimg.elements.number + "次，状态异常，将暂停并返回桌面")
                         console.error("程序在当前界面连续识别到同一内容" + ITimg.elements.number + "次，状态异常，将暂停并返回桌面")
 
@@ -974,6 +974,9 @@ function ocr文字识别(words, list) {
 
             }
             img = list.picture || captureScreen_();
+            if (img.isRecycled()) {
+                img = captureScreen_();
+            }
             if (list.saveSmallImg) {
                 primaryimg = images.copy(img, true);
             }
@@ -1072,15 +1075,12 @@ function ocr文字识别(words, list) {
 
             let img_small;
             let region = [query_.left - 10, query_.top - 10, query_.right - query_.left + 15, query_.bottom - query_.top + 15];
-            log(region)
-            log(primaryimg.width, primaryimg.height)
             if (region[0] < 0 || region[1] < 0 || region[0] + region[2] > primaryimg.width || region[1] + region[3] > primaryimg.height) {
                 region = [query_.left, query_.top, query_.right - query_.left, query_.bottom - query_.top];
-                log(region)
-
+                log(region);
             }
             if (region[0] > 0 && region[1] > 0 && region[0] + region[2] < primaryimg.width && region[1] + region[3] < primaryimg.height) {
-                img_small = images.clip(primaryimg, query_.left - 10, query_.top - 10, query_.right - query_.left + 15, query_.bottom - query_.top + 15);
+                img_small = images.clip(primaryimg, region[0], region[1], region[2], region[3]);
             } else {
                 console.error("ocr文字坐标越界，无法裁剪")
             }
