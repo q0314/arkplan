@@ -82,6 +82,7 @@ let _ = {
                 let _total = new File(_path_from).length();
                 let _processed = 0;
                 try {
+                    //38b文件里无内容卡住..._num == -1
                     while (is.available() > 0) {
                         let _num = is.read(_buffer);
                         if (_num > 0) {
@@ -89,6 +90,8 @@ let _ = {
                             _onProgress({
                                 processed: _processed += _num, total: _total,
                             });
+                        }else{
+                            break;
                         }
                     }
                     if (close) {
