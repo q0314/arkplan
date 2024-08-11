@@ -14,7 +14,7 @@ var settings;
 var blockHandle = threads.start(function() {
     setInterval(() => {}, 1000);
 });
-let gallery_info = JSON.parse(files.read("./mrfz/tuku/gallery_info.json"), (encoding = "utf-8"));
+//let gallery_info = JSON.parse(files.read("./mrfz/tuku/gallery_info.json"), (encoding = "utf-8"));
 let tool = require("./modules/tool.js");
 var setting = tool.readJSON("configure");
 var progra;
@@ -1630,7 +1630,7 @@ function 主页设置() {
     });
     setupView.hks1.on("check", (checked) => {
 
-        if (checked) {
+     /*   if (checked) {
             if (!files.exists("./mrfz/tuku/线索_传递.png")) {
                 modular_d.Dialog_Tips("确认图库", "当前图库不完整,请在左上角头像-更换图库-检查图库!")
                 return;
@@ -1650,6 +1650,7 @@ function 主页设置() {
             }
 
         }
+        */
         tool.writeJSON("处理线索溢出", checked)
     })
 

@@ -2981,7 +2981,7 @@ function 开始运行jk(jk, tips_) {
                 }
             } else {
                 */
-
+/*
         tuku_de[0] = (tuku_de[0] - height).toString();
         tuku_de[1] = (tuku_de[1] - width).toString();
         if (tuku_de[0].replace(/[^\d]/g, "") > 220 || tuku_de[1].replace(/[^\d]/g, "") > 170) {
@@ -3063,6 +3063,7 @@ function 开始运行jk(jk, tips_) {
 
             return
         }
+        */
         //  }
     }
 
