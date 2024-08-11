@@ -72,35 +72,35 @@ function screen(value) {
     device.vibrate(30)
     let cmd = "export CLASSPATH=" + dex_path + ";app_process /system/bin screenoff.only.Control " + (value ? "off" : "on")
     if (!$shell.checkAccess("root")) {
-        toastLog("未检查到应用已被授权ROOT");
+        console.warn("未检查到应用已被授权ROOT");
     } else {
         try {
             let sh_result1 = shell(cmd, true)
-            if (sh_result1.code != 0) {
-                toastLog("root权限" + (value ? "关闭" : "打开") + "屏幕失败,\n请检查是否有并授权该权限\n错误信息:" + sh_result1)
-            } else {
+            if (sh_result1.code == 0 || (sh_root_result1.code == 139 && sh_root_result1.error == "Segmentation fault")) {
                 set_up.mode = "root";
                 return true;
+            } else {
+                toastLog("root权限" + (value ? "关闭" : "打开") + "屏幕失败,\n请检查是否有并授权该权限\n错误信息:" + sh_result1)
             }
         } catch (e) {
             toastLog("root权限错误：\n" + e)
         }
     }
-    
+
     if (!$shell.checkAccess("adb")) {
-        toastLog("未检查到应用已被授权ADB");
+        toastLog("未检查到应用已被授权ROOT、ADB");
     } else {
 
         try {
             let sh_result = shell(cmd, {
                 adb: true,
             })
-            if (sh_result.code != 0) {
-                toastLog("adb权限" + (value ? "关闭" : "打开") + "屏幕失败,\n请检查是否有并授权该权限\n错误信息:" + sh_result)
-            } else {
+            if (sh_root_result.code == 0 || (sh_root_result.code == 139 && sh_root_result.error == "Segmentation fault")) {
                 set_up.mode = "adb";
 
                 return true;
+            } else {
+                toastLog("adb权限" + (value ? "关闭" : "打开") + "屏幕失败,\n请检查是否有并授权该权限\n错误信息:" + sh_result)
             }
 
         } catch (e) {

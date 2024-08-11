@@ -583,7 +583,7 @@ ui["operation-mode"].on('click', (view) => {
         .show().then(result => {
             view.setText(result.text);
             tool.writeJSON("operation_mode", result.text);
-           // view.setBackground(createShape(5, 0, 0, [2, theme.bar]));
+            // view.setBackground(createShape(5, 0, 0, [2, theme.bar]));
         })
 });
 
@@ -888,7 +888,7 @@ ui.setScreenMetrics_.on("click", () => {
 //图片资源管理
 ui.image_memory_manage.on("click", (view) => {
     toastLog("图片管理核心功能，切勿关闭");
-  //  tool.writeJSON("image_memory_manage", view.checked);
+    //  tool.writeJSON("image_memory_manage", view.checked);
 });
 ui.image_memory_manage_.on("click", () => {
     ui.image_memory_manage.performClick();
@@ -949,7 +949,7 @@ ui.usingTraffic_.on("click", () => {
 
 //桌面
 ui._home.on("click", (view) => {
-    if(!setting.end_action){
+    if (!setting.end_action) {
         setting.end_action = {};
     }
     setting.end_action.home = view.checked
@@ -1070,27 +1070,27 @@ ui.xpyx.on("click", (view) => {
 
             let dex_path = package_path + "shell/control.dex";
             var sh_path = package_path + "shell/starter.sh";
-           // if (!files.exists(dex_path) || !files.exists(sh_path)) {
-                files.copy("../lib/java/control.dex", dex_path);
-                files.create(sh_path)
+            // if (!files.exists(dex_path) || !files.exists(sh_path)) {
+            files.copy("../lib/java/control.dex", dex_path);
+            files.create(sh_path)
 
-                let sh_content = '\n' +
-                    'file_name="control.dex"\n' +
+            let sh_content = '\n' +
+                'file_name="control.dex"\n' +
 
-                    'origin_path="`dirname $0`/$file_name"\n' +
+                'origin_path="`dirname $0`/$file_name"\n' +
 
-                    'target_path="' + dex_path + '"\n' +
+                'target_path="' + dex_path + '"\n' +
 
-                    // 'if [[ -e $origin_path ]]; then\n' +
-                    //  '    cp $origin_path $target_path\n' +
-                    '    chmod 771 $origin_path $target_path\n' +
-                    '    export CLASSPATH="$target_path"\n' +
-                    '    app_process /system/bin screenoff.only.Control on\n' +
-                    '\n';
+                // 'if [[ -e $origin_path ]]; then\n' +
+                //  '    cp $origin_path $target_path\n' +
+                '    chmod 771 $origin_path $target_path\n' +
+                '    export CLASSPATH="$target_path"\n' +
+                '    app_process /system/bin screenoff.only.Control on\n' +
+                '\n';
 
-                files.write(sh_path, sh_content);
+            files.write(sh_path, sh_content);
 
-        //    }
+            //    }
 
 
             if (setting.监听键 == "音量下键") {
@@ -1106,15 +1106,16 @@ ui.xpyx.on("click", (view) => {
                 });
                 try {
                     let sh_root_result = shell("sh " + sh_path, true)
-                    if (sh_root_result.code != 0) {
-                        toastLog("测试root权限打开屏幕失败,\n错误信息:" + sh_root_result)
-                    } else {
+                    if (sh_root_result.code == 0 || (sh_root_result.code == 139 && sh_root_result.error == "Segmentation fault")) {
                         files.remove(sh_path);
                         toastLog("root权限测试打开屏幕成功")
                         sh_path = true;
+                    } else {
+                        console.error("测试root权限打开屏幕失败,\n错误信息:" + sh_root_result)
+
                     }
                 } catch (e) {
-                    toastLog("root权限错误：\n" + e);
+                    console.error("root权限错误：\n" + e);
                 }
             }
 
@@ -1131,12 +1132,15 @@ ui.xpyx.on("click", (view) => {
                         let sh_adb_result = shell("sh " + sh_path, {
                             adb: true,
                         });
-                        if (sh_adb_result.code != 0) {
+                        if (sh_root_result.code == 0 || (sh_root_result.code == 139 && sh_root_result.error == "Segmentation fault")) {
+
+                            toastLog("adb权限测试打开屏幕成功")
+                        } else {
+
                             toastLog("测试adb权限打开屏幕失败\n错误信息:" + sh_adb_result)
                             view.checked = false;
                             return
-                        } else {
-                            toastLog("adb权限测试打开屏幕成功")
+
                         }
                     } catch (e) {
                         toastLog("adb权限错误：\n" + e)
