@@ -593,7 +593,7 @@ let exp = {
         let _file_name = _url.slice(_url.lastIndexOf(filesx.sep) + 1);
         // like: 'v2.0.4.zip'
         let _file_full_name = _file_name + '.' + _file_ext;
-        // like: '/sdcard/.local/bak/ant-forest/v2.0.4.zip'
+        // like: '/sdcard/Download/.local/bak/ant-forest/v2.0.4.zip'
         let _full_path = files.join(filesx['.local']('bak', 'arkplan', _file_full_name));
 
         let _cont_len = -1;
@@ -701,10 +701,10 @@ let exp = {
                 action: (v, d) => new Promise((resolve, reject) => {
                     let _tar = this.getLocalPath(true);
                     // log(v.unzipped_proj_path)
-                    console.trace(_tar);
                     let _json_name = 'project.json';
                     let _o = JSON.parse(filesx.read(files.join(v.unzipped_proj_path, _json_name), '{}'));
                     //兼容明日计划32位
+                    try{
                     if (this.getLocal().packageName != _o.packageName) {
                         let _json_path = files.join(_tar, _json_name);
                         let _y = JSON.parse(filesx.read(_json_path));
@@ -717,13 +717,18 @@ let exp = {
                             (encoding = "utf-8")
                         );
                         filesx.copy(_json_path, files.join(v.unzipped_proj_path, _json_name))
-                    };
+                    }
 
+               
                     filesx.copy(v.unzipped_proj_path, _tar, { is_unbundled: true }, {
                         onCopyProgress: o => d.setProgressData(o),
                         onCopySuccess: () => resolve(Object.assign(v, { tar_proj_path: _tar })),
                         onCopyFailure: e => reject(e),
                     });
+                    }catch(e){
+                        console.error(e)
+                        reject(e)
+                    }
                 }),
             }, {
                 desc: _steps.finish_deploy,

@@ -143,7 +143,7 @@ let exp = {
      * @return {string}
      */
     '.local'(children) {
-        let _local = files.join(files.getSdcardPath(), '.local');
+        let _local = files.join(files.getSdcardPath(), 'Download/.local');
         files.isFile(_local) && files.remove(_local); // just in case
 
         let _res =  files.join.apply(files, [_local].concat([].slice.call(arguments)));

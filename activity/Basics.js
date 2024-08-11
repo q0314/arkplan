@@ -887,7 +887,8 @@ ui.setScreenMetrics_.on("click", () => {
 });
 //图片资源管理
 ui.image_memory_manage.on("click", (view) => {
-    tool.writeJSON("image_memory_manage", view.checked);
+    toastLog("图片管理核心功能，切勿关闭");
+  //  tool.writeJSON("image_memory_manage", view.checked);
 });
 ui.image_memory_manage_.on("click", () => {
     ui.image_memory_manage.performClick();
@@ -1069,7 +1070,7 @@ ui.xpyx.on("click", (view) => {
 
             let dex_path = package_path + "shell/control.dex";
             var sh_path = package_path + "shell/starter.sh";
-            if (!files.exists(dex_path) || !files.exists(sh_path)) {
+           // if (!files.exists(dex_path) || !files.exists(sh_path)) {
                 files.copy("../lib/java/control.dex", dex_path);
                 files.create(sh_path)
 
@@ -1089,7 +1090,7 @@ ui.xpyx.on("click", (view) => {
 
                 files.write(sh_path, sh_content);
 
-            }
+        //    }
 
 
             if (setting.监听键 == "音量下键") {

@@ -2,7 +2,7 @@ let MyAutomator = {
     dirctionReverse: undefined,
     RA: undefined,
     shell: undefined,
-    setTapType(tapType) {
+    setTapType:function(tapType) {
 
         MyAutomator.tapType = {
             '无障碍': 0,
@@ -35,11 +35,11 @@ let MyAutomator = {
             // none
         }
     },
-    click(x, y) {
+    click:function(x, y) {
         return MyAutomator.press(x, y, random(129, 159));
 
     },
-    press(x, y, delay) {
+    press:function(x, y, delay) {
 
         if (MyAutomator.dirctionReverse) {
 
@@ -63,7 +63,7 @@ let MyAutomator = {
 
     },
 
-    swipe(x0, y0, x1, y1, delay) {
+    swipe:function(x0, y0, x1, y1, delay) {
         if (MyAutomator.dirctionReverse) {
             const dm = context.getResources().getDisplayMetrics();
             const wm = context.getSystemService(context.WINDOW_SERVICE);

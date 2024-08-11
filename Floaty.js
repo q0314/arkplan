@@ -19,7 +19,7 @@ let tool = require("./modules/tool.js");
 var setting = tool.readJSON("configure");
 var progra;
 //图标运行状态,是否手动暂停
-var active_end = false;
+var active_end = true;
 let size = setting.Floaty_size;
 size = Number(size);
 if (size == undefined || isNaN(size) == true || size == 0) {
@@ -375,7 +375,9 @@ function 悬浮窗监听(window) {
                 }
                 break;
             case 功能图标[1]:
-                执行次数()
+                blockHandle.setTimeout(() => {
+                    执行次数();
+                }, 0);
                 /* setting = tool.readJSON("configure");
                  //   Executionsettings = rewriteView.implement.getSelectedItemPosition();
 
@@ -396,7 +398,9 @@ function 悬浮窗监听(window) {
                 }, 200);
                 break;
             case 功能图标[3]:
-                主页设置()
+                blockHandle.setTimeout(() => {
+                    主页设置();
+                }, 0)
                 break;
             case 功能图标[4]:
 
@@ -1288,6 +1292,7 @@ function 执行次数() {
     rewriteView.implement.setAdapter(adapter);
 
     rewriteDialogs.show();
+    let initial_i = false;
     rewriteView.implement.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener({
         onItemSelected: function(parent, view, position, id) {
             ui.run(function() {
@@ -1302,7 +1307,7 @@ function 执行次数() {
                     rewriteView.wordname.attr("visibility", "visible");
 
                 };
-                if (position == 4) {
+                if (position == 4 && rewriteView["levelPickText"].getText() != "模块选择") {
                     rewriteView["levelPickText"].setText("模块选择");
                     let _modData_ = [];
                     for (let _modular_ of mod_data) {
@@ -1313,7 +1318,7 @@ function 执行次数() {
                     change_list(_modData_, function(parent, view, position, id) {
                         tool.writeJSON("自定义模块", parent.getSelectedItem());
                     });
-                } else {
+                } else if (rewriteView["levelPickText"].getText() != "关卡选择") {
                     rewriteView["levelPickText"].setText("关卡选择");
                     change_list(level_choices_open, function(parent, view, position, id) {
 
@@ -1321,9 +1326,29 @@ function 执行次数() {
                             levelAbbreviation: parent.getSelectedItem(),
                         };
                         tool.writeJSON("指定关卡", setting.指定关卡);
+
+
+                        let level_id = level_choices.find(element => element.abbreviation == parent.getSelectedItem());
+                        if (level_id && level_id.id == "指定剿灭") {
+                            let _id = Object.values(modeGather).findIndex((text) => text == "剿灭");
+                            if (_id != -1) {
+                                rewriteView.implement.setSelection(_id);
+
+                            }
+                        } else {
+                            let _id = modeGather[rewriteView.implement.getSelectedItem()];
+
+                            if (_id != "常规" && _id != "行动") {
+                                _id = Object.values(modeGather).findIndex((text) => text == "常规");
+                                if (_id != -1) {
+                                    rewriteView.implement.setSelection(_id);
+                                }
+                            }
+                        }
+
+
                         // toastLog(setting.指定关卡.levelAbbreviation);
                     });
-
                     if (level_choices_open.indexOf(setting.指定关卡.levelAbbreviation) != -1) {
                         rewriteView.level_pick.setSelection(level_choices_open.indexOf(setting.指定关卡.levelAbbreviation));
                     };
@@ -1359,7 +1384,26 @@ function 执行次数() {
             setting.指定关卡 ? setting.指定关卡.levelAbbreviation = parent.getSelectedItem() : setting.指定关卡 = {
                 levelAbbreviation: parent.getSelectedItem(),
             };
-            tool.writeJSON("指定关卡", setting.指定关卡);
+            if (setting.指定关卡) {
+                tool.writeJSON("指定关卡", setting.指定关卡);
+            }
+            let level_id = level_choices.find(element => element.abbreviation == parent.getSelectedItem());
+            if (level_id && level_id.id == "指定剿灭") {
+                let _id = Object.values(modeGather).findIndex((text) => text == "剿灭");
+                if (_id != -1) {
+                    rewriteView.implement.setSelection(_id);
+
+                }
+            } else {
+                let _id = modeGather[rewriteView.implement.getSelectedItem()];
+                if (_id != "常规" && _id != "行动") {
+                    _id = Object.values(modeGather).findIndex((text) => text == "常规");
+                    if (_id != -1) {
+                        rewriteView.implement.setSelection(_id);
+                    }
+                }
+            }
+
             // toastLog(setting.指定关卡.levelAbbreviation);
         });
 
@@ -1955,8 +1999,9 @@ tool.putString("material_accrued_obtain", {
     done: [],
 })
 材料显示()
-tool.writeJSON("已执行动", 0)
-tool.writeJSON("已兑理智", 0)
+tool.writeJSON("已执行动", 0);
+setting = tool.writeJSON("已兑理智", 0);
+
 程序(setting.执行);
 
 function 程序(implem) {

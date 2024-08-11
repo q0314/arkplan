@@ -9,29 +9,29 @@ ui.layout(
         <vertical>
             <appbar background="#4C484C">
                 <toolbar id="toolbar" title="脚本模块平台" />
-
+                
                 <tabs id="tabs" />
             </appbar>
             {/* 启动时网络不好等待加载的动画效果 */}
             <vertical id="waitForDownload_0" bg="{{frameColor}}" gravity="center" w="*" h="50">
                 <linear w="auto">
                     <img id="img_waitForDownload"
-                        src="@drawable/ic_rotate_right_black_48dp"
-                        w="20" h="20" />
+                    src="@drawable/ic_rotate_right_black_48dp"
+                    w="20" h="20" />
                     <linear gravity="center" h="*">
                         <text id="str_waitForDownload"
-                            text="正在拉取数据..."
-                            textSize="11sp"
-                            textColor="{{textColor}}" />
+                        text="正在拉取数据..."
+                        textSize="11sp"
+                        textColor="{{textColor}}" />
                     </linear>
                 </linear>
             </vertical>
             <vertical id="noData_0" bg="{{frameColor}}" gravity="center" w="*" h="50" >
                 <linear w="auto">
                     <text id="str_noData"
-                        text="暂无数据,请刷新..."
-                        textSize="13sp" visibility="gone"
-                        textColor="{{textColor}}" />
+                    text="暂无数据,请刷新..."
+                    textSize="13sp" visibility="gone"
+                    textColor="{{textColor}}" />
                 </linear>
             </vertical>
             <frame background="{{frameColor}}">
@@ -39,195 +39,195 @@ ui.layout(
                     <frame> {/** 第一屏布局*/}
                         <vertical>
                             {/* <android.support.v4.widget.SwipeRefreshLayout> */}
-
+                            
                             <list id="files_0" layout_weight="1" >
                                 <vertical w="*">
                                     <horizontal layout_height="wrap_content" margin="10 5"
                                     >
-                                        {/* 脚本Icon */}
-                                        {/*
-                                        <img src="@drawable/ic_cloud_done_black_48dp"
-                                        tint="white"
-                                        bg ="{{img_scriptIconColor}}"
-                                        w="35"
-                                        h="35"
-                                        margin="10 5 10 2" />
-                                        */}
-                                        {/* 脚本名称 */}
-                                        <text id="script_name" textSize="16sp" textColor="#FFFFFF" text="{{this.script_name}}"
-                                            maxLines="1" ellipsize="end" layout_gravity="center|left" />
-                                        {/**把布局左边占满,让剩下的布局靠右*/}
-                                        <linear layout_width="0dp"
-                                            layout_weight="1">
-                                        </linear>
-
-                                        {/* 下载按钮图标 */}
-                                        <img id="download" src="@drawable/ic_move_to_inbox_black_48dp" tint="#CCCCCC" bg="{{img_scriptIconColor}}"
-                                            w="30" h="30" layout_gravity="center|right" />
-
-                                    </horizontal >
-
-                                    {/* 开发者名称 */}
-                                    <horizontal layout_width="wrap_content" layout_height="wrap_content" margin="10 -5 5 0">
-                                        <text id="developer"
-                                            textSize="10sp" textColor="{{textColor}}"
-                                            text="开发者：{{this.developer ? this.developer : '佚名'}}"
-                                            maxLines="1" ellipsize="end" />
-                                        {/* 脚本版本号 */}
-                                        <text id="version" textSize="10sp"
-                                            textColor="{{textColor}}" text="版本号：{{this.version}}"
-                                            marginLeft="15" maxLines="1" ellipsize="end" />
-                                        {/* 更新时间 */}
-                                        <text id="update_time" textSize="10sp" textColor="{{textColor}}"
-                                            text="更新时间：{{this.update_time ? this.update_time : '未知'}}"
-                                            marginLeft="10" maxLines="1" ellipsize="end" />
-                                    </horizontal>
-
-                                    {/* 开发者的话 */}
-                                    <text id="description" textSize="13sp" textColor="#dcdcdc"
-                                        text="开发者的话：{{this.description ? this.description : '这个人什么也不想说' }}"
-                                        margin="10 2" ellipsize="end" />
-                                    {/* 分割线填充 */}
-                                    <View id="fill_line" w="*" h="1" bg="{{color}}">
-                                    </View>
-
-                                </vertical>
-                            </list>
-                            {/* </android.support.v4.widget.SwipeRefreshLayout> */}
-                        </vertical>
-                    </frame>
-
-                    <frame> {/** 第二屏布局*/}
-                        <vertical>
-                            <list id="files_1" layout_weight="1" >
-                                <vertical w="*">
-                                    <horizontal layout_height="wrap_content" margin="10 5"
-                                    >
-                                        {/* 脚本Icon */}
-                                        {/*
-                                        <img src="@drawable/ic_cloud_done_black_48dp"
-                                        tint="white"
-                                        bg ="{{img_scriptIconColor}}"
-                                        w="35"
-                                        h="35"
-                                        margin="10 5 10 2" />
-                                        */}
-                                        {/* 脚本名称 */}
-                                        <text id="script_name" textSize="16sp" textColor="#FFFFFF" text="{{this.script_name}}"
-                                            maxLines="1" ellipsize="end" layout_gravity="center|left" />
-                                        {/**把布局左边占满,让剩下的布局靠右*/}
-                                        <linear layout_width="0dp"
-                                            layout_weight="1">
-                                        </linear>
-
-                                        {/* 下载按钮图标 */}
-                                        <img id="download" src="@drawable/ic_move_to_inbox_black_48dp" tint="#CCCCCC" bg="{{img_scriptIconColor}}"
-                                            w="30" h="30" layout_gravity="center|right" />
-
-                                    </horizontal >
-
-                                    {/* 开发者名称 */}
-                                    <horizontal layout_width="wrap_content" layout_height="wrap_content" margin="10 -5 5 0">
-                                        <text id="developer"
-                                            textSize="10sp" textColor="{{textColor}}"
-                                            text="开发者：{{this.developer ? this.developer : '佚名'}}"
-                                            maxLines="1" ellipsize="end" />
-                                        {/* 脚本版本号 */}
-                                        <text id="version" textSize="10sp"
-                                            textColor="{{textColor}}" text="版本号：{{this.version}}"
-                                            marginLeft="15" maxLines="1" ellipsize="end" />
-                                        {/* 更新时间 */}
-                                        <text id="update_time" textSize="10sp" textColor="{{textColor}}"
-                                            text="更新时间：{{this.update_time ? this.update_time : '未知'}}"
-                                            marginLeft="10" maxLines="1" ellipsize="end" />
-                                    </horizontal>
-
-                                    {/* 开发者的话 */}
-                                    <text id="description" textSize="13sp" textColor="#dcdcdc"
-                                        text="开发者的话：{{this.description ? this.description : '这个人什么也不想说' }}"
-                                        margin="10 2" ellipsize="end" />
-                                    {/* 分割线填充 */}
-                                    <View id="fill_line" w="*" h="1" bg="{{color}}">
-                                    </View>
-
-                                </vertical>
-                            </list>
-
-                        </vertical>
-                    </frame>
-
-                    <frame> {/** 第三屏布局*/}
-                        <list id="files_2" layout_weight="1" >
-                            <vertical w="*">
-                                <horizontal layout_height="wrap_content" margin="10 5"
-                                >
                                     {/* 脚本Icon */}
                                     {/*
-                                        <img src="@drawable/ic_cloud_done_black_48dp"
-                                        tint="white"
-                                        bg ="{{img_scriptIconColor}}"
-                                        w="35"
-                                        h="35"
-                                        margin="10 5 10 2" />
-                                        */}
+                                    <img src="@drawable/ic_cloud_done_black_48dp"
+                                    tint="white"
+                                    bg ="{{img_scriptIconColor}}"
+                                    w="35"
+                                    h="35"
+                                    margin="10 5 10 2" />
+                                    */}
                                     {/* 脚本名称 */}
                                     <text id="script_name" textSize="16sp" textColor="#FFFFFF" text="{{this.script_name}}"
-                                        maxLines="1" ellipsize="end" layout_gravity="center|left" />
+                                    maxLines="1" ellipsize="end" layout_gravity="center|left" />
                                     {/**把布局左边占满,让剩下的布局靠右*/}
                                     <linear layout_width="0dp"
-                                        layout_weight="1">
-                                    </linear>
-
-                                    {/* 下载按钮图标 */}
-                                    <img id="download" src="@drawable/ic_move_to_inbox_black_48dp" tint="#CCCCCC" bg="{{img_scriptIconColor}}"
-                                        w="30" h="30" layout_gravity="center|right" />
-
-                                </horizontal >
-
-                                {/* 开发者名称 */}
-                                <horizontal layout_width="wrap_content" layout_height="wrap_content" margin="10 -5 5 0">
-                                    <text id="developer"
-                                        textSize="10sp" textColor="{{textColor}}"
-                                        text="开发者：{{this.developer ? this.developer : '佚名'}}"
-                                        maxLines="1" ellipsize="end" />
-                                    {/* 脚本版本号 */}
-                                    <text id="version" textSize="10sp"
-                                        textColor="{{textColor}}" text="版本号：{{this.version}}"
-                                        marginLeft="15" maxLines="1" ellipsize="end" />
-                                    {/* 更新时间 */}
-                                    <text id="update_time" textSize="10sp" textColor="{{textColor}}"
-                                        text="更新时间：{{this.update_time ? this.update_time : '未知'}}"
-                                        marginLeft="10" maxLines="1" ellipsize="end" />
-                                </horizontal>
-
-                                {/* 开发者的话 */}
-                                <text id="description" textSize="13sp" textColor="#dcdcdc"
-                                    text="开发者的话：{{this.description ? this.description : '这个人什么也不想说' }}"
-                                    margin="10 2" ellipsize="end" />
-                                {/* 分割线填充 */}
-                                <View id="fill_line" w="*" h="1" bg="{{color}}">
-                                </View>
-
-                            </vertical>
-                        </list>
-
-                    </frame>
-
-
-
-                </viewpager>
-                <card w="50dp" h="50dp" id="_bgT" cardBackgroundColor="#4C484C" layout_gravity="bottom|right"
-                    marginRight="20" marginBottom="20" cardCornerRadius="25dp" scaleType="fitXY">
-                    <text w="*" h="*" id="Import" textColor="#ffffff"
-                        gravity="center" text="导入模块" textSize="13sp"
-                        foreground="?selectableItemBackground" />
-                </card>
-                <text id="h_text" margin="20 20 70 10" autoLink="web" h="auto" enabled="true" textIsSelectable="true" focusable="true" longClickable="true"
-                    layout_gravity="bottom" />
-
+                                    layout_weight="1">
+                                </linear>
+                                
+                                {/* 下载按钮图标 */}
+                                <img id="download" src="@drawable/ic_move_to_inbox_black_48dp" tint="#CCCCCC" bg="{{img_scriptIconColor}}"
+                                w="30" h="30" layout_gravity="center|right" />
+                                
+                            </horizontal >
+                            
+                            {/* 开发者名称 */}
+                            <horizontal layout_width="wrap_content" layout_height="wrap_content" margin="10 -5 5 0">
+                                <text id="developer"
+                                textSize="10sp" textColor="{{textColor}}"
+                                text="开发者：{{this.developer ? this.developer : '佚名'}}"
+                                maxLines="1" ellipsize="end" />
+                                {/* 脚本版本号 */}
+                                <text id="version" textSize="10sp"
+                                textColor="{{textColor}}" text="版本号：{{this.version}}"
+                                marginLeft="15" maxLines="1" ellipsize="end" />
+                                {/* 更新时间 */}
+                                <text id="update_time" textSize="10sp" textColor="{{textColor}}"
+                                text="更新时间：{{this.update_time ? this.update_time : '未知'}}"
+                                marginLeft="10" maxLines="1" ellipsize="end" />
+                            </horizontal>
+                            
+                            {/* 开发者的话 */}
+                            <text id="description" textSize="13sp" textColor="#dcdcdc"
+                            text="开发者的话：{{this.description ? this.description : '这个人什么也不想说' }}"
+                            margin="10 2" ellipsize="end" />
+                            {/* 分割线填充 */}
+                            <View id="fill_line" w="*" h="1" bg="{{color}}">
+                            </View>
+                            
+                        </vertical>
+                    </list>
+                    {/* </android.support.v4.widget.SwipeRefreshLayout> */}
+                </vertical>
             </frame>
+            
+            <frame> {/** 第二屏布局*/}
+                <vertical>
+                    <list id="files_1" layout_weight="1" >
+                        <vertical w="*">
+                            <horizontal layout_height="wrap_content" margin="10 5"
+                            >
+                            {/* 脚本Icon */}
+                            {/*
+                            <img src="@drawable/ic_cloud_done_black_48dp"
+                            tint="white"
+                            bg ="{{img_scriptIconColor}}"
+                            w="35"
+                            h="35"
+                            margin="10 5 10 2" />
+                            */}
+                            {/* 脚本名称 */}
+                            <text id="script_name" textSize="16sp" textColor="#FFFFFF" text="{{this.script_name}}"
+                            maxLines="1" ellipsize="end" layout_gravity="center|left" />
+                            {/**把布局左边占满,让剩下的布局靠右*/}
+                            <linear layout_width="0dp"
+                            layout_weight="1">
+                        </linear>
+                        
+                        {/* 下载按钮图标 */}
+                        <img id="download" src="@drawable/ic_move_to_inbox_black_48dp" tint="#CCCCCC" bg="{{img_scriptIconColor}}"
+                        w="30" h="30" layout_gravity="center|right" />
+                        
+                    </horizontal >
+                    
+                    {/* 开发者名称 */}
+                    <horizontal layout_width="wrap_content" layout_height="wrap_content" margin="10 -5 5 0">
+                        <text id="developer"
+                        textSize="10sp" textColor="{{textColor}}"
+                        text="开发者：{{this.developer ? this.developer : '佚名'}}"
+                        maxLines="1" ellipsize="end" />
+                        {/* 脚本版本号 */}
+                        <text id="version" textSize="10sp"
+                        textColor="{{textColor}}" text="版本号：{{this.version}}"
+                        marginLeft="15" maxLines="1" ellipsize="end" />
+                        {/* 更新时间 */}
+                        <text id="update_time" textSize="10sp" textColor="{{textColor}}"
+                        text="更新时间：{{this.update_time ? this.update_time : '未知'}}"
+                        marginLeft="10" maxLines="1" ellipsize="end" />
+                    </horizontal>
+                    
+                    {/* 开发者的话 */}
+                    <text id="description" textSize="13sp" textColor="#dcdcdc"
+                    text="开发者的话：{{this.description ? this.description : '这个人什么也不想说' }}"
+                    margin="10 2" ellipsize="end" />
+                    {/* 分割线填充 */}
+                    <View id="fill_line" w="*" h="1" bg="{{color}}">
+                    </View>
+                    
+                </vertical>
+            </list>
+            
         </vertical>
-
+    </frame>
+    
+    <frame> {/** 第三屏布局*/}
+        <list id="files_2" layout_weight="1" >
+            <vertical w="*">
+                <horizontal layout_height="wrap_content" margin="10 5"
+                >
+                {/* 脚本Icon */}
+                {/*
+                <img src="@drawable/ic_cloud_done_black_48dp"
+                tint="white"
+                bg ="{{img_scriptIconColor}}"
+                w="35"
+                h="35"
+                margin="10 5 10 2" />
+                */}
+                {/* 脚本名称 */}
+                <text id="script_name" textSize="16sp" textColor="#FFFFFF" text="{{this.script_name}}"
+                maxLines="1" ellipsize="end" layout_gravity="center|left" />
+                {/**把布局左边占满,让剩下的布局靠右*/}
+                <linear layout_width="0dp"
+                layout_weight="1">
+            </linear>
+            
+            {/* 下载按钮图标 */}
+            <img id="download" src="@drawable/ic_move_to_inbox_black_48dp" tint="#CCCCCC" bg="{{img_scriptIconColor}}"
+            w="30" h="30" layout_gravity="center|right" />
+            
+        </horizontal >
+        
+        {/* 开发者名称 */}
+        <horizontal layout_width="wrap_content" layout_height="wrap_content" margin="10 -5 5 0">
+            <text id="developer"
+            textSize="10sp" textColor="{{textColor}}"
+            text="开发者：{{this.developer ? this.developer : '佚名'}}"
+            maxLines="1" ellipsize="end" />
+            {/* 脚本版本号 */}
+            <text id="version" textSize="10sp"
+            textColor="{{textColor}}" text="版本号：{{this.version}}"
+            marginLeft="15" maxLines="1" ellipsize="end" />
+            {/* 更新时间 */}
+            <text id="update_time" textSize="10sp" textColor="{{textColor}}"
+            text="更新时间：{{this.update_time ? this.update_time : '未知'}}"
+            marginLeft="10" maxLines="1" ellipsize="end" />
+        </horizontal>
+        
+        {/* 开发者的话 */}
+        <text id="description" textSize="13sp" textColor="#dcdcdc"
+        text="开发者的话：{{this.description ? this.description : '这个人什么也不想说' }}"
+        margin="10 2" ellipsize="end" />
+        {/* 分割线填充 */}
+        <View id="fill_line" w="*" h="1" bg="{{color}}">
+        </View>
+        
+    </vertical>
+    </list>
+    
+    </frame>
+    
+    
+    
+    </viewpager>
+    <card w="50dp" h="50dp" id="_bgT" cardBackgroundColor="#4C484C" layout_gravity="bottom|right"
+    marginRight="20" marginBottom="20" cardCornerRadius="25dp" scaleType="fitXY">
+    <text w="*" h="*" id="Import" textColor="#ffffff"
+    gravity="center" text="导入模块" textSize="13sp"
+    foreground="?selectableItemBackground" />
+    </card>
+    <text id="h_text" margin="20 20 70 10" autoLink="web" h="auto" enabled="true" textIsSelectable="true" focusable="true" longClickable="true"
+    layout_gravity="bottom" />
+    
+    </frame>
+    </vertical>
+    
     </drawer>
 );
 
@@ -239,7 +239,7 @@ ui.tabs.setupWithViewPager(ui.viewpager);
 activity.setSupportActionBar(ui.toolbar);
 activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 ui.toolbar.setNavigationOnClickListener({
-    onClick: function () {
+    onClick: function() {
         ui.finish();
     }
 });
@@ -306,15 +306,15 @@ ui.emitter.on("options_item_selected", (e, item) => {
         case "如何上传我的模块?":
             var DHK = ui.inflate(
                 <vertical background="#ffffff" padding="5">
-                    <ScrollView>
-                        <vertical h="*">
-                            <text id="text0" textColor="#000000" enabled="true" textIsSelectable="true" focusable="true" longClickable="true" />
-                            <text id="text1" margin="10 0" autoLink="web" enabled="true" textIsSelectable="true" focusable="true" longClickable="true" />
-                            <img h="250" src="{{Warehouse_url}}/%E6%8F%90%E4%BA%A4%E8%AF%B4%E6%98%8E.png" />
-                            <text id="text2" margin="10 0" autoLink="web" enabled="true" textIsSelectable="true" focusable="true" longClickable="true" />
-                        </vertical>
-                    </ScrollView>
-                </vertical>, null, false);
+                            <ScrollView>
+                                <vertical h="*">
+                                    <text id="text0" textColor="#000000" enabled="true" textIsSelectable="true" focusable="true" longClickable="true" />
+                                    <text id="text1" margin="10 0" autoLink="web" enabled="true" textIsSelectable="true" focusable="true" longClickable="true" />
+                                    <img h="250" src="{{Warehouse_url}}/%E6%8F%90%E4%BA%A4%E8%AF%B4%E6%98%8E.png" />
+                                    <text id="text2" margin="10 0" autoLink="web" enabled="true" textIsSelectable="true" focusable="true" longClickable="true" />
+                                </vertical>
+                            </ScrollView>
+                        </vertical>, null, false);
             DHK.text1.setText("脚本模块平台仓库主页链接：" + Warehouse_url.replace("raw", "tree"))
             DHK.text2.setText('.json信息示例:\n{' +
                 '\n"script_name": "脚本名称",' +
@@ -346,23 +346,23 @@ ui.emitter.on("options_item_selected", (e, item) => {
         case "设置":
             let otherSettingView = ui.inflate(
                 <vertical padding="20 10">
-
-                    <horizontal>
-                        <text text="解压zip成功后删除zip  " textColor="#999999" />
-                        <checkbox id="delete_zip" checked="{{delete_zip}}" />
-                    </horizontal>
-                    <View bg="#666666" h="1" w="*" />
-                    <horizontal>
-                        <text text="下载单js文件成功后自动导入  " textColor="#999999" />
-                        <checkbox id="import_js" checked="{{import_js}}" />
-                    </horizontal>
-                    <View bg="#666666" h="1" w="*" />
-                    <horizontal>
-                        <text text="更改下载目录:" textColor="#999999" />
-                        <input id="download_catalogue" w="*" hint="{{path}}" />
-                    </horizontal>
-                    <View bg="#666666" h="1" w="*" />
-                </vertical>, null, false);
+                            
+                            <horizontal>
+                                <text text="解压zip成功后删除zip  " textColor="#999999" />
+                                <checkbox id="delete_zip" checked="{{delete_zip}}" />
+                            </horizontal>
+                            <View bg="#666666" h="1" w="*" />
+                            <horizontal>
+                                <text text="下载单js文件成功后自动导入  " textColor="#999999" />
+                                <checkbox id="import_js" checked="{{import_js}}" />
+                            </horizontal>
+                            <View bg="#666666" h="1" w="*" />
+                            <horizontal>
+                                <text text="更改下载目录:" textColor="#999999" />
+                                <input id="download_catalogue" w="*" hint="{{path}}" />
+                            </horizontal>
+                            <View bg="#666666" h="1" w="*" />
+                        </vertical>, null, false);
             //设置对话框
             dialogs.build({
                 type: "app-or-overlay",
@@ -383,7 +383,7 @@ ui.emitter.on("options_item_selected", (e, item) => {
                 dwadlink.put("data", set_up);
                 delete_zip = checked;
             });
-            otherSettingView.download_catalogue.on("key", function (keyCode, event) {
+            otherSettingView.download_catalogue.on("key", function(keyCode, event) {
                 if (event.getAction() == 0 && keyCode == 66) {
                     let text = otherSettingView.download_catalogue.text()
                     if (text.charAt(text.length - 1) != "/") {
@@ -403,23 +403,23 @@ ui.emitter.on("options_item_selected", (e, item) => {
 
 
 //获取数据时的等待效果
-var waitForDownload_Thread = threads.start(function () {
-    for (; ;) {
-        for (r = 0, t = 0; ;)
+var waitForDownload_Thread = threads.start(function() {
+    for (;;) {
+        for (r = 0, t = 0;;)
             if (r += .23, t += r, ui.run(() => {
-                ui.img_waitForDownload.setRotation(t)
-            }),
+                    ui.img_waitForDownload.setRotation(t)
+                }),
                 ui.img_waitForDownload.getRotation() >= 180) break;
-        for (; ;)
+        for (;;)
             if (r -= .23, t += r, ui.run(() => {
-                ui.img_waitForDownload.setRotation(t)
-            }), ui.img_waitForDownload.getRotation() >= 360) break;
+                    ui.img_waitForDownload.setRotation(t)
+                }), ui.img_waitForDownload.getRotation() >= 360) break;
     }
 });
 刷新()
 
 function 刷新() {
-    threads.start(function () {
+    threads.start(function() {
         if (!Pull_content(ui.files_0, Warehouse_url + "/%E8%87%AA%E5%AE%9A%E4%B9%89%E6%89%A7%E8%A1%8C%E6%A8%A1%E5%9D%97/Custom_executio_list.json")) {
             ui.run(() => {
                 ui.noData_0.setVisibility(0)
@@ -431,7 +431,7 @@ function 刷新() {
 
     })
 
-    threads.start(function () {
+    threads.start(function() {
         Pull_content(ui.files_2, Warehouse_url + "/%E5%9F%BA%E5%BB%BA%E6%8D%A2%E7%8F%AD%E6%A8%A1%E5%9D%97/Infrastructure_list.json")
     })
 }
@@ -463,7 +463,7 @@ function download(url, name) {
 
     //监听脚本间广播'download'事件
 
-    events.broadcast.on("download" + datali.id, function (X) {
+    events.broadcast.on("download" + datali.id, function(X) {
         if (X.name == "进度") {
             if (progressDialog) {
                 ui.run(() => {
@@ -568,7 +568,7 @@ function Pull_content(id, url) {
 
         if (jlink.statusCode == 200) {
             jlink = JSON.parse(jlink.body.string())
-            ui.run(function () {
+            ui.run(function() {
                 switch (id) {
                     case ui.files_0:
                         //  Script_information[0] = jlink;
@@ -704,7 +704,7 @@ var sto_mod = storages.create("modular")
 var mod_data = sto_mod.get("modular", []);
 
 function modular_id(file) {
-    threads.start(function () {
+    threads.start(function() {
         if (files.getExtension(file) != "js") {
             toast("不是后缀为.js的文件");
             console.error("不是后缀为.js的文件");
@@ -717,7 +717,12 @@ function modular_id(file) {
                 'getSource': file,
                 'getinterface': '模块仓库',
             });
-
+            if (route_c === null) {
+                tips = "模块拒绝响应";
+                console.error(tips);
+                toast(tips)
+                return;
+            }
         } catch (err) {
             toast("执行.js发生错误:" + err + "。\n可能非标准插件模块，请参考相关示例修改");
             console.error("执行.js发生错误:" + err + "。\n可能非标准插件模块，请参考相关示例修改")
@@ -746,8 +751,8 @@ function modular_id(file) {
                 //    tool.writeJSON("关闭应用", file);
                 break;
             case '基建换班':
-               // tool.writeJSON("基建换班", true);
-               //   tool.writeJSON("换班路径", file);
+                // tool.writeJSON("基建换班", true);
+                //   tool.writeJSON("换班路径", file);
                 break;
             default:
                 snakebar("未匹配到相应模块id，非标准插件模块，请参考其他相关示例模块修改")
@@ -782,21 +787,21 @@ function modular_id(file) {
         snakebar("确认ID完成，" + route_c.id + "模块导入成功!");
     })
 }
-ui.files_0.on("item_bind", function (itemView, itemHolder) {
+ui.files_0.on("item_bind", function(itemView, itemHolder) {
     //绑定点击事件
-    itemView.download.on("click", function () {
+    itemView.download.on("click", function() {
         inspect(itemHolder.item)
     })
 })
-ui.files_1.on("item_bind", function (itemView, itemHolder) {
+ui.files_1.on("item_bind", function(itemView, itemHolder) {
     //绑定点击事件
-    itemView.download.on("click", function () {
+    itemView.download.on("click", function() {
         inspect(itemHolder.item)
     })
 })
-ui.files_2.on("item_bind", function (itemView, itemHolder) {
+ui.files_2.on("item_bind", function(itemView, itemHolder) {
     //绑定点击事件
-    itemView.download.on("click", function () {
+    itemView.download.on("click", function() {
         inspect(itemHolder.item)
     })
 })

@@ -13,9 +13,10 @@ let gallery = {
     gallery_info: null,
     language: false,
     name: null,
+    path: context.getExternalFilesDir(null).getAbsolutePath() + "/gallery_list/",
     init() {
-        if (files.exists("./mrfz/tuku/gallery_info.json")) {
-            this.gallery_info = JSON.parse(files.read("./mrfz/tuku/gallery_info.json"), (encoding = "utf-8"));
+        if (files.exists(this.path + "template/gallery_info.json")) {
+            this.gallery_info = JSON.parse(files.read(this.path + "template/gallery_info.json"), (encoding = "utf-8"));
             this.language = this.gallery_info.服务器;
             this.name = (this.gallery_info.名称 ? this.gallery_info.名称 : this.gallery_info.name)
         }
@@ -23,9 +24,6 @@ let gallery = {
             if (this.gallery_info) {
                 let name = "当前使用图库名称：" + this.name;
                 tukuui.dwh.setText(name);
-            } else if (files.exists("./mrfz/tuku/分辨率.txt")) {
-                this.name = files.read("./mrfz/tuku/分辨率.txt");
-                tukuui.dwh.setText("当前使用图库：" + this.name);
             } else {
                 tukuui.dwh.setText("当前使用图库：空");
 
@@ -42,50 +40,50 @@ let gallery = {
 
         tukuui = ui.inflate(
             <vertical >
-                <vertical w="*" h="*">
-                    <card gravity="center_vertical" cardElevation="0dp" margin="0" cardBackgroundColor="#eff0f4">
-                        <img src="file://res/icon.png" w="50" h="30" margin="0" layout_gravity="center|left" />
-                        <text text="图库文件管理" gravity="center|left" textColor="#000000" marginLeft="50" />
-
-                        <linear gravity="center||right" marginLeft="5" >
-                            <text id="wenn" textColor="#03a9f4" text="了解更多" padding="10" w="auto" h="auto" foreground="?attr/selectableItemBackground" clickable="true" />
-                            <img id="Exit" marginRight="8" src="@drawable/ic_clear_black_48dp" w="35" h="35" tint="#000000" foreground="?attr/selectableItemBackground" clickable="true" />
-
-                        </linear>
-
-                    </card>
-                </vertical>
-
-                <ScrollView  >
-                    <vertical w="*" h="*" >
-
-                        <View bg="#f5f5f5" w="*" h="2" />
-                        <text id="wxts" autoLink="web" text="温馨" typeface="sans" margin="15 10" visibility="gone" textColor="#000000" textSize="15sp" layout_gravity="center" />
-
-                        <vertical id="parent_" visibility="gone">
-
-                            <text text="显示X说明该功能所需的图片不全，点击展开详细图片内容。可查看缺少那些小图片。tips:小图片显示 √ 并不代表此小图片在你的设备上可用，因为分辨率不同可能导致小图片在截图上匹配失败" typeface="sans" textColor="#ff7f27" textSize="12sp" margin="20 0" />
-
-                            <ScrollView h="{{1000}}px" id="scrollView" >
-
-                                <vertical id="content" padding="5" h="auto">
-
-                                </vertical>
-                            </ScrollView >
-
-                        </vertical>
-
-                        <vertical id="car" >
-                            <text id="Device_resolution" text="加载中" padding="20 0" />
-                            <text id="dwh" text="加载中" padding="20 0" />
-                            <text id="Tips" bg="#FF69B4" margin="16 0" textStyle="bold" textColor="#ffffff" text="请更换与设备分辨率较为接近的图库" w="auto" />
-                            <Switch
+                    <vertical w="*" h="*">
+                        <card gravity="center_vertical" cardElevation="0dp" margin="0" cardBackgroundColor="#eff0f4">
+                            <img src="file://res/icon.png" w="50" h="30" margin="0" layout_gravity="center|left" />
+                            <text text="图库文件管理" gravity="center|left" textColor="#000000" marginLeft="50" />
+                            
+                            <linear gravity="center||right" marginLeft="5" >
+                                <text id="wenn" textColor="#03a9f4" text="了解更多" padding="10" w="auto" h="auto" foreground="?attr/selectableItemBackground" clickable="true" />
+                                <img id="Exit" marginRight="8" src="@drawable/ic_clear_black_48dp" w="35" h="35" tint="#000000" foreground="?attr/selectableItemBackground" clickable="true" />
+                                
+                            </linear>
+                            
+                        </card>
+                    </vertical>
+                    
+                    <ScrollView  >
+                        <vertical w="*" h="*" >
+                            
+                            <View bg="#f5f5f5" w="*" h="2" />
+                            <text id="wxts" autoLink="web" text="温馨" typeface="sans" margin="15 10" visibility="gone" textColor="#000000" textSize="15sp" layout_gravity="center" />
+                            
+                            <vertical id="parent_" visibility="gone">
+                                
+                                <text text="显示X说明该功能所需的图片不全，点击展开详细图片内容。可查看缺少那些小图片。tips:小图片显示 √ 并不代表此小图片在你的设备上可用，因为分辨率不同可能导致小图片在截图上匹配失败" typeface="sans" textColor="#ff7f27" textSize="12sp" margin="20 0" />
+                                
+                                <ScrollView h="{{1000}}px" id="scrollView" >
+                                    
+                                    <vertical id="content" padding="5" h="auto">
+                                        
+                                    </vertical>
+                                </ScrollView >
+                                
+                            </vertical>
+                            
+                            <vertical id="car" >
+                                <text id="Device_resolution" text="加载中" padding="20 0" />
+                                <text id="dwh" text="加载中" padding="20 0" />
+                                <text id="Tips" bg="#FF69B4" margin="16 0" textStyle="bold" textColor="#ffffff" text="请更换与设备分辨率较为接近的图库" w="auto" />
+                                <Switch
                                 id="full_resolution" padding="16 5"
                                 text="全分辨率兼容模式(任意图库)_beta"
                                 textSize="18sp" />
-
-                            <list id="tukulb" visibility="visible" padding="20 0">
-                                <card w="*" h="30" cardCornerRadius="3dp"
+                                
+                                <list id="tukulb" visibility="visible" padding="20 0">
+                                    <card w="*" h="30" cardCornerRadius="3dp"
                                     cardElevation="0dp" id="tucolos" cardBackgroundColor="{{this.color}}" foreground="?selectableItemBackground">
                                     <text id="tui" text="{{this.name}}" textColor="#222222" textSize="13" margin="5" gravity="center|left" />
                                     <text id="tutext" text="{{this.state}}" margin="10 0 10 0" textColor="#000000" textSize="15" gravity="center|right" />
@@ -99,7 +97,7 @@ let gallery = {
                         </linear>
                     </vertical>
                 </ScrollView>
-            </vertical>, null, true);
+                </vertical>, null, true);
 
         tukuds = dialogs.build({
             type: 'app',
@@ -109,7 +107,9 @@ let gallery = {
 
         tukuui.full_resolution.checked = (setting.full_resolution ? true : false);
         tukuui.full_resolution.setTextColor(colors.parseColor(theme.text));
-        tool.setBackgroundRoundRounded(tukuds.getWindow(), { radius: 0, })
+        tool.setBackgroundRoundRounded(tukuds.getWindow(), {
+            radius: 0,
+        })
 
         tukuds.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         tukuds.show();
@@ -132,7 +132,7 @@ let gallery = {
         tukuui.wxts.setText("1. 图库是什么? \n图库非常重要，由一堆小图片组成，这些在明日计划里是被拿来在大图(屏幕截图)上匹配小图片以便确认按钮位置，所以图库与设备的兼容性决定了某些功能是否能用。\n目前，图库与设备分辨率宽度一致，而高度误差不超过230左右，或高度一致，而宽度误差不超过170左右，基本上是可以使用的，但不排除某些小图片在你的设备上无法匹配，导致某功能失效。" +
             "\n2. 没有适合你的图库？\n参考以下教程动手制作 https://mrjh.flowus.cn。 同时欢迎把图库上传到云端，分享给其他人使用(关于应用-联系作者)。 或使用虚拟机、模拟器等自调适合的分辨率，左边高度×右边宽度，DPI随意" +
             "\n 3. 模拟器如何使用？\n雷电、夜神、逍遥等，分辨率需调为手机版分辨率，分辨率反的说明你设置的是平板版，选择相反分辨率的图库即可，内存请设置4G+，否则明日计划在后台时容易被杀")
-        tukuui.Exit.on("click", function () {
+        tukuui.Exit.on("click", function() {
             if (tukuui.parent_.getVisibility() == 0) {
                 tukuui.parent_.setVisibility(8)
                 tukuui.car.setVisibility(0);
@@ -140,7 +140,7 @@ let gallery = {
             }
             tukuds.dismiss()
         })
-        tukuui.wenn.on('click', function () {
+        tukuui.wenn.on('click', function() {
             if (tukuui.wxts.getHint() == "true") {
                 tukuui.wxts.setVisibility(8)
                 tukuui.wxts.setHint("false");
@@ -188,7 +188,7 @@ let gallery = {
 
 
             if (!图库校验列表) {
-                threads.start(function () {
+                threads.start(function() {
                     图库校验列表 = http.get(url + "tulili/图库列表.json");
                     if (图库校验列表['statusCode'] != 200) {
                         toastLog('请求图库校验文件信息出错:' + 图库校验列表['statusMessage']);
@@ -208,7 +208,7 @@ let gallery = {
                 function jiance(tukuwj) {
                     var nofiles = []
                     for (var i = 0; i < tukuwj.length; i++) {
-                        if (!files.exists(files.path("./mrfz/tuku/") + tukuwj[i])) {
+                        if (!files.exists(this.path + "template/" + tukuwj[i])) {
                             nofiles.push(tukuwj[i])
                         }
                     }
@@ -227,27 +227,27 @@ let gallery = {
                         let on_file = jiance(图库校验列表[i].图片);
                         let AddText = ui.inflate(
                             <vertical w="*" h="auto" margin="20 0 0 0">
-                                <linear id="功能">
-                                    <text id="name"
-                                        margin="0 0"
-                                        textSize="15sp"
-                                        textColor="#1E90FF"
-                                        layout_gravity="center"
-                                        w="auto" />
-
-                                    <img id="files_ok" visibility="visible" src="@drawable/ic_check_black_48dp" tint="green" w="25" h="25" margin="5 0" />
-                                    <img id="files_on" visibility="gone" src="@drawable/ic_clear_black_48dp" tint="red" w="25" h="25" margin="5 0" />
-
-                                </linear>
-                                <list id="on_file" h="*" w="auto" visibility="gone">
-                                    <linear margin="15 0" h="{{65}}px" w="auto">
-                                        <text text="{{this.图片}}" textSize="15" />
-                                        <img id="file_ok" visibility="{{this.状态 ? 'visible' : 'gone' }}" src="@drawable/ic_check_black_48dp" tint="green" w="auto" h="auto" margin="5 0" />
-                                        <img id="file_on" visibility="{{this.状态 ? 'gone' : 'visible' }}" src="@drawable/ic_clear_black_48dp" tint="red" w="auto" h="auto" margin="5 0" />
-
-                                    </linear>
-                                </list>
-                            </vertical>,
+                                                    <linear id="功能">
+                                                        <text id="name"
+                                                        margin="0 0"
+                                                        textSize="15sp"
+                                                        textColor="#1E90FF"
+                                                        layout_gravity="center"
+                                                        w="auto" />
+                                                        
+                                                        <img id="files_ok" visibility="visible" src="@drawable/ic_check_black_48dp" tint="green" w="25" h="25" margin="5 0" />
+                                                        <img id="files_on" visibility="gone" src="@drawable/ic_clear_black_48dp" tint="red" w="25" h="25" margin="5 0" />
+                                                        
+                                                    </linear>
+                                                    <list id="on_file" h="*" w="auto" visibility="gone">
+                                                        <linear margin="15 0" h="{{65}}px" w="auto">
+                                                            <text text="{{this.图片}}" textSize="15" />
+                                                            <img id="file_ok" visibility="{{this.状态 ? 'visible' : 'gone' }}" src="@drawable/ic_check_black_48dp" tint="green" w="auto" h="auto" margin="5 0" />
+                                                            <img id="file_on" visibility="{{this.状态 ? 'gone' : 'visible' }}" src="@drawable/ic_clear_black_48dp" tint="red" w="auto" h="auto" margin="5 0" />
+                                                            
+                                                        </linear>
+                                                    </list>
+                                                </vertical>,
                             tukuui.content
                         );
                         ui.run(() => {
@@ -278,7 +278,7 @@ let gallery = {
                             for (let i = 0; i < ChildCount; i++) {
                                 let ui_ = tukuui.content.getChildAt(i);
                                 ui_.getChildAt(0).removeAllListeners();
-                                ui_.getChildAt(0).click(function (e) {
+                                ui_.getChildAt(0).click(function(e) {
                                     if (e.getChildAt(0).getText().toString().indexOf("◆") > -1) {
                                         ui_.getChildAt(1).setVisibility(0)
                                         let text = e.getChildAt(0).getText().toString().replace("◆", "◇");
@@ -315,7 +315,7 @@ let gallery = {
             for (let a_tuku in tukuss) {
                 tukuss[a_tuku].file_name = tool.formatFileName(tukuss[a_tuku].name);
 
-                let zipfile_name = path_ + "/gallery_list/" + tukuss[a_tuku].file_name;
+                let zipfile_name = this.path + tukuss[a_tuku].file_name;
                 if (files.exists(zipfile_name + ".zip")) {
                     tukuss[a_tuku].state = "使用";
                     tukuss[a_tuku].color = "#ffffff";
@@ -334,7 +334,7 @@ let gallery = {
             tukuui.dwh.setVisibility(0);
             tukuui.Tips.setText(" 请更换与设备分辨率较为接近的图库\n 例：设备分辨率2160x1080可用2340x1080图库 ");
 
-            if(tukuss) tukuui.tukulb.setDataSource(tukuss);
+            if (tukuss) tukuui.tukulb.setDataSource(tukuss);
         } catch (e) {
             console.error(e)
             //tukuds.dismiss()
@@ -358,9 +358,9 @@ let gallery = {
 
                         let gallery_info_json = JSON.parse(
                             files.read(
-                                files.exists(path_ + "/gallery_list/" + item.file_name + "/tuku/gallery_info.json")
-                                    ? path_ + "/gallery_list/" + item.file_name + "/tuku/gallery_info.json"
-                                    : path_ + "/gallery_list/" + item.file_name + "/gallery_info.json",
+                                files.exists(this.path + item.file_name + "/tuku/gallery_info.json") ?
+                                this.path + item.file_name + "/tuku/gallery_info.json" :
+                                this.path + item.file_name + "/gallery_info.json",
                                 (encoding = "utf-8"))
                         );
                         let gallery_info_text = '';
@@ -384,26 +384,26 @@ let gallery = {
                         };
                         let gallery_info_view = ui.inflate(
                             <vertical background="#ffffff" padding="5">
-                                <vertical h="*">
-                                    <card gravity="center_vertical" cardElevation="0dp" margin="0" cardBackgroundColor="#00000000">
-                                        <img src="file://res/icon.png" w="50" h="30" margin="0" layout_gravity="center|left" />
-                                        <text text="图库文件信息" gravity="center|left" textColor="#000000" marginLeft="50" />
-
-                                        <linear gravity="center||right" marginLeft="5">
-                                            <img id="Exit" marginRight="8" src="@drawable/ic_clear_black_48dp" w="35" h="35" tint="#000000" foreground="?attr/selectableItemBackground" clickable="true" />
-                                        </linear>
-                                    </card>
-                                    <View bg="#f5f5f5" w="*" h="1" />
-
-                                    <text id="gallery_info" textSize='15sp' textColor="#000000" margin="20 10 10 0" enabled="true" textIsSelectable="true" focusable="true" longClickable="true" />
-
-                                </vertical>
-                                <View bg="#f5f5f5" w="*" h="1" />
-                                <horizontal w="*" padding="-3" gravity="center_vertical">
-                                    <button text="删除" id="delete" textColor="#F4A460" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
-                                    <button text="使用" id="use" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
-                                </horizontal>
-                            </vertical>, null, false);
+                                                    <vertical h="*">
+                                                        <card gravity="center_vertical" cardElevation="0dp" margin="0" cardBackgroundColor="#00000000">
+                                                            <img src="file://res/icon.png" w="50" h="30" margin="0" layout_gravity="center|left" />
+                                                            <text text="图库文件信息" gravity="center|left" textColor="#000000" marginLeft="50" />
+                                                            
+                                                            <linear gravity="center||right" marginLeft="5">
+                                                                <img id="Exit" marginRight="8" src="@drawable/ic_clear_black_48dp" w="35" h="35" tint="#000000" foreground="?attr/selectableItemBackground" clickable="true" />
+                                                            </linear>
+                                                        </card>
+                                                        <View bg="#f5f5f5" w="*" h="1" />
+                                                        
+                                                        <text id="gallery_info" textSize='15sp' textColor="#000000" margin="20 10 10 0" enabled="true" textIsSelectable="true" focusable="true" longClickable="true" />
+                                                        
+                                                    </vertical>
+                                                    <View bg="#f5f5f5" w="*" h="1" />
+                                                    <horizontal w="*" padding="-3" gravity="center_vertical">
+                                                        <button text="删除" id="delete" textColor="#F4A460" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
+                                                        <button text="使用" id="use" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
+                                                    </horizontal>
+                                                </vertical>, null, false);
 
                         let gallery_info_dialog = dialogs.build({
                             type: "foreground-or-overlay",
@@ -429,8 +429,8 @@ let gallery = {
                         });
                         gallery_info_view.delete.click(() => {
                             gallery_info_dialog.dismiss();
-                            files.remove(path_ + "/gallery_list/" + item.file_name + ".zip");
-                            files.removeDir(path_ + "/gallery_list/" + item.file_name + "/");
+                            files.remove(this.path + item.file_name + ".zip");
+                            files.removeDir(this.path + item.file_name + "/");
 
                             item.state = "下载";
                             itemView.tutext.setText("下载");
@@ -443,7 +443,7 @@ let gallery = {
                     case "更换失败":
                         if (this.更换图库(item.file_name)) {
                             item.state = "使用";
-                            if (files.exists("./mrfz/tuku/gallery_info.json")) {
+                            if (files.exists(this.path + "template/gallery_info.json")) {
                                 item.state = "查看图库文件信息";
                             }
 
@@ -481,7 +481,7 @@ let gallery = {
             });
         })
 
-        tukuui.tukulb.on("item_long_click", function (e, item, i, itemView, listView) {
+        tukuui.tukulb.on("item_long_click", function(e, item, i, itemView, listView) {
             if (itemView.tutext.text() == "下载失败" || itemView.tutext.text() == "使用" || itemView.tutext.text() == "更换失败") {
                 dialogs.build({
                     type: "app",
@@ -489,8 +489,8 @@ let gallery = {
                     positive: "确定",
                     negative: "取消"
                 }).on("positive", () => {
-                    files.remove(path_ + "/gallery_list/" + item.file_name + ".zip");
-                    files.removeDir(path_ + "/gallery_list/" + item.file_name + "/");
+                    files.remove(this.path + item.file_name + ".zip");
+                    files.removeDir(this.path + item.file_name + "/");
                     item.state = "下载";
                     itemView.tutext.setText("下载");
                 }).show()
@@ -500,14 +500,19 @@ let gallery = {
 
     },
     选择图库(tukuss) {
+        if (!this.gallery_info) {
+            return this.更换图库("./lib/data/官方｛2712×1220}.zip");
+        }
         try {
             for (var i in tukuss) {
+                //   console.info(tukuss[i])
+
                 tukuss[i].file_name = tool.formatFileName(tukuss[i].name);
 
                 if (re.exec(height - tukuss[i].h)[0] < 230 && re.exec(width - tukuss[i].w)[0] < 170) {
 
-                    if (files.exists(path_ + "/gallery_list/" + tukuss[i].file_name + ".zip")) {
-                        if (!this.更换图库(path_ + "/gallery_list/" + tukuss[i].file_name + ".zip")) {
+                    if (files.exists(this.path + tukuss[i].file_name + ".zip")) {
+                        if (!this.更换图库(this.path + tukuss[i].file_name + ".zip")) {
                             Dialog_prompt("请确认", "首次运行复制图库失败！可能不支持你手机的分辨率！请打开左边侧滑栏-更换图库手动更换相近分辨率，或使用虚拟机/模拟器更改为手机版分辨率即可")
                             return false
                         } else {
@@ -573,16 +578,16 @@ let gallery = {
         datali.link = link;
         datali.id = "图库";
         datali.prohibit = true;
-        datali.myPath = files.path(path_ + "/gallery_list/");
+        datali.myPath = files.path(this.path);
         datali.fileName = name + ".zip";
         storages.create("Doolu_download").put("data", datali);
-        files.createWithDirs(path_ + "/gallery_list/")
+        files.createWithDirs(datali.myPath)
         engines.execScriptFile("./lib/download.js");
         //监听脚本间广播'download'事件
         if (item != undefined) {
             item.color = "#00bfff";
         }
-        events.broadcast.on("download" + datali.id, function (X) {
+        events.broadcast.on("download" + datali.id, function(X) {
             if (X.name == "进度") {
                 if (progressDialog) {
                     ui.run(() => {
@@ -599,7 +604,7 @@ let gallery = {
                     }
 
                     if (item != undefined) {
-                        setTimeout(function () {
+                        setTimeout(function() {
 
                             if (gallery.更换图库(name)) {
                                 item.state = "查看图库文件信息";
@@ -668,11 +673,11 @@ let gallery = {
         });
     },
     更换图库(filePath) {
-        files.removeDir("./mrfz/tuku");
+        // files.removeDir("./mrfz/tuku");
         if (!filePath.endsWith(".zip")) {
-            filePath = path_ + "/gallery_list/" + filePath + ".zip";
+            filePath = this.path + filePath + ".zip";
         }
-        if (this.unzip_copy(filePath, "./mrfz/")) {
+        if (this.unzip_copy(filePath, this.path)) {
             this.init()
 
             return true;
@@ -696,20 +701,23 @@ let gallery = {
                 console.error("非有效,可识别的压缩包:" + p1)
                 return false;
             }
-
+            //    let fileName = files.getName(p1);
 
             let tuku = zipfile.getFileHeader("tuku/");
 
             if (!tuku) {
-                p2 = p2 + "/tuku";
-                p1 = p1.replace('.zip', '/tuku/');
+                p2 = p2 + "template/";
+                p1 = p1.replace(".zip", '/');
             } else {
-                p1 = p1.replace('.zip', '/');
+                p1 = p1.replace(".zip", '/');
             }
 
             if (zipfile.getFileHeader(tuku ? "tuku/gallery_info.json" : "gallery_info.json")) {
                 console.verbose("解压图库相关信息文件到源目录:" + p1);
                 zipfile.extractFile(tuku ? "tuku/gallery_info.json" : "gallery_info.json", p1);
+                if (tuku) {
+                    files.move(p1 + "tuku/gallery_info.json", p1 + "gallery_info.json");
+                }
             } else {
                 let tips = "该图库未支持明日计划v4.4.6及以上版本";
                 toast(tips);
@@ -717,9 +725,15 @@ let gallery = {
             }
 
 
-            console.verbose("解压图库内所有文件到:" + p2);
-            zipfile.extractAll(p2)
 
+            console.verbose("解压图库内所有文件到:" + p2);
+            zipfile.extractAll(p2);
+
+            if (tuku) {
+                console.verbose("重命名文件夹: tuku");
+                files.removeDir(p2 + "template/")
+                files.rename(p2 + "tuku/", "template")
+            }
             return true;
         } catch (ezip) {
             if (!files.exists(p1)) {

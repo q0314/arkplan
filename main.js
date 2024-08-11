@@ -90,7 +90,7 @@ var setting = tool.readJSON("configure", {
     "proxy_card": true,
     "agent": true,
     "autoAllowScreen": true,
-    "image_monitor": true,
+    "image_monitor": false,
     "image_memory_manage": true,
     "defaultOcr": "XiaoYueOCR",
     "ocrExtend": false,
@@ -129,7 +129,8 @@ var setting = tool.readJSON("configure", {
     "claim_rewards": {
         "daily": true,
         "celebration_sign": false,
-        "mining_operations": false
+        "mining_operations": false,
+        "make_wish": false,
     },
     "行动理智": true,
     "ADB提醒": false,
@@ -203,20 +204,25 @@ if (setting.start == undefined || setting == null) {
 try {
     setting.defaultOcr.length;
     setting["operation_mode"].length;
-    setting.claim_rewards.celebration_sign.length;
     setting.指定关卡.length
 } catch (err) {
-    tool.writeJSON("claim_rewards", {
-        "daily": true,
-        "celebration_sign": false,
-        "mining_operations": false,
-    });
+
     tool.writeJSON("指定关卡", {
         levelAbbreviation: "当前"
     })
     tool.writeJSON("operation_mode", "无障碍");
     tool.writeJSON("defaultOcr", 'XiaoYueOCR');
     setting = tool.readJSON("configure");
+}
+try {
+    setting.claim_rewards.make_wish.length;
+} catch (e) {
+    tool.writeJSON("claim_rewards", {
+        "daily": true,
+        "make_wish": false,
+        "celebration_sign": false,
+        "mining_operations": false,
+    });
 }
 
 
@@ -1671,7 +1677,7 @@ ui.viewpager.setOnPageChangeListener({
         ui.run(() => {
             switch (index) {
                 case 0:
-                    if (!gallery.gallery_info) {
+                  /*  if (!gallery.gallery_info) {
                         items[1].text = "检查图库";
                         items[1].drawable = "@drawable/ic_wallpaper_black_48dp";
                         ui.drawerList.setDataSource(items);
@@ -1680,6 +1686,7 @@ ui.viewpager.setOnPageChangeListener({
                         items[1].drawable = "@drawable/ic_satellite_black_48dp";
                         ui.drawerList.setDataSource(items);
                     }
+                    */
 
                     ui.drawer_.setAlpha(10);
 
@@ -1902,10 +1909,10 @@ var items = [{
         text: "告使用者",
         drawable: "ic_pets_black_48dp",
     },
-    {
+  /*  {
         text: "更换图库",
         drawable: "ic_satellite_black_48dp",
-    },
+    },*/
     {
         text: "官方频道",
         drawable: "ic_games_black_48dp",
@@ -1942,6 +1949,7 @@ ui.drawerList.on("item_click", (item) => {
             return
         case "检查图库":
         case "更换图库":
+            
             if (typeof tukuss != "object") {
                 http.get(server + "tulili/gallery_item.json", {
                     headers: {
@@ -2104,7 +2112,7 @@ ui.implement.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
         };
         tool.writeJSON("执行", Object.values(modeGather)[Executionsettings]);
 
-        if (Executionsettings == 4) {
+        if (Executionsettings == 4 && ui["levelPickText"].getText() != "模块选择") {
             ui["levelPickText"].setText("模块选择");
             let _modData_ = [];
             for (let _modular_ of mod_data) {
@@ -2116,7 +2124,7 @@ ui.implement.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
                 parent.setBackground(createShape(5, 0, 0, [2, theme.bar]));
                 tool.writeJSON("自定义模块", parent.getSelectedItem());
             });
-        } else {
+        } else if (ui["levelPickText"].getText() != "关卡选择") {
             ui["levelPickText"].setText("关卡选择");
 
             change_list(ui.level_pick, level_choices_open, function(parent, view, position, id) {
@@ -2125,6 +2133,24 @@ ui.implement.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
                     levelAbbreviation: parent.getSelectedItem(),
                 };
                 tool.writeJSON("指定关卡", setting.指定关卡);
+                let level_id = level_choices.find(element => element.abbreviation == parent.getSelectedItem());
+                if (level_id && level_id.id == "指定剿灭") {
+                    let _id = Object.values(modeGather).findIndex((text) => text == "剿灭");
+                    if (_id != -1) {
+                        ui.implement.setSelection(_id);
+
+                    }
+                } else {
+
+                    let _id = modeGather[ui.implement.getSelectedItem()];
+                    if (_id != "常规"&& _id != "行动") {
+                        _id = Object.values(modeGather).findIndex((text) => text == "常规");
+                        if (_id != -1) {
+                            ui.implement.setSelection(_id);
+                        }
+                    }
+                }
+
             });
             SE执行 = level_choices_open.indexOf(setting.指定关卡.levelAbbreviation);
             if (SE执行 != -1) {
@@ -2405,7 +2431,7 @@ ui.hkxs.on("check", (checked) => {
 ui.hks1.on("check", (checked) => {
 
     if (checked) {
-        if (!files.exists("./mrfz/tuku/线索_传递.png")) {
+        if (!files.exists(gallery.path + "template/线索_传递.png")) {
             tool.dialog_tips("确认图库", "当前图库不完整,你的设备将无法正常使用明日计划-PRTS辅助的处理线索溢出功能\n请在左边侧滑栏-检查图库进行更换!")
             return;
         };
@@ -2433,7 +2459,7 @@ ui.sqxy.on("check", (checked) => {
 ui.credit_buy.on("click", (view) => {
     setting = tool.readJSON("configure");
     if (view.checked) {
-        if (!files.exists("./mrfz/tuku/行动_普通.png")) {
+        if (!files.exists(gallery.path + "template/行动_普通.png")) {
             tool.dialog_tips("确认图库", "当前图库不完整,你的设备将无法正常使用明日计划-PRTS辅助功能\n请在左边侧滑栏-检查图库进行更换!")
             return;
         }
@@ -2468,7 +2494,7 @@ ui.credit_buy.on("click", (view) => {
 
 ui.gozh.on("click", (view) => {
     if (view.checked) {
-        if (!files.exists("./mrfz/tuku/公招_确认.png")) {
+        if (!files.exists(gallery.path + "template/公招_确认.png")) {
             tool.dialog_tips("确认图库", "当前图库不完整,你的设备将无法正常使用明日计划-PRTS辅助的自动公开招募功能\n请在左边侧滑栏-检查图库进行更换!")
             return;
         }
@@ -2509,7 +2535,7 @@ ui.claim_rewards.click(function(view) {
     if (imgview.attr("src") != "@drawable/ic_keyboard_arrow_up_black_48dp") {
         imgview.attr("src", "@drawable/ic_keyboard_arrow_up_black_48dp");
         for (let i in setting.claim_rewards) {
-            log(i)
+            //   log(i)
             let addview = ui.inflate(
                 '\ <widget-switch-se7en checked="' + setting.claim_rewards[i] + '" hint="' + i + '" text="' + language[i] + '"  textSize="16" textColor="{{theme.text}}" padding="6 6 6 6" />', fatherview)
             fatherview.addView(addview, fatherview.getChildCount());
@@ -2519,7 +2545,7 @@ ui.claim_rewards.click(function(view) {
 
             })
         }
-        
+
         fatherview.getParent().setCardElevation(1);
         //        log(fatherview.getChildAt(1).getChildAt(0))
     } else {
@@ -2650,7 +2676,7 @@ ui.start_run.on("click", function() {
         return
     }
 
-    if (!files.exists("./mrfz/tuku/行动_普通.png")) {
+    if (!files.exists(gallery.path + "template/行动_普通.png")) {
         tool.dialog_tips("确认图库", "当前图库不完整,你的设备将无法正常使用明日计划-PRTS辅助功能\n请在左边侧滑栏-检查图库进行更换!")
         return;
     }
@@ -2761,7 +2787,7 @@ ui.start_floaty.on("click", function() {
             tool.dialog_tips("温馨提示", "请先授予明日计划悬浮窗权限！");
             return;
         }
-        if (!files.exists("./mrfz/tuku/行动_普通.png")) {
+        if (!files.exists(gallery.path + "template/行动_普通.png")) {
             tool.dialog_tips("确认图库", "当前图库不完整,你的设备将无法正常使用明日计划-PRTS辅助功能\n请在左边侧滑栏-检查图库进行更换!")
             return;
         }
@@ -3824,6 +3850,7 @@ function Update_UI(i) {
             change_list(ui.implement, modeGatherText);
 
             SE执行 = Object.values(modeGather).findIndex((text) => text == setting.执行);
+
             if (SE执行 != -1) {
                 ui.implement.setSelection(SE执行);
             }
@@ -3867,11 +3894,28 @@ function Update_UI(i) {
                         levelAbbreviation: parent.getSelectedItem(),
                     };
                     tool.writeJSON("指定关卡", setting.指定关卡);
+                    let level_id = level_choices.find(element => element.abbreviation == parent.getSelectedItem());
+                    if (level_id && level_id.id == "指定剿灭") {
+                        let _id = Object.values(modeGather).findIndex((text) => text == "剿灭");
+                        if (_id != -1) {
+                            ui.implement.setSelection(_id);
+
+                        }
+                    } else {
+                        let _id = modeGather[ui.implement.getSelectedItem()];
+                        if (_id != "常规" && _id != "行动") {
+                            _id = Object.values(modeGather).findIndex((text) => text == "常规");
+                            if (_id != -1) {
+                                ui.implement.setSelection(_id);
+                            }
+                        }
+                    }
+
                 });
                 if (setting.执行 != "自定义模块") {
-                    SE执行 = level_choices_open.indexOf(setting.指定关卡.levelAbbreviation);
-                    if (SE执行 != -1) {
-                        ui.level_pick.setSelection(SE执行);
+                    let _level_id = level_choices_open.indexOf(setting.指定关卡.levelAbbreviation);
+                    if (_level_id != -1) {
+                        ui.level_pick.setSelection(_level_id);
                     };
                 }
             }
@@ -4236,7 +4280,10 @@ function new_ui(name, url) {
             });
             break;
         case '日志':
-            engines.execScript("journal_ui", variable + "require('./activity/journal.js')");
+            engines.execScriptFile("./activity/journal.js", {
+                path: files.path('./activity/'),
+            });
+          //  engines.execScript("journal_ui", variable + "require('./activity/journal.js')");
             //engines.execScript("journal_ui", java.lang.String.format("'ui';  let theme = storages.create('configure').get('theme_colors');require('./activity/journal.js');"));
             break;
         case 'q群/频道':
