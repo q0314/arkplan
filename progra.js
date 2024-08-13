@@ -92,7 +92,7 @@ new ITimg.Prepare({}, {
     filter_w: zox(20),
     filter_h: zoy(20),
     saveSmallImg: true,
-    scale: 0.9,
+    scale: 1,
     visualization: setting.调试,
 }, setting);
 

@@ -18,10 +18,10 @@ importClass(com.google.android.material.bottomsheet.BottomSheetBehavior);
 importClass(android.view.ContextThemeWrapper);
 importClass(android.content.res.Resources);
 
-var apk_path = "../lib/java/WheelPicker.apk";
+var apk_path = "./lib/java/WheelPicker.apk";
 if (!files.exists(apk_path)) {
-    apk_path = "./lib/java/WheelPicker.apk";
-};
+    apk_path = "../lib/java/WheelPicker.apk";
+}
 var assetManagerCls = java.lang.Class.forName("android.content.res.AssetManager", true, context.getClass().getClassLoader());
 assetManagerObj = assetManagerCls.newInstance();
 addAssetPathMethod = assetManagerCls.getDeclaredMethod("addAssetPath", java.lang.String);

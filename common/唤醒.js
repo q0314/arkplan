@@ -263,7 +263,6 @@ let 唤醒 = {
     开始唤醒: function() {
         console.info("---开始唤醒---");
         tool.Floaty_emit("展示文本", "状态", "状态：等待开始游戏");
-        toastLog("等待加载登录");
         //开始唤醒
         //   while (true) {
         sleep(1000);
@@ -287,6 +286,7 @@ let 唤醒 = {
                 return false;
                 //  break;
             }
+             
             if (getpackage == "com.hypergryph.arknights.bilibili") {
                 tool.Floaty_emit("展示文本", "状态", "状态：当前渠道为B服，等待");
                 toastLog("当前渠道为B服，请等待")

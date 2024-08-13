@@ -104,9 +104,10 @@ function 任务() {
         }
         if (!ITimg.matchFeatures("返回", {
                 action: 4,
-                area: "上半屏",
+                area: 1,
                 timing: 1500,
                 nods: 1000,
+                scale:1,
             })) {
             if (ITimg.matchFeatures("获得物资", {
                     action: 0,
@@ -116,9 +117,10 @@ function 任务() {
 
                 if (!ITimg.matchFeatures("返回", {
                         action: 4,
-                        area: "上半屏",
+                        area: 1,
                         timing: 1500,
                         nods: 1000,
+                        scale:1,
                     })) {
                     toastLog("找不到返回键");
                 }

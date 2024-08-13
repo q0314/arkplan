@@ -22,31 +22,38 @@ let 基建任务 = {
                 action: 0,
                 nods: 1000,
                 timing: 1500,
-                area: "左半屏",
+                scale:1,
+                area: 1,
             }) || ITimg.matchFeatures("导航", {
                 action: 0,
                 timing: 1500,
-                area: "上半屏",
+                area: 1,
+                picture_failed_further:true,
             }) || ITimg.matchFeatures("导航2", {
                 action: 0,
                 timing: 1500,
                 nods: 1000,
-                area: "左半屏",
+                area: 1,
+                scale:1,
             }) || ITimg.matchFeatures("导航2", {
                 action: 0,
                 timing: 1500,
-                area: "上半屏",
+                area: 1,
+                picture_failed_further:true,
             })) {
 
             if (!ITimg.matchFeatures("导航_基建", {
                     action: 0,
                     timing: 500,
                     nods: 1000,
-                    area: "上半屏",
+                    area: 12,
+                    scale:1,
                 }) && !ITimg.matchFeatures("导航_基建", {
                     action: 0,
                     timing: 500,
-                    area: "上半屏",
+                    area: 12,
+                    scale:1,
+                    picture_failed_further:true,
                 })) {
                 toastLog("没有找到导航_基建，无法执行基建任务");
                 return false;

@@ -720,7 +720,7 @@ function modular_id(file) {
             if (route_c === null) {
                 tips = "模块拒绝响应";
                 console.error(tips);
-                toast(tips)
+                snakebar(tips);
                 return;
             }
         } catch (err) {

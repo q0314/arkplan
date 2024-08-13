@@ -135,7 +135,7 @@ ui.layout(
                         </frame>
                     </card>
                     <card w="*" id="indx2" h="40" gravity="center_vertical"  >
-                        <widget-switch-se7en id="proxy_card_check" text="剿灭优先使用代理卡" checked="false" padding="15 5 15 5" textSize="18sp"
+                        <widget-switch-se7en id="proxy_card_check" text="剿灭优先使用代理卡" checked="{{setting.proxy_card}}" padding="15 5 15 5" textSize="18sp"
                         margin="10 0" thumbSize='24' radius='24' />
                         
                     </card>
@@ -887,8 +887,12 @@ ui.setScreenMetrics_.on("click", () => {
 });
 //图片资源管理
 ui.image_memory_manage.on("click", (view) => {
-    toastLog("图片管理核心功能，切勿关闭");
-    //  tool.writeJSON("image_memory_manage", view.checked);
+    if (!view.checked) {
+        view.checked = true;
+        toastLog("图片管理核心功能，切勿关闭");
+        return
+    }
+    tool.writeJSON("image_memory_manage", view.checked);
 });
 ui.image_memory_manage_.on("click", () => {
     ui.image_memory_manage.performClick();
@@ -1106,7 +1110,7 @@ ui.xpyx.on("click", (view) => {
                 });
                 try {
                     let sh_root_result = shell("sh " + sh_path, true)
-                    if (sh_root_result.code == 0 || (sh_root_result.code == 139 && sh_root_result.error == "Segmentation fault")) {
+                    if (sh_root_result.code == 0 || (sh_root_result.code == 139 && sh_root_result.error.indexOf("Segmentation fault") != -1)) {
                         files.remove(sh_path);
                         toastLog("root权限测试打开屏幕成功")
                         sh_path = true;
@@ -1132,7 +1136,7 @@ ui.xpyx.on("click", (view) => {
                         let sh_adb_result = shell("sh " + sh_path, {
                             adb: true,
                         });
-                        if (sh_root_result.code == 0 || (sh_root_result.code == 139 && sh_root_result.error == "Segmentation fault")) {
+                        if (sh_adb_result.code == 0 || (sh_adb_result.code == 139 && sh_adb_result.error.indexOf("Segmentation fault") != -1)) {
 
                             toastLog("adb权限测试打开屏幕成功")
                         } else {

@@ -76,7 +76,7 @@ function screen(value) {
     } else {
         try {
             let sh_result1 = shell(cmd, true)
-            if (sh_result1.code == 0 || (sh_root_result1.code == 139 && sh_root_result1.error == "Segmentation fault")) {
+            if (sh_result1.code == 0 || (sh_root_result1.code == 139 && sh_root_result1.error.indexOf("Segmentation fault") != -1)) {
                 set_up.mode = "root";
                 return true;
             } else {
@@ -95,7 +95,7 @@ function screen(value) {
             let sh_result = shell(cmd, {
                 adb: true,
             })
-            if (sh_root_result.code == 0 || (sh_root_result.code == 139 && sh_root_result.error == "Segmentation fault")) {
+            if (sh_root_result.code == 0 || (sh_root_result.code == 139 && sh_root_result.error.indexOf("Segmentation fault") != -1)) {
                 set_up.mode = "adb";
 
                 return true;

@@ -50,10 +50,20 @@ let path = context.getExternalFilesDir(null).getAbsolutePath() + '/';
 setTimeout(function() {
     ui.finish();
 }, 1500);
-files.ensureDir(path+"logs/");
+files.ensureDir(path + "logs/");
 console.setGlobalLogConfig({
-    "file": path +"logs/" + _proj_def_n + "_log.txt"
+    "file": path + "logs/" + _proj_def_n + "_log.txt"
 });
+if (app.autojs.versionCode < 8082200) {
+    let url = "https://gitee.com/q0314/arkplan/releases/"
+    let tips = "很抱歉，当前项目不再支持明日计划纯32位架构\n请安装明日计划通用版本应用，" + url;
+    toast(tips)
+    console.error(tips)
+    setClip(url);
+    app.openUrl(url)
+    exit();
+
+}
 
 threads.start(function() {
     if (device.sdkInt < 24) {
