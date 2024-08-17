@@ -96,7 +96,16 @@ let 信用处理 = {
             if (ITimg.matchFeatures("收取信用", {
                     action: 0,
                     timing: 3000,
-                    area: "上半屏",
+                    area: 2,
+                    threshold:0.85,
+                    nods:1000,
+                })||ITimg.matchFeatures("收取信用", {
+                    action: 0,
+                    timing: 3000,
+                    area: 2,
+                    threshold:0.85,
+                    matcher:2,
+                    picture_failed_further:true,
                 })) {
                 while (等待提交反馈至神经()) {
                     sleep(500);

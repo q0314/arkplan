@@ -655,7 +655,7 @@ function 基建() {
     }
     if (公招 && 公招.recruit_tag[0] && 公招.recruit_tag[0].星级) {
         let tag_json = '';
-        for (let tag_ of recruit_tag) {
+        for (let tag_ of 公招.recruit_tag) {
             tag_json += tag_.名称 + " 标签，" + tag_.星级 + ", "
         }
         sleep(1000);

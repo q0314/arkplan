@@ -230,11 +230,11 @@ var 公招 = {
                             timing: 3000,
                         });
                         if (ITimg.matchFeatures("导航", {
-                                action: 0,
+                                action: 5,
                                 timing: 1000,
                                 area: 1,
                             }) || ITimg.matchFeatures("导航2", {
-                                action: 0,
+                                action: 5,
                                 timing: 1000,
                                 area: 1,
                                 refresh: false,
@@ -282,11 +282,11 @@ var 公招 = {
                                     }
 
                                     if (ITimg.matchFeatures("导航", {
-                                            action: 0,
+                                            action: 5,
                                             timing: 1000,
                                             area: 1,
                                         }) || ITimg.matchFeatures("导航2", {
-                                            action: 0,
+                                            action: 5,
                                             timing: 1000,
                                             area: 1,
                                             refresh: false,

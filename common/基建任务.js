@@ -257,24 +257,26 @@ let 基建任务 = {
             });
             ITimg.matchFeatures("无人机_最多", {
                 action: 0,
-                area: "右半屏",
+                area: 24,
                 timing: 1000,
             });
             if (!ITimg.matchFeatures("无人机_确定", {
                     action: 0,
-                    area: "右半屏",
+                    area: 24,
                     timing: 3000,
+                    refresh:false,
                 })) {
                 ITimg.matchFeatures("无人机_确定", {
                     action: 0,
-                    area: "右半屏",
+                    area: 4,
+                    matcher:2,
                     timing: 3000,
                     threshold: 0.75,
                 })
             }
             ITimg.matchFeatures("无人机_收取", {
                 action: 0,
-                area: "右半屏",
+                area: 4,
                 timing: 2000,
             });
             ITimg.matchFeatures("返回", {
@@ -287,6 +289,7 @@ let 基建任务 = {
                 action: 4,
                 timing: 2000,
                 area: 1,
+                refresh:false,
             });
             //防止偶然点击返回方舟无反应的情况
             if (ITimg.matchFeatures("制造站_制造中", {
@@ -378,11 +381,11 @@ let 基建任务 = {
                         action: 0,
                         timing: 1000,
                         nods: 1000,
-                        area: 34,
+                        area: 3,
                     }) && !ITimg.matchFeatures("无人机_协助", {
                         action: 0,
                         timing: 1000,
-                        area: 34,
+                        area: 4,
                         log_policy: true,
                     }) && (this.drone_assistance == 3)) {
                     if ((ITimg.matchFeatures("贸易站_获取中", {
@@ -399,11 +402,11 @@ let 基建任务 = {
                             action: 0,
                             timing: 1000,
                             nods: 1000,
-                            area: 34,
+                            area: 3,
                         }) || ITimg.matchFeatures("无人机_协助", {
                             action: 0,
                             timing: 1000,
-                            area: 34,
+                            area: 4,
                             log_policy: true,
                         }));
                     }
@@ -411,7 +414,7 @@ let 基建任务 = {
                 ITimg.matchFeatures("无人机_最多", {
                     action: 0,
                     timing: 200,
-                    area: "右半屏",
+                    area: 24,
                 });
                 if (drone_assistance == 1) {
                     ITimg.matchFeatures("无人机_减少", {
@@ -422,11 +425,11 @@ let 基建任务 = {
                 (ITimg.matchFeatures("无人机_确定", {
                     action: 0,
                     timing: 2000,
-                    area: "右半屏",
+                    area: 4,
                 }) || ITimg.matchFeatures("无人机_确定", {
                     action: 0,
                     timing: 2000,
-                    area: "右半屏",
+                    area: 4,
                     threshold: 0.75,
                 }))
 
@@ -442,6 +445,7 @@ let 基建任务 = {
                 action: 4,
                 timing: 2000,
                 area: 1,
+                refresh:false,
             });
 
             if (ITimg.matchFeatures("贸易站_获取中", {
@@ -494,23 +498,32 @@ let 基建任务 = {
             area: 2,
         });
 
-        if (!ITimg.matchFeatures("基建_线索", {
-                action: 0,
-                timing: 1500,
-                area: 2,
-            }) && !ITimg.matchFeatures("基建_会客室", {
-                action: 0,
-                timing: 1500,
-                area: 2,
-                threshold: 0.9,
-            }) && !ITimg.matchFeatures("基建_线索", {
-                action: 0,
-                timing: 1500,
-                area: 2,
-                resolution: true,
-                log_policy: true,
-                threshold: 0.70,
-            })) {
+        let temporary_xy = ITimg.matchFeatures("基建_线索", {
+            action: 5,
+            timing: 1500,
+            area: 2,
+        }) || ITimg.matchFeatures("基建_会客室", {
+            action: 5,
+            timing: 1500,
+            area: 2,
+            threshold: 0.9,
+        }) || ITimg.matchFeatures("基建_线索", {
+            action: 5,
+            timing: 1500,
+            area: 2,
+            resolution: true,
+            log_policy: true,
+            threshold: 0.70,
+        })
+        if (temporary_xy) {
+            temporary_xy = [temporary_xy.left + temporary_xy.w / 2, temporary_xy.bottom]
+            MyAutomator.click.apply(MyAutomator, temporary_xy);
+            sleep(200);
+            MyAutomator.click.apply(MyAutomator, temporary_xy);
+            sleep(200);
+            MyAutomator.click.apply(MyAutomator, temporary_xy);
+
+        } else {
             toastLog("没有匹配到 基建_线索.png 尝试放大基建主页面重新进行匹配");
             this.放大基建界面();
             sleep(50);
@@ -862,7 +875,6 @@ let 基建任务 = {
                     action: 0,
                     timing: 3000,
                     area: 2,
-                    refresh: false,
                 }))
 
             }
@@ -1080,7 +1092,7 @@ let 基建任务 = {
             action: 5,
             area: 2,
             refresh: false,
-            matcher:2,
+            matcher: 2,
         }))
         if (!temporary_xy) {
             toast("没有找到导航_任务，无法执行好友访问");
@@ -1140,7 +1152,7 @@ let 基建任务 = {
                 area: 4,
                 timing: 8000,
                 scale: 1,
-                refresh:false,
+                refresh: false,
             })) {
             function obtain_access_infrastructure() {
                 let button_list = ITimg.contour({
