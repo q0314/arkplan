@@ -349,8 +349,12 @@ function 自定义() {
                 break;
             }
         }
-
-        if (customize) {
+        if (!customize) {
+            tips ="未符合的自定义模块名称";
+            toast(tips);
+            console.error(tips);
+            return false;
+        }
             require(customize.path).main_entrance({
                 'cwd': customize.path.replace(files.getName(customize.path), ""),
                 'getSource': customize.path,
@@ -360,7 +364,7 @@ function 自定义() {
                 'startup_mode': 程序,
 
             });
-        };
+        
 
     } catch (e) {
         let tips = "自定义执行模式模块发生异常，，请检查:\n" + $debug.getStackTrace(e);
@@ -368,7 +372,7 @@ function 自定义() {
         toast(tips);
         tool.Floaty_emit("展示文本", "状态", "状态：自定义模块发生异常");
         tool.Floaty_emit("暂停", "结束程序");
-    };
+    }
 
 }
 
@@ -681,7 +685,7 @@ function 等待提交反馈至神经() {
     sleep(200);
     let staging_result = ITimg.ocr("正在提交反馈至神经", {
         action: 6,
-        area: "下半屏",
+        area: 34,
         part: true,
         threshold: 0.9,
         //    saveSmallImg:false,

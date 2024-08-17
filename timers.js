@@ -56,23 +56,23 @@ function 判断() {
         toast("定时任务启动失败，无障碍服务异常！请检查是否正常开启！");
         console.error("定时任务启动失败，无障碍服务异常！请检查是否正常开启！");
         return;
-    };
-
+    }
+/*
     if (!files.exists("./mrfz/tuku/导航.png")) {
         toast("定时任务启动失败，图库缺失,请在主页左上角重新选择!")
         console.error("定时任务启动失败，图库缺失,请在主页左上角重新选择!")
         return;
-    }
+    }*/
     if (setting.设置电量) {
         if (!device.isCharging() && device.getBattery() < setting.电量) {
             toast("定时任务启动失败，电量低于设定值" + setting.电量 + "%且未充电");
             console.error("定时任务启动失败，电量低于设定值" + setting.电量 + "%且未充电");
             if (setting.震动) {
                 device.vibrate(2000);
-            };
+            }
             return;
-        };
-    };
+        }
+    }
 
 
     log("尝试唤醒设备");
@@ -90,7 +90,7 @@ function 判断() {
         } else {
             device.wakeUp();
         }
-    };
+    }
     if (setting.解锁屏幕) {
 
         log('======解锁屏幕======')
@@ -252,7 +252,7 @@ function 判断() {
                 }
             }
             engines.execScript("Screen operation", "if(files.exists(files.path('./modules/screen.js'))){require('./modules/screen.js').mask()}else{require('./screen.js').mask()}");
-        };
+        }
     }, 5000)
     setTimeout(function () {
         if (Timing_data.shijian.indexOf("单次") != -1) {
@@ -264,7 +264,7 @@ function 判断() {
         exit();
     }, 30000);
 
-};
+}
 /*
 threads.start(function(){
 engines.execScript("new Timers", "var Config=engines.myEngine().execArgv;var id_str = Config.id;eval(Config.load)();", {

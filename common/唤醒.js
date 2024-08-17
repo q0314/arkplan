@@ -201,11 +201,11 @@ let 唤醒 = {
                         action: 0,
                         timing: 1000,
                         area: 1,
-                        scale: 1,
+                        scale: 1,refresh:false,
                     })) {
                     return false;
                 }
-            }else{
+            } else {
                 return false;
             }
             if (setting.调试) {
@@ -226,21 +226,26 @@ let 唤醒 = {
                 area: 1,
                 action: 0,
                 scale: 1,
+                refresh:false,
             })) {
             tool.Floaty_emit("面板", "隐藏");
             sleep(1000);
 
             while (true) {
+             
+            
                 if (!ITimg.matchFeatures("导航_首页", {
                         timing: 1000,
                         action: 0,
                         area: 1,
+                        refresh:false,
                     })) {
                     ITimg.picture("返回", {
                         timing: 1000,
                         action: 0,
                         area: 1,
-                        scale:1,
+                        scale: 1,
+                        refresh:false,
                     })
                 }
                 tool.Floaty_emit("面板", "展开");
@@ -286,7 +291,7 @@ let 唤醒 = {
                 return false;
                 //  break;
             }
-             
+
             if (getpackage == "com.hypergryph.arknights.bilibili") {
                 tool.Floaty_emit("展示文本", "状态", "状态：当前渠道为B服，等待");
                 toastLog("当前渠道为B服，请等待")
@@ -320,10 +325,22 @@ let 唤醒 = {
 
         tool.Floaty_emit("展示文本", "状态", "状态：取消公告签到通知");
         console.info("---取消公告---");
+      /*  let _sceneFeatures = $images.detectAndComputeFeatures(ITimg.captureScreen_(), {
+            region: ITimg.regional_division(2),
+        });
+        */
         let _close = ITimg.matchFeatures("关闭公告", {
             action: 5,
             area: 2,
-        })
+           // imageFeatures: _sceneFeatures,
+        }) || ITimg.matchFeatures("关闭公告", {
+            action: 5,
+            area: 2,
+            matcher: 2,
+            refresh:false,
+           // imageFeatures: _sceneFeatures,
+        });
+      //  _sceneFeatures.recycle();
         if (_close) {
             while (true) {
                 //长时间持有图片.需手动释放
@@ -349,7 +366,7 @@ let 唤醒 = {
                     picture: images.copy(rewardimg),
                     action: 1,
                     area: 12,
-                    picture_failed_further:true,
+                    picture_failed_further: true,
                 })
                 if (!this.frequency || ITimg.matchFeatures("关闭公告", {
                         timing: 1500,
@@ -414,6 +431,7 @@ let 唤醒 = {
         }
         // console.trace(_action)
         // let _max = 2;
+        
         if (ITimg.ocr("终端", {
                 timing: _timing,
                 area: 2,
@@ -428,6 +446,7 @@ let 唤醒 = {
                 action: _action,
                 refresh: false,
                 saveSmallImg: "主页_当前",
+                imageFeatures: _sceneFeatures,
                 picture_failed_further: true,
             }) || ITimg.ocr("理智/", {
                 timing: _timing,
@@ -435,11 +454,14 @@ let 唤醒 = {
                 action: _action,
                 refresh: false,
                 part: true,
+                refresh:false,
                 saveSmallImg: "主页_理智数",
                 picture_failed_further: true,
             })) {
+
             return true
         }
+
 
         return false;
     },

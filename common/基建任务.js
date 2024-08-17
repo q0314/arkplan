@@ -13,6 +13,7 @@ let 基建任务 = {
                 timing: 3000,
                 area: 4,
                 threshold: 0.65,
+                refresh: false,
                 saveSmallImg: "主页_基建",
                 picture_failed_further: true,
             })) {
@@ -22,24 +23,27 @@ let 基建任务 = {
                 action: 0,
                 nods: 1000,
                 timing: 1500,
-                scale:1,
+                scale: 1,
                 area: 1,
             }) || ITimg.matchFeatures("导航", {
                 action: 0,
                 timing: 1500,
                 area: 1,
-                picture_failed_further:true,
+                refresh: false,
+                picture_failed_further: true,
             }) || ITimg.matchFeatures("导航2", {
                 action: 0,
                 timing: 1500,
                 nods: 1000,
                 area: 1,
-                scale:1,
+                scale: 1,
+                refresh: false,
             }) || ITimg.matchFeatures("导航2", {
                 action: 0,
                 timing: 1500,
                 area: 1,
-                picture_failed_further:true,
+                refresh: false,
+                picture_failed_further: true,
             })) {
 
             if (!ITimg.matchFeatures("导航_基建", {
@@ -47,13 +51,14 @@ let 基建任务 = {
                     timing: 500,
                     nods: 1000,
                     area: 12,
-                    scale:1,
+                    scale: 1,
                 }) && !ITimg.matchFeatures("导航_基建", {
                     action: 0,
                     timing: 500,
                     area: 12,
-                    scale:1,
-                    picture_failed_further:true,
+                    matcher: 2,
+                    refresh: false,
+                    picture_failed_further: true,
                 })) {
                 toastLog("没有找到导航_基建，无法执行基建任务");
                 return false;
@@ -124,32 +129,32 @@ let 基建任务 = {
         if (ITimg.matchFeatures("基建_可收获", {
                 action: 0,
                 timing: 2000,
-                area: "左半屏",
+                area: 34,
             })) {
             to_do++;
         }
         if (ITimg.matchFeatures("基建_订单交付", {
                 action: 0,
                 timing: 2000,
-                area: "左半屏",
+                area: 3,
             })) {
             to_do++;
-        };
+        }
         sleep(1000);
         if (ITimg.matchFeatures("基建_订单交付", {
                 action: 0,
                 timing: 2000,
-                area: "左半屏",
+                area: 3,
             })) {
             to_do++;
-        };
+        }
         if (ITimg.matchFeatures("基建_信赖", {
                 action: 0,
                 timing: 3000,
-                area: "左半屏",
+                area: 3,
             })) {
             to_do++;
-        };
+        }
         this.fatigue_state = ITimg.matchFeatures("基建_干员疲劳", {
             timing: 500,
             area: 3,
@@ -247,7 +252,7 @@ let 基建任务 = {
 
             ITimg.matchFeatures("无人机_加速", {
                 action: 0,
-                area: "右半屏",
+                area: 4,
                 timing: 2000,
             });
             ITimg.matchFeatures("无人机_最多", {
@@ -275,13 +280,13 @@ let 基建任务 = {
             ITimg.matchFeatures("返回", {
                 action: 4,
                 timing: 1500,
-                area: "上半屏",
+                area: 1,
             });
 
             ITimg.matchFeatures("返回", {
                 action: 4,
                 timing: 2000,
-                area: "上半屏",
+                area: 1,
             });
             //防止偶然点击返回方舟无反应的情况
             if (ITimg.matchFeatures("制造站_制造中", {
@@ -291,7 +296,7 @@ let 基建任务 = {
                 ITimg.matchFeatures("返回", {
                     action: 4,
                     timing: 2000,
-                    area: "上半屏",
+                    area: 1,
                 });
             }
 
@@ -431,12 +436,12 @@ let 基建任务 = {
             ITimg.matchFeatures("返回", {
                 action: 4,
                 timing: 1500,
-                area: "上半屏",
+                area: 1,
             });
             ITimg.matchFeatures("返回", {
                 action: 4,
                 timing: 2000,
-                area: "上半屏",
+                area: 1,
             });
 
             if (ITimg.matchFeatures("贸易站_获取中", {
@@ -446,17 +451,17 @@ let 基建任务 = {
                 ITimg.matchFeatures("返回", {
                     action: 4,
                     timing: 2000,
-                    area: "上半屏",
+                    area: 1,
                 });
             }
             if (ITimg.matchFeatures("基建_蓝色铃铛", {
                     action: 0,
                     timing: 1500,
-                    area: "右半屏",
+                    area: 2,
                 }) || ITimg.matchFeatures("基建_蓝色铃铛", {
                     action: 0,
                     timing: 1500,
-                    area: "上半屏",
+                    area: 2,
                     threshold: 0.75,
                 })) {
                 ITimg.matchFeatures("基建_订单交付", {
@@ -481,12 +486,12 @@ let 基建任务 = {
         ITimg.matchFeatures("基建_蓝色铃铛", {
             action: 0,
             timing: 1500,
-            area: "右半屏",
+            area: 2,
         });
         ITimg.matchFeatures("基建_铃铛", {
             action: 0,
             timing: 2000,
-            area: "右半屏",
+            area: 2,
         });
 
         if (!ITimg.matchFeatures("基建_线索", {
@@ -572,12 +577,14 @@ let 基建任务 = {
         if (!ITimg.matchFeatures("线索_会客室", {
                 action: 0,
                 timing: 2000,
-                area: "下半屏",
+                area: 3,
             }) && !ITimg.matchFeatures("线索_会客室", {
                 action: 0,
                 timing: 2000,
-                area: "左半屏",
+                area: 3,
                 threshold: 0.75,
+                matcher: 2,
+                refresh: false,
             })) {
 
             toastLog("没有匹配到 线索_会客室.png , 无法处理线索! ");
@@ -586,49 +593,54 @@ let 基建任务 = {
                 action: 4,
                 timing: 1500,
                 nods: 500,
-                area: "左半屏",
+                area: 1,
             }) || ITimg.matchFeatures("返回", {
                 action: 4,
                 timing: 1500,
-                area: "上半屏",
+                area: 1,
                 threshold: 0.75,
             }));
             return false;
         }
 
-        (ITimg.matchFeatures("线索_会客室", {
+        ITimg.matchFeatures("线索_会客室", {
             action: 0,
             timing: 2000,
-            area: "下半屏",
+            area: 3,
         }) || ITimg.matchFeatures("线索_会客室", {
             action: 0,
             timing: 2000,
-            area: "左半屏",
-        }));
-
+            area: 3,
+            threshold: 0.75,
+            matcher: 2,
+            refresh: false,
+        })
         sleep(2000);
         if (ITimg.matchFeatures("线索_交流", {
                 timing: 3000,
-                area: "左半屏",
+                area: 1,
             }) || ITimg.matchFeatures("线索_交流", {
                 action: 0,
                 timing: 3000,
-                area: "上半屏",
+                area: 1,
+                matcher: 2,
                 threshold: 0.75,
+                refresh: false,
             })) {
             if (!ITimg.matchFeatures("返回", {
                     action: 4,
                     timing: 1500,
                     nods: 500,
-                    area: "左半屏",
+                    area: 1,
                 }) && !ITimg.matchFeatures("返回", {
                     action: 4,
                     timing: 1500,
-                    area: "上半屏",
+                    area: 1,
                     threshold: 0.75,
+                    refresh: false,
                 })) {
                 toastLog("找不到返回键");
-            };
+            }
         }
         //处理即将溢出线索
         if (setting.处理线索溢出 == "线索待处理") {
@@ -643,6 +655,7 @@ let 基建任务 = {
                     timing: 3000,
                     area: "右半屏",
                     threshold: 0.75,
+                    refresh: false,
                 })) {
                 sleep(1000)
                 //将线索集合
@@ -705,7 +718,7 @@ let 基建任务 = {
                 if (ITimg.ocr("传递奖励", {
                         action: 5,
                         part: true,
-                        area: "右半屏",
+                        area: 24,
                         correction_path: "信用",
                     }) || ITimg.ocr("20", {
                         action: 5,
@@ -805,6 +818,7 @@ let 基建任务 = {
                     action: 0,
                     timing: 2000,
                     area: 4,
+                    refresh: false,
                 });
                 ITimg.matchFeatures("关闭公告", {
                     action: 0,
@@ -815,16 +829,16 @@ let 基建任务 = {
             }
 
         }
-        
+
         sleep(400);
-        click(height/2,width - width/4);
+        click(height / 2, width - width / 4);
         sleep(800);
         //放入线索
         let _sceneImg = ITimg.captureScreen_();
-        
+
         let _sceneFeatures = $images.detectAndComputeFeatures(_sceneImg);
-        
-        !_sceneImg.isRecycled()&&_sceneImg.recycle()
+
+        !_sceneImg.isRecycled() && _sceneImg.recycle()
         for (let i = 1; i <= 7; i++) {
             if (ITimg.matchFeatures("线索" + i.toString(), {
                     action: 0,
@@ -832,7 +846,7 @@ let 基建任务 = {
                     scale: 1,
                     matcher: 2,
                     imageFeatures: _sceneFeatures,
-                })||ITimg.matchFeatures("线索" + i.toString(), {
+                }) || ITimg.matchFeatures("线索" + i.toString(), {
                     action: 0,
                     timing: 1000,
                     scale: 1,
@@ -848,6 +862,7 @@ let 基建任务 = {
                     action: 0,
                     timing: 3000,
                     area: 2,
+                    refresh: false,
                 }))
 
             }
@@ -977,7 +992,7 @@ let 基建任务 = {
             ITimg.matchFeatures("基建", {
                 action: 0,
                 timing: 3000,
-                area: "右半屏",
+                area: 4,
             })
             sleep(100);
             if (ITimg.matchFeatures("返回", {
@@ -995,11 +1010,12 @@ let 基建任务 = {
                 if (ITimg.matchFeatures("导航", {
                         action: 0,
                         timing: 1500,
-                        area: "左半屏",
+                        area: 1,
                     }) || ITimg.matchFeatures("导航2", {
                         action: 0,
                         timing: 1500,
-                        area: "左半屏",
+                        area: 1,
+                        refresh: false,
                     })) {
                     if (ITimg.matchFeatures("导航_基建", {
                             action: 0,
@@ -1048,21 +1064,23 @@ let 基建任务 = {
         (ITimg.matchFeatures("导航", {
             action: 0,
             timing: 1000,
-            area: "左半屏",
+            area: 1,
         }) || ITimg.matchFeatures("导航2", {
             action: 0,
             timing: 1000,
-            area: "左半屏",
+            area: 1,
+            refresh: false,
         }))
-
         sleep(200);
         temporary_xy = (ITimg.matchFeatures("导航_任务", {
             action: 5,
             nods: 2000,
-            area: "右半屏",
+            area: 2,
         }) || ITimg.matchFeatures("导航_任务", {
             action: 5,
-            area: "右半屏",
+            area: 2,
+            refresh: false,
+            matcher:2,
         }))
         if (!temporary_xy) {
             toast("没有找到导航_任务，无法执行好友访问");
@@ -1081,11 +1099,11 @@ let 基建任务 = {
             action: 0,
             timing: 6000,
             nods: 500,
-            area: "右半屏",
+            area: 4,
         }) || ITimg.matchFeatures("基建_离开", {
             action: 0,
             timing: 6000,
-            area: "右半屏",
+            area: 4,
         }))
 
 
@@ -1114,11 +1132,15 @@ let 基建任务 = {
         if (!ITimg.matchFeatures("访问基建", {
                 action: 0,
                 timing: 8000,
-                nods: 100,
+                matcher: 2,
+                nods: 200,
+                area: 4,
             }) && !ITimg.matchFeatures("访问基建", {
                 action: 0,
-                area: 34,
+                area: 4,
                 timing: 8000,
+                scale: 1,
+                refresh:false,
             })) {
             function obtain_access_infrastructure() {
                 let button_list = ITimg.contour({

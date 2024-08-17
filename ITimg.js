@@ -256,7 +256,7 @@ function 申请截图() {
                         console.info("允许请求截图权限控件信息:")
                         console.info(beginBtn)
                         beginBtn.click();
-                    };
+                    }
                 })
 
             } else {
@@ -348,7 +348,7 @@ function 申请截图() {
 
         ITimg.results--;
     }
-};
+}
 
 /*
 function rootgetScreen() {
@@ -465,7 +465,7 @@ function scaleSet(splitScreen, tuku_de, value) {
 function 图像匹配(picture, list) {
     if (!list) {
         list = {};
-    };
+    }
 
     list = {
         action: list.action,
@@ -626,7 +626,7 @@ function 图像匹配(picture, list) {
 
         return false;
 
-    };
+    }
 }
 
 /**
@@ -655,6 +655,7 @@ function matchFeatures(picture, list) {
         picture_failed_further: list.picture_failed_further,
         scale: list.scale || ITimg.default_list.matchFeatures.scale,
         log_policy: list.log_policy,
+        refresh: list.refresh,
         small_image_catalog: list.small_image_catalog || ITimg.default_list.matchFeatures.small_image_catalog,
     }
     if (list.saveSmallImg === undefined) {
@@ -667,7 +668,7 @@ function matchFeatures(picture, list) {
     if (list.visualization === undefined) {
         list.visualization = ITimg.default_list.matchFeatures.visualization;
     }
-
+    
     let small_image_catalog = files.path(list.small_image_catalog + picture + ".png");
     if (list.saveSmallImg) {
 
@@ -716,7 +717,8 @@ function matchFeatures(picture, list) {
         return false;
     }
     console.time("特征找图总时长");
-
+if (list.refresh !== false || !ITimg.sceneFeatures||ITimg.sceneFeatures.isRecycled()) {
+     !list.sceneFeatures.isRecycled() && list.sceneFeatures.recycle();
     list.area = regional_division(list.area);
     let sceneImg;
     if (!list.imageFeatures) {
@@ -774,7 +776,7 @@ function matchFeatures(picture, list) {
     // 越小越快，但可以放缩过度导致匹配错误。若在特征匹配时无法搜索到正确结果，可以调整这里的参数，比如\{scale: 1\}
     // 也可以在这里指定\{region: [...]\}参数只计算这个区域的特征提高效率
     if (!list.imageFeatures) {
-        var sceneFeatures = $images.detectAndComputeFeatures(sceneImg, {
+        ITimg.sceneFeatures = $images.detectAndComputeFeatures(sceneImg, {
             region: list.area,
             grayscale: list.grayscale,
             scale: list.scale,
@@ -782,10 +784,10 @@ function matchFeatures(picture, list) {
     }
 
     if (list.picture) {
-        !list.picture.isRecycled() && list.picture.recycle()
+        !list.picture.isRecycled() && list.picture.recycle();
         list.picture = "隐藏"
     }
-
+}
     let img_small = images.read(small_image_catalog);
 
     // 计算小图特征
@@ -815,7 +817,7 @@ function matchFeatures(picture, list) {
         //    images.save(img, drawMatches);
 
     }
-    ITimg.results = $images.matchFeatures((list.imageFeatures ? list.imageFeatures : sceneFeatures), objectFeatures, {
+    ITimg.results = $images.matchFeatures((list.imageFeatures ? list.imageFeatures : ITimg.sceneFeatures), objectFeatures, {
         drawMatches: drawMatches,
         threshold: list.threshold,
         matcher: list.matcher
@@ -824,7 +826,7 @@ function matchFeatures(picture, list) {
     // 回收特征对象
     objectFeatures.recycle();
     if (!list.imageFeatures) {
-        sceneFeatures.recycle();
+        //ITimg.sceneFeatures.recycle();
     } else {
         list.imageFeatures = "隐藏";
     }
@@ -1653,7 +1655,9 @@ function captureScreen_(way) {
                     imgList = captureScreen();
                     //重新申请截图权限,并创建定时器
                     if (ITimg.permission_detection) {
-                        console.warn("截图权限监测：间隔15分钟重新申请辅助截图权限")
+                        tips = "截图权限监测：间隔15分钟重新申请辅助截图权限";
+                        toast(tips);
+                        console.error(tips);
                         $images.stopScreenCapture();
                         sleep(100);
                         try {
@@ -1924,7 +1928,7 @@ try {
     let an = ITimg.matchFeatures(name.canvas_name, {
         // area: [0, 200, 1356, 920],
         // area: [height - height/4,width/4,height/4,width/4],
-        area:1,
+        area: 1,
         action: 5,
         threshold: 0.75,
         matcher: 1,

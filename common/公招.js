@@ -1,4 +1,4 @@
-var position =0;
+var position = 0;
 
 function 确认招募按钮(_action) {
     if (_action === undefined) {
@@ -16,6 +16,8 @@ function 确认招募按钮(_action) {
         area: 4,
         threshold: 0.7,
         scale: 1,
+        matcher: 2,
+        refresh: false,
     }))
 }
 
@@ -58,12 +60,14 @@ function 随机招募(_Refresh) {
                             timing: 500,
                             nods: 1000,
                             threshold: 0.85,
-                            area: 24,
+                            area: 4,
+                            refresh: false,
                         }) || ITimg.matchFeatures("基建_离开", {
                             action: 0,
                             timing: 500,
-                            area: 4,
+                            area: 24,
                             threshold: 0.75,
+
                         })) {
                         toast("没有四星以上的词条组合，已为您刷新标签重新检测");
                         console.error("没有四星以上的词条组合，已为您刷新标签重新检测");
@@ -121,7 +125,8 @@ function 检测tag() {
         }) || ITimg.matchFeatures("返回", {
             action: 4,
             timing: 1000,
-            area: 12,
+            area: 1,
+            refresh: false,
         }));
 
         position += 1;
@@ -183,12 +188,13 @@ var 公招 = {
 
             if (!ITimg.matchFeatures("导航", {
                     timing: 500,
-                    area: "左半屏",
+                    area: 1,
                     action: 5,
                 }) && !ITimg.matchFeatures("导航2", {
                     timing: 500,
-                    area: "左半屏",
+                    area: 1,
                     action: 5,
+                    refresh: false,
                 })) {
                 MyAutomator.click(height / 3 + random(-10, 10), 5 + random(5, 10));
                 sleep(1000);
@@ -197,21 +203,23 @@ var 公招 = {
             if (ITimg.matchFeatures("导航", {
                     action: 0,
                     timing: 1000,
-                    area: "左半屏",
+                    area: 1,
                 }) || ITimg.matchFeatures("导航2", {
                     action: 0,
                     timing: 1000,
-                    area: "左半屏",
+                    area: 1,
+                    refresh: false,
                 })) {
                 if (ITimg.matchFeatures("导航_公开招募", {
                         action: 0,
                         timing: 1000,
-                        area: "右半屏",
+                        area: 2,
                     }) || ITimg.matchFeatures("导航_公开招募", {
                         action: 0,
                         timing: 1000,
-                        area: "上半屏",
+                        area: 2,
                         threshold: 0.75,
+                        refresh: false,
                     })) {
                     tool.Floaty_emit("面板", "隐藏");
                     while (true) {
@@ -222,13 +230,14 @@ var 公招 = {
                             timing: 3000,
                         });
                         if (ITimg.matchFeatures("导航", {
+                                action: 0,
                                 timing: 1000,
-                                nods: 500,
-                                area: "左半屏",
+                                area: 1,
                             }) || ITimg.matchFeatures("导航2", {
+                                action: 0,
                                 timing: 1000,
-                                nods: 500,
-                                area: "左半屏",
+                                area: 1,
+                                refresh: false,
                             })) {
                             break;
                         }
@@ -243,26 +252,25 @@ var 公招 = {
                                 }) || ITimg.matchFeatures("公招_聘用", {
                                     action: 0,
                                     timing: 2000,
-                                    area: "左半屏",
-                                }) || ITimg.matchFeatures("公招_聘用", {
-                                    action: 0,
-                                    timing: 2000,
-                                    area: "右半屏",
+                                    area: 13,
+                                    matcher: 2,
+                                    refresh: false,
                                 })) {
                                 while (true) {
                                     if (ITimg.matchFeatures("公招_skip", {
                                             action: 0,
                                             timing: 2000,
-                                            area: "上半屏",
-                                            nods: 200,
+                                            area: 2,
+                                            nods: 1000,
                                         }) || ITimg.matchFeatures("公招_skip", {
                                             action: 0,
                                             timing: 2000,
-                                            area: "右半屏",
+                                            area: 2,
                                         }) || ITimg.matchFeatures("公招_skip", {
                                             action: 0,
                                             timing: 2000,
-                                            area: "右上半屏",
+                                            matcher: 2,
+                                            refresh: false,
                                         })) {
                                         let czname = ITimg.ocr("获取干员名", {
                                             action: 6,
@@ -274,11 +282,14 @@ var 公招 = {
                                     }
 
                                     if (ITimg.matchFeatures("导航", {
-                                            timing: 500,
-                                            area: "上半屏",
+                                            action: 0,
+                                            timing: 1000,
+                                            area: 1,
                                         }) || ITimg.matchFeatures("导航2", {
-                                            timing: 500,
-                                            area: "上半屏",
+                                            action: 0,
+                                            timing: 1000,
+                                            area: 1,
+                                            refresh: false,
                                         })) {
                                         break;
                                     } else {
@@ -438,7 +449,7 @@ var 公招 = {
 
         for (let i = position; i <= 4; i++) {
             if (this.选择位置(i)) {
-                if(!确认招募按钮()){
+                if (!确认招募按钮()) {
                     continue;
                 }
                 if (!随机招募(true)) {
@@ -454,34 +465,34 @@ var 公招 = {
         return true;
         // }
     },
-    选择位置:function(shu) {
-    tool.Floaty_emit("展示文本", "状态", "状态：选择公招位置");
-    sleep(300);
-    console.info("---选择公招位"+shu+"---");
-    switch (shu) {
-        case 1:
-            MyAutomator.click(height / 3 + random(-10, 10), width / 3 + random(-10, 10));
-            sleep(800);
-            position = 1;
-            return 确认招募按钮();
-        case 2:
-            MyAutomator.click(height / 1.4 + random(-10, 10), width / 3 + random(-10, 10))
-            sleep(800)
-            position = 2;
-            return 确认招募按钮();
-        case 3:
-            MyAutomator.click(height / 3 + random(-10, 10), width / 1.4 + random(-10, 10));
-            sleep(800)
-            position = 3
-            return 确认招募按钮();
-        case 4:
-            MyAutomator.click(height / 1.4 + random(-10, 10), width / 1.4 + random(-10, 10));
-            sleep(800)
-            position = 4;
-            return 确认招募按钮();
-    }
-    return true;
-},
+    选择位置: function(shu) {
+        tool.Floaty_emit("展示文本", "状态", "状态：选择公招位置");
+        sleep(300);
+        console.info("---选择公招位" + shu + "---");
+        switch (shu) {
+            case 1:
+                MyAutomator.click(height / 3 + random(-10, 10), width / 3 + random(-10, 10));
+                sleep(800);
+                position = 1;
+                return 确认招募按钮();
+            case 2:
+                MyAutomator.click(height / 1.4 + random(-10, 10), width / 3 + random(-10, 10))
+                sleep(800)
+                position = 2;
+                return 确认招募按钮();
+            case 3:
+                MyAutomator.click(height / 3 + random(-10, 10), width / 1.4 + random(-10, 10));
+                sleep(800)
+                position = 3
+                return 确认招募按钮();
+            case 4:
+                MyAutomator.click(height / 1.4 + random(-10, 10), width / 1.4 + random(-10, 10));
+                sleep(800)
+                position = 4;
+                return 确认招募按钮();
+        }
+        return true;
+    },
     确认招募: function() {
         taglb = ITimg.matchFeatures("公招_小时_减", {
             action: 5,
@@ -494,6 +505,7 @@ var 公招 = {
             scale: 1,
             matcher: 2,
             threshold: 0.75,
+            refresh:false,
             picture_failed_further: true,
         })
         if (!taglb) {
