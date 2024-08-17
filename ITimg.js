@@ -717,10 +717,11 @@ function matchFeatures(picture, list) {
         return false;
     }
     console.time("特征找图总时长");
-if (list.refresh !== false || !ITimg.sceneFeatures||ITimg.sceneFeatures.isRecycled()) {
-     !list.sceneFeatures.isRecycled() && list.sceneFeatures.recycle();
+if (list.refresh !== false || !ITimg.sceneFeatures||ITimg.sceneFeatures.recycled) {
+     ITimg.sceneFeatures && ITimg.sceneFeatures.recycle();
+     ITimg.sceneFeatures = null;
     list.area = regional_division(list.area);
-    let sceneImg;
+    var sceneImg;
     if (!list.imageFeatures) {
         let img_ = list.picture || captureScreen_();
         //长时间持有图片
@@ -788,6 +789,7 @@ if (list.refresh !== false || !ITimg.sceneFeatures||ITimg.sceneFeatures.isRecycl
         list.picture = "隐藏"
     }
 }
+   
     let img_small = images.read(small_image_catalog);
 
     // 计算小图特征
@@ -900,7 +902,7 @@ if (list.refresh !== false || !ITimg.sceneFeatures||ITimg.sceneFeatures.isRecycl
         return false;
     }
 
-    if (list.saveSmallImg && !list.imageFeatures) {
+    if (list.saveSmallImg && !list.imageFeatures&&sceneImg) {
 
         console.verbose("缓存小图到：" + small_image_save_catalog);
         if (ITimg.results.x >= 0 && ITimg.results.y >= 0 && ITimg.results.x + ITimg.results.w <= sceneImg.width && ITimg.results.y + ITimg.results.h <= sceneImg.height) {

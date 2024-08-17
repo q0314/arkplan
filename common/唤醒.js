@@ -446,7 +446,6 @@ let 唤醒 = {
                 action: _action,
                 refresh: false,
                 saveSmallImg: "主页_当前",
-                imageFeatures: _sceneFeatures,
                 picture_failed_further: true,
             }) || ITimg.ocr("理智/", {
                 timing: _timing,
