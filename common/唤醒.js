@@ -191,18 +191,8 @@ let 唤醒 = {
         if (this.确认主页(500)) {
             //防止此次需要重连
             if (this.确认主页(1000, 1)) {
-                if (!ITimg.matchFeatures("返回", {
-                        action: 0,
-                        timing: 1000,
-                        area: 1,
-                        scale: 1,
-                        nods: 1000,
-                    }) && !ITimg.matchFeatures("返回", {
-                        action: 0,
-                        timing: 1000,
-                        area: 1,
-                        scale: 1,refresh:false,
-                    })) {
+                //确认进入终端后点击返回
+                if (导航定位(0, true) && !点击返回(1, true)) {
                     return false;
                 }
             } else {
@@ -218,50 +208,34 @@ let 唤醒 = {
         } else {
             this.topic_tips();
         }
-        //返回到主页
-        if (ITimg.matchFeatures("导航", {
-                area: 1,
-                action: 0,
-            }) || ITimg.matchFeatures("导航2", {
-                area: 1,
-                action: 0,
-                scale: 1,
-                refresh:false,
-            })) {
+        //确认有导航键时返回到主页
+        if (导航定位(0, true)) {
             tool.Floaty_emit("面板", "隐藏");
             sleep(1000);
 
-            while (true) {
-             
-            
-                if (!ITimg.matchFeatures("导航_首页", {
-                        timing: 1000,
-                        action: 0,
-                        area: 1,
-                        refresh:false,
-                    })) {
-                    ITimg.picture("返回", {
-                        timing: 1000,
-                        action: 0,
-                        area: 1,
-                        scale: 1,
-                        refresh:false,
-                    })
-                }
+            if (导航定位(0)) {
                 tool.Floaty_emit("面板", "展开");
                 ITimg.matchFeatures("基建_离开", {
                     timing: 5000,
                     action: 0,
-                    nods: 200,
+                    nods: 1000,
                     area: 4,
                 });
-                if (this.确认主页(1)) {
-                    return true;
+
+            } else {
+                点击返回(1, true);
+            }
+            if (this.确认主页(1000) && this.确认主页(1)) {
+
+                while (等待提交反馈至神经()) {
+                    sleep(500)
                 }
+                return true;
             }
 
-
         }
+
+
         return false;
 
     },
@@ -325,22 +299,22 @@ let 唤醒 = {
 
         tool.Floaty_emit("展示文本", "状态", "状态：取消公告签到通知");
         console.info("---取消公告---");
-      /*  let _sceneFeatures = $images.detectAndComputeFeatures(ITimg.captureScreen_(), {
-            region: ITimg.regional_division(2),
-        });
-        */
+        /*  let _sceneFeatures = $images.detectAndComputeFeatures(ITimg.captureScreen_(), {
+              region: ITimg.regional_division(2),
+          });
+          */
         let _close = ITimg.matchFeatures("关闭公告", {
             action: 5,
             area: 2,
-           // imageFeatures: _sceneFeatures,
+            // imageFeatures: _sceneFeatures,
         }) || ITimg.matchFeatures("关闭公告", {
             action: 5,
             area: 2,
             matcher: 2,
-            refresh:false,
-           // imageFeatures: _sceneFeatures,
+            refresh: false,
+            // imageFeatures: _sceneFeatures,
         });
-      //  _sceneFeatures.recycle();
+        //  _sceneFeatures.recycle();
         if (_close) {
             while (true) {
                 //长时间持有图片.需手动释放
@@ -431,7 +405,7 @@ let 唤醒 = {
         }
         // console.trace(_action)
         // let _max = 2;
-        
+
         if (ITimg.ocr("终端", {
                 timing: _timing,
                 area: 2,
@@ -453,7 +427,6 @@ let 唤醒 = {
                 action: _action,
                 refresh: false,
                 part: true,
-                refresh:false,
                 saveSmallImg: "主页_理智数",
                 picture_failed_further: true,
             })) {

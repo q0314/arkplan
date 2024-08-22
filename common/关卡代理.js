@@ -1,3 +1,4 @@
+let agent = 0;
 let 关卡代理 = {
     普通: function() {
         sleep(1500);
@@ -20,7 +21,6 @@ let 关卡代理 = {
             if (setting.设置电量) {
                 if (!device.isCharging() && device.getBattery() < setting.电量) {
                     sleep(500);
-                    便笺(2000);
                     toast("电量低于设定值" + setting.电量 + "且未充电，主程序已退出并返回桌面");
                     Combat_report.record("电量低于设定值" + setting.电量 + "且未充电，主程序已退出并返回桌面");
                     console.error("电量低于设定值" + setting.电量 + "且未充电,主程序已退出并返回桌面");
@@ -43,7 +43,6 @@ let 关卡代理 = {
                 setting = tool.readJSON("configure");
                 // aa = files.read("./mrfz/行动.txt");
                 if (setting.已执行动 >= setting.行动) {
-                    便笺(2000);
 
                     toast("行动完毕，退出行动程序\n注：已执行动 >= 上限时不会执行基建收菜");
                     console.warn("行动完毕，退出行动程序，注：已执行动 >= 上限时不会执行基建收菜");
@@ -51,7 +50,7 @@ let 关卡代理 = {
                     setting = null;
                     break;
                     //   }
-                };
+                }
                 if (ITimg.matchFeatures("行动_编队确认开始", {
                         action: 5,
                         timing: 1000,
@@ -83,8 +82,7 @@ let 关卡代理 = {
 
                         tool.Floaty_emit("展示文本", "状态", "状态：校验关卡中");
                         sleep(10);
-                        let staging;
-                        if (staging = (ITimg.matchFeatures("禁止_演习", {
+                        let staging = (ITimg.matchFeatures("禁止_演习", {
                                 action: 5,
                                 area: 4,
                             }) || ITimg.matchFeatures("代理_勾_愚人号", {
@@ -93,9 +91,10 @@ let 关卡代理 = {
                             }) || ITimg.matchFeatures("代理_勾_活动", {
                                 action: 5,
                                 area: 4,
-                            }))) {
+                            }))
+                            if(staging) {
                             if (setting.重置代理次数) {
-                                console.info("重置代理次数")
+                                console.info("重置代理次数");
                                 /*  MyAutomator.click(staging.left - zox(70), staging.y + staging.h / 2);
                                   sleep(500);
                                   MyAutomator.click(staging.left - zox(70), staging.y + staging.h / 2 - zoy(80));
@@ -153,7 +152,7 @@ let 关卡代理 = {
                         } else {
                             toast("当前关卡未解锁代理指挥，请选择已勾选可代理的关卡");
                             sleep(2000);
-                        };
+                        }
 
                     } else {
                         toast("请打开已勾选可代理的关卡");
@@ -166,9 +165,9 @@ let 关卡代理 = {
                                 })) {
                                 tool.Floaty_emit("展示文本", "状态", "状态：暂停，游戏时长已上限!");
                                 tool.Floaty_emit("暂停", "结束程序");
-                            };
+                            }
                         }
-                    };
+                    }
                 } else {
                     tool.Floaty_emit("展示文本", "状态", "状态：正在代理中");
                     if (ITimg.matchFeatures("行动_普通", {
@@ -194,19 +193,18 @@ let 关卡代理 = {
                         })) {
                         toastLog("代理点击成功!");
                         break;
-                    };
+                    }
                 }
-            }; //单次循环
+            }//单次循环
             sleep(1000);
             while (true) {
-                setting = tool.readJSON("configure");
                 if (ITimg.matchFeatures("行动_编队确认开始", {
                         action: 0,
                         timing: 2000,
                         area: "右半屏",
                     })) {
                     setting.已执行动++;
-                    tool.writeJSON("已执行动", setting.已执行动)
+                   setting = tool.writeJSON("已执行动", setting.已执行动);
                     tool.Floaty_emit("展示文本", "状态", "状态：正在行动中");
                     if (agent != 0) {
                         tool.Floaty_emit("展示文本", "行动", "行动：执行" + setting.已执行动 + "次&代理失误" + agent + "次")
@@ -263,7 +261,7 @@ let 关卡代理 = {
                             threshold: 0.75,
                         })) {
                         toastLog("代理点击成功_?");
-                    };
+                    }
                     sleep(200);
                     if (setting.防沉迷) {
                         if (ITimg.matchFeatures("防沉迷_确认", {
@@ -273,9 +271,9 @@ let 关卡代理 = {
                             })) {
                             tool.Floaty_emit("展示文本", "状态", "状态：暂停，游戏时长已上限!");
                             tool.Floaty_emit("暂停", "结束程序");
-                        };
+                        }
                     }
-                }; //无红行动
+                } //无红行动
                 sleep(200)
             } //单次循环
 
@@ -312,11 +310,12 @@ let 关卡代理 = {
                 //结算
                 setting = tool.readJSON("configure");
                 sleep(100)
-                if (temporary_xy = ITimg.matchFeatures((setting.agent ? "代理_放弃行动" : "代理_继续结算"), {
-                        action: 5,
-                        timing: 500,
-                        area: "下半屏",
-                    })) {
+                temporary_xy = ITimg.matchFeatures((setting.agent ? "代理_放弃行动" : "代理_继续结算"), {
+                    action: 5,
+                    timing: 500,
+                    area: "下半屏",
+                })
+                if (temporary_xy) {
                     toast("代理失误，" + (setting.agent ? "放弃行动，重新代理" : "继续结算，二星评价"))
                     console.warn("代理失误，" + (setting.agent ? "放弃行动，重新代理" : "继续结算，二星评价"))
                     agent++;
@@ -337,7 +336,7 @@ let 关卡代理 = {
                         area: 4,
                     })) {
                     toastLog("网络不佳,重新提交战斗记录")
-                };
+                }
                 sleep(500);
 
                 if (ITimg.matchFeatures("行动_结算", {
@@ -346,12 +345,7 @@ let 关卡代理 = {
                         visualization: true,
                     }) || ITimg.matchFeatures("行动_结算", {
                         timing: 500,
-                        area: 1,
-                        threshold: 0.75,
-                        visualization: true,
-                    }) || ITimg.matchFeatures("行动_结算", {
-                        timing: 500,
-                        area: 1,
+                        area: 13,
                         threshold: 0.75,
                         visualization: true,
                     })) {
@@ -366,7 +360,7 @@ let 关卡代理 = {
                             tool.Floaty_emit("展示文本", "状态", "状态：正在结算中");
                             toast("等级提升了");
                             console.warn("等级提升了，理智已恢复");
-                        };
+                        }
 
                         if (setting.企鹅统计) {
                             sleep(300)
@@ -413,32 +407,21 @@ let 关卡代理 = {
                     }
                     tool.Floaty_emit("展示文本", "状态", "状态：等待加载关卡");
                     while (true) {
-                        sleep(1500);
-                        if (ITimg.matchFeatures("行动_普通", {
+                        sleep(500);
+                        if (ITimg.matchFeatures("行动_理智数量图标", {
                                 timing: 500,
-                                area: "右半屏",
-                                threshold: 0.75,
-                            }) || ITimg.matchFeatures("行动_磨难", {
-                                timing: 500,
-                                area: "右半屏",
-                                threshold: 0.75,
-                            }) || ITimg.matchFeatures("行动_愚人号", {
-                                timing: 1000,
-                                area: "右半屏",
-                            }) || ITimg.matchFeatures("行动_活动", {
-                                timing: 500,
-                                area: "右半屏",
+                                area: 2,
                                 threshold: 0.75,
                             })) {
                             break;
-                        };
+                        }
                         (ITimg.matchFeatures("行动_结算", {
                             action: 0,
                             timing: 500,
-                            area: "左半屏",
+                            area: 13,
                         }) || ITimg.matchFeatures("行动_结算", {
                             timing: 500,
-                            area: "左半屏",
+                            area: 13,
                             threshold: 0.75,
                         }))
                     }
@@ -456,7 +439,7 @@ let 关卡代理 = {
                     toast("等级提升了");
                     Combat_report.record("等级提升了，理智已恢复");
                     console.warn("等级提升了，理智已恢复");
-                };
+                }
                 sleep(200);
                 if (setting.防沉迷) {
                     if (ITimg.matchFeatures("防沉迷_确认", {
@@ -466,7 +449,7 @@ let 关卡代理 = {
                         })) {
                         tool.Floaty_emit("展示文本", "状态", "状态：暂停，游戏时长已上限!");
                         tool.Floaty_emit("暂停", "结束程序");
-                    };
+                    }
                 }
             } //单
 
@@ -490,20 +473,18 @@ let 关卡代理 = {
             if (setting.设置电量) {
                 if (!device.isCharging() && device.getBattery() < setting.电量) {
                     sleep(500);
-                    便笺(2000);
                     toast("电量低于设定值" + setting.电量 + "且未充电，主程序已退出并返回桌面");
                     Combat_report.record("电量低于设定值" + setting.电量 + "且未充电，主程序已退出并返回桌面");
                     console.error("电量低于设定值" + setting.电量 + "且未充电,主程序已退出并返回桌面");
 
                     跳转_暂停(true, "电量低于设定值且未充电", "暂停，电量低且未充电");
                     home();
-                };
-            };
+                }
+            }
 
             while (setting.proxy_card) {
                 setting = tool.readJSON("configure");
                 if (setting.已执行动 >= setting.剿灭) {
-                    便笺(2000);
                     toast("剿灭完毕，退出剿灭程序");
                     console.warn("剿灭完毕，退出剿灭程序");
 
@@ -531,18 +512,11 @@ let 关卡代理 = {
 
                     this.xy_ = (ITimg.matchFeatures("导航", {
                         action: 5,
-                        area: "左半屏",
+                        area: 1,
                     }) || ITimg.matchFeatures("导航2", {
                         action: 5,
-                        area: "上半屏",
-                    }) || ITimg.matchFeatures("导航", {
-                        action: 5,
-                        area: "上半屏",
-                        threshold: 0.7,
-                    }) || ITimg.matchFeatures("导航2", {
-                        action: 5,
-                        area: "左半屏",
-                        threshold: 0.7,
+                        area: 1,
+                        refresh:false,
                     }))
                     if (ITimg.matchFeatures("代理_全权委托_确认使用", {
                             action: 0,
@@ -593,7 +567,6 @@ let 关卡代理 = {
                 //aa = files.read("./mrfz/行动.txt");
                 setting = tool.readJSON("configure");
                 if (setting.已执行动 >= setting.剿灭) {
-                    便笺(2000);
                     toast("剿灭完毕，退出剿灭程序");
                     console.warn("剿灭完毕，退出剿灭程序");
 

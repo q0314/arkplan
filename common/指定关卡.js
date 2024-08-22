@@ -98,7 +98,7 @@ let collection = {
                 _terminal--;
             }
 
-            if (_terminal == 2) {
+            if (_terminal == 2||!导航定位(4,true)) {
                 continue;
             }
 
@@ -421,7 +421,7 @@ let collection = {
     /**
      * 进入终端,并检验上一次作战类型,选中非剿灭关卡
      * @returns 
-     */
+     */ 
     上次作战: function() {
         console.info("---上次作战---");
         while (true) {
@@ -432,6 +432,9 @@ let collection = {
                 timing: 1500,
                 area: 2
             });
+            if(!导航定位(4,true)){
+                continue;
+            }
             if (ITimg.matchFeatures("上一次作战", {
                     timing: 500,
                     area: "右下半屏",
@@ -448,27 +451,14 @@ let collection = {
                 }))) {
                 log("验证通过")
                 break;
-            } else {
-                if (ITimg.matchFeatures("导航", {
-                        action: 0,
-                        timing: 1000,
-                        area: "上半屏",
-                    }) || ITimg.matchFeatures("导航2", {
-                        action: 0,
-                        timing: 1000,
-                        area: "上半屏",
-                    })) {
-                    ITimg.matchFeatures("导航_终端", {
-                        action: 0,
-                        timing: 2000,
-                        area: "上半屏",
-                    });
+            } else if(导航定位("终端")){
+                
                     ITimg.matchFeatures("基建_离开", {
                         action: 0,
                         timing: 5000,
                         area: "右半屏",
                     });
-                }
+                
             }
 
         }
@@ -492,7 +482,7 @@ let collection = {
             let tips = "上次作战无法确认当前界面,重试";
             toast(tips);
             console.error(tips);
-            return false
+            return false;
         } else {
             if (ITimg.matchFeatures("行动_普通", {
                     area: 4,

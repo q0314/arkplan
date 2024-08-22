@@ -15,6 +15,14 @@ var {
 var MyAutomator = require("./modules/MyAutomator.js");
 MyAutomator.setTapType(setting["operation_mode"])
 var 唤醒 = require("./common/唤醒.js");
+var {
+    等待提交反馈至神经,
+    点击返回,
+    导航定位,
+    便笺,
+    启动应用,
+    end_task,
+} = require('./common/通用操作.js');
 
 var agent = 0,
     /**
@@ -129,101 +137,10 @@ if (setting.监听键 != "关闭") {
 if (ITimg.exit) {
     sleep(3000);
 }
+tool.writeJSON("已执行动", 0);
+setting = tool.writeJSON("已兑理智", 0);
 
 程序(setting.执行);
-
-
-function 启动应用(package_) {
-    if (package_ == undefined) {
-        if (ITimg.language == "日服" || ITimg.language == "美服") {
-            console.error("暂不支持启动 " + ITimg.language + " 方舟应用")
-            return [false, ITimg.language]
-        }
-    } //api
-
-    tool.Floaty_emit("展示文本", "状态", "状态：准备启动应用");
-    // Combat_report.record("启动了明日方舟");
-    if (typeof package_ == "string") {
-        console.verbose(package_)
-        setting.包名 = package_;
-    }
-
-    if (!app.getAppName(setting.包名)) {
-        console.error("包名应用未安装:", setting.包名, "，默认启动官服");
-        setting.包名 = "com.hypergryph.arknights";
-    }
-    let getpackage = tool.currentPackage();
-
-    let package_names_list = [setting.包名, 'com.hypergryph.arknights',
-        '_com.hypergryph.arknights',
-        'com.hypergryph.arknights.bilibili',
-        'tw.txwy.and.arknights'
-    ]
-    console.verbose("前台应用包名：" + getpackage)
-    if (getpackage == null) {
-        toastLog("暂时无法获取前台应用，默认启动")
-
-    } else {
-
-        for (let package_names of package_names_list) {
-            if (package_names == getpackage) {
-                getpackage = true;
-                break
-            }
-        }
-        if (getpackage === true) {
-            return true;
-        }
-
-    }
-    var gmvp = device.getMusicVolume();
-
-    console.verbose("启动应用包名:" + setting.包名)
-
-    toastLog("启动" + app.getAppName(setting.包名) + "中，等待启动完成");
-
-    tool.launchPackage(setting.包名);
-
-    sleep(3000);
-    getpackage = tool.currentPackage();
-    switch (getpackage) {
-        case setting.包名:
-        case "_" + setting.包名:
-            break
-        default:
-            console.error("未匹配到的包名:" + getpackage + "，重新启动");
-
-            function uiLaunchApp(appName) {
-                var script = '"ui";\nvar args = engines.myEngine().execArgv;\nlet appName = args.appName;\app.launchPackage(appName);exit();';
-                engines.execScript("uiLaunchApp", script, {
-                    arguments: {
-                        appName: appName
-                    }
-                });
-            }
-
-            uiLaunchApp(setting.包名);
-            break
-    }
-    let start_request = (text("启动应用").findOne(500) || id("permission_group_title").findOne(500));
-    if (start_request) {
-        log("自动允许启动应用");
-        className("android.widget.Button").text("允许").findOne().click();
-    }
-    if (setting.音量) {
-        tool.writeJSON("当前音量", gmvp);
-    }
-
-    threads.start(function() {
-        if (setting.音量) {
-            device.setMusicVolume(0)
-        } else if (setting.音量修复) {
-            device.setMusicVolume(Number(gmvp))
-        }
-    })
-    return true;
-
-}
 
 
 function 程序(implem) {
@@ -319,8 +236,7 @@ function 程序(implem) {
             case "定时基建":
                 threadMain.setName("上次作战");
                 唤醒.main();
-                toastLog("启动基建收菜程序");
-
+              
                 tool.Floaty_emit("展示文本", "状态", "状态：查找基建/导航等");
                 threadMain.interrupt();
                 threadMain = threads.start(基建);
@@ -350,21 +266,21 @@ function 自定义() {
             }
         }
         if (!customize) {
-            tips ="未符合的自定义模块名称";
+            tips = "未符合的自定义模块名称";
             toast(tips);
             console.error(tips);
             return false;
         }
-            require(customize.path).main_entrance({
-                'cwd': customize.path.replace(files.getName(customize.path), ""),
-                'getSource': customize.path,
-                'ITimg': ITimg,
-                'get_onstage_package': tool.currentPackage,
-                'startup_app': 启动应用,
-                'startup_mode': 程序,
+        require(customize.path).main_entrance({
+            'cwd': customize.path.replace(files.getName(customize.path), ""),
+            'getSource': customize.path,
+            'ITimg': ITimg,
+            'get_onstage_package': tool.currentPackage,
+            'startup_app': 启动应用,
+            'startup_mode': 程序,
 
-            });
-        
+        });
+
 
     } catch (e) {
         let tips = "自定义执行模式模块发生异常，，请检查:\n" + $debug.getStackTrace(e);
@@ -452,28 +368,14 @@ function 基建换班(fatigue_state) {
             sleep(2000)
         }
     }
-    if (!ITimg.matchFeatures("导航", {
-            action: 0,
-            timing: 1500,
-            area: "左半屏",
-        })) {
-        ITimg.matchFeatures("导航2", {
-            action: 0,
-            timing: 1500,
-            area: "左半屏",
-        })
-    }
-    ITimg.matchFeatures("导航_基建", {
-        action: 0,
-        timing: 500,
-        area: "上半屏",
-    });
+    导航定位("基建");
 
 }
 
 
 
 function 统计(target, attach, exterminate) {
+    setting = tool.readJSON("configure");
     switch (target) {
         case "次数":
             if (Material_data) {
@@ -528,83 +430,6 @@ function 跳转_暂停(suspended, status, literals) {
     return
 }
 
-function end_task(status, literals) {
-    if (!关闭应用(setting.执行, status)) {
-        tool.Floaty_emit("展示文本", "状态", "状态：" + literals);
-    }
-
-    if (setting.震动) {
-        device.vibrate(1000);
-    };
-    let auto_action = require("./modules/auto_action.js");
-    if (setting.end_action.home) {
-        auto_action.home();
-    };
-    if (setting.end_action.lock_screen) {
-        auto_action.lock_screen();
-    }
-    tool.Floaty_emit("暂停", "结束程序");
-    sleep(5000);
-}
-
-function 便笺(sleep_, tag, hour, type) {
-    if (sleep_ == undefined) {
-        sleep_ = 1000;
-    }
-    let morikujima_setting = tool.readJSON("morikujima_setting");
-    // console.info(morikujima_setting)
-    if (morikujima_setting == undefined) {
-        return
-    }
-    if (type) {
-
-        if (morikujima_setting.公招 == true) {
-
-            for (i in morikujima_setting.gz_list) {
-                if (morikujima_setting.gz_list[i].位置 == sleep_) {
-                    morikujima_setting.gz_list[i].时间 = new Date();
-                    morikujima_setting.gz_list[i].小时 = hour;
-                    morikujima_setting.gz_list[i].tag = tag;
-                    return
-                }
-            }
-            morikujima_setting.gz_list.push({
-                位置: sleep_,
-                时间: new Date(),
-                小时: hour,
-                tag: tag,
-            })
-            tool.writeJSON("gz_list", morikujima_setting.gz_list, "morikujima_setting")
-        }
-        return
-    }
-    if (morikujima_setting.自动识别 == true) {
-        if (!ITimg.initocr()) {
-            toast("ocr不可用")
-            console.error("ocr不可用")
-            return false
-        }
-        tool.Floaty_emit("展示文本", "状态", "状态：等待识别理智中...");
-
-        sleep(sleep_)
-        taglb = ITimg.ocr("获取屏幕文字", {
-            action: 6,
-            area: [Math.floor(height / 1.3), 0, height - Math.floor(height / 1.3), 100],
-        });
-        for (i in taglb) {
-            if (taglb[i].text.indexOf("/") != -1) {
-                console.info("剩余理智数：" + taglb[i].text)
-
-                tool.writeJSON("已有理智", taglb[i].text.split("/")[0], "morikujima_setting")
-                tool.writeJSON("理智数", taglb[i].text, "morikujima_setting")
-                tool.writeJSON("理智时间", new Date(), "morikujima_setting")
-            }
-        }
-        tool.Floaty_emit("展示文本", "状态", "状态：理智识别完成");
-
-    }
-
-}
 
 
 function 基建() {
@@ -612,7 +437,7 @@ function 基建() {
      * 干员疲劳状态
      */
     tool.Floaty_emit("面板", "复位");
-    toastLog("2秒后启动基建收菜程序");
+    toastLog("启动基建收菜程序");
     threadMain.setName("基建收菜");
     sleep(1000);
     setting = tool.readJSON("configure");
@@ -620,8 +445,6 @@ function 基建() {
     基建任务 = require("./common/基建任务.js");
 
     if (基建任务.main()) {
-
-        基建任务.确认已进入基建页面();
 
         let agency = 基建任务.待办处理();
 
@@ -632,12 +455,14 @@ function 基建() {
 
             基建任务.会客室线索处理();
         }
-        基建任务.访问好友();
+
     }
+    
 
     if (typeof 信用处理 == "undefined") {
         信用处理 = require("./common/信用点处理.js");
     }
+    信用处理.访问好友();
     信用处理.main(setting);
     log("自动公招" + setting.公招);
 
@@ -653,7 +478,7 @@ function 基建() {
         }
         领取奖励.任务();
     }
-    if (公招 && 公招.recruit_tag[0] && 公招.recruit_tag[0].星级) {
+    if (typeof 公招 != "undefined" && 公招.recruit_tag[0] && 公招.recruit_tag[0].星级) {
         let tag_json = '';
         for (let tag_ of 公招.recruit_tag) {
             tag_json += tag_.名称 + " 标签，" + tag_.星级 + ", "
@@ -679,41 +504,3 @@ function 基建() {
 
 }
 
-
-function 等待提交反馈至神经() {
-    console.verbose('---等待提交反馈至神经---');
-    sleep(200);
-    let staging_result = ITimg.ocr("正在提交反馈至神经", {
-        action: 6,
-        area: 34,
-        part: true,
-        threshold: 0.9,
-        //    saveSmallImg:false,
-    })
-    if (staging_result && staging_result.matches && staging_result.matches.length) {
-        return true;
-    } else {
-        staging_result = ITimg.ocr("正在提交反馈至神经", {
-            action: 6,
-            area: "下半屏",
-            saveSmallImg: false,
-        })
-    }
-    var to_match = ['正在提交反馈至神经', '提交反馈', '提交', '反馈', '神经']
-    for (let i in to_match) {
-        if (ITimg.ocr(to_match[i], {
-                action: 5,
-                part: true,
-                refresh: false,
-                log_policy: true,
-                saveSmallImg: false,
-                gather: staging_result,
-            })) {
-
-            return true;
-        }
-
-    }
-    //false跳出while
-    return false
-}

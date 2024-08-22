@@ -1,130 +1,133 @@
 let 基建任务 = {
     fatigue_state: false,
     main: function() {
-        if (ITimg.matchFeatures("基建", {
+        if (!this.进入基建()) {
+            tips = "既没有找到主页面基建键，也没有找到导航键。\n无法进入基建";
+            console.error(tips);
+            toast(tips);
+
+            return false;
+        }
+        return true;
+
+
+    },
+    进入基建: function() {
+        console.trace(this.navigation_infrastructure)
+        if (this.navigation_infrastructure === undefined) {
+            this.navigation_infrastructure = 0;
+        }
+        let _max = 3;
+        while (_max) {
+            let _confirm_go = ITimg.matchFeatures("基建", {
                 action: 0,
                 timing: 3000,
                 nods: 1000,
-                threshold: 0.65,
-                area: 34,
+                threshold: 0.80,
+                area: 4,
                 saveSmallImg: "主页_基建",
             }) || ITimg.matchFeatures("基建", {
                 action: 0,
                 timing: 3000,
                 area: 4,
-                threshold: 0.65,
+                threshold: 0.8,
                 refresh: false,
                 saveSmallImg: "主页_基建",
                 picture_failed_further: true,
-            })) {
-            return true;
-        }
-        if (ITimg.matchFeatures("导航", {
-                action: 0,
-                nods: 1000,
-                timing: 1500,
-                scale: 1,
-                area: 1,
-            }) || ITimg.matchFeatures("导航", {
-                action: 0,
-                timing: 1500,
-                area: 1,
-                refresh: false,
-                picture_failed_further: true,
-            }) || ITimg.matchFeatures("导航2", {
-                action: 0,
-                timing: 1500,
-                nods: 1000,
-                area: 1,
-                scale: 1,
-                refresh: false,
-            }) || ITimg.matchFeatures("导航2", {
-                action: 0,
-                timing: 1500,
-                area: 1,
-                refresh: false,
-                picture_failed_further: true,
-            })) {
+            })
 
-            if (!ITimg.matchFeatures("导航_基建", {
-                    action: 0,
-                    timing: 500,
-                    nods: 1000,
-                    area: 12,
-                    scale: 1,
-                }) && !ITimg.matchFeatures("导航_基建", {
-                    action: 0,
-                    timing: 500,
-                    area: 12,
-                    matcher: 2,
-                    refresh: false,
-                    picture_failed_further: true,
-                })) {
-                toastLog("没有找到导航_基建，无法执行基建任务");
-                return false;
-            } else {
-                return true;
+            if (!_confirm_go) {
+                _confirm_go = 导航定位("基建");
             }
-        } else {
-            toastLog("既没有找到主页面基建键，也没有找到导航键。\n无法进入基建");
-
-            //tool.Floaty_emit("展示文本", "状态", "状态：主程序暂停中");
-            // tool.Floaty_emit("暂停", "结束程序");
-            return false;
+            if (_confirm_go && this.确认已进入基建页面()) {
+                break
+            }
+            _max--;
         }
 
-
-
+        return _max;
 
     },
+    确认已进入基建页面: function(_action, _timing, _number) {
+        tool.Floaty_emit("面板", "隐藏");
+        sleep(300);
+
+        let _confirm;
+        let _max = 8;
+        if (_number) {
+            _max = _number;
+        }
+        //检查8次，可等待十几秒的样子
+        while (_max) {
+            _confirm = ITimg.matchFeatures("基建_建造模式", {
+                action: _action,
+                timing: _timing,
+                area: 1,
+            }) || ITimg.matchFeatures("基建_进驻总览", {
+                action: _action,
+                timing: _timing,
+                area: 1,
+                nods: 1000,
+                refresh: false,
+            })
+            if (_confirm) {
+                break;
+            }
+            _max--;
+        }
+        tool.Floaty_emit("面板", "展开");
+
+
+        return _confirm;
+
+    },
+
     待办处理: function() {
-        if (!ITimg.matchFeatures("基建_铃铛", {
-                action: 0,
-                area: 2,
-                timing: 2000,
-            }) && !ITimg.matchFeatures("基建_铃铛", {
-                action: 0,
-                area: 2,
-                timing: 2000,
-                threshold: 0.75,
-            })) {
-            toastLog("无法匹配铃铛 / 待办事项按钮，等待6秒")
+        if (typeof this.agency_number == "undefined") {
+            this.agency_number = 0;
+        }
+        while (等待提交反馈至神经()) {
+            sleep(500);
+        }
+        this.small_bell = ITimg.matchFeatures("基建_铃铛", {
+            action: 5,
+            area: 2,
+        }) || ITimg.matchFeatures("基建_铃铛", {
+            action: 5,
+            area: 2,
+            threshold: 0.75,
+            refresh: false,
+        })
+        if (!this.small_bell) {
+            tips = "无法匹配铃铛 / 待办事项按钮，等待6秒";
+            toast(tips);
+            console.warn(tips);
             sleep(6000);
-            if (!ITimg.matchFeatures("基建_铃铛", {
-                    action: 0,
-                    area: "右上半屏",
-                    timing: 1500,
-                }) && !ITimg.matchFeatures("基建_铃铛", {
-                    action: 0,
-                    area: "右上半屏",
-                    timing: 1500,
-                    threshold: 0.7,
-                })) {
-                /* toastLog("没有匹配到基建_铃铛, 点击返回重试");
-                 ITimg.matchFeatures("返回", {
-                     action: 4,
-                     timing: 1500,
-                     area: "左上半屏",
-                 });
-                 */
-                if (!ITimg.matchFeatures("基建_铃铛", {
-                        action: 0,
-                        area: "右上半屏",
-                        timing: 1500,
-                    }) && !ITimg.matchFeatures("基建_铃铛", {
-                        action: 0,
-                        area: "右上半屏",
-                        timing: 1500,
-                        threshold: 0.75,
-                    })) {
-                    toastLog("没有匹配到基建_铃铛, 没有待办");
-                    return false
-                }
+
+            this.small_bell = ITimg.matchFeatures("基建_铃铛", {
+                action: 5,
+                area: 2,
+            }) || ITimg.matchFeatures("基建_铃铛", {
+                action: 5,
+                area: 2,
+                threshold: 0.75,
+                refresh: false,
+                picture_failed_further: true,
+            })
+            if (!this.small_bell) {
+                tips = "没有匹配到基建_铃铛, 没有待办";
+                toast(tips);
+                console.error(tips);
+                return false;
             }
 
 
-
         }
+        let small_bell_xy = [this.small_bell.left + this.small_bell.w / 2, this.small_bell.top + this.small_bell.h / 2];
+        MyAutomator.click.apply(MyAutomator, small_bell_xy);
+        toastLog(small_bell_xy)
+        sleep(1200);
+
         let to_do = 0;
         if (ITimg.matchFeatures("基建_可收获", {
                 action: 0,
@@ -165,7 +168,21 @@ let 基建任务 = {
             to_do++;
             console.error("发现干员疲劳！基建换班:" + setting.基建换班);
         }
+        console.trace(small_bell_xy);
+        MyAutomator.click.apply(MyAutomator, small_bell_xy);
+        sleep(500);
+
         if (!to_do) {
+            //导航键和中枢中间的空白处，
+            small_bell_xy = [height / 2.5, width / 10];
+            //用于取消代办事项
+            MyAutomator.click.apply(MyAutomator, small_bell_xy);
+            sleep(1000);
+            this.agency_number++;
+            if (this.agency_number >= 3) {
+                console.verbose("重复点击代办");
+                return true;
+            }
             //重试收菜
             return this.待办处理();
 
@@ -180,7 +197,8 @@ let 基建任务 = {
             return false
         }
         tool.Floaty_emit("面板", "隐藏");
-        this.identify_frequency = 5;
+        tool.Floaty_emit("展示文本", "状态", "状态：使用无人机加速");
+        this.identify_frequency = 3;
         this.where_interface = 0;
         if (setting.加速生产) {
             console.info("查询制造站");
@@ -236,13 +254,9 @@ let 基建任务 = {
                         toast(tips);
                         console.error(tips);
                         sleep(500);
-                        ITimg.matchFeatures("返回", {
-                            action: 4,
-                            timing: 1200,
-                            area: "上半屏",
-                        });
+                        点击返回(1);
                         return false;
-                    };
+                    }
                 }
 
             }
@@ -260,73 +274,57 @@ let 基建任务 = {
                 area: 24,
                 timing: 1000,
             });
-            if (!ITimg.matchFeatures("无人机_确定", {
-                    action: 0,
-                    area: 24,
-                    timing: 3000,
-                    refresh:false,
-                })) {
-                ITimg.matchFeatures("无人机_确定", {
-                    action: 0,
-                    area: 4,
-                    matcher:2,
-                    timing: 3000,
-                    threshold: 0.75,
-                })
-            }
+            ITimg.matchFeatures("无人机_确定", {
+                action: 0,
+                area: 24,
+                timing: 3000,
+                refresh: false,
+            }) || ITimg.matchFeatures("无人机_确定", {
+                action: 0,
+                area: 4,
+                matcher: 2,
+                timing: 3000,
+                threshold: 0.75,
+            })
+
             ITimg.matchFeatures("无人机_收取", {
                 action: 0,
                 area: 4,
-                timing: 2000,
-            });
-            ITimg.matchFeatures("返回", {
-                action: 4,
-                timing: 1500,
-                area: 1,
+                timing: 1000,
             });
 
-            ITimg.matchFeatures("返回", {
-                action: 4,
-                timing: 2000,
-                area: 1,
-                refresh:false,
-            });
+            点击返回(2, true);
             //防止偶然点击返回方舟无反应的情况
-            if (ITimg.matchFeatures("制造站_制造中", {
-                    action: 5,
-                    area: "左下半屏",
-                })) {
-                ITimg.matchFeatures("返回", {
-                    action: 4,
-                    timing: 2000,
-                    area: 1,
-                });
+            let _max = 3;
+            while (_max) {
+                if (!this.确认已进入基建页面()) {
+                    点击返回(1, true);
+                } else {
+                    break
+                }
+                _max--;
             }
 
 
+
         } else {
-            console.info("查询贸易站");
+            console.info("---查询贸易站---");
             //进入贸易站
             while (this.identify_frequency) {
 
                 if (ITimg.matchFeatures("基建_贸易站", {
                         action: 0,
                         timing: 1500,
-                        nods: 500,
-                        area: "左半屏",
-                    }) || ITimg.matchFeatures("基建_贸易站", {
+                        grayscale:false,
+                        area: 13,
+                    }) ||ITimg.matchFeatures("基建_贸易站", {
                         action: 0,
                         timing: 1500,
-                        threshold: 0.75,
-                        log_policy: true,
-                        area: "下半屏",
-                    }) || ITimg.matchFeatures("基建_贸易站", {
-                        action: 0,
-                        timing: 1500,
-                        threshold: 0.70,
-                        area: "上半屏",
-                        log_policy: true,
-                    })) {
+                        picture_failed_further:true,
+                        area: 13,
+                        grayscale:false,
+                        matcher:2,
+                    })  ) {
                     break
                 } else {
                     if (this.identify_frequency == 1) {
@@ -356,23 +354,20 @@ let 基建任务 = {
             this.where_interface = (ITimg.matchFeatures("贸易站_获取中", {
                 action: 0,
                 timing: 1000,
-                area: "下半屏",
+                area: 3,
             }) || ITimg.matchFeatures("贸易站_获取中", {
                 action: 0,
                 timing: 1000,
-                area: "下半屏",
+                area: 3,
                 threshold: 0.75,
+                picture_failed_further:true,
             }));
             if (!this.where_interface) {
                 let tips = "无法匹配到 贸易站_获取中.png 小图，请确认图库是否匹配设备分辨率,或当前界面是否是贸易站界面";
                 toastLog(tips);
                 console.error(tips);
                 sleep(500);
-                ITimg.matchFeatures("返回", {
-                    action: 4,
-                    timing: 1200,
-                    area: "上半屏",
-                });
+                点击返回(1,true);
                 return false;
             }
             this.drone_assistance = 3;
@@ -416,7 +411,7 @@ let 基建任务 = {
                     timing: 200,
                     area: 24,
                 });
-                if (drone_assistance == 1) {
+                if (this.drone_assistance == 1) {
                     ITimg.matchFeatures("无人机_减少", {
                         action: 0,
                         timing: 2000,
@@ -433,30 +428,20 @@ let 基建任务 = {
                     threshold: 0.75,
                 }))
 
-                drone_assistance--;
+                this.drone_assistance--;
             }
             //返回基建主页面
-            ITimg.matchFeatures("返回", {
-                action: 4,
-                timing: 1500,
-                area: 1,
-            });
-            ITimg.matchFeatures("返回", {
-                action: 4,
-                timing: 2000,
-                area: 1,
-                refresh:false,
-            });
 
-            if (ITimg.matchFeatures("贸易站_获取中", {
-                    action: 5,
-                    area: "下半屏",
-                })) {
-                ITimg.matchFeatures("返回", {
-                    action: 4,
-                    timing: 2000,
-                    area: 1,
-                });
+            点击返回(2, true);
+            //防止偶然点击返回方舟无反应的情况
+            let _max = 3;
+            while (_max) {
+                if (!this.确认已进入基建页面()) {
+                    点击返回(1, true);
+                } else {
+                    break
+                }
+                _max--;
             }
             if (ITimg.matchFeatures("基建_蓝色铃铛", {
                     action: 0,
@@ -480,6 +465,40 @@ let 基建任务 = {
 
     },
 
+
+    放大基建界面: function() {
+        //0秒后执行,持续500毫秒
+        let left_gesture = [0, 500]
+        let right_gesture = [0, 500]
+
+        for (let i = 0; i < 10; i++) {
+            let axis_x = height / 2 - i * 50;
+            let axis_y = width / 2;
+            //在最后一步向上滑动,防止手势带来的惯性
+            if (i == 9) {
+                axis_x = height / 2 - (i - 1) * 50;
+                axis_y = width / 2 - 50;
+            }
+            left_gesture.push([axis_x, axis_y])
+        }
+        for (let i = 0; i < 10; i++) {
+            let axis_x = height / 2 + i * 50;
+            let axis_y = width / 2;
+            if (i == 9) {
+                axis_x = height / 2 + (i - 1) * 50;
+                axis_y = width / 2 - 50;
+            }
+            right_gesture.push([axis_x, axis_y]);
+        }
+        let gesturesAry_ = [
+            [left_gesture, right_gesture]
+        ];
+
+        for (let i = 0; i < gesturesAry_.length; i++) {
+            gestures.apply(null, gesturesAry_[i]);
+            sleep(400);
+        }
+    },
     会客室线索处理: function() {
         if (!setting.会客室线索) {
             sleep(200);
@@ -602,17 +621,7 @@ let 基建任务 = {
 
             toastLog("没有匹配到 线索_会客室.png , 无法处理线索! ");
             sleep(500);
-            (ITimg.matchFeatures("返回", {
-                action: 4,
-                timing: 1500,
-                nods: 500,
-                area: 1,
-            }) || ITimg.matchFeatures("返回", {
-                action: 4,
-                timing: 1500,
-                area: 1,
-                threshold: 0.75,
-            }));
+            点击返回(1, true);
             return false;
         }
 
@@ -640,20 +649,7 @@ let 基建任务 = {
                 threshold: 0.75,
                 refresh: false,
             })) {
-            if (!ITimg.matchFeatures("返回", {
-                    action: 4,
-                    timing: 1500,
-                    nods: 500,
-                    area: 1,
-                }) && !ITimg.matchFeatures("返回", {
-                    action: 4,
-                    timing: 1500,
-                    area: 1,
-                    threshold: 0.75,
-                    refresh: false,
-                })) {
-                toastLog("找不到返回键");
-            }
+            点击返回(1, true);
         }
         //处理即将溢出线索
         if (setting.处理线索溢出 == "线索待处理") {
@@ -781,36 +777,12 @@ let 基建任务 = {
 
                 toastLog("没有新的可领取线索");
                 sleep(500);
-                /** 
-                * 下个就是好友访问了,直接离开基建,不用返回基建主页
-                (ITimg.matchFeatures("返回", {
-                    action: 0,
-                    timing: 1500,
-                    nods: 500,
-                    area: "左半屏",
-                }) || ITimg.matchFeatures("返回", {
-                    action: 0,
-                    timing: 1500,
-                    area: "上半屏",
-                    threshold: 0.75,
-                }));
-                (ITimg.matchFeatures("返回", {
-                    action: 0,
-                    timing: 1500,
-                    nods: 500,
-                    area: "左半屏",
-                }) || ITimg.matchFeatures("返回", {
-                    action: 0,
-                    timing: 1500,
-                    area: "上半屏",
-                    threshold: 0.75,
-                }));
-                */
+
                 break
                 //  return true;
             }
 
-            //点击new可领取新的
+            //点击new可领取新的线索
             MyAutomator.click((temporary_xy.x + temporary_xy.w / 2) - 15, temporary_xy.bottom);
             MyAutomator.click((temporary_xy.x + temporary_xy.w / 2) - 25, temporary_xy.bottom);
             MyAutomator.click((temporary_xy.x + temporary_xy.w / 2) - 40, temporary_xy.bottom);
@@ -844,6 +816,7 @@ let 基建任务 = {
         }
 
         sleep(400);
+        //点击线索5，打开线索库
         click(height / 2, width - width / 4);
         sleep(800);
         //放入线索
@@ -883,45 +856,10 @@ let 基建任务 = {
 
         ITimg.matchFeatures("线索_解锁", {
             action: 0,
-            timing: 2000,
-            area: "下半屏",
+            timing: 1000,
+            area: 34,
         })
 
-        /** 
-         * 下个就是好友访问了,直接离开基建,不用返回基建主页
-                sleep(500);
-                (ITimg.matchFeatures("返回", {
-                    action: 0,
-                    timing: 2000,
-                    nods: 1500,
-                    area: "左半屏",
-                }) || ITimg.matchFeatures("返回", {
-                    action: 0,
-                    timing: 2000,
-                    area: "左半屏",
-                }));
-                ///还在会客室时再点下返回
-                if(ITimg.matchFeatures("线索_会客室", {
-                    action: 0,
-                    timing: 2000,
-                    area: "下半屏",
-                }) || ITimg.matchFeatures("线索_会客室", {
-                    action: 0,
-                    timing: 2000,
-                    area: "左半屏",
-                })){
-                    (ITimg.matchFeatures("返回", {
-                        action: 0,
-                        timing: 2000,
-                        nods: 1500,
-                        area: "左半屏",
-                    }) || ITimg.matchFeatures("返回", {
-                        action: 0,
-                        timing: 2000,
-                        area: "左半屏",
-                    }));
-                }
-                */
         return true;
 
     },
@@ -947,7 +885,7 @@ let 基建任务 = {
             }
         }
         sleep(500)
-        let img = ITimg.captureScreen_()
+        let img = ITimg.captureScreen_();
         let point = findColor(img, "#ff6800", {
             region: [Math.floor(height / 1.6), 0, Math.floor(height / 4.8), width],
             threads: 6
@@ -961,282 +899,9 @@ let 基建任务 = {
             Combat_report.record("传递线索：" + xs, undefined, "info")
 
             sleep(500)
-            return true
+            return true;
         }
         return false
-    },
-    放大基建界面: function() {
-        //0秒后执行,持续500毫秒
-        let left_gesture = [0, 500]
-        let right_gesture = [0, 500]
-
-        for (let i = 0; i < 10; i++) {
-            let axis_x = height / 2 - i * 50;
-            let axis_y = width / 2;
-            //在最后一步向上滑动,防止手势带来的惯性
-            if (i == 9) {
-                axis_x = height / 2 - (i - 1) * 50;
-                axis_y = width / 2 - 50;
-            }
-            left_gesture.push([axis_x, axis_y])
-        }
-        for (let i = 0; i < 10; i++) {
-            let axis_x = height / 2 + i * 50;
-            let axis_y = width / 2;
-            if (i == 9) {
-                axis_x = height / 2 + (i - 1) * 50;
-                axis_y = width / 2 - 50;
-            }
-            right_gesture.push([axis_x, axis_y]);
-        }
-        let gesturesAry_ = [
-            [left_gesture, right_gesture]
-        ];
-
-        for (let i = 0; i < gesturesAry_.length; i++) {
-            gestures.apply(null, gesturesAry_[i]);
-            sleep(400);
-        };
-    },
-    确认已进入基建页面: function() {
-        while (true) {
-            sleep(100)
-            ITimg.matchFeatures("基建", {
-                action: 0,
-                timing: 3000,
-                area: 4,
-            })
-            sleep(100);
-            if (ITimg.matchFeatures("返回", {
-                    action: 5,
-                    timing: 1500,
-                    area: "左上半屏",
-                }) || ITimg.matchFeatures("基建_铃铛", {
-                    action: 5,
-                    timing: 1500,
-                    area: "右上半屏",
-                })) {
-                sleep(200)
-                break;
-            } else {
-                if (ITimg.matchFeatures("导航", {
-                        action: 0,
-                        timing: 1500,
-                        area: 1,
-                    }) || ITimg.matchFeatures("导航2", {
-                        action: 0,
-                        timing: 1500,
-                        area: 1,
-                        refresh: false,
-                    })) {
-                    if (ITimg.matchFeatures("导航_基建", {
-                            action: 0,
-                            timing: 3000,
-                            area: "上半屏",
-                        })) {
-                        break;
-                    }
-                }
-            }
-
-        }
-        return true;
-    },
-    访问好友: function() {
-        setting = tool.readJSON("configure");
-        let Day = new Date().getMonth(); //月
-        let Dat = new Date().getDate(); //日
-        Day = Day + 1;
-        if (Day + "." + Dat != setting.当天) {
-            if (new Date().getHours() >= 4) {
-                tool.writeJSON("当天", Day + "." + Dat);
-                setting.好友 = 0;
-                tool.writeJSON("好友", 0);
-            }
-        }
-        if (!setting.好友访问 || setting.好友 >= 10) {
-            if (setting.好友 >= 10) {
-                toastLog("今日访问好友已上限");
-            } else {
-                log("好友访问" + setting.好友访问);
-            }
-
-            return false
-        }
-        if (Day + "." + Dat != setting.当天) {
-            if (new Date().getHours() >= 4) {
-                tool.writeJSON("当天", Day + "." + Dat);
-                tool.writeJSON("好友", 0);
-            }
-        }
-        Day = null;
-        Dat = null;
-        tool.Floaty_emit("展示文本", "状态", "状态：执行访问好友中");
-        tool.Floaty_emit("面板", "隐藏");
-        (ITimg.matchFeatures("导航", {
-            action: 0,
-            timing: 1000,
-            area: 1,
-        }) || ITimg.matchFeatures("导航2", {
-            action: 0,
-            timing: 1000,
-            area: 1,
-            refresh: false,
-        }))
-        sleep(200);
-        temporary_xy = (ITimg.matchFeatures("导航_任务", {
-            action: 5,
-            nods: 2000,
-            area: 2,
-        }) || ITimg.matchFeatures("导航_任务", {
-            action: 5,
-            area: 2,
-            refresh: false,
-            matcher: 2,
-        }))
-        if (!temporary_xy) {
-            toast("没有找到导航_任务，无法执行好友访问");
-            console.error("没有找到导航_任务，无法执行好友访问");
-            return false;
-        }
-        log("点击 导航_任务转导航_好友, x:" + (temporary_xy.x + temporary_xy.w) + "y:" + temporary_xy.y)
-        sleep(10);
-        MyAutomator.click((temporary_xy.x + temporary_xy.w) + 100, temporary_xy.y);
-        sleep(100)
-        MyAutomator.click((temporary_xy.x + temporary_xy.w) + 50, temporary_xy.y);
-        sleep(100)
-        MyAutomator.click(temporary_xy.x + temporary_xy.w, temporary_xy.y);
-        sleep(600);
-        (ITimg.matchFeatures("基建_离开", {
-            action: 0,
-            timing: 6000,
-            nods: 500,
-            area: 4,
-        }) || ITimg.matchFeatures("基建_离开", {
-            action: 0,
-            timing: 6000,
-            area: 4,
-        }))
-
-
-        this.identify_frequency = 10;
-        while (this.identify_frequency) {
-            if (!ITimg.matchFeatures("好友列表", {
-                    action: 0,
-                    timing: 1000,
-                    area: "上半屏",
-                    nods: 1000,
-                })) {
-                if (this.identify_frequency == 1) {
-                    let tips = "长时间无法匹配到 好友访问.png 小图，请确认图库是否匹配设备分辨率, 或当前界面是否好友界面";
-                    toast(tips);
-                    console.error(tips);
-                    return false;
-                }
-                this.identify_frequency--;
-            } else {
-                break;
-            }
-        }
-
-        sleep(200);
-
-        if (!ITimg.matchFeatures("访问基建", {
-                action: 0,
-                timing: 8000,
-                matcher: 2,
-                nods: 200,
-                area: 4,
-            }) && !ITimg.matchFeatures("访问基建", {
-                action: 0,
-                area: 4,
-                timing: 8000,
-                scale: 1,
-                refresh: false,
-            })) {
-            function obtain_access_infrastructure() {
-                let button_list = ITimg.contour({
-                    canvas: "访问基建",
-                    action: 5,
-                    area: 4,
-                    isdilate: true,
-                    threshold: 240,
-                    size: 15,
-                    type: "BINARY",
-                    filter_w: zox(30),
-                    filter_h: zoy(30),
-                });
-                if (button_list && button_list.length) {
-                    let access_infrastructure;
-                    // console.info(button_list)
-                    for (let asie of button_list) {
-                        if (!access_infrastructure || access_infrastructure.y < asie.y) {
-                            access_infrastructure = asie;
-                        }
-
-                    }
-                    if (access_infrastructure) {
-                        log(access_infrastructure)
-                        return [access_infrastructure.x, access_infrastructure.y];
-                    }
-                    return false;
-                }
-                return false;
-            }
-            let asie_ = obtain_access_infrastructure();
-
-            if (asie_) {
-                MyAutomator.click.apply(MyAutomator, asie_);
-                sleep(8000);
-            } else {
-                toast("没有找到访问基建，无法执行好友访问");
-                console.error("没有找到访问基建，无法执行好友访问");
-                return false;
-            }
-        }
-        tool.Floaty_emit("面板", "展开");
-        if (!setting.好友限制) {
-            setting.好友 = 0;
-        }
-        while (true) {
-            if (setting.好友 >= 10) {
-                Combat_report.record("今日累计访问" + setting.好友 + "个好友");
-                toastLog("已访问十次，达到上限，退出访问");
-                break;
-            }
-
-
-            let visit = ITimg.matchFeatures("访问下位", {
-                action: 5,
-                nods: 1000,
-                area: 4,
-            })
-            if (visit) {
-                if (!ITimg.matchFeatures("好友_重复访问", {
-                        action: 5,
-                        area: 2,
-                        threshold: 0.85,
-                        scale: 1,
-                    })) {
-                    visit = [visit.x + (visit.w / 2), visit.y + (visit.h / 2)];
-                    MyAutomator.click.apply(MyAutomator, visit);
-                    sleep(2000);
-                    setting.好友 = setting.好友 + 1;
-                    tool.writeJSON("好友", setting.好友);
-                } else {
-                    toastLog("今日访问" + setting.好友 + "个好友,没有待访问，退出");
-
-                    break
-                }
-                sleep(1000);
-            }
-
-            tool.Floaty_emit("展示文本", "理智", "恢复" + setting.已兑理智 + "次理智，访问" + setting.好友 + "个好友");
-        } //循环
-        Combat_report.record("今日累计访问" + setting.好友 + "个好友");
-
-        return true;
-
     },
 }
 

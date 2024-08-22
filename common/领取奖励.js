@@ -6,38 +6,29 @@ function 任务() {
     //toastLog("2秒后启动任务领取奖励程序");
     sleep(1000);
 
-    ITimg.matchFeatures("导航", {
-        action: 0,
-        timing: 1000,
-        area: 1,
-    }) || ITimg.matchFeatures("导航2", {
-        action: 0,
-        timing: 1000,
-        area: 1,
-        refresh: false,
-    })
-    if (ITimg.matchFeatures("导航_任务", {
-            action: 0,
-            area: "上半屏",
-            timing: 2000,
-        })) {
+    if (导航定位("任务")) {
         ITimg.matchFeatures("基建_离开", {
             action: 0,
-            area: "下半屏",
+            area: 4,
             timing: 8000,
-            nods: 3000,
+            nods: 1000,
         });
     } else {
-        toastLog("没有找到导航_任务");
+        tips = "无法通过导航定位进入任务界面";
+        toast(tips);
+        console.error(tips);
         tool.Floaty_emit("展示文本", "状态", "状态：主程序暂停中");
         tool.Floaty_emit("暂停", "结束程序");
-        return;
+        return false;
     }
-    temporary_xy = false;
+    while(!导航定位("任务",true)){
+        sleep(500);
+    }
+    this.temporary_xy = false;
     for (let i = 1; i <= 2; i++) {
         //获取周常任务位置点击日常任务
-        if (!temporary_xy) {
-            temporary_xy = (ITimg.matchFeatures("周常任务", {
+        if (!this.temporary_xy) {
+            this.temporary_xy = (ITimg.matchFeatures("周常任务", {
                 area: 2,
                 action: 5,
                 nods: 2000,
@@ -48,19 +39,19 @@ function 任务() {
             }) || ITimg.matchFeatures("周常任务", {
                 area: 12,
                 action: 5,
-                refresh:false,
-                matcher:2,
+                refresh: false,
+                matcher: 2,
             }))
         }
-        if (temporary_xy) {
-            console.verbose("周常任务位置数据:\n" + JSON.stringify(temporary_xy));
+        if (this.temporary_xy) {
+            console.verbose("周常任务位置数据:\n" + JSON.stringify(this.temporary_xy));
             if (i == 1) {
-                MyAutomator.click(temporary_xy.x - zox(150), temporary_xy.y);
+                MyAutomator.click(this.temporary_xy.x - zox(150), this.temporary_xy.y);
                 sleep(100);
-                MyAutomator.click(temporary_xy.x - zoy(200), temporary_xy.y);
+                MyAutomator.click(this.temporary_xy.x - zoy(200), this.temporary_xy.y);
                 sleep(600);
             } else {
-                MyAutomator.click(temporary_xy.x + temporary_xy.w / 2, temporary_xy.y + temporary_xy.h / 2);
+                MyAutomator.click(this.temporary_xy.x + this.temporary_xy.w / 2, this.temporary_xy.y + this.temporary_xy.h / 2);
             }
         }
 
@@ -98,54 +89,20 @@ function 任务() {
                 timing: 2000,
             });
         } else {
-            toastLog("没有待领取" + (i == 1 ? '日常' : '周常') + "奖励了");
-        };
-
-
-    }
-    if (!ITimg.matchFeatures("返回", {
-            action: 4,
-            area: 1,
-            timing: 1500,
-            nods: 1000,
-            scale: 1,
-        })) {
-        if (ITimg.matchFeatures("获得物资", {
-                action: 0,
-                area: "上半屏",
-                timing: 1000,
-            })) {
-
-            if (!ITimg.matchFeatures("返回", {
-                    action: 4,
-                    area: 1,
-                    timing: 1500,
-                    nods: 1000,
-                    scale: 1,
-                })) {
-                toastLog("找不到返回键");
-            }
+            tips = "没有待领取" + (i == 1 ? '日常' : '周常') + "奖励了";
+            toast(tips);
+            console.warn(tips);
         }
+
+
+    }
+    if (!点击返回(1)) {
+        MyAutomator.click.apply(MyAutomator, [height / 2, width / 1.2]);
+        sleep(1000);
+
+        点击返回(1, true);
     }
 
-    /*  } else {
-        if (!ITimg.matchFeatures("返回", {
-                action: 4,
-                area: 1,
-                timing: 1500,
-            })) {
-            toastLog("找不到返回键");
-        } else {
-            ITimg.matchFeatures("基建_离开", {
-                action: 0,
-                area: 4,
-                timing: 6000,
-            });
-        }
-        toastLog("任务奖励:" + setting.claim_rewards.daily)
-    }
-
-*/
 
 }
 

@@ -32,6 +32,183 @@ let 信用处理 = {
 
 
     },
+    访问好友: function() {
+        setting = tool.readJSON("configure");
+        let Day = new Date().getMonth(); //月
+        let Dat = new Date().getDate(); //日
+        Day = Day + 1;
+        if (Day + "." + Dat != setting.当天) {
+            if (new Date().getHours() >= 4) {
+                tool.writeJSON("当天", Day + "." + Dat);
+                setting.好友 = 0;
+                tool.writeJSON("好友", 0);
+            }
+        }
+        if (!setting.好友访问 || setting.好友 >= 10) {
+            if (setting.好友 >= 10) {
+                toastLog("今日访问好友已上限");
+            } else {
+                log("好友访问" + setting.好友访问);
+            }
+
+            return false
+        }
+        if (Day + "." + Dat != setting.当天) {
+            if (new Date().getHours() >= 4) {
+                tool.writeJSON("当天", Day + "." + Dat);
+                tool.writeJSON("好友", 0);
+            }
+        }
+        Day = null;
+        Dat = null;
+        tool.Floaty_emit("展示文本", "状态", "状态：执行访问好友中");
+        tool.Floaty_emit("面板", "隐藏");
+        if (导航定位("好友")) {
+            (ITimg.matchFeatures("基建_离开", {
+                action: 0,
+                timing: 6000,
+                nods: 500,
+                area: 4,
+            }) || ITimg.matchFeatures("基建_离开", {
+                action: 0,
+                timing: 6000,
+                area: 4,
+            }))
+        } else {
+            tips = "无法通过导航定位进入好友界面";
+            toast(tips);
+            console.error(tips);
+            return false;
+        }
+
+        this.identify_frequency = 8;
+        while (this.identify_frequency) {
+            if (!ITimg.matchFeatures("好友列表", {
+                    action: 0,
+                    timing: 1000,
+                    area: 1,
+                    nods: 1000,
+                })) {
+                if (this.identify_frequency == 1) {
+                    let tips = "长时间无法匹配到 好友访问.png 小图，请确认图库是否匹配设备分辨率, 或当前界面是否好友界面";
+                    toast(tips);
+                    console.error(tips);
+                    return false;
+                }
+                this.identify_frequency--;
+            } else {
+                break;
+            }
+        }
+        while (等待提交反馈至神经()) {
+            sleep(500);
+        }
+
+        if (!ITimg.matchFeatures("访问基建", {
+                action: 0,
+                timing: 8000,
+                matcher: 2,
+                nods: 1000,
+                area: 4,
+            }) && !ITimg.matchFeatures("访问基建", {
+                action: 0,
+                area: 4,
+                timing: 8000,
+                scale: 1,
+                picture_failed_further: true,
+            })) {
+            function obtain_access_infrastructure() {
+                let button_list = ITimg.contour({
+                    canvas: "访问基建",
+                    action: 5,
+                    area: 4,
+                    isdilate: true,
+                    threshold: 240,
+                    size: 15,
+                    type: "BINARY",
+                    filter_w: zox(30),
+                    filter_h: zoy(30),
+                });
+                if (button_list && button_list.length) {
+                    let access_infrastructure;
+                    // console.info(button_list)
+                    for (let asie of button_list) {
+                        if (!access_infrastructure || access_infrastructure.y < asie.y) {
+                            access_infrastructure = asie;
+                        }
+
+                    }
+                    if (access_infrastructure) {
+                        log(access_infrastructure)
+                        return [access_infrastructure.x, access_infrastructure.y];
+                    }
+                    return false;
+                }
+                return false;
+            }
+            let asie_ = obtain_access_infrastructure();
+
+            if (asie_) {
+                MyAutomator.click.apply(MyAutomator, asie_);
+                sleep(8000);
+            } else {
+                toast("没有找到访问基建，无法执行好友访问");
+                console.error("没有找到访问基建，无法执行好友访问");
+                return false;
+            }
+        }
+        tool.Floaty_emit("面板", "展开");
+        if (!setting.好友限制) {
+            setting.好友 = 0;
+        }
+        this.identify_frequency = 0;
+        while (true) {
+            if (setting.好友 >= 10) {
+                Combat_report.record("今日累计访问" + setting.好友 + "个好友");
+                toastLog("已访问十次，达到上限，退出访问");
+                break;
+            }
+
+
+            let visit = ITimg.matchFeatures("访问下位", {
+                action: 5,
+                nods: 1000,
+                area: 4,
+            })
+            if (visit) {
+                if (this.identify_frequency == 0 || ITimg.matchFeatures("信用_获得信用点30", {
+                        action: 5,
+                        area: 2,
+                        threshold: 0.85,
+                        scale: 1,
+                    })) {
+                    visit = [visit.x + (visit.w / 2), visit.y + (visit.h / 2)];
+                    MyAutomator.click.apply(MyAutomator, visit);
+                    sleep(2000);
+                    this.identify_frequency++;
+                    setting.好友 = setting.好友 + 1;
+                } else {
+                    this.identify_frequency--;
+                    setting.好友 = setting.好友 - 1;
+
+                    toastLog("今日访问" + setting.好友 + "个好友,没有待访问，退出");
+
+                    break
+                }
+                sleep(1000);
+                tool.writeJSON("好友", setting.好友);
+
+            }
+
+            tool.Floaty_emit("展示文本", "理智", "恢复" + setting.已兑理智 + "次理智，访问" + setting.好友 + "个好友");
+        } //循环
+
+        Combat_report.record("今日累计访问" + setting.好友 + "个好友");
+
+        return true;
+
+    },
+
     采购: function() {
         sleep(50);
         if (!this.setting.收取信用) {
@@ -45,29 +222,8 @@ let 信用处理 = {
         toastLog("2秒后启动采购程序");
         sleep(1500);
 
-        let _navigation = (ITimg.matchFeatures("导航", {
-            action: 0,
-            timing: 1500,
-            area: 1,
-        }) || ITimg.matchFeatures("导航2", {
-            action: 0,
-            timing: 1500,
-            area: 1,
-        }))
-        if (!_navigation || (!ITimg.matchFeatures("导航_采购中心", {
-                action: 0,
-                timing: 3000,
-                nods: 1000,
-                area: 2,
-            }) && !ITimg.matchFeatures("导航_采购中心", {
-                action: 0,
-                timing: 3000,
-                nods: 500,
-                area: 24,
-            }))) {
-            _navigation = false;
+        let _navigation = 导航定位("采购中心")
 
-        }
         if (!_navigation) {
             _navigation = ITimg.matchFeatures("主页_采购中心", {
                 action: 0,
@@ -79,7 +235,7 @@ let 信用处理 = {
 
         if (!_navigation) {
 
-            tips = "无法进入采购中心，处理信用点失败";
+            tips = "无法通过导航定位进入采购中心，处理信用点失败";
             toast(tips);
             console.error(tips);
             return false
@@ -97,15 +253,15 @@ let 信用处理 = {
                     action: 0,
                     timing: 3000,
                     area: 2,
-                    threshold:0.85,
-                    nods:1000,
-                })||ITimg.matchFeatures("收取信用", {
+                    threshold: 0.85,
+                    nods: 1000,
+                }) || ITimg.matchFeatures("收取信用", {
                     action: 0,
                     timing: 3000,
                     area: 2,
-                    threshold:0.85,
-                    matcher:2,
-                    picture_failed_further:true,
+                    threshold: 0.85,
+                    matcher: 2,
+                    picture_failed_further: true,
                 })) {
                 while (等待提交反馈至神经()) {
                     sleep(500);
@@ -129,7 +285,7 @@ let 信用处理 = {
                 toastLog("没有待收取信用");
                 return true;
             }
-
+            return true;
 
             /* threadMain.interrupt();
              threadMain = threads.start(任务);*/
