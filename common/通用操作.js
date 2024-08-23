@@ -26,14 +26,14 @@ let currency = {
             if (_confirm) {
                 sleep(1200);
                 _number--;
-            }else{
+            } else {
                 _max--;
-                if(!_max){
+                if (!_max) {
                     break;
                 }
             }
         }
-        return _confirm||_max;
+        return _confirm || _max;
     },
     /**
      * @param {string|number} menu - 导航到的菜单，详情查看this.menu
@@ -57,6 +57,7 @@ let currency = {
             ["好友", 2],
             ["采购中心", 2]
         ]
+        tool.Floaty_emit("展示文本", "状态", "状态：导航定位菜单...");
 
         let _max = 3;
         while (_max) {

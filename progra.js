@@ -452,7 +452,7 @@ function 基建() {
         console.info("无人机加速" + setting.无人机加速)
         if (agency) {
             基建任务.无人机加速();
-
+        tool.Floaty_emit("面板", "展开");
             基建任务.会客室线索处理();
         }
 

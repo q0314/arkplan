@@ -208,19 +208,15 @@ let 基建任务 = {
                 this.where_interface = (ITimg.matchFeatures("基建_制造站", {
                     action: 0,
                     timing: 1500,
-                    area: "左半屏",
+                    area: 13,
                     nods: 500,
                     threshold: 0.7,
                 }) || ITimg.matchFeatures("基建_制造站", {
                     action: 0,
                     timing: 1500,
-                    area: "下半屏",
-                    threshold: 0.7,
-                }) || ITimg.matchFeatures("基建_制造站", {
-                    action: 0,
-                    timing: 1500,
-                    area: "上半屏",
-                    threshold: 0.7,
+                    area: 13,
+                    matcher:2,
+                    picture_failed_further:true,
                 }));
 
 
@@ -234,11 +230,11 @@ let 基建任务 = {
                     }
 
                 }
-
+        tool.Floaty_emit("面板", "展开");
                 this.in_manufacturing = (ITimg.matchFeatures("制造站_制造中", {
                     action: 0,
                     timing: 1000,
-                    area: "左下半屏",
+                    area: 3,
                 }) || ITimg.matchFeatures("制造站_制造中", {
                     action: 0,
                     timing: 1000,
@@ -349,7 +345,7 @@ let 基建任务 = {
                 threshold: 0.75,
                 log_policy: true,
             }));
-
+        tool.Floaty_emit("面板", "展开");
             //开始执行贸易站无人机加速
             this.where_interface = (ITimg.matchFeatures("贸易站_获取中", {
                 action: 0,
@@ -505,6 +501,7 @@ let 基建任务 = {
             log("会客室线索" + setting.会客室线索);
             return false;
         }
+                tool.Floaty_emit("面板", "展开");
         tool.Floaty_emit("展示文本", "状态", "状态：准备线索处理中");
         ITimg.matchFeatures("基建_蓝色铃铛", {
             action: 0,

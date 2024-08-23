@@ -117,7 +117,7 @@ function 检测tag() {
             "名称": bon[bon.findIndex(curr => curr.indexOf("资深") != -1)]
         });
 
-        点击返回(1,true);
+        点击返回(1, true);
 
         position += 1;
         toastLog(bon[bon.findIndex(curr => curr.indexOf("资深") != -1)] + " tag, 跳过该公招位");
@@ -176,90 +176,92 @@ var 公招 = {
             Manual = true;
         } else {
 
-            if (!导航定位(6,true)) {
+            if (!导航定位(6, true)) {
                 MyAutomator.click(height / 3 + random(-10, 10), 5 + random(5, 10));
                 sleep(1000);
             }
 
             if (导航定位(6)) {
-                    tool.Floaty_emit("面板", "隐藏");
-                    while (true) {
+                tool.Floaty_emit("面板", "隐藏");
+                while (true) {
 
-                        ITimg.matchFeatures("基建_离开", {
-                            action: 0,
-                            area: "右半屏",
-                            timing: 3000,
-                        });
-                        if (导航定位(6,true)) {
-                            while(等待提交反馈至神经()){
+                    ITimg.matchFeatures("基建_离开", {
+                        action: 0,
+                        area: "右半屏",
+                        timing: 3000,
+                    });
+                    if (导航定位(6, true)) {
+                        while (等待提交反馈至神经()) {
+                            sleep(500);
+                        }
+                        break;
+                    }
+                }
+
+                if (setting.自动聘用) {
+                    while (true) {
+                        if (ITimg.matchFeatures("公招_聘用", {
+                                action: 0,
+                                timing: 2000,
+                                nods: 500,
+                            }) || ITimg.matchFeatures("公招_聘用", {
+                                action: 0,
+                                timing: 2000,
+                                area: 13,
+                                matcher: 2,
+                                refresh: false,
+                            })) {
+                            while (true) {
+                                if (ITimg.matchFeatures("公招_skip", {
+                                        action: 0,
+                                        timing: 2000,
+                                        area: 2,
+                                        nods: 1000,
+                                    }) || ITimg.matchFeatures("公招_skip", {
+                                        action: 0,
+                                        timing: 2000,
+                                        matcher: 2,
+                                        refresh: false,
+                                    })) {
+                                    let czname = ITimg.ocr("获取干员名", {
+                                        action: 6,
+                                        correction_path: "公招",
+                                    });
+                                    czname = this.result_js.get_t(czname);
+                                    czname = (czname ? czname.level + "☆ " + czname.name : "无法获取干员名");
+                                    Combat_report.record("自动聘用：" + czname, false, "warn")
+                                }
+                                MyAutomator.click(height / 2, width / 2);
                                 sleep(500);
+
+                                if (导航定位(6, true)) {
+                                    sleep(500);
+                                    break;
+                                } else {
+                                    MyAutomator.click(height / 2, width / 2);
+                                    sleep(300);
+                                }
                             }
+                        } else {
                             break;
                         }
                     }
+                } else {
+                    log("自动聘用" + setting.自动聘用);
+                }
 
-                    if (setting.自动聘用) {
-                        while (true) {
-                            if (ITimg.matchFeatures("公招_聘用", {
-                                    action: 0,
-                                    timing: 2000,
-                                    nods: 500,
-                                }) || ITimg.matchFeatures("公招_聘用", {
-                                    action: 0,
-                                    timing: 2000,
-                                    area: 13,
-                                    matcher: 2,
-                                    refresh: false,
-                                })) {
-                                while (true) {
-                                    if (ITimg.matchFeatures("公招_skip", {
-                                            action: 0,
-                                            timing: 2000,
-                                            area: 2,
-                                            nods: 1000,
-                                        }) || ITimg.matchFeatures("公招_skip", {
-                                            action: 0,
-                                            timing: 2000,
-                                            matcher: 2,
-                                            refresh: false,
-                                        })) {
-                                        let czname = ITimg.ocr("获取干员名", {
-                                            action: 6,
-                                            correction_path: "公招",
-                                        });
-                                        czname = this.result_js.get_t(czname);
-                                        czname = (czname ? czname.level + "☆ " + czname.name : "无法获取干员名");
-                                        Combat_report.record("自动聘用：" + czname, false, "warn")
-                                    }
-
-                                    if (导航定位(6,true)) {
-                                        sleep(500);
-                                        break;
-                                    } else {
-                                        MyAutomator.click(height/2,width/2);
-                                    sleep(300);
-                                    }
-                                }
-                            } else {
-                                break;
-                            }
-                        }
-                    } else {
-                        log("自动聘用" + setting.自动聘用);
+                for (let i = 1; i <= 5; i++) {
+                    if (公招.选择位置(i)) {
+                        break
+                    } else if (i == 4) {
+                        toast("无法确认已进入招募干员界面");
+                        console.error("无法确认已进入招募干员界面");
+                        tool.Floaty_emit("展示文本", "状态", "状态：无法确认进入tag选择界面");
                     }
-
-                    for (let i = 1; i <= 5; i++) {
-                        if (公招.选择位置(i)) {
-                            break
-                        } else if (i == 4) {
-                            toast("无法确认已进入招募干员界面");
-                            console.error("无法确认已进入招募干员界面");
-                            tool.Floaty_emit("展示文本", "状态", "状态：无法确认进入tag选择界面");
-                        }
-                    }
+                }
 
 
-                
+
             }
         }
 

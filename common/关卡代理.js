@@ -54,105 +54,23 @@ let 关卡代理 = {
                 if (ITimg.matchFeatures("行动_编队确认开始", {
                         action: 5,
                         timing: 1000,
-                        area: "右半屏",
+                        area: 4,
                     })) {
                     console.verbose("结束自动代理环节")
                     break
                 }
                 if (setting.已执行动 == 0) {
                     //有开始行动界面才能判断
-                    if (ITimg.matchFeatures("行动_普通", {
-                            action: 5,
-                            threshold: 0.75,
-                            area: 4,
-                            picture_failed_further: true,
-                            //    visualization: true,
-                        }) || ITimg.matchFeatures("行动_磨难", {
-                            action: 5,
-                            threshold: 0.75,
-                            area: 4,
-                        }) || ITimg.matchFeatures("行动_愚人号", {
-                            action: 5,
-                            area: "右半屏",
-                        }) || ITimg.matchFeatures("行动_活动", {
-                            action: 5,
-                            area: "右半屏",
-                            threshold: 0.75,
-                        })) {
+                    if (this.检验已选中关卡(5, true)) {
 
-                        tool.Floaty_emit("展示文本", "状态", "状态：校验关卡中");
-                        sleep(10);
-                        let staging = (ITimg.matchFeatures("禁止_演习", {
-                                action: 5,
-                                area: 4,
-                            }) || ITimg.matchFeatures("代理_勾_愚人号", {
-                                action: 5,
-                                area: 4,
-                            }) || ITimg.matchFeatures("代理_勾_活动", {
-                                action: 5,
-                                area: 4,
-                            }))
-                            if(staging) {
-                            if (setting.重置代理次数) {
-                                console.info("重置代理次数");
-                                /*  MyAutomator.click(staging.left - zox(70), staging.y + staging.h / 2);
-                                  sleep(500);
-                                  MyAutomator.click(staging.left - zox(70), staging.y + staging.h / 2 - zoy(80));
-                                  sleep(200);
-                                  */
-                                let _xy = [staging.right, staging.top - (staging.h / 2)];
-                                MyAutomator.click.apply(MyAutomator, _xy);
-                                sleep(500);
-                                _xy[1] = _xy[1] - staging.h;
-                                MyAutomator.click.apply(MyAutomator, _xy);
-                                sleep(200);
 
-                                //  delete staging;
-                            }
-                            tool.Floaty_emit("展示文本", "状态", "状态：正在代理中");
-                            if (ITimg.matchFeatures("行动_普通", {
-                                    action: 0,
-                                    timing: 1000,
-                                    area: "右半屏",
-                                    threshold: 0.75,
-                                }) || ITimg.matchFeatures("行动_磨难", {
-                                    action: 0,
-                                    threshold: 0.75,
-                                    timing: 1000,
-                                    area: "右半屏",
-
-                                }) || ITimg.matchFeatures("行动_愚人号", {
-                                    action: 0,
-                                    timing: 1000,
-                                    area: "右半屏",
-                                }) || ITimg.matchFeatures("行动_活动", {
-                                    action: 0,
-                                    timing: 1500,
-                                    area: "右半屏",
-                                })) {
-                                toastLog("代理点击成功!");
-                                break;
-                            }
+                        tool.Floaty_emit("展示文本", "状态", "状态：正在代理中");
+                        if (this.检验已选中关卡(0, false)) {
+                            toastLog("代理点击成功!");
+                            break;
                         }
 
-                        if (ITimg.matchFeatures("代理_未勾", {
-                                action: 0,
-                                timing: 1000,
-                                area: "右下半屏",
-                            }) || ITimg.matchFeatures("代理_未勾_愚人号", {
-                                action: 0,
-                                timing: 1000,
-                                area: "右下半屏",
-                            }) || ITimg.matchFeatures("代理_未勾_活动", {
-                                action: 0,
-                                timing: 1000,
-                                area: "右下半屏",
-                            })) { //有开始行动界面才能判断
-                            toast("自动勾选代理指挥");
-                        } else {
-                            toast("当前关卡未解锁代理指挥，请选择已勾选可代理的关卡");
-                            sleep(2000);
-                        }
+
 
                     } else {
                         toast("请打开已勾选可代理的关卡");
@@ -170,41 +88,21 @@ let 关卡代理 = {
                     }
                 } else {
                     tool.Floaty_emit("展示文本", "状态", "状态：正在代理中");
-                    if (ITimg.matchFeatures("行动_普通", {
-                            action: 0,
-                            timing: 1500,
-                            area: "右半屏",
-                            threshold: 0.75,
-                        }) || ITimg.matchFeatures("行动_磨难", {
-                            action: 0,
-                            threshold: 0.75,
-                            timing: 1000,
-                            area: "右半屏",
-
-                        }) || ITimg.matchFeatures("行动_愚人号", {
-                            action: 0,
-                            timing: 1000,
-                            area: "右半屏",
-                        }) || ITimg.matchFeatures("行动_活动", {
-                            action: 0,
-                            timing: 1500,
-                            area: "右半屏",
-                            threshold: 0.75,
-                        })) {
-                        toastLog("代理点击成功!");
+                    if (this.检验已选中关卡(0, false)) {
+                        toastLog("代理点击成功2!");
                         break;
                     }
                 }
-            }//单次循环
-            sleep(1000);
+            } //单次循环
+            sleep(1500);
             while (true) {
                 if (ITimg.matchFeatures("行动_编队确认开始", {
                         action: 0,
                         timing: 2000,
-                        area: "右半屏",
+                        area: 4,
                     })) {
                     setting.已执行动++;
-                   setting = tool.writeJSON("已执行动", setting.已执行动);
+                    setting = tool.writeJSON("已执行动", setting.已执行动);
                     tool.Floaty_emit("展示文本", "状态", "状态：正在行动中");
                     if (agent != 0) {
                         tool.Floaty_emit("展示文本", "行动", "行动：执行" + setting.已执行动 + "次&代理失误" + agent + "次")
@@ -217,7 +115,7 @@ let 关卡代理 = {
                     if (!ITimg.matchFeatures("行动_编队确认开始", {
                             action: 0,
                             timing: 2000,
-                            area: "右半屏",
+                            area: 4,
                         })) {
                         console.verbose("结束开始行动环节")
                         break;
@@ -227,7 +125,7 @@ let 关卡代理 = {
                     ITimg.matchFeatures("行动_编队确认开始", {
                         action: 0,
                         timing: 2000,
-                        area: "右半屏",
+                        area: 4,
                     });
                     console.verbose("结束开始行动环节")
                     break;
@@ -238,28 +136,7 @@ let 关卡代理 = {
                     }
 
                     sleep(500);
-                    if (ITimg.matchFeatures("行动_普通", {
-                            action: 0,
-                            timing: 1500,
-                            area: "右半屏",
-                            threshold: 0.75,
-
-                        }) || ITimg.matchFeatures("行动_磨难", {
-                            action: 0,
-                            threshold: 0.75,
-                            timing: 1000,
-                            area: "右半屏",
-
-                        }) || ITimg.matchFeatures("行动_愚人号", {
-                            action: 0,
-                            timing: 1000,
-                            area: "右半屏",
-                        }) || ITimg.matchFeatures("行动_活动", {
-                            action: 0,
-                            timing: 1500,
-                            area: "右半屏",
-                            threshold: 0.75,
-                        })) {
+                    if (this.检验已选中关卡(0, false)) {
                         toastLog("代理点击成功_?");
                     }
                     sleep(200);
@@ -411,7 +288,8 @@ let 关卡代理 = {
                         if (ITimg.matchFeatures("行动_理智数量图标", {
                                 timing: 500,
                                 area: 2,
-                                threshold: 0.75,
+                                threshold: 0.8,
+                                picture_failed_further: true,
                             })) {
                             break;
                         }
@@ -516,7 +394,7 @@ let 关卡代理 = {
                     }) || ITimg.matchFeatures("导航2", {
                         action: 5,
                         area: 1,
-                        refresh:false,
+                        refresh: false,
                     }))
                     if (ITimg.matchFeatures("代理_全权委托_确认使用", {
                             action: 0,
@@ -790,48 +668,95 @@ let 关卡代理 = {
 
         }, 1000) //总循环
     },
-    检验是否已选中关卡: function() {
+    检验已选中关卡: function(_action, _refresh_numer) {
+
         //有开始行动界面才能判断
-        if (ITimg.matchFeatures("行动_普通", {
-                action: 5,
-                threshold: 0.75,
-                area: 4,
-            }) || ITimg.matchFeatures("行动_磨难", {
-                action: 5,
-                threshold: 0.75,
-                area: 4,
-            }) || ITimg.matchFeatures("行动_愚人号", {
-                action: 5,
-                area: 4,
-            }) || ITimg.matchFeatures("行动_活动", {
-                action: 5,
-                area: 4,
-                threshold: 0.75,
-            })) {
+        let _operation = ITimg.matchFeatures("行动_普通", {
+            action: _action,
+            threshold: 0.75,
+            area: 4,
+            picture_failed_further: true,
+            //    visualization: true,
+        }) || ITimg.matchFeatures("行动_磨难", {
+            action: _action,
+            threshold: 0.75,
+            area: 4,
+            refresh: false,
+        }) || ITimg.matchFeatures("行动_愚人号", {
+            action: _action,
+            area: 4,
+            refresh: false,
+        }) || ITimg.matchFeatures("行动_活动", {
+            action: _action,
+            area: 4,
+            refresh: false,
 
-            if (ITimg.matchFeatures("代理_未勾", {
-                    action: 0,
-                    timing: 1000,
-                    area: "右下半屏",
-                }) || ITimg.matchFeatures("代理_未勾_愚人号", {
-                    action: 0,
-                    timing: 1000,
-                    area: "右下半屏",
-                }) || ITimg.matchFeatures("代理_未勾_活动", {
-                    action: 0,
-                    timing: 1000,
-                    area: "右下半屏",
-                })) { //有开始行动界面才能判断
-                toastlog("自动勾选代理指挥");
+        })
+        if (_action == 5 && _operation && !_refresh_numer) {
+            return _operation;
+        }
+        if (!_operation) {
+            return false;
+        } else if (_refresh_numer === false) {
+            return true;
+        }
+        tool.Floaty_emit("展示文本", "状态", "状态：校验关卡中");
+
+        let staging = (ITimg.matchFeatures("禁止_演习", {
+            action: 5,
+            area: 4,
+            refresh: false,
+        }) || ITimg.matchFeatures("代理_勾_愚人号", {
+            action: 5,
+            area: 4,
+            refresh: false,
+        }) || ITimg.matchFeatures("代理_勾_活动", {
+            action: 5,
+            area: 4,
+            refresh: false,
+        }))
+        if (staging) {
+            if (_refresh_numer && setting.重置代理次数) {
+                console.info("重置代理次数");
+                /*  MyAutomator.click(staging.left - zox(70), staging.y + staging.h / 2);
+                  sleep(500);
+                  MyAutomator.click(staging.left - zox(70), staging.y + staging.h / 2 - zoy(80));
+                  sleep(200);
+                  */
+                let _xy = [staging.right, staging.top - (staging.h / 2)];
+                MyAutomator.click.apply(MyAutomator, _xy);
+                sleep(500);
+                _xy[1] = _xy[1] - staging.h;
+                MyAutomator.click.apply(MyAutomator, _xy);
+                sleep(200);
                 return true;
-            } else {
-                toast("当前关卡未解锁代理指挥，请选择已勾选可代理的关卡");
-                return false;
-            };
-
+            }
+        } else if (ITimg.matchFeatures("代理_未勾", {
+                action: 0,
+                timing: 1000,
+                area: "右下半屏",
+            }) || ITimg.matchFeatures("代理_未勾_愚人号", {
+                action: 0,
+                timing: 1000,
+                area: "右下半屏",
+                refresh: false,
+            }) || ITimg.matchFeatures("代理_未勾_活动", {
+                action: 0,
+                timing: 1000,
+                area: "右下半屏",
+                refresh: false,
+            })) { //有开始行动界面才能判断
+            toastLog("自动勾选代理指挥");
+            if (_refresh_numer && setting.重置代理次数) {
+                return this.检验已选中关卡(_action, _refresh_numer);
+            }
+            return true;
         } else {
+            toast("当前关卡未解锁代理指挥，请选择已勾选可代理的关卡");
             return false;
         }
+
+
     },
     理智处理: function() {
         sleep(300);
@@ -846,6 +771,7 @@ let 关卡代理 = {
             }) || ITimg.matchFeatures("理智_确认", {
                 timing: 500,
                 area: 4,
+                refresh: false,
             })) {
             setting = tool.readJSON("configure");
             tool.Floaty_emit("展示文本", "状态", "状态：理智检测中");

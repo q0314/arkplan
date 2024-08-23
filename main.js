@@ -3274,6 +3274,11 @@ threads.start(function() {
     if (setting.公告 == "公告") {
         notice();
     } else if (setting.更新内容 != toupdate.getLocalVerName()) {
+        tips = "同步更新图库资源";
+        toast(tips)
+        console.info(tips);
+        gallery.gallery_info = null;
+        gallery.选择图库(tukuss);
         if (files.exists("./lib/logs/版本更新内容.txt")) {
             $ui.post(() => {
                 let edition_Updates = dialogs.build({
