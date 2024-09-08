@@ -290,6 +290,13 @@ let 关卡代理 = {
                                 area: 2,
                                 threshold: 0.8,
                                 picture_failed_further: true,
+                            })||ITimg.matchFeatures("行动_理智数量图标", {
+                                timing: 500,
+                                area: 2,
+                                matcher:2,
+                                refresh:false,
+                                threshold: 0.8,
+                                picture_failed_further: true,
                             })) {
                             break;
                         }
@@ -706,6 +713,7 @@ let 关卡代理 = {
             action: 5,
             area: 4,
             refresh: false,
+            picture_failed_further:true,
         }) || ITimg.matchFeatures("代理_勾_愚人号", {
             action: 5,
             area: 4,

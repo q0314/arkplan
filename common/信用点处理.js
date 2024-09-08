@@ -103,20 +103,22 @@ let 信用处理 = {
         while (等待提交反馈至神经()) {
             sleep(500);
         }
-
-        if (!ITimg.matchFeatures("访问基建", {
-                action: 0,
-                timing: 8000,
-                matcher: 2,
-                nods: 1000,
-                area: 4,
-            }) && !ITimg.matchFeatures("访问基建", {
-                action: 0,
-                area: 4,
-                timing: 8000,
-                scale: 1,
-                picture_failed_further: true,
-            })) {
+        let _max = 3;
+        while (_max) {
+            if (ITimg.matchFeatures("好友_访问基建"+_max, {
+                    action: 0,
+                    area: 4,
+                    timing: 8000,
+                    scale: 1,
+                    threshold: 0.85,
+                    refresh: (_max == 3 ? true : false),
+                    picture_failed_further: true,
+                })) {
+                break
+            }
+            _max--;
+        }
+        if (!_max) {
             function obtain_access_infrastructure() {
                 let button_list = ITimg.contour({
                     canvas: "访问基建",
@@ -124,10 +126,10 @@ let 信用处理 = {
                     area: 4,
                     isdilate: true,
                     threshold: 240,
-                    size: 15,
+                    size: 20,
                     type: "BINARY",
                     filter_w: zox(30),
-                    filter_h: zoy(30),
+                    filter_h: zoy(15),
                 });
                 if (button_list && button_list.length) {
                     let access_infrastructure;
@@ -170,7 +172,7 @@ let 信用处理 = {
             }
 
 
-            let visit = ITimg.matchFeatures("访问下位", {
+            let visit = ITimg.matchFeatures("好友_访问下位", {
                 action: 5,
                 nods: 1000,
                 area: 4,

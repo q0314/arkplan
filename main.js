@@ -13,7 +13,7 @@ importClass(android.text.TextUtils);
 importClass(java.lang.System);
 importClass(android.view.View);
 importClass(android.app.Service);
-importClass(android.app.Activity)
+importClass(android.app.Activity);
 importClass(android.net.Uri);
 importClass(android.widget.AdapterView);
 importClass(android.content.Context);
@@ -1677,16 +1677,16 @@ ui.viewpager.setOnPageChangeListener({
         ui.run(() => {
             switch (index) {
                 case 0:
-                  /*  if (!gallery.gallery_info) {
-                        items[1].text = "检查图库";
+                   if (!gallery.gallery_info) {
+                        items[1].text = "检查模板";
                         items[1].drawable = "@drawable/ic_wallpaper_black_48dp";
                         ui.drawerList.setDataSource(items);
                     } else {
-                        items[1].text = "更换图库";
+                        items[1].text = "模板图库";
                         items[1].drawable = "@drawable/ic_satellite_black_48dp";
                         ui.drawerList.setDataSource(items);
                     }
-                    */
+                    
 
                     ui.drawer_.setAlpha(10);
 
@@ -1909,10 +1909,10 @@ var items = [{
         text: "告使用者",
         drawable: "ic_pets_black_48dp",
     },
-  /*  {
-        text: "更换图库",
+    {
+        text: "模板图库",
         drawable: "ic_satellite_black_48dp",
-    },*/
+    },
     {
         text: "官方频道",
         drawable: "ic_games_black_48dp",
@@ -1947,8 +1947,8 @@ ui.drawerList.on("item_click", (item) => {
         case "告使用者":
             notice();
             return
-        case "检查图库":
-        case "更换图库":
+        case "检查模板":
+        case "模板图库":
             
             if (typeof tukuss != "object") {
                 http.get(server + "tulili/gallery_item.json", {
@@ -1966,7 +1966,8 @@ ui.drawerList.on("item_click", (item) => {
                 })
 
             }
-            gallery.gallery_view();
+            new_ui("模板图库");
+            
             break;
         case "官方频道":
         case "加入q群":
@@ -4285,6 +4286,12 @@ function new_ui(name, url) {
                 path: files.path('./activity/'),
             });
             break;
+        case '模板图库':
+            //gallery.gallery_view();
+            engines.execScriptFile("./activity/template_gallery.js", {
+                path: files.path('./activity/'),
+            });
+            break
         case '日志':
             engines.execScriptFile("./activity/journal.js", {
                 path: files.path('./activity/'),

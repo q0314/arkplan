@@ -88,6 +88,8 @@ let currency = {
                 this.navigation = [this.navigation.left + this.navigation.w / 2, this.navigation.top + this.navigation.h / 2];
                 MyAutomator.click.apply(MyAutomator, this.navigation);
                 sleep(800);
+                //好友转到识别任务，再偏移坐标点击好友
+
                 let deviation;
                 if (menu == "好友" || menu == 9) {
                     deviation = true;
@@ -98,21 +100,21 @@ let currency = {
                 } else {
                     menu = this.menu.find(item => item[0] === menu);
                 }
-                //转到识别任务，再偏移坐标点击好友
-
+                console.verbose("导航定位-",menu);
 
                 _confirm_go = ITimg.matchFeatures("导航_" + menu[0], {
                     action: 5,
                     nods: 500,
                     area: ITimg.regional_division(menu[1]),
                     scale: 1,
+                    picture_failed_further: true,
                 }) || ITimg.matchFeatures("导航_" + menu[0], {
                     action: 0,
                     area: ITimg.regional_division(menu[1]),
                     matcher: 2,
                     scale: 1,
                     refresh: false,
-                    picture_failed_further: true,
+                    
                 })
                 if (_confirm_go) {
                     if (deviation) {

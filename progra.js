@@ -271,6 +271,7 @@ function 自定义() {
             console.error(tips);
             return false;
         }
+        log(customize)
         require(customize.path).main_entrance({
             'cwd': customize.path.replace(files.getName(customize.path), ""),
             'getSource': customize.path,

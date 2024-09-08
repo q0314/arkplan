@@ -95,7 +95,8 @@ let 基建任务 = {
         }) || ITimg.matchFeatures("基建_铃铛", {
             action: 5,
             area: 2,
-            threshold: 0.75,
+            matcher:2,
+            threshold: 0.8,
             refresh: false,
         })
         if (!this.small_bell) {
@@ -110,6 +111,7 @@ let 基建任务 = {
             }) || ITimg.matchFeatures("基建_铃铛", {
                 action: 5,
                 area: 2,
+                matcher:2,
                 threshold: 0.75,
                 refresh: false,
                 picture_failed_further: true,

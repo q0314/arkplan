@@ -9,10 +9,12 @@
  */
 importClass(android.graphics.drawable.GradientDrawable);
 
+importClass(android.graphics.BitmapFactory);
+importClass(android.graphics.Bitmap);
+importClass(android.graphics.drawable.BitmapDrawable);
+
 const _resources_ = context.getResources();
 const scale = _resources_.getDisplayMetrics().density;
-
-
 
 
 let util = {
@@ -31,6 +33,24 @@ let util = {
          * @returns 
          */
         px => Math.floor(px / scale + 0.5),
+
+    getResDrawable(resName, size) {
+
+        let oldBmp = BitmapFactory.decodeResource(_resources_, util.getResDrawableID(resName));
+
+        let newBmp = Bitmap.createScaledBitmap(oldBmp, util.dp2px(size), util.dp2px(size), true);
+        let drawable = new BitmapDrawable(_resources_, newBmp);
+        oldBmp.recycle();
+        return drawable;
+    },
+
+    /**
+     * 获取内质资源 DrawableID
+     * @param {*} name
+     */
+    getResDrawableID(name) {
+        return _resources_.getIdentifier(name, "drawable", context.getPackageName());
+    },
     /**
      * 是否横屏
      * @returns 
@@ -67,7 +87,7 @@ let util = {
      * 其次，也有些系统获取到的状态栏高度好像是0，
      */
     getWidthHeight() {
-        
+
         //方法1
         let wPixel = util.getWidthPixels();
         let hPixel = util.getHeightPixels();

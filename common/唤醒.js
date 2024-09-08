@@ -251,11 +251,11 @@ let 唤醒 = {
             })) {
             this.检查更新();
             //防止特殊情况下，检查更新未识别到客户端已过时，下面的点击命令又执行了，跳转到商店要更新的情况
-            if (textContains(displayText["更新"]).findOne(500)) {
-                this.检查更新(true);
+           /* if (textContains(displayText["更新"]).findOne(500)) {
+                this.检查更新();
                 // continue;
                 return false;
-            }
+            }*/
             MyAutomator.click(height / 2, width - 100);
             sleep(1000);
             getpackage = tool.currentPackage();
@@ -306,12 +306,15 @@ let 唤醒 = {
         let _close = ITimg.matchFeatures("关闭公告", {
             action: 5,
             area: 2,
+            rectangular_error:25,
             // imageFeatures: _sceneFeatures,
         }) || ITimg.matchFeatures("关闭公告", {
             action: 5,
             area: 2,
             matcher: 2,
             refresh: false,
+            rectangular_error:35,
+            picture_failed_further:true,
             // imageFeatures: _sceneFeatures,
         });
         //  _sceneFeatures.recycle();
