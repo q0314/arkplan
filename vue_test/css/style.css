@@ -1,0 +1,120 @@
+[v-cloak] {
+  display: none;
+}
+.fixed-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000; /* 确保它在其他元素之上 */
+}
+.seize-seat-upper-corner {
+    height: 50px;
+}
+.custom-slide-button {
+  min-width: 26px;
+  font-size: 10px;
+  line-height: 18px;
+  text-align: center;
+  border-radius: 100px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.simple-span {
+  margin: 0;
+  color: rgba(69, 90, 100, 0.6);
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 16px;
+}
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.image-comparison {
+  margin-bottom: 5px;
+  margin-top :5px;
+  border-bottom: 2px solid #ccc;
+}
+.image-section {
+  display: flex;
+  justify-content: space-between; /* 将左右两部分对齐到两端 */
+  align-items: center; /* 垂直居中对齐内容 */
+
+}
+
+.button-container {
+    display: flex;
+  justify-content: space-between; /* 可选，根据需要调整按钮间距 */
+}
+.button {
+    height: 35px;
+    margin: 2px 15px 2px 0px;
+}
+.image-viewer {
+  display: flex;
+  flex: 1;
+  text-align: center;
+  align-items: center;
+  height: 100%; 
+  width: 100%;
+}
+.image-viewer img {
+  max-width: 30%;
+  height: 40px;
+  margin: 2px 15px; 
+}
+.picture-info-text {
+    display: flex;
+  align-items: center;
+}
+.no-cache-image {
+  font-size: 16px;  
+  color: #999;  
+  padding: 10px;  
+  text-align: center;
+  height: 80%;
+  width: 100%;
+}
+
+.image-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+}
+
+.input-container {
+  display: flex;
+  gap: 10px;
+  margin-top: -2px;
+}
+
+
+.adaptive-field .van-field__label {
+  display: inline-block;
+  width: auto;
+  white-space: nowrap; /* 防止换行 */
+}
+
+
+
+
+.rotate {
+  transform: rotate(180deg);
+}
+/* 禁用长按菜单 复制等 */
+* {
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
+  -khtml-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
+}

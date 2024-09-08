@@ -1,0 +1,64 @@
+<!--
+ * @Author: TonyJiangWJ
+ * @Date: 2020-11-29 13:17:06
+ * @Last Modified by: TonyJiangWJ
+ * @Last Modified time: 2020-12-23 23:04:37
+ * @Description: 
+-->
+<!DOCTYPE html>
+<html lang=en>
+
+<head>
+  <meta charset=utf-8>
+  <meta http-equiv=X-UA-Compatible content="IE=edge">
+  <meta name=viewport content="width=device-width,initial-scale=1">
+  <title>图库配置工具</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.10/lib/index.css" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/vant@2.10/lib/vant.min.js"></script>
+</head>
+
+<body>
+  <noscript><strong>We're sorry but this doesn't work properly without JavaScript enabled. Please enable
+      it to continue.</strong></noscript>
+  <div id=app class="root-container" v-cloak :style="'min-height:' + clientHeight + 'px'">
+      <div>
+      <van-nav-bar title="模板图库管理" left-arrow  class="fixed-bar"/>
+    </div>
+    <div class="seize-seat-upper-corner"> </div>
+      <van-row >
+   <picture-operation/>
+      </van-row >
+     
+  </div>
+</body>
+<script type="text/javascript">
+  /**
+   * 禁用长按菜单，复制等 
+   **/
+  window.addEventListener('contextmenu', function (e) {
+    e.preventDefault()
+  })
+  // 直接浏览器调试时，mock js bridge方法
+  if (typeof $app === 'undefined') {
+    window.$app = {
+      mock: true,
+      invoke: (bridgeName, data, callback) => { },
+      receiveMessage: params => { },
+      registerFunction: (functionName, func) => { }
+    }
+    window.$nativeApi = {
+      request: (bridgeName, data) => { return Promise.reject({}) }
+    }
+    setTimeout(() => {
+      window.$app.delay_off = true
+    }, 5000)
+  }
+</script>
+<script src="./js/app.js"></script>
+<script src="./js/components/common.js"></script>
+<script src="./js/components/configuration.js"></script>
+
+</html>
