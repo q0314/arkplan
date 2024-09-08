@@ -116,6 +116,7 @@ function Prepare(picture_default, ocr_default, outline_default, matchFeatures_de
         filter_w: matchFeatures_default.filter_w || 10,
         filter_h: matchFeatures_default.filter_h || 10,
         scale: matchFeatures_default.scale || 0.8,
+        rectangular_error:matchFeatures_default.rectangular_error || 35,
         matcher: matchFeatures_default.matcher || "BRUTEFORCE_L1",
         visualization: matchFeatures_default.visualization || true,
         saveSmallImg: matchFeatures_default.saveSmallImg,
@@ -738,8 +739,10 @@ if (list.refresh !== false || !ITimg.sceneFeatures||ITimg.sceneFeatures.recycled
         let big_keyPoints = new MatOfKeyPoint();
         let bigTrainImage = new Mat();
 
+
         //还原色彩空间，因为mat默认使用bgr, 而不是rgb
         Imgproc.cvtColor(sceneImg.mat.submat(list.area[1], list.area[3] + list.area[1], list.area[0], list.area[2] + list.area[0]), bigTrainImage, Imgproc.COLOR_BGRA2RGBA);
+
         if (list.scale != 1) {
             //按缩放比例缩放
             let newSize = new Size(bigTrainImage.cols() * list.scale, bigTrainImage.rows() * list.scale);
@@ -798,6 +801,15 @@ if (list.refresh !== false || !ITimg.sceneFeatures||ITimg.sceneFeatures.recycled
     });
 
     img_small.recycle();
+    
+    // 将特征和匹配绘制出来，在调试时更容易看出匹配效果，但会增加耗时
+    let drawMatches;
+    //大图指定区域部分没有特征点(全黑)时会崩溃，ajp遗留bug
+    if (list.visualization) {
+        drawMatches = package_path + "/logs/matchFeatures/" + picture + "_特征"+list.matcher+"_匹配结果.jpg";
+       //  log(drawMatches)
+       //    images.save(img, drawMatches);
+    }
 
     //其他匹配算法可能导致闪退
     if (list.matcher == 1) {
@@ -808,16 +820,6 @@ if (list.refresh !== false || !ITimg.sceneFeatures||ITimg.sceneFeatures.recycled
         list.matcher = "BRUTEFORCE";
     } else if (list.matcher == 4) {
         list.matcher = "FLANNBASED";
-    }
-    // 将特征和匹配绘制出来，在调试时更容易看出匹配效果，但会增加耗时
-    let drawMatches;
-    //大图指定区域部分没有特征点(全黑)时会崩溃，ajp遗留bug
-    if (list.visualization) {
-        drawMatches = package_path + "/logs/matchFeatures/" + picture + "_特征匹配结果.jpg";
-        // log(drawMatches)
-
-        //    images.save(img, drawMatches);
-
     }
     ITimg.results = $images.matchFeatures((list.imageFeatures ? list.imageFeatures : ITimg.sceneFeatures), objectFeatures, {
         drawMatches: drawMatches,
@@ -853,7 +855,7 @@ if (list.refresh !== false || !ITimg.sceneFeatures||ITimg.sceneFeatures.recycled
         let BD = Math.sqrt((D.x - B.x) ** 2 + (D.y - B.y) ** 2);
 
         //可容忍误差百分比，最高建议35
-        let errorPercentage = 15; // 允许±5%的误差
+        let errorPercentage = list.rectangular_error||ITimg.default_list.matchFeatures.rectangular_error; // 允许±5%的误差
 
         //检查是否有两对相等的边和闭合的对角线
         if (approximatelyEqual(AB, CD, errorPercentage) && approximatelyEqual(BC, DA, errorPercentage) &&
@@ -1920,9 +1922,11 @@ try {
         savePath = '/sdcard/processed_image.jpg';
         processedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, new java.io.FileOutputStream(savePath));
     }
+    height = 2400
+    width = 1080;
     let name = {
-        picture_name: "94",
-        canvas_name: "公招_小时_减"
+        picture_name: "97",
+        canvas_name: "关闭公告"
     }
     let picture = images.read("/storage/emulated/0/DCIM/Screenshots/" + name.picture_name + ".jpg");
     let imgpath = package_path + "/gallery_list/template/"
@@ -1930,11 +1934,11 @@ try {
     let an = ITimg.matchFeatures(name.canvas_name, {
         // area: [0, 200, 1356, 920],
         // area: [height - height/4,width/4,height/4,width/4],
-        area: 1,
+        area: 2,
         action: 5,
-        threshold: 0.75,
-        matcher: 1,
-        grayscale: true,
+        threshold: 0.85,
+        matcher: 2,
+        grayscale: false,
         visualization: true,
         scale: 1,
         saveSmallImg: false,
