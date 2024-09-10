@@ -9,7 +9,7 @@
 Vue.use(vant);
 let app = new Vue({
   el: '#app',
-  data () {
+  data() {
     return {
       resourcePath: 'unknown',
       message: '',
@@ -19,6 +19,20 @@ let app = new Vue({
     }
   },
   methods: {
+    onClickLeft: function () {
+      $app.invoke('uiExit', {})
+    },
+    onSearchClick: function () {
+      // 处理搜索图标点击事件
+      console.log('Search icon clicked');
+      vant.Toast("搜索");
+      console.log(this.images)
+    },
+    onSettingClick: function () {
+      // 处理设置图标点击事件
+      console.log('Setting icon clicked');
+      vant.Toast("设置")
+    },
     invokeAutojsToast: function () {
       this.message = '点击触发toast'
       console.log('点击触发 toast')
@@ -36,7 +50,7 @@ let app = new Vue({
       this.showMenuDialog = true
     },
     resetDefaultConfigs: function () {
-     $app.invoke('resetConfigs')
+      $app.invoke('resetConfigs')
     },
     exportConfigs: function () {
       $app.invoke('exportConfigs')
@@ -61,7 +75,7 @@ let app = new Vue({
       self.clientHeight = document.querySelector('html').clientHeight
       console.log('client---height:' + self.clientHeight)
     }, 200)
-    
+
     // document.getElementById('app').style.minHeight = this.clientHeight + 'px'
   }
 })

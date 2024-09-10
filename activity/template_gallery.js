@@ -23,6 +23,7 @@ let local_config_path = files.cwd() + '/local_config.cfg'
 let runtime_store_path = files.cwd() + '/runtime_store.cfg'
 let aesKey = device.getAndroidId()
 */
+require('../lib/Runtimes.js')(global)
 ui.layout(
     <vertical>
         <webview id="webview" margin="0 10" />
@@ -68,7 +69,7 @@ let bridgeHandler = {
         toastLog(data.message)
     },
     uiExit:data=>{
-        
+        ui.finish();
     },
     infoImage: (data, callbackId) => {
         //log(ImgData)
@@ -232,7 +233,10 @@ postMessageToWebView = prepareWebView(ui.webview, {
     mainScriptPath: mainScriptPath,
     indexFilePath: "file://" + indexFilePath,
     bridgeHandler: bridgeHandler,
-    onPageFinished: () => {}
+    onPageFinished: () => {
+        ui.webview.loadUrl('javascript:window.vConsole && window.vConsole.destroy()')
+    
+    }
 
 })
 
