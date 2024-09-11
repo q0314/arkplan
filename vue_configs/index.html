@@ -36,21 +36,44 @@
           </van-nav-bar>
           </template>
     
-    </div>
-    <div class="seize-seat-upper-corner"> </div>
-      <van-row >
-   <picture-operation/>
+        </div>
+        
+    <div class="seize-seat-upper-corner">
+         </div>
+    
+     <van-row class="minimum-container">
+                   
+   <picture-operation />
       </van-row >
-     
+    
+    <van-dialog v-model="showSetupDialog" v-cloak title="设置" :show-confirm-button="false" :close-on-click-overlay="true"
+      :get-container="getDialogContainer" >
+        <div  class="dialog-content">
+      <van-divider :style="{ margin: '0' }"></van-divider>
+      <van-checkbox v-model="deleteFile" shape="square" class="restore-checkbox">删除无关文件</van-checkbox>
+    <van-button type="warning" @click="restoreTemplate" :style="{height:'35px',margin:'0px'}">还原默认模板图库</van-button>
+  </div>
+    </van-dialog>
   </div>
 </body>
 <script type="text/javascript">
+ let firstResize = true
+
   /**
    * 禁用长按菜单，复制等 
    **/
   window.addEventListener('contextmenu', function (e) {
     e.preventDefault()
   })
+    window.addEventListener('resize', function (e) {
+    console.log('页面高度:' + window.innerHeight)
+    if (window.innerHeight > 0 && firstResize) {
+      firstResize = false
+      console.log('修改root height:' + window.innerHeight)
+      document.getElementById('app').style.height =  window.innerHeight + 'px'
+    }
+  }, false);
+  
   // 直接浏览器调试时，mock js bridge方法
   if (typeof $app === 'undefined') {
     window.$app = {
@@ -63,7 +86,8 @@
       request: (bridgeName, data) => { return Promise.reject({}) }
     }
     setTimeout(() => {
-      window.$app.delay_off = true
+      window.$app.delay_off = true;
+      
     }, 5000)
   }
 </script>

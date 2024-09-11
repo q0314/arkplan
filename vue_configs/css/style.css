@@ -1,6 +1,16 @@
 [v-cloak] {
   display: none;
 }
+.root-container {
+  position: relative;
+  width: 100%;
+  /* min-height: 755px; */
+  overflow: scroll;
+  background: #ffffff;
+}
+.minimum-container {
+    min-height: 850px;
+}
 .fixed-bar {
   position: fixed;
   top: 0;
@@ -10,6 +20,41 @@
 }
 .seize-seat-upper-corner {
     height: 50px;
+}
+.icon {
+  margin-left: 16px;
+  font-size: 20px;
+  color: #333;
+  pointer-events: auto; /* 确保点击事件能够被捕捉 */
+}
+
+  .dialog-content {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0px;
+    align-items: center; /* 内容居中对齐 */
+  }
+
+  .restore-checkbox {
+      margin-top: 20px;
+    margin-bottom: 5px;  
+  }
+ 
+ 
+.search-input {
+    display: none;
+    width: 90%;
+    padding: 5px 0px; 
+    margin-left: 20px;
+    margin-right: 20px;
+    box-sizing: border-box;
+}
+.display {
+    display: block;
+}
+/* 隐藏 */
+.hidden {
+    display: none;
 }
 .custom-slide-button {
   min-width: 26px;
@@ -85,9 +130,13 @@
   justify-content: space-around;
 }
 .container {
-  display: flex;
+    display: flex;
   flex-direction: column;
   margin-top: 20px;
+}
+.dialog-content {
+  max-height: 100%; /* 使用父容器的高度 */
+  overflow-y: auto; /* 启用垂直滚动条 */
 }
 
 .input-container {
@@ -95,8 +144,6 @@
   gap: 10px;
   margin-top: -2px;
 }
-
-
 .adaptive-field .van-field__label {
   display: inline-block;
   width: auto;

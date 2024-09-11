@@ -17,6 +17,8 @@ Vue.component('picture-operation', function(resolve, reject) {
                 images: null,
                 showInfoDialog: false,
                 showImages: false,
+                searchQuery: '',
+                imgPath: {},
                 currentTemplateInfo: {},
                 currentIndex: 0,
                 activeNames: [],
@@ -27,7 +29,7 @@ Vue.component('picture-operation', function(resolve, reject) {
         computed: {
             visualizationPaths() {
                 const visualization = this.currentTemplateInfo?.visualization;
-                console.log('visualization:', visualization);
+               // console.log('visualization:', visualization);
                 return Array.isArray(visualization) ? visualization : this.images[0].templateInfo.visualization;
             }
 
@@ -36,6 +38,28 @@ Vue.component('picture-operation', function(resolve, reject) {
             saveConfigs: function() {
                 console.log('save gallery configs')
                 this.doSaveConfigs();
+            },
+            saveImageInfo:function(){
+                $app.invoke("infoImage", {}, data => {
+                // console.log(JSON.stringify(data))
+                this.currentTemplateInfo = data.imgList[0].templateInfo;
+                this.images = data.imgList;
+                this.imgPath = data.imgPath;
+            })
+            },
+            searchValue: function() {
+                if (!this.images_copy) {
+                    this.images_copy = this.images;
+                } else {
+                    this.images = this.images_copy;
+                    this.images_copy = null;
+                }
+            },
+            filteredImages: function() {
+                const query = this.searchQuery.toLowerCase();
+                this.images = this.images_copy.filter(image =>
+                    image.templateImage.toLowerCase().includes(query)
+                )
             },
             replaceImage: function(index) {
                 // 处理替换图片的逻辑
@@ -71,28 +95,25 @@ Vue.component('picture-operation', function(resolve, reject) {
                                 templateImage: ''
                             });
                             // 等待 Vue 完成 DOM 更新
-                           // setTimeout(() => {
-                                $app.invoke("replaceImage", {
-                                    img: e.target.result,
-                                    path: this.imgPath.template,
-                                    name: name,
-                                }, data => {
+                            // setTimeout(() => {
+                            $app.invoke("replaceImage", {
+                                img: e.target.result,
+                                path: this.imgPath.template,
+                                name: name,
+                            }, data => {
 
-                                    vant.Toast(data.message);
-                                    if (data.issuccess) {
-                                        console.log(JSON.stringify(data))
+                                vant.Toast(data.message);
+                                if (data.issuccess) {
+
+                                    this.$set(this.images, this.currentIndex, {
+                                        ...this.images[this.currentIndex],
+                                        templateImage: data.name
+                                    });
 
 
-                                        this.$set(this.images, this.currentIndex, {
-                                            ...this.images[this.currentIndex],
-                                            templateImage: data.name
-                                        });
-
-                                        console.log("4",JSON.stringify(this.images[this.currentIndex]))
-
-                                    }
-                                });
-                           // }, 100);
+                                }
+                            });
+                            // }, 100);
                             /*
                             const img = document.createElement('img');
                             img.src = e.target.result;
@@ -137,6 +158,8 @@ Vue.component('picture-operation', function(resolve, reject) {
 
             },
             removeExtension: function(filename) {
+               filename = filename.startsWith('_') ? filename.slice(1) : filename;
+    
                 return filename.replace('.png', '');
             },
             handleConfirm: function() {
@@ -145,14 +168,11 @@ Vue.component('picture-operation', function(resolve, reject) {
         },
 
         mounted() {
-            $app.invoke("infoImage", {}, data => {
-                //console.log(JSON.stringify(data))
+            this.saveImageInfo();
+            $app.registerFunction('doSaveImageInfo', this.saveImageInfo);
 
-                this.currentTemplateInfo = data.imgList[0].templateInfo;
+            $app.registerFunction('doSearchValue', this.searchValue);
 
-                this.imgPath = data.imgPath;
-                this.images = data.imgList;
-            })
             //注册saveConfigs为saveGalleryConfigs
             $app.registerFunction('saveGalleryConfigs', this.saveConfigs);
             //console.log(this.images)
@@ -161,6 +181,7 @@ Vue.component('picture-operation', function(resolve, reject) {
         },
 
         template: '<div>\
+        <input v-model="searchQuery" placeholder="  过滤图片名称" @input="filteredImages" id="Search" class="search-input" />\
     <!-- 遍历每个图像对 -->\
     <div v-for="(item, index) in images" :key="index" class="image-comparison">\
       <div class="image-section" >\
@@ -182,6 +203,7 @@ Vue.component('picture-operation', function(resolve, reject) {
         <div class="image-viewer">\
           <img v-if="item.cacheImage" :src="imgPath.cache+item.cacheImage" alt="Cache Image" />\
           <div v-else class="no-cache-image">暂无缓存图生成</div>\
+         <span v-if="item.cacheImage" class="picture-info-text"> </span>\
         </div>\
         <div class="button-container">\
           <van-button class="button" type="danger" @click="deleteCacheImage(index,item.cacheImage)" v-if="item.cacheImage">删除缓存图</van-button>\
@@ -189,7 +211,8 @@ Vue.component('picture-operation', function(resolve, reject) {
       </div>\
       </div>\
     <!-- 模板图信息弹窗 -->\
-<van-dialog v-model="showInfoDialog" :title="removeExtension(images[this.currentIndex].templateImage) +` 模板图信息`" show-cancel-button confirmButtonText="保存" @confirm="saveTemplateInfo">\
+<van-dialog v-model="showInfoDialog" :title="removeExtension(images[this.currentIndex].templateImage) +` 模板图信息`" show-cancel-button confirmButtonText="保存" @confirm="saveTemplateInfo" lock-scroll="false" style="min-height:35%;overflow-y:scroll" >\
+    <div class="dialog-content">\
      <div class="container">\
      <tip-block> 原图宽高是指用于裁剪小图的大图分辨率</tip-block>\
     <div class="input-container">\
@@ -209,6 +232,7 @@ Vue.component('picture-operation', function(resolve, reject) {
           <img :src="path" alt="image" style="width: 100%; max-width: 300px;" />\
         </van-collapse-item>\
       </van-collapse>\
+      </div>\
   </van-dialog>\
   </div>'
     })

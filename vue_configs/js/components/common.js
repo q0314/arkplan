@@ -111,7 +111,7 @@ let mixin_common = {
     },
   },
   mounted () {
-    this.loadConfigs()
+   // this.loadConfigs()
   }
 }
 /**

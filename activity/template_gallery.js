@@ -32,7 +32,7 @@ ui.layout(
 //let mainScriptPath = FileUtils.getRealMainScriptPath(true)
 //mainScriptPath = "/storage/emulated/0/脚本/arkplan"
 mainScriptPath = files.path("../").replace("测试.js", "")
-let indexFilePath = mainScriptPath + "vue_test/index.html"
+let indexFilePath = mainScriptPath + "vue_configs/index.html"
 const prepareWebView = require(mainScriptPath + 'lib/PrepareWebView.js')
 
 let postMessageToWebView = () => {
@@ -40,9 +40,9 @@ let postMessageToWebView = () => {
 }
 /*
 //重命名文件防止缓存
-let md5_list = require(mainScriptPath + "/vue_test/config/get_md5.js")()
+let md5_list = require(mainScriptPath + "/vue_configs/config/get_md5.js")()
 
-let _md5_ = JSON.parse(files.read(mainScriptPath + '/vue_test/config/files_md5.json'))
+let _md5_ = JSON.parse(files.read(mainScriptPath + '/vue_configs/config/files_md5.json'))
 for (let md5 in md5_list) {
     log(md5, md5_list[md5].md5 == _md5_[md5].md5)
     if (md5_list[md5].md5 != _md5_[md5].md5) {
@@ -56,8 +56,9 @@ for (let md5 in md5_list) {
     }
 }
 */
-let gallery = require(mainScriptPath+"subview/gallery.js");
+let gallery = require(mainScriptPath + "subview/gallery.js");
 let storageConfig = storages.create("chick_config_version");
+let gallery_dir = gallery.path + "template/";
 
 
 
@@ -68,20 +69,24 @@ let bridgeHandler = {
     toastLog: data => {
         toastLog(data.message)
     },
-    uiExit:data=>{
+    uiExit: data => {
         ui.finish();
     },
+    searchValue: () => {
+        postMessageToWebView({
+            functionName: 'doSearchValue'
+        })
+    },
+
     infoImage: (data, callbackId) => {
-        //log(ImgData)
-        let dir = gallery.path + "template/";
 
         let cachePngFiles = Array.from(files.listDir(gallery.path, function(name) {
             return name.endsWith(".png");
         })); //不拷贝没办法对元素操作
 
         //默认名称排序
-        let pngFiles = files.listDir(dir, function(name) {
-            return name.endsWith(".png") //&& files.isFile(files.join(dir, name));
+        let pngFiles = files.listDir(gallery_dir, function(name) {
+            return name.endsWith(".png") //&& files.isFile(files.join(gallery_dir, name));
         });
         pngFiles = Array.from(pngFiles)
         let imgList = [];
@@ -101,9 +106,20 @@ let bridgeHandler = {
                     visualization: []
                 }
             }
+            // let similarity = undefined;
 
             if (files.exists(gallery.path + pngFiles[_img])) {
                 templateImg.cacheImage = pngFiles[_img];
+                /*  let cacheImage = images.read(gallery.path + pngFiles[_img]);
+                  let templateImage = images.read(gallery_dir + pngFiles[_img]);
+                  similarity = images.getSimilarity(templateImage, cacheImage);
+                  try {
+                      cacheImage.recycle();
+                      templateImage.recycle();
+                  } catch (e) {
+                      console.error(e);
+                  }
+                  */
                 let i_c = cachePngFiles.indexOf(pngFiles[_img]);
                 cachePngFiles.splice(i_c, 1);
             }
@@ -131,7 +147,7 @@ let bridgeHandler = {
         let ImgData = {
             imgList: imgList,
             imgPath: {
-                template: dir,
+                template: gallery_dir,
                 cache: gallery.path,
                 info: gallery.path + "gallery_info.json"
             },
@@ -145,15 +161,15 @@ let bridgeHandler = {
     },
     replaceImage: (file, callbackId) => {
         let success;
-        let filepath = file.path+ "_"+file.name ;
-                
+        let filepath = file.path + "_" + file.name;
+
         try {
             let img = images.fromBase64(file.img);
             if (!img) {
                 tips = "失败\n无法解码base64";
                 console.error(tips);
             } else {
-                
+
                 success = images.save(img, filepath, "png", 100);
                 tips = file.name + "\n保存到指定路径:" + success;
                 console.log(tips, filepath)
@@ -166,20 +182,45 @@ let bridgeHandler = {
         postMessageToWebView({
             callbackId: callbackId,
             data: {
-                "name":"_"+file.name,
+                "name": "_" + file.name,
                 "message": tips,
                 "issuccess": success,
             }
         })
         //为了防止vue使用原来的缓存图像，先改名，等那边更新完再改回来
         setTimeout(() => {
-            files.remove(file.path+file.name);
-            files.rename(filepath,file.name);
-        },200)
+            files.remove(file.path + file.name);
+            files.rename(filepath, file.name);
+        }, 200)
     },
     deleteCacheImage: (data, callbackId) => {
         //log(data.file)
         console.info("删除文件:" + files.remove(data.path + data.file));
+    },
+    restoreTemplate: (data, callbackId) => {
+        if (data.deleteFile) {
+            console.warn("删除无关图片文件:" + gallery_dir)
+            let fileList = files.listDir(gallery_dir, function(name) {
+                return name.endsWith(".png") //&& files.isFile(files.join(gallery_dir, name));
+            });
+            for (let _file of fileList) {
+                files.remove(gallery_dir + _file);
+            }
+        }
+        let isSuccess = gallery.更换图库(files.path("../lib/data/官方｛2712×1220}.zip"));
+        postMessageToWebView({
+            callbackId: callbackId,
+            data: {
+                "message": "",
+                "isSuccess": isSuccess,
+            }
+        })
+        if (isSuccess) {
+            postMessageToWebView({
+                functionName: 'doSaveImageInfo'
+            })
+        }
+
     },
     /*
     loadConfigs: (data, callbackId) => {
@@ -196,7 +237,7 @@ let bridgeHandler = {
                 newVal = data[key]
                 if (typeof newVal !== 'undefined') {
                     storageConfig.put(key, newVal)
-                   // config[key] = newVal
+                    // config[key] = newVal
                 }
             })
         }
@@ -232,10 +273,11 @@ let bridgeHandler = {
 postMessageToWebView = prepareWebView(ui.webview, {
     mainScriptPath: mainScriptPath,
     indexFilePath: "file://" + indexFilePath,
+    //\ enable_log:true,
     bridgeHandler: bridgeHandler,
     onPageFinished: () => {
-        ui.webview.loadUrl('javascript:window.vConsole && window.vConsole.destroy()')
-    
+        // ui.webview.loadUrl('javascript:window.vConsole && window.vConsole.destroy()')
+
     }
 
 })
