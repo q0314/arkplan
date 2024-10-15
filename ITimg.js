@@ -632,13 +632,13 @@ function 图像匹配(picture, list) {
 
 /**
  * 基于autojs Pro9 优化的特征匹配
- * @param {boolean} grayscale - 是否灰度化后再计算特征，默认为true
+ * @param {boolean} [list.grayscale] = true - 是否灰度化后再计算特征
+ * @param {string} [list.small_image_catalog = "./mrfz/tuku/"] - picture小图片所在的文件目录
  */
 function matchFeatures(picture, list) {
     if (!list) {
         list = {};
     }
-
     list = {
         action: list.action,
         timing: list.timing || ITimg.default_list.matchFeatures.timing,
@@ -738,11 +738,11 @@ if (list.refresh !== false || !ITimg.sceneFeatures||ITimg.sceneFeatures.recycled
         console.time("detect_test");
         let big_keyPoints = new MatOfKeyPoint();
         let bigTrainImage = new Mat();
-
-
+        //sceneImg和area区域，对不上会导致闪退
+        //console.info(sceneImg.mat)
+        //log(list.area)
         //还原色彩空间，因为mat默认使用bgr, 而不是rgb
         Imgproc.cvtColor(sceneImg.mat.submat(list.area[1], list.area[3] + list.area[1], list.area[0], list.area[2] + list.area[0]), bigTrainImage, Imgproc.COLOR_BGRA2RGBA);
-
         if (list.scale != 1) {
             //按缩放比例缩放
             let newSize = new Size(bigTrainImage.cols() * list.scale, bigTrainImage.rows() * list.scale);
@@ -1937,6 +1937,7 @@ try {
         area: 2,
         action: 5,
         threshold: 0.85,
+        rectangular_error:35,
         matcher: 2,
         grayscale: false,
         visualization: true,

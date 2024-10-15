@@ -706,7 +706,9 @@ let gallery = {
             let tuku = zipfile.getFileHeader("tuku/");
 
             if (!tuku) {
-                p2 = p2 + "template/";
+                if (!p2.endsWith("/template/") && !p2.endsWith("/template")) {
+                    p2 = p2 + "template/";
+                }
                 p1 = p1.replace(".zip", '/');
             } else {
                 p1 = p1.replace(".zip", '/');

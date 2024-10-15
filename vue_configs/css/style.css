@@ -1,6 +1,7 @@
 [v-cloak] {
   display: none;
 }
+
 .root-container {
   position: relative;
   width: 100%;
@@ -28,19 +29,16 @@
   pointer-events: auto; /* 确保点击事件能够被捕捉 */
 }
 
-  .dialog-content {
+.dialog-content {
+      overflow-x: hidden;
     display: flex;
     flex-direction: column;
     padding: 10px 0px;
     align-items: center; /* 内容居中对齐 */
-  }
+   max-height: 100%; /* 使用父容器的高度 */
+  overflow-y: auto; /* 启用垂直滚动条 */
+}
 
-  .restore-checkbox {
-      margin-top: 20px;
-    margin-bottom: 5px;  
-  }
- 
- 
 .search-input {
     display: none;
     width: 90%;
@@ -56,6 +54,11 @@
 .hidden {
     display: none;
 }
+.tip-block-wrap-text {
+  overflow-wrap: break-word; /* 自动换行 */
+  word-break: break-word; /* 保证单词换行 */
+}
+
 .custom-slide-button {
   min-width: 26px;
   font-size: 10px;
@@ -134,25 +137,38 @@
   flex-direction: column;
   margin-top: 20px;
 }
-.dialog-content {
-  max-height: 100%; /* 使用父容器的高度 */
-  overflow-y: auto; /* 启用垂直滚动条 */
-}
 
-.input-container {
-  display: flex;
-  gap: 10px;
-  margin-top: -2px;
-}
 .adaptive-field .van-field__label {
   display: inline-block;
   width: auto;
   white-space: nowrap; /* 防止换行 */
 }
-
-
-
-
+.custom-select {
+  height: 25px;
+  border: 1px solid #00FF00; /* 设置绿色边框 */
+  outline: none; /* 去除聚焦时的轮廓 */
+  padding: 0px 5px; /* 可根据需要调整内边距 */
+  background: transparent; /* 背景透明 */
+  appearance: none; /* 去掉浏览器默认样式 */
+  justify-content: center;
+}
+.van-dropdown-item {
+  position: absolute; /* 确保绝对定位 */
+  top: 45px !important; /* 修改为你想要的值 */
+}
+.popup_version_title {
+  margin-bottom: 5px;
+}
+.popup_version_version {
+  margin-top: 15px;
+}
+.popup_version_desc {
+  padding-left: 10px;
+  white-space: pre-wrap;
+}
+.van-popover--dark{
+        overflow:inherit !important;
+}
 .rotate {
   transform: rotate(180deg);
 }

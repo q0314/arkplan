@@ -49,7 +49,8 @@ let mixin_methods = {
 let mixin_common = {
   mixins: [mixin_methods],
   data: function () {
-    return {}
+    return {
+    }
   },
   methods: {
     loadConfigs: function () {
@@ -114,23 +115,3 @@ let mixin_common = {
    // this.loadConfigs()
   }
 }
-/**
- * TipBlock
- * 用于展示说明信息
- */
-Vue.component('tip-block', resolve => {
-  resolve({
-    mixins: [mixin_methods],
-    props: {
-      tipFontSize: {
-        type: String,
-        default: '0.7rem'
-      }
-    },
-    template: '<van-row>\
-      <van-col :span="22" :offset="1">\
-        <span :style="\'color: gray;font-size: \' + tipFontSize"><slot></slot></span>\
-      </van-col>\
-    </van-row>'
-  })
-})
