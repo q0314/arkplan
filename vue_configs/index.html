@@ -6,16 +6,16 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>图库配置工具</title>
-    <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/vant@4.6.0/lib/index.css" />
+  <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/vant@4.6.0/lib/index.css" />
   <link rel="stylesheet" href="./css/style.css" />
   <script src="https://fastly.jsdelivr.net/npm/vconsole@3.11.2/dist/vconsole.min.js"></script>
   <script>window.vConsole = new VConsole();</script>
   <script src="https://fastly.jsdelivr.net/npm/vue@3.5.11/dist/vue.global.min.js"></script>
-    <script src="https://fastly.jsdelivr.net/npm/vue-router@4.4.5/dist/vue-router.global.min.js"></script>
-    <script src="https://fastly.jsdelivr.net/npm/vant@4.6.0/lib/vant.min.js"></script>
-<script src="https://fastly.jsdelivr.net/npm/vue3-sfc-loader/dist/vue3-sfc-loader.js"></script>
-<!-- <script src="https://unpkg.com/vue-router@4.0.15/dist/vue-router.global.js"></script>-->
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <script src="https://fastly.jsdelivr.net/npm/vue-router@4.4.5/dist/vue-router.global.min.js"></script>
+  <script src="https://fastly.jsdelivr.net/npm/vant@4.6.0/lib/vant.min.js"></script>
+  <script src="https://fastly.jsdelivr.net/npm/vue3-sfc-loader/dist/vue3-sfc-loader.js"></script>
+  <!-- <script src="https://unpkg.com/vue-router@4.0.15/dist/vue-router.global.js"></script>-->
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
 </head>
 
 <body>
@@ -40,8 +40,8 @@
 
     if (window.innerHeight > 0 && firstResize) {
       firstResize = false;
-      if(window.innerHeight< 209){
-          window.innerHeight = 866;
+      if (window.innerHeight < 209) {
+        window.innerHeight = 866;
       }
       console.log('修改root height:' + window.innerHeight);
       document.getElementById('app').style.height = window.innerHeight + 'px';
@@ -52,9 +52,9 @@
   if (typeof $app === 'undefined') {
     window.$app = {
       mock: true,
-      invoke: (bridgeName, data, callback) => {},
-      receiveMessage: params => {},
-      registerFunction: (functionName, func) => {}
+      invoke: (bridgeName, data, callback) => { },
+      receiveMessage: params => { },
+      registerFunction: (functionName, func) => { }
     };
     window.$nativeApi = {
       request: (bridgeName, data) => { return Promise.reject({}) }
@@ -65,7 +65,7 @@
   }
 </script>
 
-<script  src="./js/components/common.js"></script>
+<script src="./js/components/common.js"></script>
 <script type="module" src="./js/app.js"></script>
 
 </html>

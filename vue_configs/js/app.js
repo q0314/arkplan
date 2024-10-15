@@ -6,9 +6,9 @@
  * @Description: 
  */
 
-const { createApp, defineComponent,ref,h,onMounted ,watch} = Vue;
-const { NavBar, Cell, SwipeCell, CellGroup, Checkbox, Collapse, CollapseItem, Icon, Image, Button, showToast, Dialog, Divider, Field, Popover, Popup, Col, Row, Switch, Stepper} = vant;
-const { createRouter, createWebHashHistory,useRoute } = VueRouter;
+const { createApp, defineComponent, ref, h, onMounted, watch } = Vue;
+const { NavBar, Cell, SwipeCell, CellGroup, Checkbox, Collapse, CollapseItem, Icon, Image, Button, showToast, Dialog, Divider, Field, Popover, Popup, Col, Row, Switch, Stepper } = vant;
+const { createRouter, createWebHashHistory, useRoute } = VueRouter;
 
 import {
     pictureOperation
@@ -45,7 +45,7 @@ const options = {
             // xhr.setRequestHeader("Content-Type", "text/x-vue");
 
             // 定义请求成功的回调
-            xhr.onload = function() {
+            xhr.onload = function () {
                 if (xhr.status >= 200 && xhr.status < 300) {
                     // 根据 asBinary 参数返回数据
                     const getContentData = (asBinary) => {
@@ -69,7 +69,7 @@ const options = {
             };
 
             // 定义请求失败的回调
-            xhr.onerror = function() {
+            xhr.onerror = function () {
                 reject(new Error('Network error ' + url));
             };
 
@@ -93,14 +93,14 @@ const about = loadModule("./js/test.vue", options);
 var router = createRouter({
     history: createWebHashHistory(),
     routes: [{
-            path: "/",
-            name: 'index', //使用这种方法加载的vue，出错可能不会报错误信息，报错也没有明显的信息
-            component: () => index,
-        }, {
-            path: '/test', 
-            name: 'test',
-            component: () => about,
-        },
+        path: "/",
+        name: 'index', //使用这种方法加载的vue，出错可能不会报错误信息，报错也没有明显的信息
+        component: () => index,
+    }, {
+        path: '/test',
+        name: 'test',
+        component: () => about,
+    },
         // 其他路由...
     ],
 });
@@ -150,7 +150,7 @@ const components = [
     Popup,
     Col,
     Row,
-    Switch,Stepper,
+    Switch, Stepper,
 ];
 
 components.forEach(component => myApp.use(component));

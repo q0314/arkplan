@@ -12,12 +12,13 @@
     <div class="seize-seat-upper-corner"></div>
 
     <van-row class="minimum-container">
-    <router-view></router-view>  <!-- 显示当前路由的组件 -->
+      <router-view></router-view> <!-- 显示当前路由的组件 -->
 
       <picture-operation />
     </van-row>
 
-    <van-dialog v-model:show="showSetupDialog" v-cloak title="设置" :show-confirm-button="false" :close-on-click-overlay="true">
+    <van-dialog v-model:show="showSetupDialog" v-cloak title="设置" :show-confirm-button="false"
+      :close-on-click-overlay="true">
       <div class="dialog-content">
         <div class="input-container">
           <p style="text-align: center;">选中的模板图库:</p>
@@ -32,12 +33,14 @@
 
         <van-divider :style="{ margin: '0' }"></van-divider>
         <div style="border-bottom: 1px solid gray; width: 90%; margin: 5px 0px 8px 0px;"></div>
- <van-field v-model="galleryZip" placeholder="输入模板图压缩包路径后点击导入" ></van-field>
- 
-          <van-checkbox v-model="deleteFile" shape="square">删除无关图片</van-checkbox>
+        <van-field v-model="galleryZip" placeholder="输入模板图压缩包路径后点击导入"></van-field>
+
+        <van-checkbox v-model="deleteFile" shape="square">删除无关图片</van-checkbox>
         <div class="input-container">
-         <van-button type="primary" @click="restoreTemplate(true)" :style="{height:'35px',margin:'0px'}">导入模板图库</van-button>
-          <van-button type="warning" @click="restoreTemplate(false)" :style="{height:'35px',margin:'0px'}">还原默认模板图库</van-button>
+          <van-button type="primary" @click="restoreTemplate(true)"
+            :style="{ height: '35px', margin: '0px' }">导入模板图库</van-button>
+          <van-button type="warning" @click="restoreTemplate(false)"
+            :style="{ height: '35px', margin: '0px' }">还原默认模板图库</van-button>
         </div>
       </div>
     </van-dialog>
@@ -46,13 +49,13 @@
 
 <script setup>
 const { ref, onMounted } = Vue;
-const {showToast} = vant;
+const { showToast } = vant;
 const resourcePath = ref('unknown');
 const showSetupDialog = ref(false);
 const clientHeight = ref(200);
 const deleteFile = ref(false);
 const value1 = ref(0);
-const galleryZip =ref("")
+const galleryZip = ref("")
 const galleryName = ref([
   {
     name: "明日计划内置模板",
@@ -104,22 +107,22 @@ const onSettingClick = (e) => {
 };
 
 const restoreTemplate = (value) => {
-    
+
   $app.invoke("restoreTemplate", {
-    import:value,
-    zip:galleryZip.value,
+    import: value,
+    zip: galleryZip.value,
     deleteFile: deleteFile.value,
   }, data => {
     if (data.isSuccess) {
       showSetupDialog.value = false;
-      if(value){
-           showToast((deleteFile.value ? "清空所有图片文件并\n" : "") + "导入模板包解压成功");
-      }else{
-      showToast((deleteFile.value ? "清空无关文件并\n" : "") + "还原所有模板图成功");
-      }
-          
+      if (value) {
+        showToast((deleteFile.value ? "清空所有图片文件并\n" : "") + "导入模板包解压成功");
       } else {
-      showToast((value?"导入":"还原")+"模板图失败\n"+data.message);
+        showToast((deleteFile.value ? "清空无关文件并\n" : "") + "还原所有模板图成功");
+      }
+
+    } else {
+      showToast((value ? "导入" : "还原") + "模板图失败\n" + data.message);
       console.error(data.message);
     }
   });
@@ -146,10 +149,10 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
 .input-container {
   justify-content: center;
-  align-items: center; /* 垂直居中 */
+  align-items: center;
+  /* 垂直居中 */
   display: flex;
   gap: 10px;
   margin-top: 5px;

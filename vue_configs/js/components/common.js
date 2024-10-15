@@ -19,7 +19,7 @@ let mixin_methods = {
   },
   methods: {
     stopTouchmove: function (e) {
-     // e.stopPropagation()
+      // e.stopPropagation()
     },
     isNotEmpty: function (v) {
       return !(typeof v === 'undefined' || v === null || v === '')
@@ -56,10 +56,10 @@ let mixin_common = {
     loadConfigs: function () {
       $app.invoke('loadConfigs', {}, config => {
         Object.keys(this.configs).forEach(key => {
-        //   console.log('load config key:[' + key + '] value: [' + config[key] + ']')
+          //   console.log('load config key:[' + key + '] value: [' + config[key] + ']')
           this.$set(this.configs, key, config[key])
-     // vant.Toast(key)
-         
+          // vant.Toast(key)
+
         })
         this.device.width = config.device_width
         this.device.height = config.device_height
@@ -68,30 +68,30 @@ let mixin_common = {
     },
     doSaveConfigs: function (deleteFields) {
       console.log('执行保存配置');
-      
+
       let newConfigs = {}
-   //   console.log(Array.isArray(this.images))
-     if(Array.isArray(this.images)){
-         newConfigs = this.images
-     }else{
-     // Object.assign(newConfigs, this.configs)
-       Object.assign(newConfigs, this.images)
-     
-      let errorFields = Object.keys(this.validationError);
-      if (errorFields && errorFields.length > 0) {
-        errorFields.forEach(key => {
-          if (this.isNotEmpty(this.validationError[key])) {
+      //   console.log(Array.isArray(this.images))
+      if (Array.isArray(this.images)) {
+        newConfigs = this.images
+      } else {
+        // Object.assign(newConfigs, this.configs)
+        Object.assign(newConfigs, this.images)
+
+        let errorFields = Object.keys(this.validationError);
+        if (errorFields && errorFields.length > 0) {
+          errorFields.forEach(key => {
+            if (this.isNotEmpty(this.validationError[key])) {
+              newConfigs[key] = ''
+            }
+          })
+        }
+        if (deleteFields && deleteFields.length > 0) {
+          deleteFields.forEach(key => {
             newConfigs[key] = ''
-          }
-        })
+          })
+        }
       }
-      if (deleteFields && deleteFields.length > 0) {
-        deleteFields.forEach(key => {
-          newConfigs[key] = ''
-        })
-      }
-    }
-     $app.invoke('saveConfigs', newConfigs)
+      $app.invoke('saveConfigs', newConfigs)
     }
   },
   computed: {
@@ -111,7 +111,7 @@ let mixin_common = {
       return errors
     },
   },
-  mounted () {
-   // this.loadConfigs()
+  mounted() {
+    // this.loadConfigs()
   }
 }

@@ -1,11 +1,11 @@
 
 //import {defineComponent } from 'https://cdn.jsdelivr.net/npm/vue@3.5.11/dist/vue.esm-browser.js';
-const {defineComponent,ref } = Vue;
-const {showToast } =vant;
+const { defineComponent, ref } = Vue;
+const { showToast } = vant;
 
 export const pictureOperation = defineComponent({
   mixins: [mixin_common],
-    
+
   data() {
     return {
       configs: ref({}),
@@ -43,7 +43,7 @@ export const pictureOperation = defineComponent({
       },
       currentIndex: 0,
       activeNames: [], /*van-collapse组件默认配置*/
-      
+
     };
   },
 
@@ -84,8 +84,8 @@ export const pictureOperation = defineComponent({
     filteredImages() {
       let query = this.searchQuery.toLowerCase();
       this.images = this.images_copy.filter((image) => {
-         return image && image.templateImage && image.templateImage.toLowerCase().includes(query);
-})
+        return image && image.templateImage && image.templateImage.toLowerCase().includes(query);
+      })
     },
     replaceImage(index) {
       // 处理替换图片的逻辑
@@ -116,10 +116,10 @@ export const pictureOperation = defineComponent({
           const reader = new FileReader();
           reader.onload = (e) => {
             let name = this.images[this.currentIndex].templateImage;
-                this.images[this.currentIndex] = {
-               ...this.images[this.currentIndex],
-                templateImage: ''
-               };
+            this.images[this.currentIndex] = {
+              ...this.images[this.currentIndex],
+              templateImage: ''
+            };
             // 等待 Vue 完成 DOM 更新
             // setTimeout(() => {
             $app.invoke("replaceImage", {
@@ -131,10 +131,10 @@ export const pictureOperation = defineComponent({
               showToast(data.message);
               if (data.issuccess) {
 
-             this.images[this.currentIndex] = {
-              ...this.images[this.currentIndex],
-                templateImage: data.name
-            };
+                this.images[this.currentIndex] = {
+                  ...this.images[this.currentIndex],
+                  templateImage: data.name
+                };
 
               }
             });
@@ -167,14 +167,14 @@ export const pictureOperation = defineComponent({
       this.currentIndex = index;
       this.currentTemplateInfo = this.images[index].templateInfo;
       this.$router.push('/test'); // 使用 this.$router.push() 方法进行页面跳转
- 
-       $app.invoke("doTestInfo", {
-           input:true,
-           templateImage:this.images[this.currentIndex].templateImage,
-           cacheImage:this.images[this.currentIndex].cacheImage,
-           currentTemplateInfo:this.currentTemplateInfo,
-           imgPath:this.imgPath,
-       })
+
+      $app.invoke("doTestInfo", {
+        input: true,
+        templateImage: this.images[this.currentIndex].templateImage,
+        cacheImage: this.images[this.currentIndex].cacheImage,
+        currentTemplateInfo: this.currentTemplateInfo,
+        imgPath: this.imgPath,
+      })
 
     },
     saveTemplateInfo() {
@@ -189,15 +189,15 @@ export const pictureOperation = defineComponent({
       $app.invoke("deleteCacheImage", {
         path: this.imgPath.cache,
         file: list[index].cacheImage
-      }, data => {});
-     if(isCache){
-     list.splice(index, 1);
-    }else{
+      }, data => { });
+      if (isCache) {
+        list.splice(index, 1);
+      } else {
         list[index] = {
-            ...list[index],
-            cacheImage: ''
-       };
-    }
+          ...list[index],
+          cacheImage: ''
+        };
+      }
     },
     removeExtension(filename) {
       filename = filename.startsWith('_') ? filename.slice(1) : filename;
@@ -212,7 +212,7 @@ export const pictureOperation = defineComponent({
 
     $app.registerFunction('doSearchValue', this.searchValue);
     //注册saveConfigs为saveGalleryConfigs
-   // $app.registerFunction('saveGalleryConfigs', this.saveConfigs);
+    // $app.registerFunction('saveGalleryConfigs', this.saveConfigs);
 
     // 确保数据在这里是定义好的
   },
@@ -301,7 +301,7 @@ export const pictureOperation = defineComponent({
   </div>
 </van-dialog>
   </div>`
- });
+});
 //app.component('picture-operation',pictureOperation);
 /*
 module.exports.distinguishTest = distinguishTest;
