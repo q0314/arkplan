@@ -80,6 +80,12 @@
       </van-cell>
       <tip-block>模板特征匹配(SIFT)提供了全分辨率找图功能，可以识别检测图像中明显的特征并根据特征来查找类似图片</tip-block>
 
+      <van-cell center title="图片相似度:threshold">
+        <van-stepper v-model="areaSelect.threshold" :min="0.60" :max="1.00" :step="0.05" theme="round" :decimal-length="2"
+          button-size="25px" @change="onStepperChange('threshold', $event)"></van-stepper>
+      </van-cell>
+      <tip-block>计算特征时大图的缩放比例，缩放比例越小，计算特征越快，但可能因为放缩过度导致特征计算错误，影响矩形、准确度</tip-block>
+
       <van-cell center title="大图缩放比例:scale">
         <van-stepper v-model="areaSelect.scale" :min="0.40" :max="1.00" :step="0.05" theme="round" :decimal-length="2"
           button-size="25px" @change="onStepperChange('scale', $event)"></van-stepper>
@@ -248,7 +254,7 @@ const onSelectMatcher = (action) => {
 const onStepperChange = (stepperId, value) => {
   // 处理步进器值变化的逻辑
   console.log(`步进器 ${stepperId} 的值变化为:`, value);
-  areaSelect.value[stepperId == "stepper1" ? 'threshold' : 'scale'] = value;
+  areaSelect.value[stepperId] = value;
 
 }
 function splitPath(filePath) {
