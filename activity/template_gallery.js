@@ -590,21 +590,11 @@ ui.emitter.on('pause', () => {
         functionName: 'saveGalleryConfigs'
     })
 })
-let timeout = null
 ui.emitter.on('back_pressed', (e) => {
   if (ui.webview.canGoBack()) {
     ui.webview.goBack()
     e.consumed = true
     return
-  }
-  // toastLog('触发了返回')
-  if (timeout == null || timeout < new Date().getTime()) {
-    e.consumed = true
-    toastLog('再按一次退出')
-    // 一秒内再按一次
-    timeout = new Date().getTime() + 1000;
-  } else {
-   // toastLog('再见~')
   }
 })
 
