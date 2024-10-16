@@ -575,7 +575,7 @@ let bridgeHandler = {
 postMessageToWebView = prepareWebView(ui.webview, {
     mainScriptPath: mainScriptPath,
     indexFilePath: "file://" + indexFilePath,
-    enable_log: true,
+    //enable_log: true,
     bridgeHandler: bridgeHandler,
     onPageFinished: () => {
         // ui.webview.loadUrl('javascript:window.vConsole && window.vConsole.destroy()')
@@ -590,6 +590,7 @@ ui.emitter.on('pause', () => {
         functionName: 'saveGalleryConfigs'
     })
 })
+
 ui.emitter.on('back_pressed', (e) => {
   if (ui.webview.canGoBack()) {
     ui.webview.goBack()
@@ -598,9 +599,6 @@ ui.emitter.on('back_pressed', (e) => {
   }
 })
 
-events.on("exit", function() {
-    files.rename(indexFilePath, "index.html");
-})
 
 function sendConfigChangedBroadcast(newConfig) {
     newConfig = newConfig //|| config

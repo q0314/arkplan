@@ -1,3 +1,10 @@
+/*test
+ * @Author: q0314
+ * @Date: 2024-10-12 08:24:38
+ * @Last Modified by: q0314
+ * @Last Modified time: 2024-10-16 16:49:01
+ * @Description: 使用sfc单文件组件方便在手机上查看修改
+ */
 <template>
   <div class="image-test-container">
     <van-nav-bar title="图片测试" left-arrow @click-left="$router.back()"></van-nav-bar>
@@ -84,7 +91,7 @@
         <van-stepper v-model="areaSelect.threshold" :min="0.60" :max="1.00" :step="0.05" theme="round" :decimal-length="2"
           button-size="25px" @change="onStepperChange('threshold', $event)"></van-stepper>
       </van-cell>
-      <tip-block>计算特征时大图的缩放比例，缩放比例越小，计算特征越快，但可能因为放缩过度导致特征计算错误，影响矩形、准确度</tip-block>
+      <tip-block>特征点相似度，过低容易在其它大图误匹配到该小图，降低相似度至0.70以下时的同时请降低矩形误差值</tip-block>
 
       <van-cell center title="大图缩放比例:scale">
         <van-stepper v-model="areaSelect.scale" :min="0.40" :max="1.00" :step="0.05" theme="round" :decimal-length="2"
@@ -107,10 +114,11 @@
       </van-cell>
       <tip-block>匹配成功后，从大图裁剪匹配区域的小图为缓存图，正常运行时会使用缓存图进行普通匹配而不是模板特征匹配，加快匹配速度，普通匹配失败时根据picture_failed_further是否重新进行模板特征匹配</tip-block>
 
-      <div class="action-button-wrapper">
-        <van-button type="danger" @click="startTest">开始特征匹配</van-button>
-      </div>
-
+        <van-floating-bubble v-model:offset="offset" axis="xy" magnetic="x" icon="play" @click="startTest" >
+           	
+		
+        </van-floating-bubble>
+    
       <van-cell :title="visualizationResultTitle" is-link @click="toggleVisualizationResult">
         <template #right-icon>
           <van-icon :name="showImagesResult ? 'arrow-up' : 'arrow-down'"></van-icon>
@@ -139,6 +147,9 @@ const featuresImgRoute = ref({
   path: "",
   is: false,
 });
+const offset = ref({
+ x:document.body.clientWidth*300/375,y:document.body.clientHeight*0.87
+})
 const area_actions = ref([{ text: "全屏", area: 0 },
 { text: "左上角", area: 1 },
 { text: "左下角", area: 3 },
@@ -379,7 +390,6 @@ onMounted(() => {
   align-items: center;
   /* 垂直居中对齐 */
 }
-
 .flex_ {
   display: flex;
 }

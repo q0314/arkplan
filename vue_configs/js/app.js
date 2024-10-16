@@ -1,13 +1,13 @@
-/*test
+/*
  * @Author: q0314
  * @Date: 2024-09-27 13:24:38
  * @Last Modified by: q0314
- * @Last Modified time: 2024-10-13 20:38:01
+ * @Last Modified time: 2024-10-15 20:38:01
  * @Description: 
  */
 
 const { createApp, defineComponent, ref, h, onMounted, watch } = Vue;
-const { NavBar, Cell, SwipeCell, CellGroup, Checkbox, Collapse, CollapseItem, Icon, Image, Button, showToast, Dialog, Divider, Field, Popover, Popup, Col, Row, Switch, Stepper } = vant;
+const { NavBar, Cell, SwipeCell, CellGroup, Checkbox, Collapse, CollapseItem, Icon, Image, Button, showToast, Dialog, Divider, Field, FloatingBubble,Popover, Popup, Col, Row, Switch, Stepper } = vant;
 const { createRouter, createWebHashHistory, useRoute } = VueRouter;
 
 import {
@@ -145,7 +145,7 @@ const components = [
     Button,
     Dialog,
     Divider,
-    Field,
+    Field,FloatingBubble,
     Popover,
     Popup,
     Col,

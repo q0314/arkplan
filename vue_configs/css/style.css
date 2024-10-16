@@ -12,6 +12,9 @@
 .minimum-container {
     min-height: 850px;
 }
+.van-floating-bubble {
+	background: #ee0a24;
+}
 .fixed-bar {
   position: fixed;
   top: 0;
