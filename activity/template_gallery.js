@@ -330,7 +330,7 @@ let bridgeHandler = {
                 }
             })
             postMessageToWebView({
-                functionName: 'doSaveImageInfo'
+                functionName: 'doUpdateImageInfo'
             })
 
         } else {
@@ -518,7 +518,7 @@ let bridgeHandler = {
         })
         if (isSuccess) {
             postMessageToWebView({
-                functionName: 'doSaveImageInfo'
+                functionName: 'doUpdateImageInfo'
             })
         }
 
@@ -575,7 +575,7 @@ let bridgeHandler = {
 postMessageToWebView = prepareWebView(ui.webview, {
     mainScriptPath: mainScriptPath,
     indexFilePath: "file://" + indexFilePath,
-    //enable_log: true,
+    enable_log: true,
     bridgeHandler: bridgeHandler,
     onPageFinished: () => {
         // ui.webview.loadUrl('javascript:window.vConsole && window.vConsole.destroy()')

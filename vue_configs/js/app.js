@@ -8,18 +8,19 @@
 
 const { createApp, defineComponent, ref, h, onMounted, watch } = Vue;
 const { NavBar, Cell, SwipeCell, CellGroup, Checkbox, Collapse, CollapseItem, Icon, Image, Button, showToast, Dialog, Divider, Field, FloatingBubble,Popover, Popup, Col, Row, Switch, Stepper } = vant;
-const { createRouter, createWebHashHistory, useRoute } = VueRouter;
-
+const { createRouter, createWebHashHistory } = VueRouter;
+/*
 import {
     pictureOperation
 } from './components/configuration.js';
+*/
 const VanImage = Image;
 const {
     loadModule
 } = window['vue3-sfc-loader'];
 const options = {
     moduleCache: {
-        vue: Vue
+        vue: Vue,
     },
     async getFile(url) {
         if (url.startsWith('http')) {
@@ -155,7 +156,7 @@ const components = [
 
 components.forEach(component => myApp.use(component));
 
-myApp.component('picture-operation', pictureOperation);
+//myApp.component('picture-operation', pictureOperation);
 
 myApp.component('TipBlock', defineComponent({
     name: 'TipBlock',

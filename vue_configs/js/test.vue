@@ -7,8 +7,8 @@
  */
 <template>
   <div class="image-test-container">
-    <van-nav-bar title="图片测试" left-arrow @click-left="$router.back()"></van-nav-bar>
-
+    <van-nav-bar title="图片测试" left-arrow @click-left="$router.back()" class="fixed-bar"></van-nav-bar>
+<div class="seize-seat-upper-corner"></div>
     <div class="content-wrapper">
       <div class="image-selection-area">
         <!-- 左侧区域，包含图像1 -->

@@ -66,16 +66,16 @@ let mixin_common = {
         this.is_pro = config.is_pro
       })
     },
-    doSaveConfigs: function (deleteFields) {
+    doSaveConfigs: function (deleteFields,value) {
       console.log('执行保存配置');
 
       let newConfigs = {}
       //   console.log(Array.isArray(this.images))
-      if (Array.isArray(this.images)) {
-        newConfigs = this.images
+      if (value && Array.isArray(value)) {
+        newConfigs = value;
       } else {
         // Object.assign(newConfigs, this.configs)
-        Object.assign(newConfigs, this.images)
+        Object.assign(newConfigs, value)
 
         let errorFields = Object.keys(this.validationError);
         if (errorFields && errorFields.length > 0) {
