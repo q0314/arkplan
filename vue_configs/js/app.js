@@ -88,8 +88,8 @@ const options = {
         document.head.insertBefore(style, ref);
     },
 }
-const index = loadModule("./js/home.vue", options)
-const about = loadModule("./js/test.vue", options);
+const index = loadModule("./js/pages/galleryHome.vue", options)
+const about = loadModule("./js/pages/galleryTest.vue", options);
 
 var router = createRouter({
     history: createWebHashHistory(),

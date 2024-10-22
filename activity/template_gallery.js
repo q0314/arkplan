@@ -213,11 +213,6 @@ let bridgeHandler = {
     uiExit: data => {
         ui.finish();
     },
-    searchValue: () => {
-        postMessageToWebView({
-            functionName: 'doSearchValue'
-        })
-    },
     doTestInfo: (data, callbackId) => {
         if (data.input) {
             testImgInfo = data;

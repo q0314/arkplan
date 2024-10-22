@@ -1,11 +1,20 @@
-
+/*
+ * @Author: q0314
+ * @Date: 2024-10-09 12:24:38
+ * @Last Modified by: q0314
+ * @Last Modified time: 2024-10-21 16:15:01
+ * @Description: 使用sfc单文件组件方便在手机上查看修改
+ */
 
 <template>
   <div>
     <div>
       <van-nav-bar title="模板图库管理" left-arrow @click-left="onClickLeft" class="fixed-bar">
         <template #right>
-          <van-icon name="search" class="icon" @click.stop="onSearchClick" ></van-icon>
+         <!-- <van-icon name="search" class="icon" @click.stop="onSearchClick" ></van-icon>-->
+         <element-search ref="eleSearch" :refSearchAttrName="searchTemplate" 
+            refHighLightAttrName="scheme-list-to-highlit" />
+        
           <van-icon name="setting" class="icon" @click.stop="onSettingClick" ></van-icon>
         </template>
       </van-nav-bar>
@@ -17,7 +26,6 @@
       <router-view></router-view> <!-- 显示当前路由的组件 -->
 
   <div>
-    <input v-model="searchQuery" placeholder="  过滤图片名称"  id="Search" @input="filteredImages" v-if="searchShow" class="search-input"/>
     <div v-for="(item,index) in images" :key="index" class="image-comparison">
       <div class="image-section">
         <div class="image-viewer">
@@ -133,6 +141,8 @@
 const { ref, onMounted ,computed  } = Vue;
 const { showToast } = vant;
 const {useRouter}  = VueRouter;
+import ElementSearch from "../components/ElementSearch.vue";
+
 const router = useRouter();
 const resourcePath = ref('unknown');
 const showSetupDialog = ref(false);
@@ -152,8 +162,6 @@ const galleryName = ref([
 const selectCachePath = ref('');
 const selectTemplatePath = ref('');
 
-const searchQuery = ref('');
-const searchShow = ref(false)
 const images_copy = ref([]);
 
 const images = ref([
@@ -186,11 +194,12 @@ const currentTemplateInfo = ref({
 });
 const currentIndex = ref(0);
 const activeNames = ref([]);
-const fileInput = ref(null);
+const fileInput = ref();
 const visualizationPaths = computed(() => {
   const visualization = currentTemplateInfo.value?.visualization;
   return Array.isArray(visualization) ? visualization : images.value[0].templateInfo.visualization;
 });
+
 
 function saveConfigs() {
   console.log('save gallery configs');
@@ -209,32 +218,12 @@ function updateImageInfo() {
 }
 
 function onClickLeft () {
+    //离开时清空搜索数据
+    localStorage.setItem('elementSearch', JSON.stringify({}));
     saveConfigs();
-  $app.invoke('uiExit', {});
+    $app.invoke('uiExit', {});
 };
 
-function onSearchClick() {
-  console.log('Search icon clicked');
-  searchShow.value = !searchShow.value;
-  if (images_copy.value.length == 0) {
-    images_copy.value = images.value;
-  } else {
-    images.value = images_copy.value;
-    images_copy.value = [];
-  }
-  /*
-  let searchElement = document.getElementById('Search');
-  if (searchElement && searchElement.classList.contains('display')) {
-    searchElement.classList.remove('display');
-    searchElement.classList.add('hidden');
-  } else {
-    showToast("搜索");
-    searchElement.classList.remove('hidden');
-    searchElement.classList.add('display');
-    
-  }
-  */
-};
 
 function onSettingClick(e) {
   console.log('Setting icon clicked', showSetupDialog.value);
@@ -242,30 +231,39 @@ function onSettingClick(e) {
   showSetupDialog.value = !showSetupDialog.value;
 };
 
-function filteredImages() {
-    
-  let query = searchQuery.value.toLowerCase();
+
+function searchTemplate(value){
+    if(selectTemplatePath.value == ""){
+        return false
+    }
+    if (value&&images_copy.value.length == 0) {
+        images_copy.value = images.value;
+    } else if(!value&&value.k==""){
+        images.value = images_copy.value;
+        images_copy.value = [];
+    return true;
+    }
+   //   let query = searchQuery.value.toLowerCase();
   let temporary = images_copy.value.filter((image)=> {
-  return image?.templateImage?.toLowerCase().includes(query);
-});
+  return image?.templateImage?.toLowerCase().includes(value.k);
+  });
   if(!temporary.length){
       showToast("未搜索到该图片");
   }else{
     //  console.info(temporary)
       images.value = temporary;
   }
-  
+  return true;
 }
-
 function replaceImage(index) {
-  currentIndex.value = index;
+    currentIndex.value = index;
     
-  if (fileInput && typeof fileInput.value.click === 'function') {
-    fileInput.click();
-  } else {
-  console.error('fileInput 不是一个有效的 HTMLInputElement 或没有 click 方法');
+    if (fileInput && typeof fileInput.value.click === 'function') {
+        fileInput.click();
+    } else {
+        console.error('fileInput 不是一个有效的 HTMLInputElement 或没有 click 方法');
         document.getElementById('fileInput').click();
-        }
+    }
 }
 
 function handleFileChange(event) {
@@ -310,11 +308,13 @@ function showTemplateInfo(index) {
 function testInfo(index) {
   currentIndex.value = index;
   currentTemplateInfo.value = images.value[index].templateInfo;
+  let pictureName = images.value[currentIndex.value].templateImage;
+  pictureName = pictureName.startsWith('_') ? pictureName.slice(1) : pictureName;
   router.push('/test'); 
   
   $app.invoke('doTestInfo', {
     input: true,
-    templateImage: images.value[currentIndex.value].templateImage,
+    templateImage: pictureName,
     cacheImage: images.value[currentIndex.value].cacheImage,
     currentTemplateInfo: currentTemplateInfo.value,
     imgPath: imgPath.value,
@@ -396,10 +396,11 @@ onMounted(() => {
     selectCachePath.value = data.galleryInfo.cache;
   });
   updateImageInfo();
-    $app.registerFunction('doUpdateImageInfo', updateImageInfo);
+ 
+  $app.registerFunction('doUpdateImageInfo', updateImageInfo);
 
     //注册saveConfigs为saveGalleryConfigs
-     $app.registerFunction('saveGalleryConfigs', saveConfigs);
+  $app.registerFunction('saveGalleryConfigs', saveConfigs);
 
   //showToast && showToast('vue加载完成...');
   setTimeout(() => {
@@ -444,7 +445,6 @@ onMounted(() => {
   align-items: center; /* 垂直居中对齐内容 */
 
 }
-
 .button-container {
     display: flex;
   justify-content: space-between; /* 可选，根据需要调整按钮间距 */
