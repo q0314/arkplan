@@ -58,7 +58,19 @@ let currency = {
             ["采购中心", 2]
         ]
         tool.Floaty_emit("展示文本", "状态", "状态：导航定位菜单...");
+        //好友转到识别任务，再偏移坐标点击好友
 
+        let deviation;
+        if (menu == "好友" || menu == 9) {
+            deviation = true;
+            menu = 8;
+        }
+        if (typeof menu == "number") {
+            menu = this.menu[menu];
+        } else if (typeof menu !== "object") {
+            menu = this.menu.find(item => item[0] === menu);
+        }
+        console.verbose("导航定位-", menu);
         let _max = 3;
         while (_max) {
 
@@ -88,19 +100,6 @@ let currency = {
                 this.navigation = [this.navigation.left + this.navigation.w / 2, this.navigation.top + this.navigation.h / 2];
                 MyAutomator.click.apply(MyAutomator, this.navigation);
                 sleep(800);
-                //好友转到识别任务，再偏移坐标点击好友
-
-                let deviation;
-                if (menu == "好友" || menu == 9) {
-                    deviation = true;
-                    menu = 8;
-                }
-                if (typeof menu == "number") {
-                    menu = this.menu[menu];
-                } else {
-                    menu = this.menu.find(item => item[0] === menu);
-                }
-                console.verbose("导航定位-",menu);
 
                 _confirm_go = ITimg.matchFeatures("导航_" + menu[0], {
                     action: 5,
@@ -114,7 +113,7 @@ let currency = {
                     matcher: 2,
                     scale: 1,
                     refresh: false,
-                    
+
                 })
                 if (_confirm_go) {
                     if (deviation) {
