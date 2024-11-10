@@ -6,14 +6,7 @@ const language = theme.getLanguage("about");
 
 let toupdate;
 
-var server = storages.create("server").get("server");
-
-let key = new $crypto.Key("qiao031420030313");
-
-server = $crypto.decrypt(server, key, "AES", {
-    "input": "base64",
-    "output": "string"
-});
+var server = "http://arkplan.top/arkplan/";
 try {
     jlink_mian;
 } catch (e) {

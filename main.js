@@ -34,22 +34,13 @@ let {
 require("./modules/ButtonLayout");
 require('./modules/widget-switch-se7en');
 require("./modules/NonSwipeableViewPager");
-var server = storages.create("server").get("server"),
-    url_info = {
+var server = "http://arkplan.top/arkplan/";
+var url_info = {
         now: new Date().getTime(),
         versionName: app.versionName,
         AndroidId: device.getAndroidId(),
     };
-let key = new $crypto.Key("qiao031420030313");
 
-if (!server) {
-    server = "98UNFLF/xmobQFcfLGFBpdUe1vgz6seOjHcOVaXoV0Y=";
-    storages.create("server").put("server", server);
-}
-server = $crypto.decrypt(server, key, "AES", {
-    "input": "base64",
-    "output": "string"
-});
 let height = device.height;
 let width = device.width;
 //包名
