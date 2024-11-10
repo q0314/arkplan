@@ -35,11 +35,6 @@ require("./modules/ButtonLayout");
 require('./modules/widget-switch-se7en');
 require("./modules/NonSwipeableViewPager");
 var server = "http://arkplan.top/arkplan/";
-var url_info = {
-        now: new Date().getTime(),
-        versionName: app.versionName,
-        AndroidId: device.getAndroidId(),
-    };
 
 let height = device.height;
 let width = device.width;
@@ -217,14 +212,10 @@ try {
 }
 
 
-threads.start(function() {
+threads.start(function () {
 
     try {
         http.get(server + "about_link.json", {
-            headers: {
-                'url_info': url_info,
-                'User-Agent': System.getProperty("http.agent")
-            }
         }, (res, err) => {
 
             if (err || res['statusCode'] != 200) {
@@ -236,31 +227,26 @@ threads.start(function() {
 
 
         })
-
-        http.get(server + "tulili/gallery_item.json", {
-            headers: {
-                'url_info': url_info,
-                'User-Agent': System.getProperty("http.agent")
-            }
-        }, (res, err) => {
-            if (err || res['statusCode'] != 200) {
-                console.error(System.getProperty("http.agent"))
-                throw Error('请求云端图库列表信息出错:\n' + (res ? res : err.messag));
-
-            } else {
-                tukuss = JSON.parse(res.body.string());
-
-                if (!gallery.gallery_info) {
-                    gallery.选择图库(tukuss);
-                }
-            }
-        })
-        threads.start(function() {
+        /*
+                http.get(server + "tulili/gallery_item.json", {
+                }, (res, err) => {
+                    if (err || res['statusCode'] != 200) {
+                        console.error(System.getProperty("http.agent"))
+                        throw Error('请求云端图库列表信息出错:\n' + (res ? res : err.messag));
+        
+                    } else {
+                        tukuss = JSON.parse(res.body.string());
+        
+                        if (!gallery.gallery_info) {
+                            gallery.选择图库(tukuss);
+                        }
+                    }
+                }) */
+        if (!gallery.gallery_info) {
+            gallery.选择图库(tukuss);
+        }
+        threads.start(function () {
             http.get(server + "force.js", {
-                headers: {
-                    'url_info': url_info,
-                    'User-Agent': System.getProperty("http.agent")
-                }
             }, (res, err) => {
                 if (err || res['statusCode'] != 200) {
                     console.error("获取热更新文件失败:" + (res ? res : err.messag));
@@ -284,65 +270,65 @@ SystemUiVisibility(false);
 //背景色#426e6d
 ui.layout(
     <frame id="all">
-        
+
         <non-swipeable-view-pager id="viewpager" bg="{{theme.bar}}">
             {/**drawer侧边栏 */}
-            
+
             <relative w="*" id="drawer_" clickable="true">
                 <relative id="drawerToolbar" margin="0 10 0 10" paddingTop="{{iStatusBarHeight()}}px">
                     <img
-                    id="icon"
-                    w="40"
-                    h="40"
-                    margin="20 0"
-                    scaleType="fitXY"
-                    circle="true"
-                    src="{{server}}splashIcon.png"
+                        id="icon"
+                        w="40"
+                        h="40"
+                        margin="20 0"
+                        scaleType="fitXY"
+                        circle="true"
+                        src="{{server}}splashIcon.png"
                     />
-                    
+
                     <text
-                    id="title"
-                    layout_toRightOf="icon"
-                    layout_alignParentTop="true"
-                    w="auto" h="auto"
-                    text="明日计划"
-                    textSize="16sp"
-                    textStyle="bold"
-                    textColor="#ffffff"
-                    typeface="monospace"
+                        id="title"
+                        layout_toRightOf="icon"
+                        layout_alignParentTop="true"
+                        w="auto" h="auto"
+                        text="明日计划"
+                        textSize="16sp"
+                        textStyle="bold"
+                        textColor="#ffffff"
+                        typeface="monospace"
                     />
-                    
+
                     <text
-                    id="subtitle"
-                    layout_toRightOf="icon"
-                    layout_below="title"
-                    w="auto" h="auto"
-                    text="罗德岛终端辅助应用工具"
-                    textSize="12sp"
-                    textStyle="bold"
-                    textColor="#7fffffff"
-                    typeface="monospace"
+                        id="subtitle"
+                        layout_toRightOf="icon"
+                        layout_below="title"
+                        w="auto" h="auto"
+                        text="罗德岛终端辅助应用工具"
+                        textSize="12sp"
+                        textStyle="bold"
+                        textColor="#7fffffff"
+                        typeface="monospace"
                     />
-                    
+
                 </relative>
                 <frame w="*" h="*">
                     <card id="homepage" layout_gravity="right|center"
-                    bg="#00000000" cardCornerRadius="30dp">
-                </card>
-            </frame>
-            <frame id="drawerFrame" layout_below="drawerToolbar" layout_above="drawerHorizontal" h="*">
-                <ScrollView>
-                    <vertical layout_gravity="center" marginTop="10"  >
-                        <list id="drawerList" w="auto" h="auto" layout_gravity="center">
-                            <button-layout w="*" text="{{this.text}}" leftDrawable="{{this.drawable}}" />
-                        </list>
-                        <button-layout id="cnos" w="*" h="auto" visibility="gone" text="常用选项" leftDrawable="ic_stars_black_48dp" />
-                        <vertical id="cnos_list" w="*" h="auto" visibility="gone">
-                            <button-layout id="start_gamesup" w="*" h="auto" text="启动游戏" leftDrawable="ic_stars_black_48dp" />
-                            <button-layout id="vibration" w="*" h="auto" text="震动反馈" leftDrawable="ic_stars_black_48dp" />
-                            <button-layout id="desktop" w="*" h="auto" text="返回桌面" leftDrawable="ic_stars_black_48dp" />
-                        </vertical>
-                        {/*  <button-layout id="indt" w="auto" h="auto" text="定时任务" leftDrawable="ic_alarm_black_48dp"/>
+                        bg="#00000000" cardCornerRadius="30dp">
+                    </card>
+                </frame>
+                <frame id="drawerFrame" layout_below="drawerToolbar" layout_above="drawerHorizontal" h="*">
+                    <ScrollView>
+                        <vertical layout_gravity="center" marginTop="10"  >
+                            <list id="drawerList" w="auto" h="auto" layout_gravity="center">
+                                <button-layout w="*" text="{{this.text}}" leftDrawable="{{this.drawable}}" />
+                            </list>
+                            <button-layout id="cnos" w="*" h="auto" visibility="gone" text="常用选项" leftDrawable="ic_stars_black_48dp" />
+                            <vertical id="cnos_list" w="*" h="auto" visibility="gone">
+                                <button-layout id="start_gamesup" w="*" h="auto" text="启动游戏" leftDrawable="ic_stars_black_48dp" />
+                                <button-layout id="vibration" w="*" h="auto" text="震动反馈" leftDrawable="ic_stars_black_48dp" />
+                                <button-layout id="desktop" w="*" h="auto" text="返回桌面" leftDrawable="ic_stars_black_48dp" />
+                            </vertical>
+                            {/*  <button-layout id="indt" w="auto" h="auto" text="定时任务" leftDrawable="ic_alarm_black_48dp"/>
                         <list id="timed_tasks_list" visibility="gone">
                             <card w="*" h="40" margin="5 0 5 0" cardCornerRadius="2dp"
                             bg="#926e6d" cardElevation="5dp" foreground="?selectableItemBackground">
@@ -359,304 +345,304 @@ ui.layout(
                     
                     <button id="timed_tasks_add" visibility="gone" layout_weight="1" textSize="16" text="添加" style="Widget.AppCompat.Button.Borderless.Colored"/>
                     */}
-                </vertical>
-            </ScrollView>
-            
-        </frame>
-        
-        <horizontal id="drawerHorizontal" padding="0 0" paddingBottom="40px" layout_alignParentBottom="true">
-            
-            <button-layout id="settingsBtn" text="设置" drawablePadding="5" leftDrawable="ic_settings_black_48dp" />
-            
-            <View bg="#ffffff" w="2px" h="16" layout_gravity="center_vertical" />
-            
-            {/*          <button-layout id="logBtn" text="公招计算" drawablePadding="3" leftDrawable="ic_language_black_48dp" />
+                        </vertical>
+                    </ScrollView>
+
+                </frame>
+
+                <horizontal id="drawerHorizontal" padding="0 0" paddingBottom="40px" layout_alignParentBottom="true">
+
+                    <button-layout id="settingsBtn" text="设置" drawablePadding="5" leftDrawable="ic_settings_black_48dp" />
+
+                    <View bg="#ffffff" w="2px" h="16" layout_gravity="center_vertical" />
+
+                    {/*          <button-layout id="logBtn" text="公招计算" drawablePadding="3" leftDrawable="ic_language_black_48dp" />
             <View bg="#ffffff" w="2px" h="16" layout_gravity="center_vertical" />
             */}
-            <button-layout id="analysis" text="抽卡分析" drawablePadding="3" leftDrawable="@drawable/ic_local_florist_black_48dp" />
-        </horizontal>
-        
-    </relative>
-    
-    {/**界面 */}
-    <card id="card" cardElevation="0" cardCornerRadius="0" cardBackgroundColor="{{theme.bg}}">
-        <vertical bg="#00000000">
-            <toolbar w="*" h="auto" margin="0 10 0 10" paddingTop="{{iStatusBarHeight()}}px">
-                <img
-                id="icon_b" w="35dp" h="35dp"
-                scaleType="fitXY" circle="true" layout_gravity="left"
-                src="{{server}}splashIcon.png"
-                />
-                <text
-                w="auto" h="auto"
-                text="PRTS配置" textSize="21"
-                textStyle="bold|italic"
-                textColor="{{theme.icons}}"
-                typeface="monospace" layout_gravity="center"
-                />
-                
-                <horizontal id="selectTime" layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right" foreground="?android:attr/selectableItemBackgroundBorderless">
-                    <img w="35dp" h="35dp" scaleType="fitXY" circle="true" src="file://./res/hd.png" />
-                    
-                    <text id="text_ap" text="实时数据" w="auto" h="auto" marginLeft="8dp" marginRight="20dp" textSize="15" textStyle="bold" layout_gravity="center" />
-                    
-                    
+                    <button-layout id="analysis" text="抽卡分析" drawablePadding="3" leftDrawable="@drawable/ic_local_florist_black_48dp" />
                 </horizontal>
-                
-            </toolbar>
-            <ScrollView>
-                <vertical margin="20 0 20 50" >
-                    <widget-switch-se7en id="floatyCheckPermission" text="悬浮窗权限" checked="{{floaty.checkPermission() != false}}" padding="6 0 6 5" textSize="22"
-                    thumbSize="24"
-                    radius="24"
-                    textColor="{{theme.text}}"
-                    trackColor="{{theme.track}}" />
-                    <widget-switch-se7en id="autoService" text="无障碍服务" checked="{{auto.service != null}}" padding="6 6 6 6" textSize="22"
-                    thumbSize="24" w="*"
-                    radius="24"
-                    textColor="{{theme.text}}"
-                    trackColor="{{theme.track}}" />
-                    <View w="*" h="2" bg="#000000" />
-                    <card w="*" id="indx2" margin="0 0 0 1" h="45dp" cardCornerRadius="0"
-                    cardElevation="3dp" gravity="center_vertical"  >
-                    <linear clipChildren="false" bg="{{theme.bg}}" elevation="0" gravity="center_vertical" >
-                        <text textSize="16" w="auto" h="auto" marginLeft="5" text="程序执行模式: " layout_gravity="center" layout_weight="1" textColor="{{theme.text}}" />
-                        <spinner id="implement" textSize="16" entries=""
-                        layout_gravity="right|center" layout_weight="2" />
-                    </linear>
-                </card>
-                <vertical id="xingdongquyu">
-                    <vertical id="xlkz" visibility="gone">
-                        <horizontal marginLeft="5" gravity="center">
-                            <text id="levelPickText" text="关卡选择" textSize="{{px2dp(48)}}" textColor="{{theme.text}}" marginRight="50" />
-                            <spinner id="level_pick" textSize="{{px2dp(62)}}" entries=""
-                            gravity="center" layout_weight="1" margin="5 5" padding="4" />
-                            {/*  <TextView id="level_pick" textSize="{{px2dp(62)}}"
+
+            </relative>
+
+            {/**界面 */}
+            <card id="card" cardElevation="0" cardCornerRadius="0" cardBackgroundColor="{{theme.bg}}">
+                <vertical bg="#00000000">
+                    <toolbar w="*" h="auto" margin="0 10 0 10" paddingTop="{{iStatusBarHeight()}}px">
+                        <img
+                            id="icon_b" w="35dp" h="35dp"
+                            scaleType="fitXY" circle="true" layout_gravity="left"
+                            src="{{server}}splashIcon.png"
+                        />
+                        <text
+                            w="auto" h="auto"
+                            text="PRTS配置" textSize="21"
+                            textStyle="bold|italic"
+                            textColor="{{theme.icons}}"
+                            typeface="monospace" layout_gravity="center"
+                        />
+
+                        <horizontal id="selectTime" layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right" foreground="?android:attr/selectableItemBackgroundBorderless">
+                            <img w="35dp" h="35dp" scaleType="fitXY" circle="true" src="file://./res/hd.png" />
+
+                            <text id="text_ap" text="实时数据" w="auto" h="auto" marginLeft="8dp" marginRight="20dp" textSize="15" textStyle="bold" layout_gravity="center" />
+
+
+                        </horizontal>
+
+                    </toolbar>
+                    <ScrollView>
+                        <vertical margin="20 0 20 50" >
+                            <widget-switch-se7en id="floatyCheckPermission" text="悬浮窗权限" checked="{{floaty.checkPermission() != false}}" padding="6 0 6 5" textSize="22"
+                                thumbSize="24"
+                                radius="24"
+                                textColor="{{theme.text}}"
+                                trackColor="{{theme.track}}" />
+                            <widget-switch-se7en id="autoService" text="无障碍服务" checked="{{auto.service != null}}" padding="6 6 6 6" textSize="22"
+                                thumbSize="24" w="*"
+                                radius="24"
+                                textColor="{{theme.text}}"
+                                trackColor="{{theme.track}}" />
+                            <View w="*" h="2" bg="#000000" />
+                            <card w="*" id="indx2" margin="0 0 0 1" h="45dp" cardCornerRadius="0"
+                                cardElevation="3dp" gravity="center_vertical"  >
+                                <linear clipChildren="false" bg="{{theme.bg}}" elevation="0" gravity="center_vertical" >
+                                    <text textSize="16" w="auto" h="auto" marginLeft="5" text="程序执行模式: " layout_gravity="center" layout_weight="1" textColor="{{theme.text}}" />
+                                    <spinner id="implement" textSize="16" entries=""
+                                        layout_gravity="right|center" layout_weight="2" />
+                                </linear>
+                            </card>
+                            <vertical id="xingdongquyu">
+                                <vertical id="xlkz" visibility="gone">
+                                    <horizontal marginLeft="5" gravity="center">
+                                        <text id="levelPickText" text="关卡选择" textSize="{{px2dp(48)}}" textColor="{{theme.text}}" marginRight="50" />
+                                        <spinner id="level_pick" textSize="{{px2dp(62)}}" entries=""
+                                            gravity="center" layout_weight="1" margin="5 5" padding="4" />
+                                        {/*  <TextView id="level_pick" textSize="{{px2dp(62)}}"
                             margin="5 5" textColor="black" w="*" text="当前/上次" gravity="center" />
                             */}
-                        </horizontal>
-                        <widget-switch-se7en id="only_medicament" checked="{{setting.only_medicament}}" text="仅使用药剂恢复理智" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
-                        <widget-switch-se7en id="unlimited_eat_expired_sane" checked="{{setting.无限吃24小时过期理智药}}" text="{{language['unlimited-eat-expired-sane']}}" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
-                        
-                        <horizontal gravity="center" marginLeft="5">
-                            <text id="mr1" text="刷图上限:" textSize="15" textColor="{{theme.text}}" />
-                            <input id="input_extinguish" inputType="number" hint="{{setting.剿灭}}次" layout_weight="1" visibility="gone" paddingLeft="6" w="auto" textColorHint="{{theme.text3}}" />
-                            <input id="input_ordinary" inputType="number" hint="{{setting.行动}}次" layout_weight="1" paddingLeft="6" w="auto" textColorHint="{{theme.text3}}" />
-                            <text id="mr2" text="磕药/碎石:" textSize="15" textColor="{{theme.text}}" />
-                            <input id="input_sane" inputType="number" hint="{{setting.理智}}个" layout_weight="1" w="auto" textColorHint="{{theme.text3}}" />
-                        </horizontal>
-                    </vertical>
-                    
-                    <widget-switch-se7en id="olrs" text="PRTS辅助记录汇报"
-                    checked="{{setting.作战汇报}}" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
-                    <widget-switch-se7en id="qetj" text="企鹅物流数据统计"
-                    checked="{{setting.企鹅统计}}" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
-                    
-                    <widget-switch-se7en id="limitMaterial" text="是否统计所需材料"
-                    checked="{{setting.指定材料}}" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
-                    <vertical id="materialList" visibility="gone" margin="-15 0 5 0">
-                        <horizontal>
-                            <spinner
-                            id="chooseMaterial"
-                            w="*" h="40"
-                            layout_weight="1"
-                            spinnerMode="dialog"
-                            />
-                            <card w="40" h="40"
-                            cardBackgroundColor="#0d84ff" layout_gravity="right|center" cardCornerRadius="20">
-                            
-                            <text text="+"
-                            textSize="25sp" textColor="#ffffff" gravity="center"
-                            id="addMaterial"
-                            foreground="?selectableItemBackground"
-                            />
-                        </card>
-                        <card w="40" h="40" marginLeft="10"
-                        cardBackgroundColor="#0d84ff" id="hideMaterial" layout_gravity="right|center" cardCornerRadius="20" foreground="?selectableItemBackground">
-                        
-                        <img marginTop="2" w="20" height="20" src="@drawable/ic_call_split_black_48dp"
-                        tint="#ffffff" layout_gravity="center"
-                        />
-                    </card>
-                </horizontal>
-                <ScrollView marginTop="5">
-                    <vertical id="addMaterialList">
-                    </vertical>
-                </ScrollView>
-            </vertical>
-        </vertical>
-        
-        
-        <vertical id="jijianquyu" >
-            <widget-switch-se7en id="jjhb" text="基建换班模块"  padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
-            
-            <widget-switch-se7en
-            id="uav_acceleration"
-            checked="{{setting.无人机加速}}"
-            text="基建内无人机加速"
-            padding="6 6 6 6"
-            textSize="16" textColor="{{theme.text}}"
-            />
-            <radiogroup id="uav_acceleration_list" orientation="horizontal">
-                <radio id="manufacturing" text="无人机加速生产" w="auto" textColor="{{theme.text}}" />
-                <radio id="trade" text="无人机加速贸易" w="auto" textColor="{{theme.text}}" />
-            </radiogroup>
-            
-            <widget-switch-se7en id="hkxs" checked="{{setting.会客室线索}}" text="基建会客室线索" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
-            <radiogroup id="hks" orientation="horizontal" visibility="{{setting.会客室线索 ? 'visible':'gone'}}">
-                <checkbox id="hks1" text="处理线索溢出" checked="{{setting.处理线索溢出}}" w="auto" textColor="{{theme.text}}" />
-            </radiogroup>
-            
-            <widget-switch-se7en id="hyfw" checked="{{setting.好友访问}}" text="基建内好友访问" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
-            <widget-switch-se7en id="sqxy" checked="{{setting.收取信用}}" text="收取每日信用" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
-            <widget-switch-se7en id="credit_buy" text="购买信用物品" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
-            <widget-switch-se7en id="gozh" checked="{{setting.公招}}" text="自动公开招募" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
-            <radiogroup id="tag" orientation="horizontal" visibility="{{setting.公招 ? 'visible':'gone'}}">
-                <checkbox id="tag1" text="8小时无tag招募" checked="{{setting.无tag招募}}" w="auto" textColor="{{theme.text}}" />
-                
-                <checkbox id="tag2" text="聘用候选人" checked="{{setting.自动聘用}}" w="auto" textColor="{{theme.text}}" />
-            </radiogroup>
-            {/*  <widget-switch-se7en id="rwjl" checked="{{setting.claim_rewards&&setting.claim_rewards}}" text="领取任务奖励" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
+                                    </horizontal>
+                                    <widget-switch-se7en id="only_medicament" checked="{{setting.only_medicament}}" text="仅使用药剂恢复理智" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
+                                    <widget-switch-se7en id="unlimited_eat_expired_sane" checked="{{setting.无限吃24小时过期理智药}}" text="{{language['unlimited-eat-expired-sane']}}" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
+
+                                    <horizontal gravity="center" marginLeft="5">
+                                        <text id="mr1" text="刷图上限:" textSize="15" textColor="{{theme.text}}" />
+                                        <input id="input_extinguish" inputType="number" hint="{{setting.剿灭}}次" layout_weight="1" visibility="gone" paddingLeft="6" w="auto" textColorHint="{{theme.text3}}" />
+                                        <input id="input_ordinary" inputType="number" hint="{{setting.行动}}次" layout_weight="1" paddingLeft="6" w="auto" textColorHint="{{theme.text3}}" />
+                                        <text id="mr2" text="磕药/碎石:" textSize="15" textColor="{{theme.text}}" />
+                                        <input id="input_sane" inputType="number" hint="{{setting.理智}}个" layout_weight="1" w="auto" textColorHint="{{theme.text3}}" />
+                                    </horizontal>
+                                </vertical>
+
+                                <widget-switch-se7en id="olrs" text="PRTS辅助记录汇报"
+                                    checked="{{setting.作战汇报}}" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
+                                <widget-switch-se7en id="qetj" text="企鹅物流数据统计"
+                                    checked="{{setting.企鹅统计}}" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
+
+                                <widget-switch-se7en id="limitMaterial" text="是否统计所需材料"
+                                    checked="{{setting.指定材料}}" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
+                                <vertical id="materialList" visibility="gone" margin="-15 0 5 0">
+                                    <horizontal>
+                                        <spinner
+                                            id="chooseMaterial"
+                                            w="*" h="40"
+                                            layout_weight="1"
+                                            spinnerMode="dialog"
+                                        />
+                                        <card w="40" h="40"
+                                            cardBackgroundColor="#0d84ff" layout_gravity="right|center" cardCornerRadius="20">
+
+                                            <text text="+"
+                                                textSize="25sp" textColor="#ffffff" gravity="center"
+                                                id="addMaterial"
+                                                foreground="?selectableItemBackground"
+                                            />
+                                        </card>
+                                        <card w="40" h="40" marginLeft="10"
+                                            cardBackgroundColor="#0d84ff" id="hideMaterial" layout_gravity="right|center" cardCornerRadius="20" foreground="?selectableItemBackground">
+
+                                            <img marginTop="2" w="20" height="20" src="@drawable/ic_call_split_black_48dp"
+                                                tint="#ffffff" layout_gravity="center"
+                                            />
+                                        </card>
+                                    </horizontal>
+                                    <ScrollView marginTop="5">
+                                        <vertical id="addMaterialList">
+                                        </vertical>
+                                    </ScrollView>
+                                </vertical>
+                            </vertical>
+
+
+                            <vertical id="jijianquyu" >
+                                <widget-switch-se7en id="jjhb" text="基建换班模块" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
+
+                                <widget-switch-se7en
+                                    id="uav_acceleration"
+                                    checked="{{setting.无人机加速}}"
+                                    text="基建内无人机加速"
+                                    padding="6 6 6 6"
+                                    textSize="16" textColor="{{theme.text}}"
+                                />
+                                <radiogroup id="uav_acceleration_list" orientation="horizontal">
+                                    <radio id="manufacturing" text="无人机加速生产" w="auto" textColor="{{theme.text}}" />
+                                    <radio id="trade" text="无人机加速贸易" w="auto" textColor="{{theme.text}}" />
+                                </radiogroup>
+
+                                <widget-switch-se7en id="hkxs" checked="{{setting.会客室线索}}" text="基建会客室线索" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
+                                <radiogroup id="hks" orientation="horizontal" visibility="{{setting.会客室线索 ? 'visible':'gone'}}">
+                                    <checkbox id="hks1" text="处理线索溢出" checked="{{setting.处理线索溢出}}" w="auto" textColor="{{theme.text}}" />
+                                </radiogroup>
+
+                                <widget-switch-se7en id="hyfw" checked="{{setting.好友访问}}" text="基建内好友访问" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
+                                <widget-switch-se7en id="sqxy" checked="{{setting.收取信用}}" text="收取每日信用" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
+                                <widget-switch-se7en id="credit_buy" text="购买信用物品" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
+                                <widget-switch-se7en id="gozh" checked="{{setting.公招}}" text="自动公开招募" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
+                                <radiogroup id="tag" orientation="horizontal" visibility="{{setting.公招 ? 'visible':'gone'}}">
+                                    <checkbox id="tag1" text="8小时无tag招募" checked="{{setting.无tag招募}}" w="auto" textColor="{{theme.text}}" />
+
+                                    <checkbox id="tag2" text="聘用候选人" checked="{{setting.自动聘用}}" w="auto" textColor="{{theme.text}}" />
+                                </radiogroup>
+                                {/*  <widget-switch-se7en id="rwjl" checked="{{setting.claim_rewards&&setting.claim_rewards}}" text="领取任务奖励" padding="6 6 6 6" textSize="16" textColor="{{theme.text}}" />
             */}
-            
-            <card w="*"  h="*" cardCornerRadius="1"
-            cardElevation="0dp" gravity="center_vertical" cardBackgroundColor="#00000000" >
-            <vertical>
-                <horizontal id="claim_rewards" clipChildren="false" elevation="0" gravity="center_vertical" margin="6 0" bg="#00000000" h="40">
-                    <text  gravity="center" textSize="16" text="领取任务奖励" textColor="{{theme.text}}" />
-                    <text layout_weight="1" />
-                    <img id="claim_rewards_img" src="@drawable/ic_keyboard_arrow_down_black_48dp" layout_gravity="right|center_vertical" w="{{px2dp(120)}}" h="*" padding="-3 -8" tint="{{theme.text}}" />
-                </horizontal>
-            </vertical>
-        </card>
-        
-    </vertical>
-    
-    
-    <card w="*" id="indt" visibility="visible" margin="0 0 0 1" h="40" cardCornerRadius="1"
-    cardElevation="0dp" gravity="center_vertical" cardBackgroundColor="#00000000" >
-    <linear clipChildren="false" elevation="0" gravity="center_vertical" margin="6 0" bg="#00000000">
-        <img id="timetu" src="@drawable/ic_alarm_black_48dp" layout_gravity="top|center_vertical" w="25dp" h="*" tint="{{theme.text}}" />
-        <text id="timetxt" margin="10 0 0 0" gravity="center" textSize="16" text="定时任务" textColor="{{theme.text}}" />
-        <text layout_weight="1" />
-        <img id="down"  src="@drawable/ic_keyboard_arrow_down_black_48dp" layout_gravity="right|center_vertical" w="{{px2dp(120)}}" h="*" padding="-3 -8" tint="{{theme.text}}" />
-    </linear>
-    </card>
-    <list id="timed_tasks_list" visibility="gone" bg="#00000000" >
-        <card w="*" h="40" margin="5 0 5 0" cardCornerRadius="2dp"
-        cardElevation="0dp" foreground="?selectableItemBackground">
-        <horizontal gravity="center_horizontal" bg="{{theme.bg}}">
-            <vertical padding="5 0" h="auto" w="0" layout_weight="1">
-                <text text="{{this.app}}" textSize="16" maxLines="1" textColor="{{theme.text}}" />
-                <text text="{{this.shijian}}" textSize="14" maxLines="1" textColor="{{theme.text3}}" />
-            </vertical>
-            <img id="done" src="@drawable/ic_close_black_48dp" layout_gravity="right|center" tint="{{theme.text}}" w="30" h="*" margin="0 0 5 0" />
-        </horizontal>
-        <View bg="#dcdcdc" h="1" w="auto" layout_gravity="bottom" />
-    </card>
-    </list>
-    <button id="timed_tasks_add" margin="0 -5" visibility="gone" layout_weight="1" textSize="16" text="添加" style="Widget.AppCompat.Button.Borderless.Colored" />
-    
-    <card
-    w="*"
-    h="1" bg="#00000000"
-    marginTop="150"
-    marginBottom="0"
-    paddingBottom="30"
-    cardElevation="0dp"
-    cardCornerRadius="30dp"
-    >
-    </card>
-    </vertical>
-    </ScrollView>
-    
-    </vertical>
-    <card w="50dp" h="50dp" id="module_config" cardBackgroundColor="#87CEFA" layout_gravity="bottom|right"
-    marginRight="10" marginBottom="100" cardCornerRadius="25dp" scaleType="fitXY">
-    <text w="*" h="*" id="module_config_txt" textColor="#ffffff"
-    gravity="center" text="模块配置" textSize="13sp"
-    foreground="?selectableItemBackground" />
-    </card>
-    
-    <card w="50dp" h="50dp" id="_bgA" cardBackgroundColor="#87CEFA" layout_gravity="bottom|right"
-    marginRight="10" marginBottom="40" cardCornerRadius="25dp" scaleType="fitXY">
-    <text w="*" h="*" id="start_floaty" textColor="#ffffff"
-    gravity="center" text="悬浮窗" textSize="13sp"
-    foreground="?selectableItemBackground" />
-    </card>
-    <frame w="*" h="auto" layout_gravity="bottom|center" >
-        <img id="start_run" w="*" h="40" layout_gravity="center" src="#00000000" borderWidth="1dp" scaleType="fitXY" borderColor="#40a5f3" circle="true" margin="50 0" />
-        <text id="start" h="50" text="开始运行" textSize="22" gravity="center" textColor="#40a5f3" />
-    </frame>
-    </card>
-    
-    {/*webview*/}
-    <frame id="main_web" bg="{{theme.bg}}">
-        <vertical h="*" marginBottom="-5" bg="#00ffffff">
-            <vertical h="{{iStatusBarHeight()}}px" bg="{{theme.bg}}" >
-                
-                <text
-                w="*"
-                h="auto"
-                text="webview"
-                textSize="20sp"
-                textStyle="bold|italic"
-                textColor="{{theme.icons}}"
-                typeface="monospace"
-                gravity="center"
-                />
-            </vertical>
-            
-            <progressbar id='progress' w='*' h='10' indeterminate='true' margin="0 -3" layout_gravity='top' style='@style/Base.Widget.AppCompat.ProgressBar.Horizontal' />
-            
-            <vertical w="*" h="*" marginBottom="55" bg="#00ffffff">
-                
-                <webview id='webview' w='*' h='*' />
-            </vertical>
-            
-        </vertical>
-        
-        
-        
-        <vertical gravity="bottom" >
-            
-            <frame id="web_tips" layout_gravity="bottom" bg="#95000000" visibility="gone" >
-                <horizontal w="*">
-                    <text id="tips_text" text="" textColor="#ffffff" layout_gravity="center|left" />
-                    <horizontal w="*" gravity="right">
-                        <button text="拒绝" id="tips_no" style="Widget.AppCompat.Button.Borderless.Colored" />
-                        <button text="允许" id="tips_ok" style="Widget.AppCompat.Button.Borderless.Colored" />
-                    </horizontal>
-                </horizontal>
-            </frame>
-            <card w="*" h="50" cardElevation="0" foreground="?selectableItemBackground" cardBackgroundColor="{{theme.bg}}" >
-                
-                <grid id="icons" w="*" h="*" spanCount="5" gravity="center_horizontal">
-                    <card w="*" h="*" cardElevation="0" foreground="?selectableItemBackground" layout_gravity="center_horizontal" cardBackgroundColor="{{theme.bg}}">
-                        <img id="icon_" w="{{this.size}}" layout_gravity="center" src="{{this.icon}}" tint="{{theme.icon}}" />
-                    </card>
-                </grid>
-                
-                <horizontal weightSum="5" h="20" layout_gravity="center_vertical">
-                    
-                    <frame layout_weight="1" >
-                        <View bg="{{theme.icons}}" w="1" layout_gravity="right" />
-                    </frame>
-                    <frame layout_weight="1" >
-                        <View bg="{{theme.icons}}" w="1" layout_gravity="right" />
-                    </frame>
-                    <frame layout_weight="1" >
-                        <View bg="{{theme.icons}}" w="1" layout_gravity="right" />
-                    </frame>
-                    <frame layout_weight="1" >
-                        <View bg="{{theme.icons}}" w="1" layout_gravity="right" />
-                    </frame>
-                </horizontal>
+
+                                <card w="*" h="*" cardCornerRadius="1"
+                                    cardElevation="0dp" gravity="center_vertical" cardBackgroundColor="#00000000" >
+                                    <vertical>
+                                        <horizontal id="claim_rewards" clipChildren="false" elevation="0" gravity="center_vertical" margin="6 0" bg="#00000000" h="40">
+                                            <text gravity="center" textSize="16" text="领取任务奖励" textColor="{{theme.text}}" />
+                                            <text layout_weight="1" />
+                                            <img id="claim_rewards_img" src="@drawable/ic_keyboard_arrow_down_black_48dp" layout_gravity="right|center_vertical" w="{{px2dp(120)}}" h="*" padding="-3 -8" tint="{{theme.text}}" />
+                                        </horizontal>
+                                    </vertical>
+                                </card>
+
+                            </vertical>
+
+
+                            <card w="*" id="indt" visibility="visible" margin="0 0 0 1" h="40" cardCornerRadius="1"
+                                cardElevation="0dp" gravity="center_vertical" cardBackgroundColor="#00000000" >
+                                <linear clipChildren="false" elevation="0" gravity="center_vertical" margin="6 0" bg="#00000000">
+                                    <img id="timetu" src="@drawable/ic_alarm_black_48dp" layout_gravity="top|center_vertical" w="25dp" h="*" tint="{{theme.text}}" />
+                                    <text id="timetxt" margin="10 0 0 0" gravity="center" textSize="16" text="定时任务" textColor="{{theme.text}}" />
+                                    <text layout_weight="1" />
+                                    <img id="down" src="@drawable/ic_keyboard_arrow_down_black_48dp" layout_gravity="right|center_vertical" w="{{px2dp(120)}}" h="*" padding="-3 -8" tint="{{theme.text}}" />
+                                </linear>
+                            </card>
+                            <list id="timed_tasks_list" visibility="gone" bg="#00000000" >
+                                <card w="*" h="40" margin="5 0 5 0" cardCornerRadius="2dp"
+                                    cardElevation="0dp" foreground="?selectableItemBackground">
+                                    <horizontal gravity="center_horizontal" bg="{{theme.bg}}">
+                                        <vertical padding="5 0" h="auto" w="0" layout_weight="1">
+                                            <text text="{{this.app}}" textSize="16" maxLines="1" textColor="{{theme.text}}" />
+                                            <text text="{{this.shijian}}" textSize="14" maxLines="1" textColor="{{theme.text3}}" />
+                                        </vertical>
+                                        <img id="done" src="@drawable/ic_close_black_48dp" layout_gravity="right|center" tint="{{theme.text}}" w="30" h="*" margin="0 0 5 0" />
+                                    </horizontal>
+                                    <View bg="#dcdcdc" h="1" w="auto" layout_gravity="bottom" />
+                                </card>
+                            </list>
+                            <button id="timed_tasks_add" margin="0 -5" visibility="gone" layout_weight="1" textSize="16" text="添加" style="Widget.AppCompat.Button.Borderless.Colored" />
+
+                            <card
+                                w="*"
+                                h="1" bg="#00000000"
+                                marginTop="150"
+                                marginBottom="0"
+                                paddingBottom="30"
+                                cardElevation="0dp"
+                                cardCornerRadius="30dp"
+                            >
+                            </card>
+                        </vertical>
+                    </ScrollView>
+
+                </vertical>
+                <card w="50dp" h="50dp" id="module_config" cardBackgroundColor="#87CEFA" layout_gravity="bottom|right"
+                    marginRight="10" marginBottom="100" cardCornerRadius="25dp" scaleType="fitXY">
+                    <text w="*" h="*" id="module_config_txt" textColor="#ffffff"
+                        gravity="center" text="模块配置" textSize="13sp"
+                        foreground="?selectableItemBackground" />
+                </card>
+
+                <card w="50dp" h="50dp" id="_bgA" cardBackgroundColor="#87CEFA" layout_gravity="bottom|right"
+                    marginRight="10" marginBottom="40" cardCornerRadius="25dp" scaleType="fitXY">
+                    <text w="*" h="*" id="start_floaty" textColor="#ffffff"
+                        gravity="center" text="悬浮窗" textSize="13sp"
+                        foreground="?selectableItemBackground" />
+                </card>
+                <frame w="*" h="auto" layout_gravity="bottom|center" >
+                    <img id="start_run" w="*" h="40" layout_gravity="center" src="#00000000" borderWidth="1dp" scaleType="fitXY" borderColor="#40a5f3" circle="true" margin="50 0" />
+                    <text id="start" h="50" text="开始运行" textSize="22" gravity="center" textColor="#40a5f3" />
+                </frame>
             </card>
-        </vertical>
-        
-    </frame>
-    </non-swipeable-view-pager>
+
+            {/*webview*/}
+            <frame id="main_web" bg="{{theme.bg}}">
+                <vertical h="*" marginBottom="-5" bg="#00ffffff">
+                    <vertical h="{{iStatusBarHeight()}}px" bg="{{theme.bg}}" >
+
+                        <text
+                            w="*"
+                            h="auto"
+                            text="webview"
+                            textSize="20sp"
+                            textStyle="bold|italic"
+                            textColor="{{theme.icons}}"
+                            typeface="monospace"
+                            gravity="center"
+                        />
+                    </vertical>
+
+                    <progressbar id='progress' w='*' h='10' indeterminate='true' margin="0 -3" layout_gravity='top' style='@style/Base.Widget.AppCompat.ProgressBar.Horizontal' />
+
+                    <vertical w="*" h="*" marginBottom="55" bg="#00ffffff">
+
+                        <webview id='webview' w='*' h='*' />
+                    </vertical>
+
+                </vertical>
+
+
+
+                <vertical gravity="bottom" >
+
+                    <frame id="web_tips" layout_gravity="bottom" bg="#95000000" visibility="gone" >
+                        <horizontal w="*">
+                            <text id="tips_text" text="" textColor="#ffffff" layout_gravity="center|left" />
+                            <horizontal w="*" gravity="right">
+                                <button text="拒绝" id="tips_no" style="Widget.AppCompat.Button.Borderless.Colored" />
+                                <button text="允许" id="tips_ok" style="Widget.AppCompat.Button.Borderless.Colored" />
+                            </horizontal>
+                        </horizontal>
+                    </frame>
+                    <card w="*" h="50" cardElevation="0" foreground="?selectableItemBackground" cardBackgroundColor="{{theme.bg}}" >
+
+                        <grid id="icons" w="*" h="*" spanCount="5" gravity="center_horizontal">
+                            <card w="*" h="*" cardElevation="0" foreground="?selectableItemBackground" layout_gravity="center_horizontal" cardBackgroundColor="{{theme.bg}}">
+                                <img id="icon_" w="{{this.size}}" layout_gravity="center" src="{{this.icon}}" tint="{{theme.icon}}" />
+                            </card>
+                        </grid>
+
+                        <horizontal weightSum="5" h="20" layout_gravity="center_vertical">
+
+                            <frame layout_weight="1" >
+                                <View bg="{{theme.icons}}" w="1" layout_gravity="right" />
+                            </frame>
+                            <frame layout_weight="1" >
+                                <View bg="{{theme.icons}}" w="1" layout_gravity="right" />
+                            </frame>
+                            <frame layout_weight="1" >
+                                <View bg="{{theme.icons}}" w="1" layout_gravity="right" />
+                            </frame>
+                            <frame layout_weight="1" >
+                                <View bg="{{theme.icons}}" w="1" layout_gravity="right" />
+                            </frame>
+                        </horizontal>
+                    </card>
+                </vertical>
+
+            </frame>
+        </non-swipeable-view-pager>
     </frame>
 
 );
@@ -729,333 +715,333 @@ function initPop(modify) {
             {/* <img  src="file://./res/youlan.png" h="330" radiusBottomLeft="0dp" radiusBottomRight="0dp" scaleType="fitXY"/>
             */}
             <card w="*" h="auto" cardBackgroundColor="{{theme.bar}}" margin="10 8"
-            cardCornerRadius="10dp" cardElevation="0" foreground="?selectableItemBackground" >
-            <vertical >
-                <horizontal id="binding_error" gravity="center" margin="0 10"
-                layout_width="fill_parent" layout_height="wrap_content" padding="65dp 15dp">
-                
-                <img layout_width="55dip" layout_height="55dip"
-                src="file://./res/moriku.png" scaleType="fitCenter" />
-                <text textSize="20sp" id="tv_error_message" textColor="red"
-                layout_marginLeft="15dip" text="未登录...     " />
-                
-            </horizontal>
-            <vertical id="binding_game_info" visibility="gone" >
-                
-                <TableRow layout_width="match_parent" layout_height="match_parent">
-                    
-                    <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
-                        
-                        <text id="text_info_channelName" text="官服"
-                        layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp"
-                        layout_marginTop="5dp" textColor="{{pop_textColor2}}" textStyle="bold" />
-                        
-                        <text
-                        id="text_info_nickName" text="梦月時謌#8300"
-                        w="auto" layout_height="wrap_content" lines="1"
-                        layout_gravity="bottom" layout_margin="5 0 0 5" textSize="15dp" ellipsize="marquee"
-                        textColor="{{pop_textColor2}}" textStyle="bold" >
-                        
-                    </text>
-                    
-                </card>
-                
-                <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
-                    
-                    
-                    <text
-                    layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp"
-                    layout_marginTop="5dp" text="理智"
-                    textColor="{{pop_textColor2}}" textStyle="bold" />
-                    
-                    <text
-                    id="text_ap_status" w="auto" layout_height="wrap_content" lines="1"
-                    layout_gravity="bottom" layout_margin="5 0 0 5" textSize="15dp" ellipsize="marquee"
-                    focusableInTouchMode="true" textIsSelectable="true"
-                    text="将在明天12:00完全恢复" textColor="{{pop_textColor2}}" textStyle="bold" >
-                    
-                </text>
-                <text
-                id="text_ap" text='120/135' marginRight="5dp" marginBottom="8dp"
-                layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
-                textColor="{{pop_textColor}}" />
-            </card>
-            
-        </TableRow>
-        
-        {/**公招 */}
-        <TableRow layout_width="match_parent" layout_height="match_parent">
-            
-            
-            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
-                
-                <text layout_width="wrap_content" layout_height="wrap_content"
-                layout_marginStart="5dp" layout_marginTop="5dp"
-                text="公开招募" textColor="{{pop_textColor2}}" textStyle="bold" />
-                
-                <text
-                id="text_recruit_status" layout_width="wrap_content" layout_height="wrap_content"
-                layout_gravity="bottom" layout_margin="5 0 0 5"
-                textColor="{{pop_textColor2}}" textStyle="bold" />
-                
-                
-                <text id="text_recruit_ts" text="0/4" layout_width="wrap_content" layout_height="wrap_content"
-                layout_gravity="center|right" textColor="{{pop_textColor}}" textSize="15sp" />
-            </card>
-            
-            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
-                
-                
-                <text
-                layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp"
-                layout_marginTop="5dp" text="公招刷新"
-                textColor="{{pop_textColor2}}" textStyle="bold" />
-                
-                <text
-                id="text_hire_status" layout_width="wrap_content" layout_height="wrap_content"
-                layout_gravity="bottom" layout_margin="5 0 0 5"
-                textColor="{{pop_textColor2}}" textStyle="bold" />
-                
-                
-                <text
-                id="text_hire" marginRight="5dp"
-                layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
-                textColor="{{pop_textColor_mainly}}" textSize="30sp" />
-            </card>
-            
-        </TableRow>
-        {/**训练室 线索 */}
-        <TableRow layout_width="match_parent" layout_height="match_parent">
-            
-            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
-                
-                <text
-                layout_width="wrap_content"
-                layout_height="wrap_content"
-                layout_marginStart="5dp"
-                layout_marginTop="5dp"
-                text="训练室"
-                textColor="{{pop_textColor2}}"
-                textStyle="bold" />
-                
-                <text
-                id="text_train_status" layout_width="wrap_content" layout_height="wrap_content"
-                layout_gravity="bottom" layout_margin="5 0 0 5"
-                text="暂无专精" textColor="{{pop_textColor2}}" textStyle="bold" />
-                
-                <text id="text_trainer" text="暂无干员"
-                layout_width="wrap_content" layout_height="wrap_content"
-                layout_gravity="center|right"
-                textColor="{{pop_textColor_mainly}}" textSize="16sp" textStyle="bold" />
-                
-            </card>
-            
-            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
-                
-                
-                <text
-                layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp"
-                layout_marginTop="5dp" text="线索搜集"
-                textColor="{{pop_textColor2}}" textStyle="bold" />
-                
-                <text
-                id="text_clue_status" layout_width="wrap_content" layout_height="wrap_content"
-                layout_gravity="bottom" layout_margin="5 0 0 5"
-                text="搜集中" textColor="{{pop_textColor2}}" textStyle="bold" />
-                
-                <text
-                id="text_clue" marginRight="5dp"
-                layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
-                textColor="{{pop_textColor}}" />
-            </card>
-            
-            
-        </TableRow>
-        
-        {/**制造站 贸易站  */}
-        <TableRow layout_width="match_parent" layout_height="match_parent">
-            
-            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
-                
-                <text
-                layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp"
-                layout_marginTop="5dp" text="制造站"
-                textColor="{{pop_textColor2}}" textStyle="bold" />
-                
-                <text
-                id="text_manufactures_status" layout_width="wrap_content" layout_height="wrap_content"
-                layout_gravity="bottom" layout_margin="5 0 0 5"
-                textColor="{{pop_textColor2}}" textStyle="bold" />
-                
-                <text
-                id="text_manufactures" marginRight="5dp"
-                layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
-                textColor="{{pop_textColor}}" />
-                
-            </card>
-            
-            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
-                
-                
-                <text
-                layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp"
-                layout_marginTop="5dp" text="贸易站"
-                textColor="{{pop_textColor2}}" textStyle="bold" />
-                
-                <text
-                id="text_trading_status" layout_width="wrap_content" layout_height="wrap_content"
-                layout_gravity="bottom" layout_margin="5 0 0 5"
-                textColor="{{pop_textColor2}}" textStyle="bold" />
-                
-                <text
-                id="text_trading" marginRight="5dp"
-                layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
-                textColor="{{pop_textColor}}" />
-            </card>
-            
-        </TableRow>
-        {/**休息  疲劳  */}
-        <TableRow layout_width="match_parent" layout_height="match_parent">
-            
-            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
-                
-                <text
-                layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp" text="休息进度"
-                textColor="{{pop_textColor2}}" textStyle="bold" layout_gravity="center|left" />
-                
-                <text
-                id="text_dormitories" marginRight="5dp"
-                layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
-                textColor="{{pop_textColor}}" />
-                
-            </card>
-            
-            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
-                
-                
-                <text text="干员疲劳"
-                layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp"
-                textColor="{{pop_textColor2}}" textStyle="bold" layout_gravity="center|left" />
-                
-                
-                <text id="text_tired" marginRight="5dp"
-                layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
-                textColor="{{pop_textColor_warn}}" textSize="20sp" />
-            </card>
-            
-        </TableRow>
-        {/**无人机 剿灭  */}
-        <TableRow layout_width="match_parent" layout_height="match_parent">
-            
-            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
-                
-                <text
-                layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp" text="无人机"
-                textColor="{{pop_textColor2}}" textStyle="bold" layout_gravity="center|left" />
-                
-                <text
-                id="text_labor" marginRight="5dp"
-                layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
-                textColor="{{pop_textColor}}" />
-                
-            </card>
-            
-            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
-                
-                
-                <text
-                layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp" text="剿灭"
-                textColor="{{pop_textColor2}}" textStyle="bold" layout_gravity="center|left" />
-                
-                <text
-                id="text_campaign" marginRight="5dp"
-                layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
-                textColor="{{pop_textColor_warn}}" />
-            </card>
-            
-        </TableRow>
-        {/**日常 周常  */}
-        <TableRow layout_width="match_parent" layout_height="match_parent">
-            
-            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
-                
-                <text
-                layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp" text="日常"
-                textColor="{{pop_textColor2}}" textStyle="bold" layout_gravity="center|left" />
-                
-                <text
-                id="text_routineDay" text='0/10' marginRight="5dp"
-                layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
-                textColor="{{pop_textColor}}" />
-                
-            </card>
-            
-            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
-                
-                
-                <text
-                layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp" text="周常"
-                textColor="{{pop_textColor2}}" textStyle="bold" layout_gravity="center|left" />
-                
-                <text
-                id="text_routineWeek" text='0/13' marginRight="5dp"
-                layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
-                textColor="{{pop_textColor}}" />
-            </card>
-            
-        </TableRow>
-        
-        <list id="gz_list">
-            <card w="*" h="auto" margin="10 8 10 4" cardBackgroundColor="#ff8c9099"
-            cardCornerRadius="10dp" cardElevation="0"  >
-            
-            <linear >
-                <vertical gravity="left" padding="5 0 0 0" layout_weight="1" >
-                    <linear w="auto">
-                        <text text="公招 {{this.位置}}   " w="auto" textSize="18" textColor="#ffffff" textStyle="bold" />
-                        <text id="gongzhao" text="{{this.时间}}" textSize="12" textColor="#95ffffff" />
-                    </linear>
-                    <text id="tag_" text="{{this.tag}}" textSize="12" w="auto" textColor="#95ffffff" layout_gravity="right" marginRight="10" />
-                </vertical>
-                <vertical id="shanchu" layout_gravity="center"  >
-                    <img src="@drawable/ic_delete_black_48dp" tint="#ffffff" w="28" h="28" margin="2 0" />
-                </vertical>
-            </linear>
-        </card>
-        </list>
-        
-        </vertical>
-        
-        
-        
-        <horizontal gravity="center">
-            {/**把布局左边占满,让剩下的布局靠右*/}
-            <linear layout_width="0dp"
-            layout_weight="1">
-        </linear>
-        {/**   <card id="manually_correction" w="auto" h="auto" margin="5 5"
+                cardCornerRadius="10dp" cardElevation="0" foreground="?selectableItemBackground" >
+                <vertical >
+                    <horizontal id="binding_error" gravity="center" margin="0 10"
+                        layout_width="fill_parent" layout_height="wrap_content" padding="65dp 15dp">
+
+                        <img layout_width="55dip" layout_height="55dip"
+                            src="file://./res/moriku.png" scaleType="fitCenter" />
+                        <text textSize="20sp" id="tv_error_message" textColor="red"
+                            layout_marginLeft="15dip" text="未登录...     " />
+
+                    </horizontal>
+                    <vertical id="binding_game_info" visibility="gone" >
+
+                        <TableRow layout_width="match_parent" layout_height="match_parent">
+
+                            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
+
+                                <text id="text_info_channelName" text="官服"
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp"
+                                    layout_marginTop="5dp" textColor="{{pop_textColor2}}" textStyle="bold" />
+
+                                <text
+                                    id="text_info_nickName" text="梦月時謌#8300"
+                                    w="auto" layout_height="wrap_content" lines="1"
+                                    layout_gravity="bottom" layout_margin="5 0 0 5" textSize="15dp" ellipsize="marquee"
+                                    textColor="{{pop_textColor2}}" textStyle="bold" >
+
+                                </text>
+
+                            </card>
+
+                            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
+
+
+                                <text
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp"
+                                    layout_marginTop="5dp" text="理智"
+                                    textColor="{{pop_textColor2}}" textStyle="bold" />
+
+                                <text
+                                    id="text_ap_status" w="auto" layout_height="wrap_content" lines="1"
+                                    layout_gravity="bottom" layout_margin="5 0 0 5" textSize="15dp" ellipsize="marquee"
+                                    focusableInTouchMode="true" textIsSelectable="true"
+                                    text="将在明天12:00完全恢复" textColor="{{pop_textColor2}}" textStyle="bold" >
+
+                                </text>
+                                <text
+                                    id="text_ap" text='120/135' marginRight="5dp" marginBottom="8dp"
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
+                                    textColor="{{pop_textColor}}" />
+                            </card>
+
+                        </TableRow>
+
+                        {/**公招 */}
+                        <TableRow layout_width="match_parent" layout_height="match_parent">
+
+
+                            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
+
+                                <text layout_width="wrap_content" layout_height="wrap_content"
+                                    layout_marginStart="5dp" layout_marginTop="5dp"
+                                    text="公开招募" textColor="{{pop_textColor2}}" textStyle="bold" />
+
+                                <text
+                                    id="text_recruit_status" layout_width="wrap_content" layout_height="wrap_content"
+                                    layout_gravity="bottom" layout_margin="5 0 0 5"
+                                    textColor="{{pop_textColor2}}" textStyle="bold" />
+
+
+                                <text id="text_recruit_ts" text="0/4" layout_width="wrap_content" layout_height="wrap_content"
+                                    layout_gravity="center|right" textColor="{{pop_textColor}}" textSize="15sp" />
+                            </card>
+
+                            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
+
+
+                                <text
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp"
+                                    layout_marginTop="5dp" text="公招刷新"
+                                    textColor="{{pop_textColor2}}" textStyle="bold" />
+
+                                <text
+                                    id="text_hire_status" layout_width="wrap_content" layout_height="wrap_content"
+                                    layout_gravity="bottom" layout_margin="5 0 0 5"
+                                    textColor="{{pop_textColor2}}" textStyle="bold" />
+
+
+                                <text
+                                    id="text_hire" marginRight="5dp"
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
+                                    textColor="{{pop_textColor_mainly}}" textSize="30sp" />
+                            </card>
+
+                        </TableRow>
+                        {/**训练室 线索 */}
+                        <TableRow layout_width="match_parent" layout_height="match_parent">
+
+                            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
+
+                                <text
+                                    layout_width="wrap_content"
+                                    layout_height="wrap_content"
+                                    layout_marginStart="5dp"
+                                    layout_marginTop="5dp"
+                                    text="训练室"
+                                    textColor="{{pop_textColor2}}"
+                                    textStyle="bold" />
+
+                                <text
+                                    id="text_train_status" layout_width="wrap_content" layout_height="wrap_content"
+                                    layout_gravity="bottom" layout_margin="5 0 0 5"
+                                    text="暂无专精" textColor="{{pop_textColor2}}" textStyle="bold" />
+
+                                <text id="text_trainer" text="暂无干员"
+                                    layout_width="wrap_content" layout_height="wrap_content"
+                                    layout_gravity="center|right"
+                                    textColor="{{pop_textColor_mainly}}" textSize="16sp" textStyle="bold" />
+
+                            </card>
+
+                            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
+
+
+                                <text
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp"
+                                    layout_marginTop="5dp" text="线索搜集"
+                                    textColor="{{pop_textColor2}}" textStyle="bold" />
+
+                                <text
+                                    id="text_clue_status" layout_width="wrap_content" layout_height="wrap_content"
+                                    layout_gravity="bottom" layout_margin="5 0 0 5"
+                                    text="搜集中" textColor="{{pop_textColor2}}" textStyle="bold" />
+
+                                <text
+                                    id="text_clue" marginRight="5dp"
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
+                                    textColor="{{pop_textColor}}" />
+                            </card>
+
+
+                        </TableRow>
+
+                        {/**制造站 贸易站  */}
+                        <TableRow layout_width="match_parent" layout_height="match_parent">
+
+                            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
+
+                                <text
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp"
+                                    layout_marginTop="5dp" text="制造站"
+                                    textColor="{{pop_textColor2}}" textStyle="bold" />
+
+                                <text
+                                    id="text_manufactures_status" layout_width="wrap_content" layout_height="wrap_content"
+                                    layout_gravity="bottom" layout_margin="5 0 0 5"
+                                    textColor="{{pop_textColor2}}" textStyle="bold" />
+
+                                <text
+                                    id="text_manufactures" marginRight="5dp"
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
+                                    textColor="{{pop_textColor}}" />
+
+                            </card>
+
+                            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
+
+
+                                <text
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp"
+                                    layout_marginTop="5dp" text="贸易站"
+                                    textColor="{{pop_textColor2}}" textStyle="bold" />
+
+                                <text
+                                    id="text_trading_status" layout_width="wrap_content" layout_height="wrap_content"
+                                    layout_gravity="bottom" layout_margin="5 0 0 5"
+                                    textColor="{{pop_textColor2}}" textStyle="bold" />
+
+                                <text
+                                    id="text_trading" marginRight="5dp"
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
+                                    textColor="{{pop_textColor}}" />
+                            </card>
+
+                        </TableRow>
+                        {/**休息  疲劳  */}
+                        <TableRow layout_width="match_parent" layout_height="match_parent">
+
+                            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
+
+                                <text
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp" text="休息进度"
+                                    textColor="{{pop_textColor2}}" textStyle="bold" layout_gravity="center|left" />
+
+                                <text
+                                    id="text_dormitories" marginRight="5dp"
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
+                                    textColor="{{pop_textColor}}" />
+
+                            </card>
+
+                            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
+
+
+                                <text text="干员疲劳"
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp"
+                                    textColor="{{pop_textColor2}}" textStyle="bold" layout_gravity="center|left" />
+
+
+                                <text id="text_tired" marginRight="5dp"
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
+                                    textColor="{{pop_textColor_warn}}" textSize="20sp" />
+                            </card>
+
+                        </TableRow>
+                        {/**无人机 剿灭  */}
+                        <TableRow layout_width="match_parent" layout_height="match_parent">
+
+                            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
+
+                                <text
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp" text="无人机"
+                                    textColor="{{pop_textColor2}}" textStyle="bold" layout_gravity="center|left" />
+
+                                <text
+                                    id="text_labor" marginRight="5dp"
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
+                                    textColor="{{pop_textColor}}" />
+
+                            </card>
+
+                            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
+
+
+                                <text
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp" text="剿灭"
+                                    textColor="{{pop_textColor2}}" textStyle="bold" layout_gravity="center|left" />
+
+                                <text
+                                    id="text_campaign" marginRight="5dp"
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
+                                    textColor="{{pop_textColor_warn}}" />
+                            </card>
+
+                        </TableRow>
+                        {/**日常 周常  */}
+                        <TableRow layout_width="match_parent" layout_height="match_parent">
+
+                            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
+
+                                <text
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp" text="日常"
+                                    textColor="{{pop_textColor2}}" textStyle="bold" layout_gravity="center|left" />
+
+                                <text
+                                    id="text_routineDay" text='0/10' marginRight="5dp"
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
+                                    textColor="{{pop_textColor}}" />
+
+                            </card>
+
+                            <card layout_width="0dp" layout_height="50dp" layout_margin="5dp" layout_weight="1" cardElevation="0" cardBackgroundColor="#00000000">
+
+
+                                <text
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_marginStart="5dp" text="周常"
+                                    textColor="{{pop_textColor2}}" textStyle="bold" layout_gravity="center|left" />
+
+                                <text
+                                    id="text_routineWeek" text='0/13' marginRight="5dp"
+                                    layout_width="wrap_content" layout_height="wrap_content" layout_gravity="center|right"
+                                    textColor="{{pop_textColor}}" />
+                            </card>
+
+                        </TableRow>
+
+                        <list id="gz_list">
+                            <card w="*" h="auto" margin="10 8 10 4" cardBackgroundColor="#ff8c9099"
+                                cardCornerRadius="10dp" cardElevation="0"  >
+
+                                <linear >
+                                    <vertical gravity="left" padding="5 0 0 0" layout_weight="1" >
+                                        <linear w="auto">
+                                            <text text="公招 {{this.位置}}   " w="auto" textSize="18" textColor="#ffffff" textStyle="bold" />
+                                            <text id="gongzhao" text="{{this.时间}}" textSize="12" textColor="#95ffffff" />
+                                        </linear>
+                                        <text id="tag_" text="{{this.tag}}" textSize="12" w="auto" textColor="#95ffffff" layout_gravity="right" marginRight="10" />
+                                    </vertical>
+                                    <vertical id="shanchu" layout_gravity="center"  >
+                                        <img src="@drawable/ic_delete_black_48dp" tint="#ffffff" w="28" h="28" margin="2 0" />
+                                    </vertical>
+                                </linear>
+                            </card>
+                        </list>
+
+                    </vertical>
+
+
+
+                    <horizontal gravity="center">
+                        {/**把布局左边占满,让剩下的布局靠右*/}
+                        <linear layout_width="0dp"
+                            layout_weight="1">
+                        </linear>
+                        {/**   <card id="manually_correction" w="auto" h="auto" margin="5 5"
         cardCornerRadius="5dp" cardElevation="0" foreground="?selectableItemBackground" cardBackgroundColor="#00000000">
         
         <img src="@drawable/ic_create_black_48dp" w="30" h="30" tint="#ffffff" />
         </card>
         */}
-        <card id="morikujima_refresh_view" w="auto" h="auto" margin="5 5"
-        cardCornerRadius="5dp" cardElevation="0" foreground="?selectableItemBackground" cardBackgroundColor="#00000000">
-        <img src="file://./res/ic_refresh.webp" w="25" h="25" tint="#ffffff" />
-        </card>
-        
-        <card id="morikujima_login_view" w="auto" h="auto" margin="5 5"
-        cardCornerRadius="5dp" cardElevation="0" foreground="?selectableItemBackground" cardBackgroundColor="#00000000">
-        <img src="file://./res/q9.png" w="30" h="30" tint="#ffffff" />
-        </card>
-        <card id="morikujima_setting_view" w="auto" h="auto" margin="5 5"
-        cardCornerRadius="5dp" cardElevation="0" foreground="?selectableItemBackground" cardBackgroundColor="#00000000">
-        <img src="@drawable/ic_settings_applications_black_48dp" w="30" h="30" tint="#ffffff" />
-        </card>
-        
-        </horizontal>
-        </vertical >
-        </card>
+                        <card id="morikujima_refresh_view" w="auto" h="auto" margin="5 5"
+                            cardCornerRadius="5dp" cardElevation="0" foreground="?selectableItemBackground" cardBackgroundColor="#00000000">
+                            <img src="file://./res/ic_refresh.webp" w="25" h="25" tint="#ffffff" />
+                        </card>
+
+                        <card id="morikujima_login_view" w="auto" h="auto" margin="5 5"
+                            cardCornerRadius="5dp" cardElevation="0" foreground="?selectableItemBackground" cardBackgroundColor="#00000000">
+                            <img src="file://./res/q9.png" w="30" h="30" tint="#ffffff" />
+                        </card>
+                        <card id="morikujima_setting_view" w="auto" h="auto" margin="5 5"
+                            cardCornerRadius="5dp" cardElevation="0" foreground="?selectableItemBackground" cardBackgroundColor="#00000000">
+                            <img src="@drawable/ic_settings_applications_black_48dp" w="30" h="30" tint="#ffffff" />
+                        </card>
+
+                    </horizontal>
+                </vertical >
+            </card>
         </vertical>
     )
 
@@ -1100,7 +1086,7 @@ function initPop(modify) {
         popView.binding_error.setVisibility(0);
         popView.binding_game_info.setVisibility(8);
         popView.tv_error_message.setText("获取数据中");
-        threads.start(function() {
+        threads.start(function () {
             binding_info = moriku.get_binding_info()
             moriku.game_info(binding_info.token)
                 .then((value) => {
@@ -1296,9 +1282,9 @@ function initPop(modify) {
     }
 
     function moriku_input_mode() {
-        moriku.input_mode(function() {
+        moriku.input_mode(function () {
             let usr_token;
-            threads.start(function() {
+            threads.start(function () {
                 ui.run(() => {
                     web_set.computer = true;
                     let webview = $ui.findView("webview");
@@ -1312,7 +1298,7 @@ function initPop(modify) {
 
                     // 创建自定义的WebViewBridge，实现js交互
                     let webViewBridge = new WebViewBridge(new BridgeHandler({
-                        exec: function(params) {
+                        exec: function (params) {
                             log('bridge handler exec: ' + params)
                             if (params) {
                                 usr_token = JSON.parse(params);
@@ -1325,7 +1311,7 @@ function initPop(modify) {
                     webview.addJavascriptInterface(webViewBridge, 'nativeWebviewBridge');
 
                     let token = files.read("./lib/prototype/morikujima_gettoken.txt")
-                    let pollCred = setInterval(function() {
+                    let pollCred = setInterval(function () {
                         webview.loadUrl("javascript:" + token.toString() + "token();")
                     }, 1000);
                 })
@@ -1366,7 +1352,7 @@ function initPop(modify) {
         refresh_info();
     });
     popView.morikujima_setting_view.click((view) => {
-        require("./subview/reason.js").ssbjview(function(text, text2) {
+        require("./subview/reason.js").ssbjview(function (text, text2) {
             if (text2 == "get") {
                 morikujima_setting = tool.readJSON("morikujima_setting");
                 switch (text) {
@@ -1418,13 +1404,13 @@ function initPop(modify) {
 
         })
     })
-    popView.morikujima_login_view.on("click", function() {
+    popView.morikujima_login_view.on("click", function () {
         moriku_input_mode();
     });
-    popView.tv_error_message.on("click", function() {
+    popView.tv_error_message.on("click", function () {
         moriku_input_mode();
     });
-    popView.gz_list.on("item_click", function(itemView, i) {
+    popView.gz_list.on("item_click", function (itemView, i) {
         let delete_timing = dialogs.build({
             type: "app",
             title: "\n确定公招" + itemView.位置 + "已完成招募？\n确定要移除此公招信息？",
@@ -1661,14 +1647,14 @@ ui.viewpager.overScrollMode = View.OVER_SCROLL_NEVER; //删除滑动到底的阴
 
 ui.viewpager.setOnPageChangeListener({
 
-    onPageScrolled: function(position) {
+    onPageScrolled: function (position) {
         animation_viewpager = ui.viewpager.getCurrentItem() + position;
     },
-    onPageSelected: function(index) {
+    onPageSelected: function (index) {
         ui.run(() => {
             switch (index) {
                 case 0:
-                   if (!gallery.gallery_info) {
+                    if (!gallery.gallery_info) {
                         items[1].text = "检查模板";
                         items[1].drawable = "@drawable/ic_wallpaper_black_48dp";
                         ui.drawerList.setDataSource(items);
@@ -1677,7 +1663,7 @@ ui.viewpager.setOnPageChangeListener({
                         items[1].drawable = "@drawable/ic_satellite_black_48dp";
                         ui.drawerList.setDataSource(items);
                     }
-                    
+
 
                     ui.drawer_.setAlpha(10);
 
@@ -1733,7 +1719,7 @@ ui.icons.setDataSource(web_set.web_icon);
 var label_plug = require("./subview/label_plug.js");
 var web_set_plug = require("./subview/web_set_plug.js");
 
-ui.icons.on("item_click", function(icon, i, itemView, listView) {
+ui.icons.on("item_click", function (icon, i, itemView, listView) {
     switch (i) {
         case 0:
             ui.run(() => {
@@ -1759,11 +1745,11 @@ ui.icons.on("item_click", function(icon, i, itemView, listView) {
 
             break
         case 4:
-            web_set_plug.web_set_plug(function(title, get_s) {
+            web_set_plug.web_set_plug(function (title, get_s) {
 
                 switch (title) {
                     case "书签":
-                        label_plug.label_plug(function(url) {
+                        label_plug.label_plug(function (url) {
                             ui.run(() => {
                                 ui.webview.loadUrl(url);
                             })
@@ -1867,7 +1853,7 @@ ui.icons.on("item_click", function(icon, i, itemView, listView) {
                         if (get_s) {
                             return web_set.night_mode;
                         }
-                        ui.run(function() {
+                        ui.run(function () {
                             if (web_set.night_mode) {
                                 web_set.night_mode = false;
                                 new_ui("day");
@@ -1887,7 +1873,7 @@ ui.icons.on("item_click", function(icon, i, itemView, listView) {
             })
             break
         case 3:
-            label_plug.label_plug(function(url) {
+            label_plug.label_plug(function (url) {
                 ui.run(() => {
                     ui.webview.loadUrl(url);
                 })
@@ -1897,37 +1883,37 @@ ui.icons.on("item_click", function(icon, i, itemView, listView) {
 })
 
 var items = [{
-        text: "告使用者",
-        drawable: "ic_pets_black_48dp",
-    },
-    {
-        text: "模板图库",
-        drawable: "ic_satellite_black_48dp",
-    },
-    {
-        text: "官方频道",
-        drawable: "ic_games_black_48dp",
-    },
-    {
-        text: "问题帮助",
-        drawable: "@drawable/ic_help_black_48dp",
-    },
-    {
-        text: "捐赠打赏",
-        drawable: "ic_favorite_black_48dp",
-    },
-    {
-        text: "关于应用",
-        drawable: "ic_account_circle_black_48dp",
-    },
-    {
-        text: "运行日志",
-        drawable: "ic_assignment_black_48dp",
-    },
-    {
-        text: "模块仓库",
-        drawable: "@drawable/ic_archive_black_48dp"
-    }
+    text: "告使用者",
+    drawable: "ic_pets_black_48dp",
+},
+{
+    text: "模板图库",
+    drawable: "ic_satellite_black_48dp",
+},
+{
+    text: "官方频道",
+    drawable: "ic_games_black_48dp",
+},
+{
+    text: "问题帮助",
+    drawable: "@drawable/ic_help_black_48dp",
+},
+{
+    text: "捐赠打赏",
+    drawable: "ic_favorite_black_48dp",
+},
+{
+    text: "关于应用",
+    drawable: "ic_account_circle_black_48dp",
+},
+{
+    text: "运行日志",
+    drawable: "ic_assignment_black_48dp",
+},
+{
+    text: "模块仓库",
+    drawable: "@drawable/ic_archive_black_48dp"
+}
 ];
 
 ui.drawerList.setDataSource(items);
@@ -1940,13 +1926,9 @@ ui.drawerList.on("item_click", (item) => {
             return
         case "检查模板":
         case "模板图库":
-            
+
             if (typeof tukuss != "object") {
                 http.get(server + "tulili/gallery_item.json", {
-                    headers: {
-                        'url_info': url_info,
-                        'User-Agent': System.getProperty("http.agent")
-                    }
                 }, (res, err) => {
                     if (err || res['statusCode'] != 200) {
                         toast('请求云端图库列表信息出错' + res['statusMessage']);
@@ -1958,7 +1940,7 @@ ui.drawerList.on("item_click", (item) => {
 
             }
             new_ui("模板图库");
-            
+
             break;
         case "官方频道":
         case "加入q群":
@@ -2020,7 +2002,7 @@ ui.cnos.on("click", () => {
 })
 
 
-ui.indt.on("click", function() {
+ui.indt.on("click", function () {
     if (ui.timed_tasks_add.getVisibility() == 8) {
         ui.timed_tasks_add.attr("visibility", "visible");
         ui.timed_tasks_list.attr("visibility", "visible");
@@ -2050,7 +2032,7 @@ var modeGatherText = Object.keys(modeGather);
 
 var SE执行 = ui.implement.getSelectedItemPosition();
 ui.implement.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
-    onItemSelected: function(parent, view, Executionsettings, id) {
+    onItemSelected: function (parent, view, Executionsettings, id) {
         // let itext = parent.getSelectedItem()
         if (Executionsettings == SE执行) {
             return false
@@ -2112,14 +2094,14 @@ ui.implement.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
                     _modData_.push(_modular_.script_name);
                 }
             };
-            change_list(ui.level_pick, _modData_, function(parent, view, position, id) {
+            change_list(ui.level_pick, _modData_, function (parent, view, position, id) {
                 parent.setBackground(createShape(5, 0, 0, [2, theme.bar]));
                 tool.writeJSON("自定义模块", parent.getSelectedItem());
             });
         } else if (ui["levelPickText"].getText() != "关卡选择") {
             ui["levelPickText"].setText("关卡选择");
 
-            change_list(ui.level_pick, level_choices_open, function(parent, view, position, id) {
+            change_list(ui.level_pick, level_choices_open, function (parent, view, position, id) {
                 parent.setBackground(createShape(5, 0, 0, [2, theme.bar]));
                 setting.指定关卡 ? setting.指定关卡.levelAbbreviation = parent.getSelectedItem() : setting.指定关卡 = {
                     levelAbbreviation: parent.getSelectedItem(),
@@ -2135,7 +2117,7 @@ ui.implement.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
                 } else {
 
                     let _id = modeGather[ui.implement.getSelectedItem()];
-                    if (_id != "常规"&& _id != "行动") {
+                    if (_id != "常规" && _id != "行动") {
                         _id = Object.values(modeGather).findIndex((text) => text == "常规");
                         if (_id != -1) {
                             ui.implement.setSelection(_id);
@@ -2170,7 +2152,7 @@ ui.implement.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
 }));
 
 //悬浮窗
-ui.floatyCheckPermission.on("check", function(checked) {
+ui.floatyCheckPermission.on("check", function (checked) {
     if (checked && floaty.checkPermission() == false) {
         try {
             app.startActivity({
@@ -2248,7 +2230,7 @@ ui.autoService.on("long_click", () => {
 });
 
 //无障碍&悬浮窗回弹
-ui.emitter.on("resume", function() {
+ui.emitter.on("resume", function () {
     let themes = storages.create('themes').get('theme')
     if (theme.bar != themes.bar) {
         ui.statusBarColor(themes.bar);
@@ -2320,8 +2302,8 @@ ui.olrs.on("check", (checked) => {
 })
 
 var MaterialListC = JSON.parse(
-        files.read("./lib/game_data/materialName.json", (encoding = "utf-8"))
-    ),
+    files.read("./lib/game_data/materialName.json", (encoding = "utf-8"))
+),
     MaterialList = Object.keys(MaterialListC),
     AddItem,
     AddItemList = [],
@@ -2363,10 +2345,10 @@ ui.limitMaterial.on("click", (view) => {
 });
 
 //添加材料
-ui.addMaterial.click(function() {
+ui.addMaterial.click(function () {
     AddMaterial(ui.chooseMaterial.getSelectedItem());
 });
-ui.hideMaterial.click(function() {
+ui.hideMaterial.click(function () {
     if (ui.addMaterialList.getChildCount() == 0) {
         snakebar("请先添加所需材料")
         return
@@ -2463,7 +2445,7 @@ ui.credit_buy.on("click", (view) => {
                 return
             }
             try {
-                require("./subview/credit_buy.js")(setting.信用处理, function(words) {
+                require("./subview/credit_buy.js")(setting.信用处理, function (words) {
                     setting.信用处理 = words;
                     tool.writeJSON("信用处理", words);
                 });
@@ -2520,7 +2502,7 @@ ui.tag1.on("check", (checked) => {
 ui.tag2.on("check", (checked) => {
     tool.writeJSON("自动聘用", checked);
 })
-ui.claim_rewards.click(function(view) {
+ui.claim_rewards.click(function (view) {
     // let index = parent.getParent().indexOfChild(0);
     let imgview = view.getChildAt(2);
     let fatherview = view.getParent();
@@ -2555,13 +2537,13 @@ ui.rwjl.on("check", (checked) => {
     tool.writeJSON("任务奖励", checked)
 })
 */
-ui.input_ordinary.on("key", function(keyCode, event) {
+ui.input_ordinary.on("key", function (keyCode, event) {
     if (event.getAction() == 0 && keyCode == 66) {
         输入框(ui.input_ordinary, ui.input_ordinary.text())
         event.consumed = true;
     }
 });
-ui.input_extinguish.on("key", function(keyCode, event) {
+ui.input_extinguish.on("key", function (keyCode, event) {
     if (event.getAction() == 0 && keyCode == 66) {
         输入框(ui.input_extinguish, ui.input_extinguish.text())
         event.consumed = true;
@@ -2575,7 +2557,7 @@ ui.searchiz.click(() => {
 
 });
 */
-ui.input_sane.on("key", function(keyCode, event) {
+ui.input_sane.on("key", function (keyCode, event) {
     if (event.getAction() == 0 && keyCode == 66) {
         输入框(ui.input_sane, ui.input_sane.text())
         event.consumed = true;
@@ -2585,7 +2567,7 @@ ui.input_sane.on("key", function(keyCode, event) {
 var timed_tasks_list = timed_tasks_storage.get("items", []);
 ui.timed_tasks_list.setDataSource(timed_tasks_list);
 
-ui.timed_tasks_list.on("item_click", function(itemView, i) {
+ui.timed_tasks_list.on("item_click", function (itemView, i) {
     let delete_timing = dialogs.build({
         type: "app",
         title: itemView.app + "\n确定要删除此定时任务吗？",
@@ -2602,14 +2584,14 @@ ui.timed_tasks_list.on("item_click", function(itemView, i) {
 });
 
 //定时任务添加事件
-ui.timed_tasks_add.on("click", function() {
+ui.timed_tasks_add.on("click", function () {
     setting = tool.readJSON("configure");
     //let str_level_choices = [];
     // for (let i = 1; i < ui['level_pick'].getCount(); i++) {
     //     str_level_choices.push(String(ui['level_pick'].getItemAtPosition(i)));
     //  };
     //require("./subview/timed_tasks_set.js")(timed_tasks_list, str_level_choices, function (parameter) {
-    require("./subview/timed_tasks_set.js")(timed_tasks_list, function(parameter) {
+    require("./subview/timed_tasks_set.js")(timed_tasks_list, function (parameter) {
         timed_tasks_storage.put("items", parameter);
     });
     // delete str_level_choices;
@@ -2617,14 +2599,14 @@ ui.timed_tasks_add.on("click", function() {
 });
 
 //模块配置事件
-ui.module_config.on("click", function() {
+ui.module_config.on("click", function () {
     let mod = require("./subview/modular_list.js");
     mod.create_modular();
 
 });
 
 //开始运行
-ui.start_run.on("click", function() {
+ui.start_run.on("click", function () {
     ui.run(() => {
         ui.start_run.attr("src", "#D3D3D3")
     })
@@ -2632,7 +2614,7 @@ ui.start_run.on("click", function() {
         ui.start_run.attr("src", "#00000000")
     }, 150)
     ui.start_run.setEnabled(false);
-    setTimeout(function() {
+    setTimeout(function () {
         ui.start_run.setEnabled(true);
     }, 600);
 
@@ -2660,7 +2642,7 @@ ui.start_run.on("click", function() {
         currentActivity();
     } catch (er) {
         tool.dialog_tips("温馨提示", "无障碍服务已启用但并未运行，您需要强行停止应用/重启无障碍服务/重启手机");
-        setTimeout(function() {
+        setTimeout(function () {
 
             toast("无障碍服务已启用但并未运行，您需要强行停止应用/重启无障碍服务/重启手机");
             console.error(er + "无障碍服务已启用但并未运行，这可能是安卓的BUG，您可能需要重启手机或强行停止应用/重启无障碍服务")
@@ -2700,13 +2682,13 @@ ui.start_run.on("click", function() {
         if (setting.start == true || setting.执行 == "上次") {
             let appnameui = ui.inflate(
                 <vertical padding="25 0">
-                            <View bg="#000000" h="1" w="auto" />
-                            <horizontal w="*" >
-                                <button id="fg2" text="繁中服" visibility="visible" layout_weight="1" style="Widget.AppCompat.Button.Colored" h="auto" />
-                                <button id="fg1" text="B服" visibility="visible" layout_weight="1" style="Widget.AppCompat.Button.Colored" h="auto" />
-                                <button id="fg" text="简中服" visibility="visible" layout_weight="1" style="Widget.AppCompat.Button.Colored" h="auto" />
-                            </horizontal>
-                        </vertical>, null, false);
+                    <View bg="#000000" h="1" w="auto" />
+                    <horizontal w="*" >
+                        <button id="fg2" text="繁中服" visibility="visible" layout_weight="1" style="Widget.AppCompat.Button.Colored" h="auto" />
+                        <button id="fg1" text="B服" visibility="visible" layout_weight="1" style="Widget.AppCompat.Button.Colored" h="auto" />
+                        <button id="fg" text="简中服" visibility="visible" layout_weight="1" style="Widget.AppCompat.Button.Colored" h="auto" />
+                    </horizontal>
+                </vertical>, null, false);
             let appname = dialogs.build({
                 type: 'app',
                 customView: appnameui,
@@ -2768,9 +2750,9 @@ ui.start_run.on("click", function() {
     return true;
 })
 
-ui.start_floaty.on("click", function() {
+ui.start_floaty.on("click", function () {
     ui.start_floaty.setEnabled(false);
-    setTimeout(function() {
+    setTimeout(function () {
         ui.start_floaty.setEnabled(true)
     }, 800);
     setting = tool.readJSON("configure");
@@ -2835,7 +2817,7 @@ ui.emitter.on("back_pressed", e => {
                 return
         }
 
-    } catch (err) {}
+    } catch (err) { }
 
     e.consumed = false;
 })
@@ -2973,89 +2955,89 @@ function 开始运行jk(jk, tips_) {
                 }
             } else {
                 */
-/*
-        tuku_de[0] = (tuku_de[0] - height).toString();
-        tuku_de[1] = (tuku_de[1] - width).toString();
-        if (tuku_de[0].replace(/[^\d]/g, "") > 220 || tuku_de[1].replace(/[^\d]/g, "") > 170) {
-            console.error("设备分辨率与图库分辨率相差过大，可能无法正常使用")
-            let Tips_tuku_ui = ui.inflate(
-                <vertical id="parent">
-                    
-                    <card gravity="center_vertical" cardElevation="0dp" margin="0">
-                        <img src="file://res/icon.png" w="50" h="30" margin="0" />
-                        <text text="无法使用PRTS辅助" padding="5" textSize="20" gravity="center|left" textColor="#f03752" marginLeft="50" />
-                        
-                        
-                    </card>
-                    
-                    <ScrollView>
-                        <vertical>
-                            <vertical padding="10 0" >
-                                <View bg="#f5f5f5" w="*" h="2" />
-                                <text id="Device_resolution" text="加载中" />
-                                <text id="dwh" text="加载中" />
-                                <text id="Tips" textStyle="italic" textColor="#f03752" />
+        /*
+                tuku_de[0] = (tuku_de[0] - height).toString();
+                tuku_de[1] = (tuku_de[1] - width).toString();
+                if (tuku_de[0].replace(/[^\d]/g, "") > 220 || tuku_de[1].replace(/[^\d]/g, "") > 170) {
+                    console.error("设备分辨率与图库分辨率相差过大，可能无法正常使用")
+                    let Tips_tuku_ui = ui.inflate(
+                        <vertical id="parent">
+                            
+                            <card gravity="center_vertical" cardElevation="0dp" margin="0">
+                                <img src="file://res/icon.png" w="50" h="30" margin="0" />
+                                <text text="无法使用PRTS辅助" padding="5" textSize="20" gravity="center|left" textColor="#f03752" marginLeft="50" />
                                 
-                                <text id="wxts" autoLink="web" text="温馨" typeface="sans" padding="5" textColor="#000000" textSize="15sp" layout_gravity="center" />
-                            </vertical>
-                            <horizontal w="*" padding="-3" gravity="center_vertical">
-                                <button text="退出(5s)" id="exit" textColor="#dbdbdb" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
-                                <button text="执意启动" id="ok" textColor="#dbdbdb" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
-                            </horizontal>
-                        </vertical>
-                    </ScrollView>
-                    
-                </vertical>);
-
-            let Tips_tuku = dialogs.build({
-                type: "app",
-                customView: Tips_tuku_ui,
-                wrapInScrollView: false,
-                cancelable: false,
-                canceledOnTouchOutside: false
-            })
-            tool.setBackgroundRoundRounded(Tips_tuku.getWindow(), {
-                radius: 0,
-            })
-            Tips_tuku.show();
-            Tips_tuku_ui.exit.on("click", function() {
-                Tips_tuku.dismiss();
-            })
-            Tips_tuku_ui.ok.on("click", function() {
-                Tips_tuku.dismiss()
-                开始运行jk(false, true)
-
-            })
-
-            Tips_tuku_ui.wxts.setText("1. 没有适合你的图库？\n参考以下教程动手制作 https://mrjh.flowus.cn，或使用虚拟机、模拟器等自调适合的分辨率，左边高度×右边宽度，DPI随意" +
-                "\n2. 分辨率反的？ \n请在竖屏下启动悬浮窗。华为：更改屏幕分辨率-为对应图库。模拟器：说明设置的是平板版分辨率(更换与设备分辨率相反的图库分辨率即可)。 注：更换设备分辨率后都需要到应用内更换相符合的图库")
-            Tips_tuku_ui.Device_resolution.setText("当前设备分辨率{ 'w':" + width + ", 'h': " + height + "}")
-
-            Tips_tuku_ui.dwh.setText("当前使用图库名称：" + gallery.gallery_info.名称);
-
-            Tips_tuku_ui.Tips.setText("请在软件主页面-左边侧滑栏-更换图库\n更换设备分辨率相近的图库，否则将无法正常使用本应用-PRTS辅助。\n目前，图库与设备分辨率宽度一致，而高度误差不超过230左右，或高度一致，而宽度误差不超过170左右，基本上是可以使用的，但不排除某些小图片在你的设备上无法匹配，导致某功能失效")
-            Tips_tuku_ui.exit.setEnabled(false);
-            let i_tnter = 5;
-            let id_tnter = setInterval(function() {
-                if (i_tnter >= 0) {
-                    i_tnter--;
+                                
+                            </card>
+                            
+                            <ScrollView>
+                                <vertical>
+                                    <vertical padding="10 0" >
+                                        <View bg="#f5f5f5" w="*" h="2" />
+                                        <text id="Device_resolution" text="加载中" />
+                                        <text id="dwh" text="加载中" />
+                                        <text id="Tips" textStyle="italic" textColor="#f03752" />
+                                        
+                                        <text id="wxts" autoLink="web" text="温馨" typeface="sans" padding="5" textColor="#000000" textSize="15sp" layout_gravity="center" />
+                                    </vertical>
+                                    <horizontal w="*" padding="-3" gravity="center_vertical">
+                                        <button text="退出(5s)" id="exit" textColor="#dbdbdb" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
+                                        <button text="执意启动" id="ok" textColor="#dbdbdb" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
+                                    </horizontal>
+                                </vertical>
+                            </ScrollView>
+                            
+                        </vertical>);
+        
+                    let Tips_tuku = dialogs.build({
+                        type: "app",
+                        customView: Tips_tuku_ui,
+                        wrapInScrollView: false,
+                        cancelable: false,
+                        canceledOnTouchOutside: false
+                    })
+                    tool.setBackgroundRoundRounded(Tips_tuku.getWindow(), {
+                        radius: 0,
+                    })
+                    Tips_tuku.show();
+                    Tips_tuku_ui.exit.on("click", function() {
+                        Tips_tuku.dismiss();
+                    })
+                    Tips_tuku_ui.ok.on("click", function() {
+                        Tips_tuku.dismiss()
+                        开始运行jk(false, true)
+        
+                    })
+        
+                    Tips_tuku_ui.wxts.setText("1. 没有适合你的图库？\n参考以下教程动手制作 https://mrjh.flowus.cn，或使用虚拟机、模拟器等自调适合的分辨率，左边高度×右边宽度，DPI随意" +
+                        "\n2. 分辨率反的？ \n请在竖屏下启动悬浮窗。华为：更改屏幕分辨率-为对应图库。模拟器：说明设置的是平板版分辨率(更换与设备分辨率相反的图库分辨率即可)。 注：更换设备分辨率后都需要到应用内更换相符合的图库")
+                    Tips_tuku_ui.Device_resolution.setText("当前设备分辨率{ 'w':" + width + ", 'h': " + height + "}")
+        
+                    Tips_tuku_ui.dwh.setText("当前使用图库名称：" + gallery.gallery_info.名称);
+        
+                    Tips_tuku_ui.Tips.setText("请在软件主页面-左边侧滑栏-更换图库\n更换设备分辨率相近的图库，否则将无法正常使用本应用-PRTS辅助。\n目前，图库与设备分辨率宽度一致，而高度误差不超过230左右，或高度一致，而宽度误差不超过170左右，基本上是可以使用的，但不排除某些小图片在你的设备上无法匹配，导致某功能失效")
+                    Tips_tuku_ui.exit.setEnabled(false);
+                    let i_tnter = 5;
+                    let id_tnter = setInterval(function() {
+                        if (i_tnter >= 0) {
+                            i_tnter--;
+                        }
+                        ui.run(() => {
+                            if (i_tnter == 0) {
+                                Tips_tuku_ui.exit.setEnabled(true);
+                                Tips_tuku_ui.exit.setText("退出")
+                                Tips_tuku_ui.exit.setTextColor(colors.parseColor("#F4A460"))
+                                clearInterval(id_tnter);
+                            } else {
+                                Tips_tuku_ui.exit.setText("退出(" + i_tnter + "s)")
+                            }
+        
+                        })
+                    }, 1000)
+        
+                    return
                 }
-                ui.run(() => {
-                    if (i_tnter == 0) {
-                        Tips_tuku_ui.exit.setEnabled(true);
-                        Tips_tuku_ui.exit.setText("退出")
-                        Tips_tuku_ui.exit.setTextColor(colors.parseColor("#F4A460"))
-                        clearInterval(id_tnter);
-                    } else {
-                        Tips_tuku_ui.exit.setText("退出(" + i_tnter + "s)")
-                    }
-
-                })
-            }, 1000)
-
-            return
-        }
-        */
+                */
         //  }
     }
 
@@ -3142,7 +3124,7 @@ function 开始运行jk(jk, tips_) {
 };
 
 
-threads.start(function() {
+threads.start(function () {
     sleep(500);
     switch (web_set.homepage) {
         case 1:
@@ -3164,7 +3146,7 @@ threads.start(function() {
             break;
     };
 
-    setInterval(function() {
+    setInterval(function () {
 
         ui.post(() => {
             web_set = tool.readJSON("web_set")
@@ -3397,27 +3379,27 @@ function AddMaterial(item, num) {
     AddItemList.push(AddItem);
     let AddText = ui.inflate(
         <horizontal w="*" h="auto" layout_weight="1" margin="20 0 0 -5">
-            
+
             <card cardCornerRadius="15"
-            layout_gravity="center" w="30" >
-            <img id="img" src="{{ImgPath}}{{AddItem}}.png" h="30" w="30" />
-        </card>
-        <text text="{{AddItem}}"
-        margin="10 0"
-        textSize="15sp"
-        textColor="black"
-        layout_gravity="center"
-        w="100" />
-        <horizontal w="*" gravity="center" >
-            <input text="{{AddItemNum}}" inputType="number" w="*" marginRight="80" />
-        </horizontal>
-        <card w="30sp" h="30sp" marginLeft="-35" cardCornerRadius="15sp" cardBackgroundColor="#0d84ff" layout_gravity="center">
-            <text text="×"
-            textSize="20sp"
-            textColor="#ffffff" gravity="center"
-            foreground="?selectableItemBackground"
-            />
-        </card>
+                layout_gravity="center" w="30" >
+                <img id="img" src="{{ImgPath}}{{AddItem}}.png" h="30" w="30" />
+            </card>
+            <text text="{{AddItem}}"
+                margin="10 0"
+                textSize="15sp"
+                textColor="black"
+                layout_gravity="center"
+                w="100" />
+            <horizontal w="*" gravity="center" >
+                <input text="{{AddItemNum}}" inputType="number" w="*" marginRight="80" />
+            </horizontal>
+            <card w="30sp" h="30sp" marginLeft="-35" cardCornerRadius="15sp" cardBackgroundColor="#0d84ff" layout_gravity="center">
+                <text text="×"
+                    textSize="20sp"
+                    textColor="#ffffff" gravity="center"
+                    foreground="?selectableItemBackground"
+                />
+            </card>
         </horizontal>,
         ui.addMaterialList
     );
@@ -3429,7 +3411,7 @@ function AddMaterial(item, num) {
         ui.addMaterialList
             .getChildAt(i)
             .getChildAt(3)
-            .click(function(e) {
+            .click(function (e) {
 
                 AddItemList.splice(
                     AddItemList.indexOf(e.getParent().getChildAt(1).getText()),
@@ -3453,13 +3435,13 @@ function setSpinnerAdapter(spinner, dataList) {
                     <img id="img" h="40" w="40" />
                 </card>
                 <text
-                id="name"
-                text=""
-                gravity="left|center"
-                textSize="18sp"
-                textColor="black"
-                w="*"
-                h="50"
+                    id="name"
+                    text=""
+                    gravity="left|center"
+                    textSize="18sp"
+                    textColor="black"
+                    w="*"
+                    h="50"
                 />
             </horizontal>
         </card>
@@ -3467,19 +3449,19 @@ function setSpinnerAdapter(spinner, dataList) {
 
     function createAdapter(dataList) {
         let adapter = JavaAdapter(android.widget.SpinnerAdapter, {
-            getCount: function() {
+            getCount: function () {
                 return dataList.length;
             },
-            getItem: function(position) {
+            getItem: function (position) {
                 return dataList[position];
             },
-            getItemId: function(position) {
+            getItemId: function (position) {
                 return position;
             },
-            getViewTypeCount: function(position) {
+            getViewTypeCount: function (position) {
                 return 1;
             },
-            getView: function(position, convertView, parent) {
+            getView: function (position, convertView, parent) {
                 if (!convertView) {
                     convertView = ui.inflate(boxXml, ui.drawerFrame, false);
                 }
@@ -3488,7 +3470,7 @@ function setSpinnerAdapter(spinner, dataList) {
                 convertView.img.attr("src", ImgPath + item + ".png");
                 return convertView;
             },
-            getDropDownView: function(position, convertView, parent) {
+            getDropDownView: function (position, convertView, parent) {
                 if (!convertView) {
                     convertView = ui.inflate(boxXml, ui.drawerFrame, false);
                 }
@@ -3538,7 +3520,7 @@ function Painting_planning(input, ok) {
                             <Switch id="it2" text="需求经验值" textSize="20sp" />
                             <Switch id="it3" text="需求龙门币" textSize="20sp" />
                             <text id="wxts" text="数据来源：明日方舟工具箱" typeface="sans" textColor="#000000" textSize="8sp" gravity="right" marginRight="10" />
-                            
+
                         </vertical>
                         <horizontal w="*" padding="-3" gravity="center_vertical">
                             <button text="退出" id="exit" textColor="#F4A460" style="Widget.AppCompat.Button.Borderless.Colored" layout_weight="1" />
@@ -3563,40 +3545,40 @@ function Painting_planning(input, ok) {
     })
     plan.show();
 
-    planui.jump.on("click", function() {
+    planui.jump.on("click", function () {
         ok = true;
         plan.dismiss();
         ui.viewpager.currentItem = 2;
     })
-    planui.ok.on("click", function() {
+    planui.ok.on("click", function () {
         ok = true;
         plan.dismiss();
         timing_plan(0);
         ui.viewpager.currentItem = 2;
     })
 
-    planui.exit.on("click", function() {
+    planui.exit.on("click", function () {
         plan.dismiss()
     })
 
-    planui.it1.on("check", function() {
+    planui.it1.on("check", function () {
         timing_plan(1);
     });
-    planui.it2.on("check", function() {
+    planui.it2.on("check", function () {
         timing_plan(2);
     });
-    planui.it3.on("check", function() {
+    planui.it3.on("check", function () {
         timing_plan(3);
     });
 
     function timing_plan(i) {
-        let timing_plan = setInterval(function() {
+        let timing_plan = setInterval(function () {
             if (input) {
                 ui.post(() => {
                     switch (i) {
                         case 0:
                             ui.webview.evaluateJavascript("javascript:function click(){var c = document.getElementsByTagName('button');for(let i =0;i<c.length;i++){if(c[i].innerHTML=='开始规划'){c[i].click();return c;};};};click();", new ValueCallback({
-                                onReceiveValue: function(value) {
+                                onReceiveValue: function (value) {
                                     if (value != "null") {
                                         clearInterval(timing_plan)
                                     }
@@ -3628,7 +3610,7 @@ function Painting_planning(input, ok) {
         let planning = files.read("./lib/prototype/plan.txt");
 
         ui.webview.evaluateJavascript("javascript:" + planning.toString() + "; let input = " + JSON.stringify(input) + ";planning();", new ValueCallback({
-            onReceiveValue: function(value) {
+            onReceiveValue: function (value) {
                 if (value == "null") {
                     input_plan()
                 } else {
@@ -3666,7 +3648,7 @@ function change_list(view, mCountries, fun) {
         view.setAdapter(adapter);
         if (fun) {
             view.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({
-                onItemSelected: function(parent, view, position, id) {
+                onItemSelected: function (parent, view, position, id) {
                     fun(parent, view, position, id);
                 }
             }));
@@ -3688,7 +3670,7 @@ function MyPageTransform() {
     let mRadius = 0;
     let pageWidth;
 
-    this.transformPage = function(view, position) {
+    this.transformPage = function (view, position) {
         if (animation_viewpager < 2) {
 
             pageWidth = view.getWidth();
@@ -3755,7 +3737,7 @@ function MyPageTransform() {
 
 
 function notice() {
-    threads.start(function() {
+    threads.start(function () {
         while (true) {
             if (typeof jlink_mian != "object") {
                 sleep(1000)
@@ -3767,11 +3749,7 @@ function notice() {
         try {
 
             http.get(jlink_mian.告使用者, {
-                headers: {
-                    'url_info': url_info,
-                    'User-Agent': System.getProperty("http.agent")
-                }
-            }, (res, err) => {
+             }, (res, err) => {
                 if (err || res['statusCode'] != 200) {
                     throw new Error('请求云端公告信息出错:\n' + (res ? res : err.messag));
 
@@ -3834,7 +3812,7 @@ function notice() {
 
 function Update_UI(i) {
     if (i == 1) {
-        ui.run(function() {
+        ui.run(function () {
             SystemUiVisibility(false);
 
             //输入法
@@ -3878,7 +3856,7 @@ function Update_UI(i) {
                         _modData_.push(_modular_.script_name);
                     }
                 };
-                change_list(ui.level_pick, _modData_, function(parent, view, position, id) {
+                change_list(ui.level_pick, _modData_, function (parent, view, position, id) {
                     parent.setBackground(createShape(5, 0, 0, [2, theme.bar]));
                     tool.writeJSON("自定义模块", parent.getSelectedItem());
                 });
@@ -3886,7 +3864,7 @@ function Update_UI(i) {
                 ui["levelPickText"].setText("关卡选择");
 
 
-                change_list(ui.level_pick, level_choices_open, function(parent, view, position, id) {
+                change_list(ui.level_pick, level_choices_open, function (parent, view, position, id) {
                     parent.setBackground(createShape(5, 0, 0, [2, theme.bar]));
                     setting.指定关卡 ? setting.指定关卡.levelAbbreviation = parent.getSelectedItem() : setting.指定关卡 = {
                         levelAbbreviation: parent.getSelectedItem(),
@@ -4018,21 +3996,21 @@ function Update_UI(i) {
 
             let WebViewClient = android.webkit.WebViewClient;
             let webViewClient = new JavaAdapter(WebViewClient, {
-                onPageStarted: function(webView, url, bitmap) {
+                onPageStarted: function (webView, url, bitmap) {
                     // console.log('页面正在加载');
                     //  ui.webview.loadUrl("javascript:(function(){if("+web_set.night_mode+" == false){return};const blackList=[\'example.com\'];const hostname=window.location.hostname;const key=encodeURIComponent(\'谷花泰:野径云俱黑，江船火独明:执行判断\');const isBlack=blackList.some(keyword=>{if(hostname.match(keyword)){return true};return false});if(isBlack||window[key]){return};window[key]=true;class ChangeBackground{constructor(){this.init()};init(){this.addStyle(`html,body{background-color:#000!important}*{color:#CCD1D9!important;box-shadow:none!important}*:after,*:before{border-color:#1e1e1e!important;color:#CCD1D9!important;box-shadow:none!important;background-color:transparent!important}a,a>*{color:#409B9B!important}[data-change-border-color][data-change-border-color-important]{border-color:#1e1e1e!important}[data-change-background-color][data-change-background-color-important]{background-color:#000!important}`);this.selectAllNodes(node=>{if(node.nodeType!==1){return};const style=window.getComputedStyle(node,null);const whiteList=[\'rgba(0, 0, 0, 0)\',\'transparent\'];const backgroundColor=style.getPropertyValue(\'background-color\');const borderColor=style.getPropertyValue(\'border-color\');if(whiteList.indexOf(backgroundColor)<0){if(this.isWhiteToBlack(backgroundColor)){node.dataset.changeBackgroundColor=\'\';node.dataset.changeBackgroundColorImportant=\'\'}else{return;delete node.dataset.changeBackgroundColor;delete node.dataset.changeBackgroundColorImportant}};if(whiteList.indexOf(borderColor)<0){if(this.isWhiteToBlack(borderColor)){node.dataset.changeBorderColor=\'\';node.dataset.changeBorderColorImportant=\'\'}else{delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant}};if(borderColor.indexOf(\'rgb(255, 255, 255)\')>=0){delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant;node.style.borderColor=\'transparent\'}})};addStyle(style=\'\'){const styleElm=document.createElement(\'style\');styleElm.innerHTML=style;document.head.appendChild(styleElm)};isWhiteToBlack(colorStr=\'\'){let hasWhiteToBlack=false;const colorArr=colorStr.match(/rgb.+?\\)/g);if(!colorArr||colorArr.length===0){return true};colorArr.forEach(color=>{const reg=/rgb[a]*?\\(([0-9]+),.*?([0-9]+),.*?([0-9]+).*?\\)/g;const result=reg.exec(color);const red=result[1];const green=result[2];const blue=result[3];const deviation=20;const max=Math.max(red,green,blue);const min=Math.min(red,green,blue);if(max-min<=deviation){hasWhiteToBlack=true}});return hasWhiteToBlack};selectAllNodes(callback=()=>{}){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)});this.observe({targetNode:document.documentElement,config:{attributes:false},callback(mutations,observer){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)})}})};observe({targetNode,config={},callback=()=>{}}){if(!targetNode){return};config=Object.assign({attributes:true,childList:true,subtree:true},config);const observer=new MutationObserver(callback);observer.observe(targetNode,config)}};new ChangeBackground()})();");
 
                     //     console.info(url)
                     ui.progress.setVisibility(0);
                 },
-                onPageFinished: function(webView, curUrl) {
+                onPageFinished: function (webView, curUrl) {
                     // ui.webview.loadUrl("javascript:(function(){if("+web_set.night_mode+" == false){return};const blackList=[\'example.com\'];const hostname=window.location.hostname;const key=encodeURIComponent(\'谷花泰:野径云俱黑，江船火独明:执行判断\');const isBlack=blackList.some(keyword=>{if(hostname.match(keyword)){return true};return false});if(isBlack||window[key]){return};window[key]=true;class ChangeBackground{constructor(){this.init()};init(){this.addStyle(`html,body{background-color:#000!important}*{color:#CCD1D9!important;box-shadow:none!important}*:after,*:before{border-color:#1e1e1e!important;color:#CCD1D9!important;box-shadow:none!important;background-color:transparent!important}a,a>*{color:#409B9B!important}[data-change-border-color][data-change-border-color-important]{border-color:#1e1e1e!important}[data-change-background-color][data-change-background-color-important]{background-color:#000!important}`);this.selectAllNodes(node=>{if(node.nodeType!==1){return};const style=window.getComputedStyle(node,null);const whiteList=[\'rgba(0, 0, 0, 0)\',\'transparent\'];const backgroundColor=style.getPropertyValue(\'background-color\');const borderColor=style.getPropertyValue(\'border-color\');if(whiteList.indexOf(backgroundColor)<0){if(this.isWhiteToBlack(backgroundColor)){node.dataset.changeBackgroundColor=\'\';node.dataset.changeBackgroundColorImportant=\'\'}else{delete node.dataset.changeBackgroundColor;delete node.dataset.changeBackgroundColorImportant}};if(whiteList.indexOf(borderColor)<0){if(this.isWhiteToBlack(borderColor)){node.dataset.changeBorderColor=\'\';node.dataset.changeBorderColorImportant=\'\'}else{delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant}};if(borderColor.indexOf(\'rgb(255, 255, 255)\')>=0){delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant;node.style.borderColor=\'transparent\'}})};addStyle(style=\'\'){const styleElm=document.createElement(\'style\');styleElm.innerHTML=style;document.head.appendChild(styleElm)};isWhiteToBlack(colorStr=\'\'){let hasWhiteToBlack=false;const colorArr=colorStr.match(/rgb.+?\\)/g);if(!colorArr||colorArr.length===0){return true};colorArr.forEach(color=>{const reg=/rgb[a]*?\\(([0-9]+),.*?([0-9]+),.*?([0-9]+).*?\\)/g;const result=reg.exec(color);const red=result[1];const green=result[2];const blue=result[3];const deviation=20;const max=Math.max(red,green,blue);const min=Math.min(red,green,blue);if(max-min<=deviation){hasWhiteToBlack=true}});return hasWhiteToBlack};selectAllNodes(callback=()=>{}){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)});this.observe({targetNode:document.documentElement,config:{attributes:false},callback(mutations,observer){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)})}})};observe({targetNode,config={},callback=()=>{}}){if(!targetNode){return};config=Object.assign({attributes:true,childList:true,subtree:true},config);const observer=new MutationObserver(callback);observer.observe(targetNode,config)}};new ChangeBackground()})();");
                     ui.progress.setVisibility(8);
 
                     //  ui.webview.loadUrl("javascript:(function(){if("+web_set.night_mode+" == false){return};const blackList=[\'example.com\'];const hostname=window.location.hostname;const key=encodeURIComponent(\'谷花泰:野径云俱黑，江船火独明:执行判断\');const isBlack=blackList.some(keyword=>{if(hostname.match(keyword)){return true};return false});if(isBlack||window[key]){return};window[key]=true;class ChangeBackground{constructor(){this.init()};init(){this.addStyle(`html,body{background-color:#000!important}*{color:#CCD1D9!important;box-shadow:none!important}*:after,*:before{border-color:#1e1e1e!important;color:#CCD1D9!important;box-shadow:none!important;background-color:transparent!important}a,a>*{color:#409B9B!important}[data-change-border-color][data-change-border-color-important]{border-color:#1e1e1e!important}[data-change-background-color][data-change-background-color-important]{background-color:#000!important}`);this.selectAllNodes(node=>{if(node.nodeType!==1){return};const style=window.getComputedStyle(node,null);const whiteList=[\'rgba(0, 0, 0, 0)\',\'transparent\'];const backgroundColor=style.getPropertyValue(\'background-color\');const borderColor=style.getPropertyValue(\'border-color\');if(whiteList.indexOf(backgroundColor)<0){if(this.isWhiteToBlack(backgroundColor)){node.dataset.changeBackgroundColor=\'\';node.dataset.changeBackgroundColorImportant=\'\'}else{return;delete node.dataset.changeBackgroundColor;delete node.dataset.changeBackgroundColorImportant}};if(whiteList.indexOf(borderColor)<0){if(this.isWhiteToBlack(borderColor)){node.dataset.changeBorderColor=\'\';node.dataset.changeBorderColorImportant=\'\'}else{delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant}};if(borderColor.indexOf(\'rgb(255, 255, 255)\')>=0){delete node.dataset.changeBorderColor;delete node.dataset.changeBorderColorImportant;node.style.borderColor=\'transparent\'}})};addStyle(style=\'\'){const styleElm=document.createElement(\'style\');styleElm.innerHTML=style;document.head.appendChild(styleElm)};isWhiteToBlack(colorStr=\'\'){let hasWhiteToBlack=false;const colorArr=colorStr.match(/rgb.+?\\)/g);if(!colorArr||colorArr.length===0){return true};colorArr.forEach(color=>{const reg=/rgb[a]*?\\(([0-9]+),.*?([0-9]+),.*?([0-9]+).*?\\)/g;const result=reg.exec(color);const red=result[1];const green=result[2];const blue=result[3];const deviation=20;const max=Math.max(red,green,blue);const min=Math.min(red,green,blue);if(max-min<=deviation){hasWhiteToBlack=true}});return hasWhiteToBlack};selectAllNodes(callback=()=>{}){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)});this.observe({targetNode:document.documentElement,config:{attributes:false},callback(mutations,observer){const allNodes=document.querySelectorAll(\'*\');Array.from(allNodes,node=>{callback(node)})}})};observe({targetNode,config={},callback=()=>{}}){if(!targetNode){return};config=Object.assign({attributes:true,childList:true,subtree:true},config);const observer=new MutationObserver(callback);observer.observe(targetNode,config)}};new ChangeBackground()})();");
                     //    ui.webview.loadUrl("javascript:alert(document.getElementsByTagName('html')[0].innerHTML);");
                 },
-                shouldOverrideUrlLoading: function(webView, request) {
+                shouldOverrideUrlLoading: function (webView, request) {
                     if (!request.url) {
                         return
                     }
@@ -4048,7 +4026,7 @@ function Update_UI(i) {
 
                     try {
                         if (request.startsWith("folder://bookmark")) {
-                            label_plug.label_plug(function(url) {
+                            label_plug.label_plug(function (url) {
                                 ui.run(() => {
                                     ui.webview.loadUrl(url);
                                 })
@@ -4087,14 +4065,14 @@ function Update_UI(i) {
                             //  if (value) {
                             ui.web_tips.setVisibility(0);
                             ui.tips_text.setText("    网页请求打开" + app)
-                            ui.tips_ok.on("click", function() {
+                            ui.tips_ok.on("click", function () {
                                 ui.web_tips.setVisibility(8)
                                 new_ui("activity", request)
                             });
-                            ui.tips_no.on("click", function() {
+                            ui.tips_no.on("click", function () {
                                 ui.web_tips.setVisibility(8)
                             });
-                            ui.post(function() {
+                            ui.post(function () {
                                 ui.web_tips.setVisibility(8)
                             }, 3000)
 
@@ -4129,12 +4107,12 @@ function Update_UI(i) {
 
                       //  console.log("onProgressChanged")
                   },*/
-                onConsoleMessage: function(message) {
+                onConsoleMessage: function (message) {
                     if (web_set.h5rizhi) {
                         message.message && console.verbose("h5: " + message.message());
                     }
                 },
-                onShowFileChooser: function(webview, filePathCallback_, fileChooserParams) {
+                onShowFileChooser: function (webview, filePathCallback_, fileChooserParams) {
                     filePathCallback = filePathCallback_
 
                     let i = new android.content.Intent(android.content.Intent.ACTION_GET_CONTENT);
@@ -4155,7 +4133,7 @@ function Update_UI(i) {
             webview.setWebChromeClient(webChromeClient);
             //  webview.setDownloadListener(new DownloadListener() {
             webview.setDownloadListener({
-                onDownloadStart: function(url, userAgent, contentDisposition, mimeType, contentLength) {
+                onDownloadStart: function (url, userAgent, contentDisposition, mimeType, contentLength) {
                     //   console.trace(url)
                     let webdow = JSON.parse(
                         files.read("./lib/game_data/webdow.json", (encoding = "utf-8"))
@@ -4183,7 +4161,7 @@ function Update_UI(i) {
                             engines.execScriptFile("./lib/download.js");
                             //监听脚本间广播'download'事件
                             snakebar('开始下载文件: ' + datali.fileName, 3000);
-                            events.broadcast.on("download" + datali.id, function(X) {
+                            events.broadcast.on("download" + datali.id, function (X) {
                                 if (X.name == "进度") {
                                     console.verbose(datali.fileName + " 下载进度: " + X.data);
 
@@ -4287,7 +4265,7 @@ function new_ui(name, url) {
             engines.execScriptFile("./activity/journal.js", {
                 path: files.path('./activity/'),
             });
-          //  engines.execScript("journal_ui", variable + "require('./activity/journal.js')");
+            //  engines.execScript("journal_ui", variable + "require('./activity/journal.js')");
             //engines.execScript("journal_ui", java.lang.String.format("'ui';  let theme = storages.create('configure').get('theme_colors');require('./activity/journal.js');"));
             break;
         case 'q群/频道':
@@ -4359,7 +4337,7 @@ function tishi() {
 
     }, 2500)
     ui.post(() => {
-        label_plug.label_plug(function(url) {
+        label_plug.label_plug(function (url) {
             ui.run(() => {
                 ui.webview.loadUrl(url);
             })
@@ -4374,18 +4352,18 @@ function network_reminder_tips(e) {
             <card gravity="center_vertical" cardElevation="0dp" margin="5 5">
                 <img src="file://res/icon.png" w="50" h="30" margin="0" />
                 <text text="错误" textSize="25" gravity="center|left" textColor="#D32F2F" marginLeft="50" />
-                
-                
+
+
             </card>
             <View bg="#f5f5f5" w="*" h="1" />
-            
+
             <ScrollView>
                 <vertical>
                     <text id="deleteTips" textStyle="bold" textSize="15" margin="0 5 0 5" autoLink="web" enabled="true" textIsSelectable="true" focusable="true" longClickable="true" />
-                    
+
                 </vertical>
             </ScrollView>
-            
+
         </vertical>, null, false);
     e = e.toString().replace("/8888", "");
     e = e.toString().replace(":80", "");

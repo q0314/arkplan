@@ -61,7 +61,7 @@ require(mainScriptPath + '/lib/ResourceMonitor.js')(runtime, this)
 let {
     filesx
 } = require(mainScriptPath + '/modules/ext-files');
-let indexFilePath = mainScriptPath + "/vue_configs/index.html"
+let indexFilePath = mainScriptPath + "/vue_configs/template_gallery.html";
 const prepareWebView = require(mainScriptPath + '/lib/PrepareWebView.js')
 
 let postMessageToWebView = () => {

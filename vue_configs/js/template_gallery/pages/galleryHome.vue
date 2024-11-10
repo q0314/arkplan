@@ -141,7 +141,7 @@
 const { ref, onMounted ,computed  } = Vue;
 const { showToast } = vant;
 const {useRouter}  = VueRouter;
-import ElementSearch from "../components/ElementSearch.vue";
+import ElementSearch from "../ElementSearch.vue";
 
 const router = useRouter();
 const resourcePath = ref('unknown');
