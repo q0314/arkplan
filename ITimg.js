@@ -450,7 +450,7 @@ function scaleSet(splitScreen, tuku_de, value) {
  * 在大图中匹配小图
  * @param {string} picture - 图片名称,不包括后缀
  * @param {object} list 
- * @param {number} [list.action = undefined] - 找图识别到后立即进行的操作
+ * @param {number} [list.action = undefined] - 找图识别到后立即进行的操作。0=点击小图中间，1=点击小图左上角，2=点击小图右上角，3=点击小图左下角，4=点击小图右下角，5=返回小图坐标，6=使用images.matchTemplate，在大图中找出多个小图返回
  * @param {number} [list.timing = 0] - 找图识别到→action操作后等待时间
  * @param {string | number | ObjectArray} [list.area = "全屏"] - 找图识别区域, 全屏从中划分四角, 1:左上角,2:右上角,3左下角,4:右下角, 可组合
  * @param {number} [list.nods = 0] - 找不到后等待时间
@@ -460,7 +460,7 @@ function scaleSet(splitScreen, tuku_de, value) {
  * @param {Number} [list.threshold = 0.8] - 图片相似度 - 0.8
  * @param {boolean} [list.resolution = false] - 使用多分辨率缩放兼容找图 - false
  * @param {string} [list.small_image_catalog = "./mrfz/tuku/"] - picture小图片所在的文件目录
- * @param {Number} [list.matchTemplate_max = 5] - 在大图片中搜索小图片最大的结果数量
+ * @param {Number} [list.matchTemplate_max = 5] - 使用list.action:6时在大图片中搜索小图片最大的结果数量
  * @returns {boolean|object} - 返回值取决于list.action
  */
 function 图像匹配(picture, list) {
@@ -631,9 +631,22 @@ function 图像匹配(picture, list) {
 }
 
 /**
- * 基于autojs Pro9 优化的特征匹配
- * @param {boolean} [list.grayscale] = true - 是否灰度化后再计算特征
+ * 基于autojs Pro9 优化的特征图匹配
+ * @param {string} picture - 图片名称,不包括后缀
+ * @param {object} list 
+ * @param {number} [list.action= undefined] - 特征匹配成功后的操作，0=点击小图中间，1=点击小图左上角，2=点击小图右上角，3=点击小图左下角，4=点击小图右下角，5=返回小图坐标
+ * @param {number} [list.timing = 0] - 找图识别到→list.action操作后等待时间
+ * @param {string | number | ObjectArray} [list.area = "全屏"] - 找图识别区域, 全屏从中划分四角, 1:左上角,2:右上角,3左下角,4:右下角, 可组合
+ * @param {number} [list.nods = 0] - 匹配失败后等待时间
+ * @param {object} [list.picture = ITimg.captureScreen_()] - 在指定大图中识别
+ * @param {number} [list.threshold = 0.8] - 匹配阈值，缓存图常规匹配继承该值
+ * @param {boolean} [list.grayscale = true] - 是否灰度化大图后再计算特征
+ * @param {boolean|string} [list.saveSmallImg = false] - 是否保存缓存小图、使用缓存图普通匹配。匹配成功后，从大图裁剪匹配区域的小图为缓存图，正常运行时会使用缓存图进行普通匹配而不是模板特征匹配，加快匹配速度，普通匹配失败时根据picture_failed_further是否重新进行模板特征匹配
+ * @param {boolean} [list.picture_failed_further = false] - 当list.saveSmallImg:true时仅会进行缓存图普通匹配，list.picture_failed_further:true=匹配失败后继续特征匹配
  * @param {string} [list.small_image_catalog = "./mrfz/tuku/"] - picture小图片所在的文件目录
+ * @param {boolean|string} [list.log_policy = undefined] - 识别结果日志打印策略 - list.log_policy:true=不显示
+ * @param {boolean} [list.refresh = true] - 是否使用上一次缓存的特征大图(如果有)。两个不同区域小图匹配，最好第二张小图开头就设置picture_failed_further:true重新匹配计算特征，否则会导致匹配可视化结果图区域不对
+ * @param {object} [list.imageFeatures] - 大图特征，如有需要复用特征的可自行计算传过来
  */
 function matchFeatures(picture, list) {
     if (!list) {
@@ -651,12 +664,13 @@ function matchFeatures(picture, list) {
         filter_h: list.filter_h || ITimg.default_list.matchFeatures.filter_h,
         grayscale: list.grayscale,
         visualization: list.visualization,
-        saveSmallImg: list.saveSmallImg,
         imageFeatures: list.imageFeatures,
+        refresh: list.refresh,
+        
+        saveSmallImg: list.saveSmallImg,
         picture_failed_further: list.picture_failed_further,
         scale: list.scale || ITimg.default_list.matchFeatures.scale,
         log_policy: list.log_policy,
-        refresh: list.refresh,
         small_image_catalog: list.small_image_catalog || ITimg.default_list.matchFeatures.small_image_catalog,
     }
     if (list.saveSmallImg === undefined) {
@@ -1328,30 +1342,6 @@ function binarized_contour(list) {
     //裁剪，还原色彩空间，因为mat默认使用bgr, 而不是rgb
     Imgproc.cvtColor(img.mat.submat(list.area[1], list.area[3] + list.area[1], list.area[0], list.area[2] + list.area[0]), mat, Imgproc.COLOR_BGRA2RGBA);
 
-    /*   let roiBitmap;
-    try {
-        roiBitmap = Bitmap.createBitmap(img.bitmap, list.area[0], list.area[1], list.area[2], list.area[3]);
-    } catch (e) {
-        console.error(e)
-        img = ITimg.captureScreen_();
-        roiBitmap = Bitmap.createBitmap(img.bitmap, list.area[0], list.area[1], list.area[2], list.area[3]);
-    }
-    if (roiBitmap.width == height && roiBitmap.height == width) {
-        console.verbose("全屏查找矩形")
-        roiBitmap = Bitmap.createBitmap(list.area[2], list.area[3], Bitmap.Config.ARGB_8888);
-        let canvas = new Canvas(roiBitmap);
-        canvas.drawBitmap(img.bitmap, list.area[0], list.area[1], null);
-    }
-    // if(list.filter_color &&list.filter_color.length){
-
-    // }else{
-    let mat = new Mat();
-    Utils.bitmapToMat(roiBitmap, mat);
-*/
-    //还原色彩空间
-    //  Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGRA2RGBA);
-
-    // img.recycle();
     // 转换为灰度图像
     Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGR2GRAY);
     /*// 降噪
@@ -1373,13 +1363,9 @@ function binarized_contour(list) {
             Imgproc.dilate(mat, mat, element);
         }
     }
-    //查找直边界矩形，多线程的情况下ITimg.results容易和ocr的冲突，所以就改名
-    ITimg.results_contour = new java.util.ArrayList();
-    let hierarchy = new Mat();
-    Imgproc.findContours(mat, ITimg.results_contour, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-    if (list.canvas) {
+        function drawImg (){
         // 在原始图像上绘制直边界矩形
-        rectPaint = new Paint();
+        let rectPaint = new Paint();
         rectPaint.setStyle(Paint.Style.STROKE);
         rectPaint.setStrokeWidth(3);
         rectPaint.setColor(Color.RED);
@@ -1402,11 +1388,25 @@ function binarized_contour(list) {
         Utils.matToBitmap(mat, roiBitmap);
         list.canvas.img.drawBitmap(roiBitmap, list.area[0], list.area[1], rectPaint)
         roiBitmap && roiBitmap.recycle();
-    } else {
+ 
+}
+
+    if(list.action==7){
+        drawImg();
+        list.canvas.img = list.canvas.img.toImage();
+        return list.canvas.img;
+    }
+    
+    //查找直边界矩形，多线程的情况下ITimg.results容易和ocr的冲突，所以就改名
+    ITimg.results_contour = new java.util.ArrayList();
+    let hierarchy = new Mat();
+    Imgproc.findContours(mat, ITimg.results_contour, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+if (list.canvas) {
+    drawImg();
+} else {
         !img.isRecycled() && img.recycle();
 
     }
-
     //roiBitmap && roiBitmap.recycle();
     let query_contour = [];
 
@@ -1922,14 +1922,27 @@ try {
         savePath = '/sdcard/processed_image.jpg';
         processedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, new java.io.FileOutputStream(savePath));
     }
-    height = 2400
-    width = 1080;
+   // height = 2400
+   // width = 1080;
     let name = {
-        picture_name: "97",
-        canvas_name: "关闭公告"
+        picture_name: "121",
+        canvas_name: "好友_访问基建"
     }
     let picture = images.read("/storage/emulated/0/DCIM/Screenshots/" + name.picture_name + ".jpg");
-    let imgpath = package_path + "/gallery_list/template/"
+    let imgpath = package_path + "/gallery_list/template/";
+    /*
+     picture = ITimg.contour({
+                    canvas: "访问基建",
+                    action: 7,
+                    area: 0,
+                    threshold: 240,
+                    size: 0,
+                    type: "BINARY",
+                    picture:picture,
+                });
+    let pngPtah = package_path + "/logs/binarized_contour/_visualization.jpg";
+        files.ensureDir(pngPtah);
+    images.save(picture,pngPtah);*/
     //同样的设置，读取的本地图片能匹配到小小图，截屏函数的不行...
     let an = ITimg.matchFeatures(name.canvas_name, {
         // area: [0, 200, 1356, 920],

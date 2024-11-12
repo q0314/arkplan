@@ -9,7 +9,7 @@ module.exports =  (function() {
             return JavaAdapter(
                 com.stardust.autojs.core.ui.widget.JsViewPager, {
                     NoScrollViewPager: function(context, AttributeSet_attrs) {
-                        this.super$(context, attrs);
+                        this.super$(context, AttributeSet_attrs);
                     },
                     NoScrollViewPager: function(context) {
                         this.super$(context);

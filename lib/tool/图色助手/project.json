@@ -1,0 +1,64 @@
+{
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a"
+  ],
+  "assets": [],
+  "build": {
+    "build_id": "8266FB87-47",
+    "build_number": 47,
+    "build_time": 1698479841292,
+    "release": false
+  },
+  "encryptLevel": 0,
+  "features": {
+    "activityIntentTasks": false,
+    "nodejs": "auto"
+  },
+  "icon": "res/ic_app_logo.png",
+  "launchConfig": {
+    "displaySplash": true,
+    "hideLogs": false,
+    "splashIcon": "res/ic_app_logo.png",
+    "splashText": "图色助手Pro",
+    "stableMode": false
+  },
+  "main": "图色助手UI.js",
+  "name": "图色助手Pro",
+  "optimization": {
+    "obfuscateComponents": true,
+    "removeAccessibilityService": true,
+    "removeOpenCv": false,
+    "unusedResources": false
+  },
+  "packageName": "com.cgfz.tszspro",
+  "permissionConfig": {
+    "manifestPermissions": [
+      "android.permission.WRITE_EXTERNAL_STORAGE",
+      "android.permission.READ_EXTERNAL_STORAGE",
+      "android.permission.FOREGROUND_SERVICE",
+      "android.permission.SYSTEM_ALERT_WINDOW"
+    ],
+    "requestListOnStartup": [
+      "android.permission.READ_EXTERNAL_STORAGE",
+      "android.permission.WRITE_EXTERNAL_STORAGE",
+      "android.permission.SYSTEM_ALERT_WINDOW"
+    ]
+  },
+  "publish": {
+    "category": "实用工具",
+    "details": "支持多图操作，二值化，缩放，找图找色测试，复制保存点色数据",
+    "maxAutoJsVersion": -1,
+    "maxProVersion": 8039999,
+    "minAutoJsVersion": -1,
+    "minProVersion": 8030000,
+    "minSdkVersion": 0,
+    "permissions": [],
+    "summary": "轻量级的取色工具，重写UI部分操作更加流畅",
+    "tags": []
+  },
+  "scripts": {},
+  "useFeatures": [],
+  "versionCode": 3,
+  "versionName": "2.5"
+}

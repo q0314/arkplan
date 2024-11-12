@@ -71,32 +71,40 @@ let currency = {
             menu = this.menu.find(item => item[0] === menu);
         }
         console.verbose("导航定位-", menu);
-        let _max = 3;
+        let _max = 2;
         while (_max) {
 
             this.navigation = ITimg.matchFeatures("导航", {
                 action: 5,
-                nods: 1000,
                 scale: 1,
                 area: 1,
-            }) || ITimg.matchFeatures("导航", {
-                action: 5,
-                area: 1,
-                refresh: false,
                 picture_failed_further: true,
             }) || ITimg.matchFeatures("导航2", {
                 action: 5,
-                nods: 1000,
                 area: 1,
                 scale: 1,
                 refresh: false,
-            }) || ITimg.matchFeatures("导航2", {
-                action: 5,
-                area: 1,
-                refresh: false,
-                picture_failed_further: true,
+                nods: 500,
             })
-            if (this.navigation && !confirm_navigation) {
+            if (!this.navigation) {
+
+                if (!ITimg.matchFeatures("返回", {
+                        action: 5,
+                        area: 1,
+                        scale: 1,
+                        refresh: false,
+                    })) {
+                    _max = 0;
+                    break;
+                }
+                
+                continue;
+            }
+            if (confirm_navigation) {
+                //如果是确认导航键存在
+                break
+
+            } else {
                 this.navigation = [this.navigation.left + this.navigation.w / 2, this.navigation.top + this.navigation.h / 2];
                 MyAutomator.click.apply(MyAutomator, this.navigation);
                 sleep(800);
@@ -130,10 +138,8 @@ let currency = {
                     sleep(800);
 
                 }
-                //如果是确认导航键存在
-            } else if (this.navigation) {
-                break
             }
+
             _max--;
         }
         return _max;

@@ -1928,10 +1928,10 @@ ui.drawerList.on("item_click", (item) => {
         case "模板图库":
 
             if (typeof tukuss != "object") {
-                http.get(server + "tulili/gallery_item.json", {
+                http.get(server + "gallery/gallery_item.json", {
                 }, (res, err) => {
                     if (err || res['statusCode'] != 200) {
-                        toast('请求云端图库列表信息出错' + res['statusMessage']);
+                        toast('请求云端图库列表信息出错' + (res.statusMessage? res['statusMessage'] : err));
                         console.error('请求云端图库列表信息出错' + res);
                     } else {
                         tukuss = JSON.parse(res.body.string());
@@ -1939,6 +1939,7 @@ ui.drawerList.on("item_click", (item) => {
                 })
 
             }
+            
             new_ui("模板图库");
 
             break;

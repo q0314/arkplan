@@ -67,24 +67,7 @@ const prepareWebView = require(mainScriptPath + '/lib/PrepareWebView.js')
 let postMessageToWebView = () => {
     console.error('function not ready')
 }
-/*
-//重命名文件防止缓存
-let md5_list = require(mainScriptPath + "/vue_configs/config/get_md5.js")()
 
-let _md5_ = JSON.parse(files.read(mainScriptPath + '/vue_configs/config/files_md5.json'))
-for (let md5 in md5_list) {
-    log(md5, md5_list[md5].md5 == _md5_[md5].md5)
-    if (md5_list[md5].md5 != _md5_[md5].md5) {
-        console.error(md5_list[md5].md5, _md5_[md5].md5)
-
-        _md5_ = indexFilePath;
-        indexFilePath = indexFilePath.replace("index.html", "index" + md5_list[md5].md5 + ".html");
-        files.rename(_md5_, "index" + md5_list[md5].md5 + ".html");
-
-        break
-    }
-}
-*/
 let testImgInfo = {};
 var ITimg;
 var height = device.height,
@@ -213,6 +196,9 @@ let bridgeHandler = {
     uiExit: data => {
         ui.finish();
     },
+    cropTool:data=>{
+        engines.execScriptFile(mainScriptPath+"/lib/tool/图色助手/main.js");
+    },
     doTestInfo: (data, callbackId) => {
         if (data.input) {
             testImgInfo = data;
@@ -317,6 +303,9 @@ let bridgeHandler = {
         let _galleryInfo = galleryInitialization(data)
 
         if (_galleryInfo) {
+            ui.run(() => {
+                ui.webview.clearCache(true);
+            });
             postMessageToWebView({
                 callbackId: callbackId,
                 data: {
@@ -483,7 +472,7 @@ let bridgeHandler = {
      * 解压模板图库，还原模板
      */
     restoreTemplate: (data, callbackId) => {
-        
+
         if (data.deleteFile) {
             console.warn("删除无关图片文件:" + galleryInfo.dir)
             let fileList = files.listDir(galleryInfo.dir, function(name) {
@@ -493,17 +482,22 @@ let bridgeHandler = {
                 files.remove(galleryInfo.dir + _file);
             }
         }
+        ui.run(() => {
+            ui.webview.clearCache(true);
+        })
         //console.trace(galleryInfo.zip,data.zip)
-        if(data.import&&!files.exists(data.zip)){
+        if (data.import && !files.exists(data.zip)) {
             postMessageToWebView({
-                callbackId,callbackId,
-                data:{
-                    message:"压缩包不存在",
-                    isSuccess:false
+                callbackId,
+                callbackId,
+                data: {
+                    message: "压缩包不存在",
+                    isSuccess: false
                 }
             })
         }
-        let isSuccess = gallery[(galleryInfo.name == "明日计划内置模板") ? "更换图库" : "unzip_copy"]((data.import ? data.zip :galleryInfo.zip), galleryInfo.dir);
+
+        let isSuccess = gallery[(galleryInfo.name == "明日计划内置模板") ? "更换图库" : "unzip_copy"]((data.import ? data.zip : galleryInfo.zip), galleryInfo.dir);
         postMessageToWebView({
             callbackId: callbackId,
             data: {
@@ -587,11 +581,11 @@ ui.emitter.on('pause', () => {
 })
 
 ui.emitter.on('back_pressed', (e) => {
-  if (ui.webview.canGoBack()) {
-    ui.webview.goBack()
-    e.consumed = true
-    return
-  }
+    if (ui.webview.canGoBack()) {
+        ui.webview.goBack()
+        e.consumed = true
+        return
+    }
 })
 
 

@@ -10,7 +10,7 @@
       v-model="highLightStr"
       @input="elementSearchInputEvent"
       @keyup="elementSearchKeyEvent"
-      ref="inputer" placeholder="请输入关键字"
+      ref="inputer" placeholder="请输入名称或备注"
       class="element-search"
     />
   </span>

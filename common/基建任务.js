@@ -13,7 +13,7 @@ let 基建任务 = {
 
     },
     进入基建: function() {
-        console.trace(this.navigation_infrastructure)
+        //console.trace(this.navigation_infrastructure)
         if (this.navigation_infrastructure === undefined) {
             this.navigation_infrastructure = 0;
         }
@@ -26,14 +26,16 @@ let 基建任务 = {
                 threshold: 0.80,
                 area: 4,
                 saveSmallImg: "主页_基建",
+                picture_failed_further: true,
+
             }) || ITimg.matchFeatures("基建", {
                 action: 0,
                 timing: 3000,
                 area: 4,
+                matcher: 2,
                 threshold: 0.8,
                 refresh: false,
                 saveSmallImg: "主页_基建",
-                picture_failed_further: true,
             })
 
             if (!_confirm_go) {
@@ -53,16 +55,17 @@ let 基建任务 = {
         sleep(300);
 
         let _confirm;
-        let _max = 8;
+        let _max = 5;
         if (_number) {
             _max = _number;
         }
-        //检查8次，可等待十几秒的样子
+        //检查5次，可等待十秒的样子
         while (_max) {
             _confirm = ITimg.matchFeatures("基建_建造模式", {
                 action: _action,
                 timing: _timing,
                 area: 1,
+                picture_failed_further: true,
             }) || ITimg.matchFeatures("基建_进驻总览", {
                 action: _action,
                 timing: _timing,
@@ -83,6 +86,7 @@ let 基建任务 = {
     },
 
     待办处理: function() {
+        tool.Floaty_emit("展示文本", "状态", "状态：基建代办处理..");
         if (typeof this.agency_number == "undefined") {
             this.agency_number = 0;
         }
@@ -92,10 +96,11 @@ let 基建任务 = {
         this.small_bell = ITimg.matchFeatures("基建_铃铛", {
             action: 5,
             area: 2,
+            picture_failed_further: true,
         }) || ITimg.matchFeatures("基建_铃铛", {
             action: 5,
             area: 2,
-            matcher:2,
+            matcher: 2,
             threshold: 0.8,
             refresh: false,
         })
@@ -108,13 +113,13 @@ let 基建任务 = {
             this.small_bell = ITimg.matchFeatures("基建_铃铛", {
                 action: 5,
                 area: 2,
+                picture_failed_further: true,
             }) || ITimg.matchFeatures("基建_铃铛", {
                 action: 5,
                 area: 2,
-                matcher:2,
+                matcher: 2,
                 threshold: 0.75,
                 refresh: false,
-                picture_failed_further: true,
             })
             if (!this.small_bell) {
                 tips = "没有匹配到基建_铃铛, 没有待办";
@@ -127,43 +132,37 @@ let 基建任务 = {
         }
         let small_bell_xy = [this.small_bell.left + this.small_bell.w / 2, this.small_bell.top + this.small_bell.h / 2];
         MyAutomator.click.apply(MyAutomator, small_bell_xy);
-        toastLog(small_bell_xy)
+        toastLog("展开基建代办菜单", small_bell_xy);
         sleep(1200);
-
         let to_do = 0;
-        if (ITimg.matchFeatures("基建_可收获", {
-                action: 0,
-                timing: 2000,
-                area: 34,
-            })) {
-            to_do++;
-        }
-        if (ITimg.matchFeatures("基建_订单交付", {
-                action: 0,
-                timing: 2000,
-                area: 3,
-            })) {
-            to_do++;
-        }
-        sleep(1000);
-        if (ITimg.matchFeatures("基建_订单交付", {
-                action: 0,
-                timing: 2000,
-                area: 3,
-            })) {
-            to_do++;
-        }
-        if (ITimg.matchFeatures("基建_信赖", {
-                action: 0,
-                timing: 3000,
-                area: 3,
-            })) {
-            to_do++;
-        }
+        //有些商品交付完之后还需再交付一次，不知道现在？
+
+        let agency_item = ["基建_可收获", "基建_订单交付", "基建_订单交付", "基建_信赖", "基建_代办_队列轮换", "基建_代办_干员休整"];
+
+        agency_item.forEach(function(item) {
+
+            if (ITimg.matchFeatures(item, {
+                    action: 0,
+                    timing: 1200,
+                    area: 3,
+                    threshold: 0.85,
+                    picture_failed_further: true,
+                })) {
+                to_do++;
+                while (等待提交反馈至神经()) {
+                    sleep(500);
+                }
+            }
+        })
+
+
         this.fatigue_state = ITimg.matchFeatures("基建_干员疲劳", {
             timing: 500,
             area: 3,
+            action: 5,
             threshold: 0.8,
+            refresh: false,
+            picture_failed_further: true,
         });
 
         if (this.fatigue_state) {
@@ -173,18 +172,20 @@ let 基建任务 = {
         console.trace(small_bell_xy);
         MyAutomator.click.apply(MyAutomator, small_bell_xy);
         sleep(500);
+        //导航键和中枢中间的空白处，
+        small_bell_xy = [height / 2.5, width / 10];
+        //用于取消代办事项
+        MyAutomator.click.apply(MyAutomator, small_bell_xy);
+        sleep(1000);
 
         if (!to_do) {
-            //导航键和中枢中间的空白处，
-            small_bell_xy = [height / 2.5, width / 10];
-            //用于取消代办事项
-            MyAutomator.click.apply(MyAutomator, small_bell_xy);
-            sleep(1000);
             this.agency_number++;
-            if (this.agency_number >= 3) {
+            if (this.agency_number >= 2) {
                 console.verbose("重复点击代办");
                 return true;
             }
+            toastLog("似乎未完成基建代办,重复");
+
             //重试收菜
             return this.待办处理();
 
@@ -217,8 +218,8 @@ let 基建任务 = {
                     action: 0,
                     timing: 1500,
                     area: 13,
-                    matcher:2,
-                    picture_failed_further:true,
+                    matcher: 2,
+                    picture_failed_further: true,
                 }));
 
 
@@ -232,7 +233,7 @@ let 基建任务 = {
                     }
 
                 }
-        tool.Floaty_emit("面板", "展开");
+                tool.Floaty_emit("面板", "展开");
                 this.in_manufacturing = (ITimg.matchFeatures("制造站_制造中", {
                     action: 0,
                     timing: 1000,
@@ -313,16 +314,16 @@ let 基建任务 = {
                 if (ITimg.matchFeatures("基建_贸易站", {
                         action: 0,
                         timing: 1500,
-                        grayscale:false,
+                        grayscale: false,
                         area: 13,
-                    }) ||ITimg.matchFeatures("基建_贸易站", {
+                        picture_failed_further: true,
+                    }) || ITimg.matchFeatures("基建_贸易站", {
                         action: 0,
                         timing: 1500,
-                        picture_failed_further:true,
                         area: 13,
-                        grayscale:false,
-                        matcher:2,
-                    })  ) {
+                        grayscale: false,
+                        matcher: 2,
+                    })) {
                     break
                 } else {
                     if (this.identify_frequency == 1) {
@@ -346,26 +347,28 @@ let 基建任务 = {
                 area: "左半屏",
                 threshold: 0.75,
                 log_policy: true,
+                refresh: false,
             }));
-        tool.Floaty_emit("面板", "展开");
+            tool.Floaty_emit("面板", "展开");
             //开始执行贸易站无人机加速
             this.where_interface = (ITimg.matchFeatures("贸易站_获取中", {
                 action: 0,
                 timing: 1000,
                 area: 3,
+                picture_failed_further: true,
             }) || ITimg.matchFeatures("贸易站_获取中", {
                 action: 0,
                 timing: 1000,
                 area: 3,
                 threshold: 0.75,
-                picture_failed_further:true,
+                refresh: false,
             }));
             if (!this.where_interface) {
                 let tips = "无法匹配到 贸易站_获取中.png 小图，请确认图库是否匹配设备分辨率,或当前界面是否是贸易站界面";
                 toastLog(tips);
                 console.error(tips);
                 sleep(500);
-                点击返回(1,true);
+                点击返回(1, true);
                 return false;
             }
             this.drone_assistance = 3;
@@ -375,33 +378,30 @@ let 基建任务 = {
                         timing: 1000,
                         nods: 1000,
                         area: 3,
+                        picture_failed_further: true,
                     }) && !ITimg.matchFeatures("无人机_协助", {
                         action: 0,
                         timing: 1000,
                         area: 4,
                         log_policy: true,
+                        refresh: false,
+
+                        //确保进入贸易站
                     }) && (this.drone_assistance == 3)) {
-                    if ((ITimg.matchFeatures("贸易站_获取中", {
+
+                    if (ITimg.matchFeatures("贸易站_获取中", {
                             action: 0,
                             timing: 1000,
-                            area: "下半屏",
+                            area: 3,
+                            picture_failed_further: true,
                         }) || ITimg.matchFeatures("贸易站_获取中", {
                             action: 0,
                             timing: 1000,
-                            area: "下半屏",
-                            threshold: 0.75,
-                        }))) {
-                        (ITimg.matchFeatures("无人机_协助", {
-                            action: 0,
-                            timing: 1000,
-                            nods: 1000,
                             area: 3,
-                        }) || ITimg.matchFeatures("无人机_协助", {
-                            action: 0,
-                            timing: 1000,
-                            area: 4,
-                            log_policy: true,
-                        }));
+                            threshold: 0.75,
+                            refresh: false,
+                        })) {
+                        continue;
                     }
                 }
                 ITimg.matchFeatures("无人机_最多", {
@@ -419,11 +419,13 @@ let 基建任务 = {
                     action: 0,
                     timing: 2000,
                     area: 4,
+                    picture_failed_further: true,
                 }) || ITimg.matchFeatures("无人机_确定", {
                     action: 0,
                     timing: 2000,
                     area: 4,
                     threshold: 0.75,
+                    refresh: false,
                 }))
 
                 this.drone_assistance--;
@@ -445,16 +447,18 @@ let 基建任务 = {
                     action: 0,
                     timing: 1500,
                     area: 2,
+                    picture_failed_further: true,
                 }) || ITimg.matchFeatures("基建_蓝色铃铛", {
                     action: 0,
                     timing: 1500,
                     area: 2,
                     threshold: 0.75,
+                    refresh: false,
                 })) {
                 ITimg.matchFeatures("基建_订单交付", {
                     action: 0,
                     timing: 2000,
-                    area: "下半屏",
+                    area: 3,
                 });
             }
 
@@ -503,32 +507,37 @@ let 基建任务 = {
             log("会客室线索" + setting.会客室线索);
             return false;
         }
-                tool.Floaty_emit("面板", "展开");
+        tool.Floaty_emit("面板", "展开");
         tool.Floaty_emit("展示文本", "状态", "状态：准备线索处理中");
         ITimg.matchFeatures("基建_蓝色铃铛", {
             action: 0,
             timing: 1500,
             area: 2,
+            picture_failed_further: true,
         });
         ITimg.matchFeatures("基建_铃铛", {
             action: 0,
             timing: 2000,
             area: 2,
+            refresh: false,
         });
 
         let temporary_xy = ITimg.matchFeatures("基建_线索", {
             action: 5,
             timing: 1500,
             area: 2,
+            refresh: false,
         }) || ITimg.matchFeatures("基建_会客室", {
             action: 5,
             timing: 1500,
             area: 2,
+            refresh: false,
             threshold: 0.9,
         }) || ITimg.matchFeatures("基建_线索", {
             action: 5,
             timing: 1500,
             area: 2,
+            refresh: false,
             resolution: true,
             log_policy: true,
             threshold: 0.70,
@@ -553,17 +562,13 @@ let 基建任务 = {
                     timing: 1500,
                     log_policy: true,
                     area: "右上半屏",
+                    picture_failed_further: true,
                 }) && !ITimg.matchFeatures("基建_会客室", {
                     action: 0,
                     timing: 1500,
                     area: 2,
                     threshold: 0.9,
-                }) && !ITimg.matchFeatures("基建_线索", {
-                    action: 0,
-                    timing: 1500,
-                    area: "右上半屏",
-                    resolution: true,
-                    threshold: 0.70,
+                    refresh: false,
                 })) {
                 toastLog("没有匹配到基建_线索.png, 可能会客室没有新线索待处理");
                 sleep(500)
@@ -609,6 +614,7 @@ let 基建任务 = {
                 action: 0,
                 timing: 2000,
                 area: 3,
+                picture_failed_further: true,
             }) && !ITimg.matchFeatures("线索_会客室", {
                 action: 0,
                 timing: 2000,
@@ -624,18 +630,6 @@ let 基建任务 = {
             return false;
         }
 
-        ITimg.matchFeatures("线索_会客室", {
-            action: 0,
-            timing: 2000,
-            area: 3,
-        }) || ITimg.matchFeatures("线索_会客室", {
-            action: 0,
-            timing: 2000,
-            area: 3,
-            threshold: 0.75,
-            matcher: 2,
-            refresh: false,
-        })
         sleep(2000);
         if (ITimg.matchFeatures("线索_交流", {
                 timing: 3000,
@@ -774,7 +768,7 @@ let 基建任务 = {
             }
             if (!temporary_xy) {
 
-                toastLog("没有新的可领取线索");
+              log("没有新的可领取线索");
                 sleep(500);
 
                 break
@@ -787,23 +781,36 @@ let 基建任务 = {
             MyAutomator.click((temporary_xy.x + temporary_xy.w / 2) - 40, temporary_xy.bottom);
             MyAutomator.click((temporary_xy.x + temporary_xy.w / 2) - 60, temporary_xy.bottom);
 
-            sleep(1000);
+            sleep(1500);
             if (ITimg.matchFeatures("线索_全部收取", {
                     action: 0,
-                    timing: 2000,
+                    timing: 1200,
+                    area: 4,
+                    nods: 500,
+                    picture_failed_further: true,
+                }) || ITimg.matchFeatures("线索_全部收取", {
+                    action: 0,
+                    timing: 1200,
                     area: 4,
                 })) {
+                while (等待提交反馈至神经()) {
+                    sleep(500);
+                }
                 sleep(100);
                 MyAutomator.click(height / 2 + random(-10, 10), 50 + random(-5, 5));
                 sleep(500);
             } else {
 
-                ITimg.matchFeatures("线索_领取", {
+                if(ITimg.matchFeatures("线索_领取", {
                     action: 0,
-                    timing: 2000,
+                    timing: 1200,
                     area: 4,
                     refresh: false,
-                });
+                })){
+                    while (等待提交反馈至神经()) {
+                    sleep(500);
+                }
+                }
                 ITimg.matchFeatures("关闭公告", {
                     action: 0,
                     timing: 1500,
@@ -813,10 +820,8 @@ let 基建任务 = {
             }
 
         }
-
-        sleep(400);
-        //点击线索5，打开线索库
-        click(height / 2, width - width / 4);
+        //取消线索库，还原线索入口位置
+        click(height / 2, zoy(150));
         sleep(800);
         //放入线索
         let _sceneImg = ITimg.captureScreen_();
@@ -829,6 +834,7 @@ let 基建任务 = {
                     action: 0,
                     timing: 1000,
                     scale: 1,
+                    threshold: 0.75,
                     matcher: 2,
                     imageFeatures: _sceneFeatures,
                 }) || ITimg.matchFeatures("线索" + i.toString(), {
@@ -836,19 +842,27 @@ let 基建任务 = {
                     timing: 1000,
                     scale: 1,
                     matcher: 1,
+                    threshold: 0.70,
+                    grayscale: false,
                     imageFeatures: _sceneFeatures,
                 })) {
-                (ITimg.matchFeatures("线索_相关搜集者", {
-                    action: 0,
-                    timing: 3000,
-                    nods: 500,
-                    area: 4,
-                }) || ITimg.matchFeatures("线索_相关搜集者", {
-                    action: 0,
-                    timing: 3000,
-                    area: 2,
-                }))
-
+                if (ITimg.matchFeatures("线索_相关搜集者", {
+                        action: 0,
+                        timing: 12000,
+                        nods: 500,
+                        area: 4,
+                    }) || ITimg.matchFeatures("线索_相关搜集者", {
+                        action: 0,
+                        timing: 1200,
+                        area: 2,
+                    })) {
+                    while (等待提交反馈至神经()) {
+                        sleep(500);
+                    }
+                }
+                //取消线索库，还原线索入口位置
+                click(height / 2, zoy(150));
+                sleep(200);
             }
         }
         _sceneFeatures.recycle();

@@ -108,15 +108,19 @@
       <van-cell center title="灰度化:grayscale">
         <van-switch v-model="areaSelect.grayscale" size="20px"></van-switch>
       </van-cell>
-
+      <tip-block>是否灰度化大图后再计算特征，减少色彩的影响</tip-block>
+      
       <van-cell center title="成功后裁剪缓存小图:saveSmallImg">
         <van-switch v-model="areaSelect.saveSmallImg" size="20px"></van-switch>
       </van-cell>
       <tip-block>匹配成功后，从大图裁剪匹配区域的小图为缓存图，正常运行时会使用缓存图进行普通匹配而不是模板特征匹配，加快匹配速度，普通匹配失败时根据picture_failed_further是否重新进行模板特征匹配</tip-block>
+      
+      <van-cell center title="使用上次缓存的特征大图:refresh">
+        <van-switch v-model="areaSelect.refresh" size="20px" disabled></van-switch>
+      </van-cell>
+      <tip-block>如果有上次特征图...，两个不同区域小图匹配，最好第二张小图开头就设置picture_failed_further:true重新匹配计算特征，否则会导致匹配可视化结果图区域不对</tip-block>
 
         <van-floating-bubble v-model:offset="offset" axis="xy" magnetic="x" icon="play" @click="startTest" >
-           	
-		
         </van-floating-bubble>
     
       <van-cell :title="visualizationResultTitle" is-link @click="toggleVisualizationResult">
@@ -184,8 +188,9 @@ let areaSelect = ref({
   rectangular_error: 35,
   matcher: 1,
   matcherText: "BRUTEFORCE_L1",
-  grayscale: false,
+  grayscale: true,
   visualization: true,
+  refresh:true,
   action: 5,
   scale: 1,
   saveSmallImg: false,

@@ -307,14 +307,15 @@ let 唤醒 = {
             action: 5,
             area: 2,
             rectangular_error:25,
+            picture_failed_further:true,
             // imageFeatures: _sceneFeatures,
         }) || ITimg.matchFeatures("关闭公告", {
             action: 5,
             area: 2,
             matcher: 2,
+            //上一次匹配同名小图时使用缓存图常规匹配，又没有picture_failed_further重新计算特征大图，此时再进行特征匹配并refresh设置为false使用上次缓存特征大图，会导致匹配可视化结果图区域不对
             refresh: false,
             rectangular_error:35,
-            picture_failed_further:true,
             // imageFeatures: _sceneFeatures,
         });
         //  _sceneFeatures.recycle();

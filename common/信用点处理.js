@@ -85,7 +85,7 @@ let 信用处理 = {
         while (this.identify_frequency) {
             if (!ITimg.matchFeatures("好友列表", {
                     action: 0,
-                    timing: 1000,
+                    timing: 2000,
                     area: 1,
                     nods: 1000,
                 })) {
@@ -103,68 +103,77 @@ let 信用处理 = {
         while (等待提交反馈至神经()) {
             sleep(500);
         }
+        tool.Floaty_emit("展示文本", "状态", "状态：执行访问好友中");
+        function obtain_access_infrastructure() {
+            /* let button_list = ITimg.contour({
+                 canvas: "访问基建",
+                 action: 5,
+                 area: 4,
+                 isdilate: true,
+                 threshold: 240,
+                 size: 20,
+                 type: "BINARY",
+                 filter_w: zox(30),
+                 filter_h: zoy(15),
+             });
+             if (button_list && button_list.length) {
+                 let access_infrastructure;
+                 // console.info(button_list)
+                 for (let asie of button_list) {
+                     if (!access_infrastructure || access_infrastructure.y < asie.y) {
+                         access_infrastructure = asie;
+                     }
+
+                 }
+                 if (access_infrastructure) {
+                     log(access_infrastructure)
+                     return [access_infrastructure.x, access_infrastructure.y];
+                 }
+                 return false;
+             }
+             return false;
+             */
+            let friend_list_img = ITimg.contour({
+                canvas: "访问基建",
+                action: 7,
+                area: 4,
+                threshold: 240,
+                size: 0,
+                type: "BINARY",
+            });
+            let visit_result = ITimg.matchFeatures("好友_访问基建", {
+                area: 4,
+                action: 0,
+                threshold: 0.70,
+                timing: 8000,
+                nods: 1000,
+                matcher: 2,
+                grayscale: false,
+                visualization: true,
+                scale: 1,
+                saveSmallImg: true,
+                picture: friend_list_img,
+            });
+            !friend_list_img.isRecycled() && friend_list_img.recycle();
+            return visit_result;
+        }
         let _max = 3;
         while (_max) {
-            if (ITimg.matchFeatures("好友_访问基建"+_max, {
-                    action: 0,
-                    area: 4,
-                    timing: 8000,
-                    scale: 1,
-                    threshold: 0.85,
-                    refresh: (_max == 3 ? true : false),
-                    picture_failed_further: true,
-                })) {
-                break
+            console.verbose("---识别匹配访问基建按钮---", _max);
+            if (!obtain_access_infrastructure() && !_max) {
+                toast("没有匹配到好友_访问基建，无法执行好友访问");
+                console.error("没有匹配到好友_访问基建，无法执行好友访问");
+                return false;
             }
             _max--;
-        }
-        if (!_max) {
-            function obtain_access_infrastructure() {
-                let button_list = ITimg.contour({
-                    canvas: "访问基建",
-                    action: 5,
-                    area: 4,
-                    isdilate: true,
-                    threshold: 240,
-                    size: 20,
-                    type: "BINARY",
-                    filter_w: zox(30),
-                    filter_h: zoy(15),
-                });
-                if (button_list && button_list.length) {
-                    let access_infrastructure;
-                    // console.info(button_list)
-                    for (let asie of button_list) {
-                        if (!access_infrastructure || access_infrastructure.y < asie.y) {
-                            access_infrastructure = asie;
-                        }
-
-                    }
-                    if (access_infrastructure) {
-                        log(access_infrastructure)
-                        return [access_infrastructure.x, access_infrastructure.y];
-                    }
-                    return false;
-                }
-                return false;
-            }
-            let asie_ = obtain_access_infrastructure();
-
-            if (asie_) {
-                MyAutomator.click.apply(MyAutomator, asie_);
-                sleep(8000);
-            } else {
-                toast("没有找到访问基建，无法执行好友访问");
-                console.error("没有找到访问基建，无法执行好友访问");
-                return false;
-            }
         }
         tool.Floaty_emit("面板", "展开");
         if (!setting.好友限制) {
             setting.好友 = 0;
         }
         this.identify_frequency = 0;
-        while (true) {
+        this.visit_frequency = 8;
+        while (this.visit_frequency) {
             if (setting.好友 >= 10) {
                 Combat_report.record("今日累计访问" + setting.好友 + "个好友");
                 toastLog("已访问十次，达到上限，退出访问");
@@ -184,14 +193,16 @@ let 信用处理 = {
                         threshold: 0.85,
                         scale: 1,
                     })) {
+                    console.log("点击访问下一位");
                     visit = [visit.x + (visit.w / 2), visit.y + (visit.h / 2)];
                     MyAutomator.click.apply(MyAutomator, visit);
-                    sleep(2000);
+                    sleep(3000);
                     this.identify_frequency++;
                     setting.好友 = setting.好友 + 1;
                 } else {
                     this.identify_frequency--;
                     setting.好友 = setting.好友 - 1;
+                    tool.writeJSON("好友", setting.好友);
 
                     toastLog("今日访问" + setting.好友 + "个好友,没有待访问，退出");
 
@@ -200,6 +211,8 @@ let 信用处理 = {
                 sleep(1000);
                 tool.writeJSON("好友", setting.好友);
 
+            }else{
+                this.visit_frequency--;
             }
 
             tool.Floaty_emit("展示文本", "理智", "恢复" + setting.已兑理智 + "次理智，访问" + setting.好友 + "个好友");
@@ -221,8 +234,7 @@ let 信用处理 = {
 
         // let da = new Date();
         tool.Floaty_emit("展示文本", "状态", "状态：执行收集信用中");
-        toastLog("2秒后启动采购程序");
-        sleep(1500);
+        sleep(500);
 
         let _navigation = 导航定位("采购中心")
 
@@ -245,6 +257,8 @@ let 信用处理 = {
         while (等待提交反馈至神经()) {
             sleep(500);
         }
+        tool.Floaty_emit("展示文本", "状态", "状态：执行收集信用中");
+
         sleep(1000);
         if (ITimg.matchFeatures("信用交易所", {
                 action: 0,
@@ -257,13 +271,16 @@ let 信用处理 = {
                     area: 2,
                     threshold: 0.85,
                     nods: 1000,
+                    grayscale: false,
+                    picture_failed_further: true,
                 }) || ITimg.matchFeatures("收取信用", {
                     action: 0,
                     timing: 3000,
                     area: 2,
                     threshold: 0.85,
                     matcher: 2,
-                    picture_failed_further: true,
+                    grayscale: false,
+                    refresh: false,
                 })) {
                 while (等待提交反馈至神经()) {
                     sleep(500);

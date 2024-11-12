@@ -8,6 +8,7 @@
 
 <template>
   <div>
+      
     <div>
       <van-nav-bar title="模板图库管理" left-arrow @click-left="onClickLeft" class="fixed-bar">
         <template #right>
@@ -23,7 +24,6 @@
     <div class="seize-seat-upper-corner"></div>
 
     <van-row class="minimum-container">
-      <router-view></router-view> <!-- 显示当前路由的组件 -->
 
   <div>
     <div v-for="(item,index) in images" :key="index" class="image-comparison">
@@ -65,8 +65,9 @@
           <van-button class="button" type="danger" @click="deleteCacheImage(index,true)" v-if="item.cacheImage">删除</van-button>
         </div>
             </div>
+            
       </div>
-      
+    
 
     <!-- 模板图信息弹窗 -->
 <van-dialog
@@ -103,10 +104,14 @@
     </van-collapse>
   </div>
 </van-dialog>
+
+    
   </div>
   
     </van-row>
 
+<van-floating-bubble v-model:offset="offset" axis="xy" magnetic="x" icon="photo" @click="cropTool" >
+        </van-floating-bubble>
     <van-dialog v-model:show="showSetupDialog" v-cloak title="设置" :show-confirm-button="false"
       :close-on-click-overlay="true">
       <div class="dialog-content">
@@ -134,7 +139,9 @@
         </div>
       </div>
     </van-dialog>
+    
   </div>
+  
 </template>
 
 <script setup>
@@ -195,12 +202,17 @@ const currentTemplateInfo = ref({
 const currentIndex = ref(0);
 const activeNames = ref([]);
 const fileInput = ref();
+const offset = ref({
+ x:document.body.clientWidth*300/375,y:750
+})
 const visualizationPaths = computed(() => {
   const visualization = currentTemplateInfo.value?.visualization;
   return Array.isArray(visualization) ? visualization : images.value[0].templateInfo.visualization;
 });
 
-
+function cropTool(){
+    $app.invoke('cropTool',{});
+}
 function saveConfigs() {
   console.log('save gallery configs');
   mixin_common.methods.doSaveConfigs(false,images.value); 
@@ -241,12 +253,17 @@ function searchTemplate(value){
     } else if(!value&&value.k==""){
         images.value = images_copy.value;
         images_copy.value = [];
-    return true;
+        return true;
     }
    //   let query = searchQuery.value.toLowerCase();
-  let temporary = images_copy.value.filter((image)=> {
-  return image?.templateImage?.toLowerCase().includes(value.k);
-  });
+    let kLower = value.k.toLowerCase();
+    let temporary = images_copy.value.filter((image) => {
+        return (
+        (image?.templateImage && image.templateImage.toLowerCase().includes(kLower)) ||
+        (image?.templateInfo && image.templateInfo.remarks && image.templateInfo.remarks.toLowerCase().includes(kLower))
+        );
+    });
+
   if(!temporary.length){
       showToast("未搜索到该图片");
   }else{
