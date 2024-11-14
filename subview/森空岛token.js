@@ -19,7 +19,22 @@ importClass(android.graphics.drawable.GradientDrawable);
 importClass(com.google.android.material.bottomsheet.BottomSheetDialog);
 importClass(com.google.android.material.bottomsheet.BottomSheetBehavior);
 importClass(android.view.View.MeasureSpec);
+/*(function() {
+    let request = http.request;
+    // 覆盖http关键函数request，其他http返回最终会调用这个函数
+    http.request = function() {
+        try {
+            // 捕捉所有异常
+            return request.apply(http, arguments);
+        } catch (e) {
+            // 出现异常返回null
+            console.error(e);
 
+            return null;
+        }
+    }
+})();
+*/
 var securitySm = require("../lib/SecuritySm.js");
 // 设置字符编码
 const UTF8 = StandardCharsets.UTF_8;
@@ -83,54 +98,70 @@ let cred_code_url = "https://zonai.skland.com/web/v1/user/auth/generate_cred_by_
 //登出
 let logout_url = "https://as.hypergryph.com/user/info/v1/logout";
 
+var checkResults = {
+    "code":false,
+    "msg":false,
+};
 /**
  * 使用token获得认证代码,再使用认证代码获取cred和签名sign_key即token返回
  * @param {string} token 
- * @returns {Promise<*>|{cred: string, userld: string, token:string}}
+ * @returns {cred: string, userld: string, token:string}
  */
 function get_cred_by_token(token) {
     console.log("认证");
-    return new Promise((resolve, reject) => {
-        http.postJson(grant_code_url, {
-            appCode: app_code,
-            token: token,
-            type: 0
+    let tips = "认证代码请求失败";
+    let _getCt = http.postJson(grant_code_url, {
+        appCode: app_code,
+        token: token,
+        type: 0
+    }, {
+        headers: header_login
+    })
+    if (!_getCt || _getCt['statusCode'] !== 200) {
+
+        checkResults = {
+            "code": tips,
+            "msg": _getCt ? _getCt['statusMessage'] : undefined
+        }
+        return null;
+    } else {
+        _getCt = _getCt.body.json();
+        if (_getCt['msg'] != 'OK') {
+            checkResults = {
+                "code": tips,
+                "msg": _getCt['msg']
+            }
+            return null;
+        }
+
+        let grant_code = _getCt.data.code;
+        let _getCc = http.postJson(cred_code_url, {
+            kind: 1,
+            code: grant_code
         }, {
             headers: header_login
-        }, (res, err) =>{
-            if (err || res.statusCode !== 200) {
-                reject(err || {
-                    code: '认证代码请求失败',
-                    msg: res.statusMessage ? res.statusMessage : res.body.json().msg
-                });
-            } else {
-                let grant_code = res.body.json().data.code;
-                http.postJson(cred_code_url, {
-                    kind: 1,
-                    code: grant_code
-                }, {
-                    headers: header_login
-                }, (res, err) => {
-                    if (err || res.statusCode !== 200) {
-                        reject(err || {
-                            code: 'cred,token-key请求失败',
-                            msg: res.statusMessage ? res.statusMessage : res.body.json().msg
-                        });
-                    } else {
-                        res = res.body.json()
-                        let cred = res.data.cred;
-                       // let user_id = res.data.user_id;
-                        let token = res.data.token;
-                        resolve({
-                            cred: cred,
-                          //  user_id: user_id,
-                            token: token
-                        });
-                    }
-                });
+        })
+        if (!_getCc || _getCc.statusCode !== 200) {
+
+            checkResults = {
+                "code": 'cred,token-key请求失败',
+                "msg": _getCc.statusMessage ? _getCc.statusMessage : _getCc.body.json().msg
             }
-        });
-    });
+        } else {
+            _getCc = _getCc.body.json()
+            let cred = _getCc.data.cred;
+            // let user_id = res.data.user_id;
+            let token = _getCc.data.token;
+            return {
+                cred: cred,
+                //  user_id: user_id,
+                token: token
+            }
+
+        }
+
+    }
+
 }
 
 function byteArrayToHexString(bytes) {
@@ -218,51 +249,51 @@ function get_sign_header(url, method, body, oldHeader) {
  * 获取角色信息列表
  * @param {string} cred 
  * @param {string} key - 密钥
- * @return {Promise<*>} 角色列表
+ * @return {Array} 角色列表
  */
+
 
 function getBindingList(cred, key) {
     header['cred'] = cred;
     sign_key = key;
     log("获取角色列表信息");
 
-    return new Promise((resolve, reject) => {
-        http.get(binding_url, {
-            headers: get_sign_header(binding_url, 'get', null, header)
-        }, (res, err) => {
-            if (err) {
-                reject({
-                    "code": '用户登录可能失效了，请删除token,重新添加',
-                    "msg": err.message || '请求失败'
-                });
+    let _getbl = http.get(binding_url, {
+        headers: get_sign_header(binding_url, 'get', null, header)
+    })
 
+    if (!_getbl || _getbl['statusCode'] !== 200) {
+
+        checkResults = {
+            "code": '用户登录可能失效了，请删除token,重新添加',
+            "msg": _getbl ? _getbl['statusMessage'] : undefined
+        }
+        return null;
+    } else {
+        _getbl = _getbl.body.json();
+
+        if (_getbl['code'] !== 0) {
+            checkResults = {
+                "code": '用户登录可能失效了，请删除token,重新添加',
+                "msg": _getbl['message']
             }
+            return null;
+        }
 
-            let statusCode = res['statusCode'] !== 200;
-            res = res.body.json();
-
-            if (statusCode || res['code'] !== 0) {
-                reject({
-                    "code": '用户登录可能失效了，请删除token,重新添加',
-                    "msg": res['message']
-                });
-                return Promise.reject()
-            }
-
-            let v = [];
-            for (let item of res['data']['list']) {
-                if (item.appCode && item['appCode'] !== 'arknights') continue;
-                if (item.bindingList) {
-                    for (let binding of item.bindingList) {
-                        binding.defaultUid = item.defaultUid;
-                        v.push(binding);
-                    }
+        let v = [];
+        for (let item of _getbl['data']['list']) {
+            if (item.appCode && item['appCode'] !== 'arknights') continue;
+            if (item.bindingList) {
+                for (let binding of item.bindingList) {
+                    binding.defaultUid = item.defaultUid;
+                    v.push(binding);
                 }
             }
-            resolve(v);
-        });
-    });
+        }
+        return v;
+    }
 }
+
 /**
  * 登出token,使其失效
  * @param {string} token 
@@ -309,46 +340,40 @@ function list_awards(game_id, uid) {
 function do_sign(cred_resp) {
     log("使用cred,token-key获得角色列表进行签到");
     return new Promise((resolve, reject) => {
-        getBindingList(cred_resp['cred'], cred_resp['token'])
-            .then(value => {
-                //console.trace(value);
-                if (value.msg && value.code) {
-                    throw new Error(value.code + ": " + value.msg);
-                }
-                return value;
-            })
-            .then(characters => {
-                let promises = characters.map((character, index) => {
-                    const _body = {
-                        'gameId': 1,
-                        'uid': character['uid'],
-                    };
+        let bindingList = getBindingList(cred_resp['cred'], cred_resp['token'])
+        //console.trace(value);
+        if (bindingList.msg && bindingList.code) {
+            throw new Error(bindingList.code + ": " + bindingList.msg);
+        }
 
-                    console.log(character['nickName'] + " 签到中" + $ui.isUiThread());
-                    return new Promise((resolve, reject) => {
-                        threads.start(() => {
-                            let resp = http.request(sign_url, {
-                                method: "POST",
-                                body: JSON.stringify(_body),
-                                headers: get_sign_header(sign_url, 'post', _body, header),
-                                contentType: "application/json;charset=UTF-8",
-                            }).body.json();
+        if (bindingList) {
+            let promises = bindingList.map((character, index) => {
+                const _body = {
+                    'gameId': 1,
+                    'uid': character['uid'],
+                };
 
-                            console.log(character['nickName'] + " 签到请求结果: " + JSON.stringify(resp));
-                            let status = handleSignResponse(character, resp, characters, index)
-                            resolve(status);
-                        }).join();
-                    });
+                console.log(character['nickName'] + " 签到中" + $ui.isUiThread());
+                return new Promise((resolve, reject) => {
+                    threads.start(() => {
+                        let resp = http.request(sign_url, {
+                            method: "POST",
+                            body: JSON.stringify(_body),
+                            headers: get_sign_header(sign_url, 'post', _body, header),
+                            contentType: "application/json;charset=UTF-8",
+                        })
+                        //console.info(resp.body)
+                        resp = resp.body.json();
+
+                        console.log(character['nickName'] + " 签到请求结果: " + JSON.stringify(resp));
+                        let status = handleSignResponse(character, resp, bindingList, index)
+                        resolve(status);
+                    }).join();
                 });
-
-                return Promise.all(promises);
-            })
-            .then(results => {
-                resolve(results);
-            })
-            .catch(err => {
-                reject(err);
             });
+
+            resolve(Promise.all(promises))
+        }
     });
 }
 
@@ -1458,50 +1483,54 @@ function sign(tokens, callback) {
             ui_add.ok.setText("签到中..");
         }
     });
-    // 保持仅签到模块时持续运行
+
     threads.start(function() {
-        while (token_global) {
+        /* while (token_global) {
             sleep(100);
         }
-    });
-
-    tokens = tokens || do_init();
-    if (tokens.length === 0) {
-        finishSignProcess(callback);
-        return;
-    }
-
-    toastLog('森空岛签到: \n使用已存储token签到, 可用数量:' + tokens.length);
-
-    function signToken(index) {
-        if (index >= tokens.length) {
+    */
+        tokens = tokens || do_init();
+        if (tokens.length === 0) {
             finishSignProcess(callback);
             return;
         }
 
-        token_global = tokens[index];
-        get_cred_by_token(token_global)
-            .then((credToken) => {
-                //console.trace(credToken)
-                return do_sign(credToken);
-            })
-            .then((value) => {
-                //console.trace(value)
-                if (value instanceof Array) {
-                    value = value[0];
-                }
-                updateUI(value.index, value.message);
-            })
-            .catch((error) => {
-                console.error(error);
-                updateUI(index, "签到失败", error.msg);
-            })
-            .finally(() => {
-                signToken(index + 1);
-            });
-    }
+        toastLog('森空岛签到: \n使用已存储token签到, 可用数量:' + tokens.length);
 
-    signToken(0);
+        function signToken(index) {
+            if (index >= tokens.length) {
+                finishSignProcess(callback);
+                return;
+            }
+
+            token_global = tokens[index];
+            let credToken = get_cred_by_token(token_global)
+            //console.verbose(credToken)
+            if (credToken) {
+
+                do_sign(credToken).then((value) => {
+                        //console.trace(value)
+                        if (value instanceof Array) {
+                            value = value[0];
+                        }
+                        updateUI(value.index, value.message);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        updateUI(index, "签到失败", error.msg);
+                    })
+                    .finally(() => {
+                        signToken(index + 1);
+                    });
+            }else{
+                    updateUI(index, "签到失败", checkResults.msg);
+                    
+            }
+        }
+
+        signToken(0);
+    });
+
 }
 
 function updateUI(index, status, errorMsg) {
@@ -1531,51 +1560,48 @@ function finishSignProcess(callback) {
  */
 function game_info(token) {
     return new Promise((resolve, reject) => {
-        get_cred_by_token(token)
-            .then(value => {
-                header['cred'] = value['cred'];
-                sign_key = value['token'];
-                return getBindingList(header['cred'], sign_key);
-            })
-            .then(result => {
-                if (result.msg) {
-                    toastLog(result.code);
-                    console.error(result.msg);
-                    throw new Error(result.msg);
-                }
-                let uid = roles_list.findIndex(curr => curr.token == token) !== -1
-                    ? roles_list[roles_list.findIndex(curr => curr.token == token)].defaultUid
-                    : result[0]['uid'];
+        let bindingList;
+        let credToken = get_cred_by_token(token)
+        if (credToken) {
 
-                console.verbose("获取角色uid:" + uid + "数据");
+            header['cred'] = credToken['cred'];
+            sign_key = credToken['token'];
+            bindingList = getBindingList(header['cred'], sign_key);
+        }
 
-                return http.get(game_info_url + "?uid=" + uid, {
-                    headers: get_sign_header(game_info_url + "?uid=" + uid, 'get', null, header)
-                });
-            })
-            .then(res => {
-                if (res.statusCode !== 200) {
-                    reject({
-                        "code": '获得角色数据失败',
-                        "msg": res.statusMessage
-                    });
-                } else {
-                    let content = gzipInputStream(res.body.bytes());
-                    if (!content) {
-                        reject({
-                            "code": '获得角色数据失败',
-                            "msg": content
-                        });
-                    }
-                    resolve(getGameInfo(content));
-                }
-            })
-            .catch(error => {
-                reject({
-                    "code": error.code,
-                    "msg": error.msg
-                });
+        if (!bindingList || bindingList.msg) {
+            bindingList = bindingList ? bindingList : checkResults;
+            toastLog(bindingList.code);
+            console.error(bindingList.msg);
+            throw new Error(bindingList.msg);
+        }
+
+        let uid = roles_list.findIndex(curr => curr.token == token) !== -1 ?
+            roles_list[roles_list.findIndex(curr => curr.token == token)].defaultUid :
+            bindingList[0]['uid'];
+
+        console.verbose("获取角色uid:" + uid + "数据");
+
+        let res = http.get(game_info_url + "?uid=" + uid, {
+            headers: get_sign_header(game_info_url + "?uid=" + uid, 'get', null, header)
+        });
+
+        if (res.statusCode !== 200) {
+            reject({
+                "code": '获得角色数据失败',
+                "msg": res.statusMessage
             });
+        } else {
+            let content = gzipInputStream(res.body.bytes());
+            if (!content) {
+                reject({
+                    "code": '获得角色数据失败',
+                    "msg": content
+                });
+            }
+            resolve(getGameInfo(content));
+        }
+
     });
 }
 
@@ -1586,8 +1612,11 @@ function getGameInfo(tree) {
 
     function getWeightFromId(id) {
         const weights = {
-            "1": 2, "4": 2,
-            "2": 3, "13": 3, "14": 3
+            "1": 2,
+            "4": 2,
+            "2": 3,
+            "13": 3,
+            "14": 3
         };
         return weights[id] || 5;
     }
@@ -1636,13 +1665,13 @@ function getGameInfo(tree) {
     };
 
     // AP
-//分情况
+    //分情况
     //如果currentAp本身大于max（一般来说recoverTime  == -1）,直接取current.
     //然后正常计算自然恢复理智
     //如果currentTS > recoverTs, 取max
     //如果currentTs < recoverTS, 取计算值。
-    
-  GameInfo.ap = tree.data.status.ap;
+
+    GameInfo.ap = tree.data.status.ap;
     GameInfo.ap.currentTs = currentTs;
 
     // Train
@@ -1663,11 +1692,17 @@ function getGameInfo(tree) {
     // Recruit
     GameInfo.recruit.isNull = isNull(tree.data.recruit);
     if (!GameInfo.recruit.isNull) {
-        let unable = 0, complete = 0, finishTs = -1;
+        let unable = 0,
+            complete = 0,
+            finishTs = -1;
         tree.data.recruit.forEach(node => {
             switch (node.state) {
-                case 0: unable++; break;
-                case 3: complete++; break;
+                case 0:
+                    unable++;
+                    break;
+                case 3:
+                    complete++;
+                    break;
                 case 2:
                     if (node.finishTs < currentTs) complete++;
                     finishTs = Math.max(node.finishTs, finishTs);
@@ -1705,7 +1740,7 @@ function getGameInfo(tree) {
         GameInfo.tower.highTotal = node_high.total;
         GameInfo.tower.lowCurrent = node_low.current;
         GameInfo.tower.lowTotal = node_low.total;
-    
+
 
     }
 
@@ -1725,7 +1760,7 @@ function getGameInfo(tree) {
         } else {
             GameInfo.trading.status = "获取中"
         }
-                GameInfo.trading.value = stock;
+        GameInfo.trading.value = stock;
         GameInfo.trading.maxValue = stockLimit;
     }
 
@@ -1742,16 +1777,16 @@ function getGameInfo(tree) {
                     ((node.completeWorkTime - node.lastUpdateTime) / (node_max - node.complete)));
             return [v + node_value, m + node_max];
         }, [0, 0]);
-        
-         if (value >= max) {
+
+        if (value >= max) {
             GameInfo.manufactures.status = "已上限"
         } else {
             GameInfo.manufactures.status = "生产中"
         }
-            GameInfo.manufactures.value = value;
+        GameInfo.manufactures.value = value;
         GameInfo.manufactures.maxValue = max;
-    
-        
+
+
     }
 
     //Labor 无人机
@@ -1763,7 +1798,11 @@ function getGameInfo(tree) {
         node_labor.maxValue
     );
     let labor_remain = Math.max(0, node_labor.remainSecs - (currentTs - node_labor.lastUpdateTime));
-    GameInfo.labor = { value: labor_value, maxValue: node_labor.maxValue, recoverTime: labor_remain };
+    GameInfo.labor = {
+        value: labor_value,
+        maxValue: node_labor.maxValue,
+        recoverTime: labor_remain
+    };
 
     // Routine Day and Week
     if (!isNull(tree.data.routine)) {
@@ -1773,7 +1812,10 @@ function getGameInfo(tree) {
             current: convertTs2Day(currentTs - 14400) > convertTs2Day(lastOnLineTs - 14400) ? 0 : node_day.current,
             total: node_day.total
         };
-        GameInfo.routineWeek = { current: node_week.current, total: node_week.total };
+        GameInfo.routineWeek = {
+            current: node_week.current,
+            total: node_week.total
+        };
     }
 
     //Dormitories
@@ -1781,7 +1823,7 @@ function getGameInfo(tree) {
     //恢复效率：基础值level + 氛围值/2500。如满级宿舍＋5000氛围值 = 一小时恢复4点
     //60 * 60 / 14,40000 (currentTs - lastUpdateTime) * 100 *speed + currentAp >=? 8640000
     //level1: 1.6, level2:1.7, level3:1.8, level4:1.9, level5:2
-   
+
     let node_dormitories = tree.data.building.dormitories;
     GameInfo.dormitories.isNull = isNull(node_dormitories);
     if (!GameInfo.dormitories.isNull) {
@@ -1789,7 +1831,7 @@ function getGameInfo(tree) {
             let speed = (node.level * 0.1 + 1.5 + node.comfort / 2500) * 100;
             return node.chars.reduce(([m, v], chr) => {
                 m++;
-                if ((chr.ap - chr.lastApAddTime) > 86400 || 
+                if ((chr.ap - chr.lastApAddTime) > 86400 ||
                     (currentTs - chr.lastApAddTime) * speed + chr.ap >= 8640000) {
                     v++;
                 }
@@ -1806,20 +1848,21 @@ function getGameInfo(tree) {
     if (!GameInfo.meeting.isNull) {
         let sharing = node_meeting.clue.sharing;
         let shareCompleteTime = node_meeting.clue.shareCompleteTime;
-        GameInfo.meeting.status = !sharing ? 
+        GameInfo.meeting.status = !sharing ?
             (node_meeting.clue.own >= 10 ? '线索上限' : '收集中') :
             (shareCompleteTime > currentTs ? '交流中' : '交流完成');
         GameInfo.meeting.value = node_meeting.clue.board.length;
     }
 
     // Tired
-     //干员疲劳,数据太久的话不准,要遍历基建群
-   
+    //干员疲劳,数据太久的话不准,要遍历基建群
+
     GameInfo.tired.value = tree.data.building.tiredChars.length;
 
     console.info(GameInfo);
     return GameInfo;
 }
+
 function gzipInputStream(content) {
     let gzipInputStream_;
     try {
