@@ -737,8 +737,8 @@ let 关卡代理 = {
                 _xy[1] = _xy[1] - staging.h;
                 MyAutomator.click.apply(MyAutomator, _xy);
                 sleep(200);
-                return true;
             }
+            return true;
         } else if (ITimg.matchFeatures("代理_未勾", {
                 action: 0,
                 timing: 1000,
