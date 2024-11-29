@@ -362,7 +362,7 @@ function do_sign(cred_resp) {
                             headers: get_sign_header(sign_url, 'post', _body, header),
                             contentType: "application/json;charset=UTF-8",
                         })
-                        //console.info(resp.body)
+                        console.info(resp.body);
                         resp = resp.body.json();
 
                         console.log(character['nickName'] + " 签到请求结果: " + JSON.stringify(resp));
@@ -1893,7 +1893,7 @@ let intent = engines.myEngine().execArgv.intent;
 
 //定时任务启动的
 if (intent != null) {
-
+   sleep(1000);
     console.info('=========sign==========');
 
     sign();

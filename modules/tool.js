@@ -107,7 +107,7 @@ function autoService(force, mode) {
                                 }
                                 wuzhangai = false;
 
-                            }, 2000);
+                            }, 3000);
                         }
                     } else {
                         return true
@@ -115,7 +115,7 @@ function autoService(force, mode) {
 
                     }
 
-                }, 550)
+                }, 1550)
 
             } else {
                 return false
@@ -173,7 +173,7 @@ function autoService(force, mode) {
                     }
                     wuzhangai = false;
 
-                }, 2000);
+                }, 3000);
                 return false
             }
         }

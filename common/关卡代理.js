@@ -676,7 +676,7 @@ let 关卡代理 = {
         }, 1000) //总循环
     },
     检验已选中关卡: function(_action, _refresh_numer) {
-
+console.verbose("---检验是否选中可代理关卡---");
         //有开始行动界面才能判断
         let _operation = ITimg.matchFeatures("行动_普通", {
             action: _action,
@@ -699,6 +699,7 @@ let 关卡代理 = {
             refresh: false,
 
         })
+        
         if (_action == 5 && _operation && !_refresh_numer) {
             return _operation;
         }
