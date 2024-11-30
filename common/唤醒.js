@@ -5,11 +5,15 @@ let 唤醒 = {
     main: function() {
         tool.Floaty_emit("展示文本", "状态", "状态：唤醒程序运行中...");
 
-        sleep(1500);
+        sleep(1000);
+        while (等待提交反馈至神经()) {
+            sleep(1000)
+        }
         while (true) {
             if (this.确认返回主页()) {
-                this.取消公告();
-                return true;
+                if (this.取消公告()) {
+                    return true;
+                }
             }
 
             启动应用(true);
@@ -251,11 +255,11 @@ let 唤醒 = {
             })) {
             this.检查更新();
             //防止特殊情况下，检查更新未识别到客户端已过时，下面的点击命令又执行了，跳转到商店要更新的情况
-           /* if (textContains(displayText["更新"]).findOne(500)) {
-                this.检查更新();
-                // continue;
-                return false;
-            }*/
+            /* if (textContains(displayText["更新"]).findOne(500)) {
+                 this.检查更新();
+                 // continue;
+                 return false;
+             }*/
             MyAutomator.click(height / 2, width - 100);
             sleep(1000);
             getpackage = tool.currentPackage();
@@ -306,8 +310,8 @@ let 唤醒 = {
         let _close = ITimg.matchFeatures("关闭公告", {
             action: 5,
             area: 2,
-            rectangular_error:25,
-            picture_failed_further:true,
+            rectangular_error: 25,
+            picture_failed_further: true,
             // imageFeatures: _sceneFeatures,
         }) || ITimg.matchFeatures("关闭公告", {
             action: 5,
@@ -315,7 +319,7 @@ let 唤醒 = {
             matcher: 2,
             //上一次匹配同名小图时使用缓存图常规匹配，又没有picture_failed_further重新计算特征大图，此时再进行特征匹配并refresh设置为false使用上次缓存特征大图，会导致匹配可视化结果图区域不对
             refresh: false,
-            rectangular_error:35,
+            rectangular_error: 35,
             // imageFeatures: _sceneFeatures,
         });
         //  _sceneFeatures.recycle();
@@ -355,14 +359,19 @@ let 唤醒 = {
                     //
                     rewardimg.recycle();
                     //双重保险
-                    if (this.确认主页() && this.确认主页()) {
-                        return true;
-
+                    if (this.确认主页()) {
+                        while (等待提交反馈至神经()) {
+                            sleep(1000);
+                        }
+                        if (this.确认主页()) {
+                            return true;
+                        }
                     } else {
                         if (this.topic_tips()) {
                             break
                         }
                     }
+                    
                 } else {
                     (ITimg.ocr("立即领取", {
                         action: 0,
