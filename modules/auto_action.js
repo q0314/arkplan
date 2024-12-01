@@ -59,12 +59,7 @@ let auto_action = {
      */
     performGlobalAction(action) {
         //无障碍服务实例
-        let service;
-        try {
-            service = com.stardust.autojs.core.accessibility.AccessibilityService.Companion.getInstance();
-        } catch (e) {
-            service = com.mrfz.qiao.AccessibilityService.Companion.getInstance();
-        }
+        let service = runtime.accessibilityBridge.getService();
         if (!service) {
             throw new Error("无障碍服务未开启或异常");
         }
