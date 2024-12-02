@@ -13,6 +13,8 @@ let 唤醒 = {
             if (this.确认返回主页()) {
                 if (this.取消公告()) {
                     return true;
+                }else if(this.确认返回主页()){
+                    return true
                 }
             }
 
