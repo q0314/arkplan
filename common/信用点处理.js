@@ -100,49 +100,26 @@ let 信用处理 = {
                 break;
             }
         }
+        
+        sleep(1000);
         while (等待提交反馈至神经()) {
             sleep(500);
         }
         tool.Floaty_emit("展示文本", "状态", "状态：执行访问好友中");
-        function obtain_access_infrastructure() {
-            /* let button_list = ITimg.contour({
-                 canvas: "访问基建",
-                 action: 5,
-                 area: 4,
-                 isdilate: true,
-                 threshold: 240,
-                 size: 20,
-                 type: "BINARY",
-                 filter_w: zox(30),
-                 filter_h: zoy(15),
-             });
-             if (button_list && button_list.length) {
-                 let access_infrastructure;
-                 // console.info(button_list)
-                 for (let asie of button_list) {
-                     if (!access_infrastructure || access_infrastructure.y < asie.y) {
-                         access_infrastructure = asie;
-                     }
-
-                 }
-                 if (access_infrastructure) {
-                     log(access_infrastructure)
-                     return [access_infrastructure.x, access_infrastructure.y];
-                 }
-                 return false;
-             }
-             return false;
-             */
+        function obtain_access_infrastructure(_max) {
+            let visit_result;
+            if(_max>=4){
+                
             let friend_list_img = ITimg.contour({
                 canvas: "访问基建",
                 action: 7,
-                area: 4,
+                area: _max==5 ? 4:24,
                 threshold: 240,
                 size: 0,
                 type: "BINARY",
             });
-            let visit_result = ITimg.matchFeatures("好友_访问基建", {
-                area: 4,
+            visit_result = ITimg.matchFeatures("好友_访问基建", {
+                area: _max==5 ? 4:24,
                 action: 0,
                 threshold: 0.70,
                 timing: 8000,
@@ -155,12 +132,33 @@ let 信用处理 = {
                 picture: friend_list_img,
             });
             !friend_list_img.isRecycled() && friend_list_img.recycle();
+            
+            }else {
+            
+            visit_result = ITimg.matchFeatures("好友_访问基建", {
+                area: _max ==1? 24 : 4,
+                action: 0,
+                threshold: 0.70,
+                timing: 8000,
+                nods: 1000,
+                matcher: _max ==3?2:1,
+                grayscale: _max ==3?false:true,
+                visualization: true,
+                scale: 1,
+                saveSmallImg: true,
+            });
+                
+            }
+            
             return visit_result;
         }
-        let _max = 3;
+        
+        let _max = 5;
         while (_max) {
             console.verbose("---识别匹配访问基建按钮---", _max);
-            if (!obtain_access_infrastructure() && !_max) {
+            if (obtain_access_infrastructure(_max)){
+                break;
+            }else if(_max==1) {
                 toast("没有匹配到好友_访问基建，无法执行好友访问");
                 console.error("没有匹配到好友_访问基建，无法执行好友访问");
                 return false;
