@@ -13,18 +13,12 @@ let 唤醒 = {
             if (this.确认返回主页()) {
                 if (this.取消公告()) {
                     return true;
-                }else if(this.确认返回主页()){
+                } else if (this.确认返回主页()) {
                     return true
                 }
             }
 
             启动应用(true);
-            try {
-                press(height / 2, width - zoy(100), 100);
-            } catch (e) {
-
-                console.error(e)
-            }
             sleep(100);
             this.开始唤醒();
             sleep(500);
@@ -52,7 +46,7 @@ let 唤醒 = {
                 part: true,
                 refresh: false,
             })) {
-            sleep(500);
+            sleep(200);
             click(height / 2, width - zoy(60));
             click(height / 2, zoy(50));
             tool.Floaty_emit("展示文本", "状态", "状态：客户端已过时");
@@ -62,7 +56,7 @@ let 唤醒 = {
                  // 对于应用窗口，他的title属性就是应用的名称，因此可以通过title属性来判断一个应用
                  return window.title == "TapTap";
              });*/
-
+            sleep(2000);
             let update_app;
             while (true) {
                 //   tool.Floaty_emit("展示文本", "状态", "状态：确认可在TapTap更新");
@@ -74,7 +68,7 @@ let 唤醒 = {
                 }
                 sleep(500);
 
-                update_app = id("com.taptap.app.middle:id/btn_container").findOne(2000);
+                update_app = id("com.taptap.app.middle:id/gd_bottom_view_main_btn").findOne(2000);
                 if (update_app) {
                     if (!update_app.clickable() || !update_app.click()) {
                         update_app = update_app.bounds();
@@ -312,7 +306,7 @@ let 唤醒 = {
         let _close = ITimg.matchFeatures("关闭公告", {
             action: 5,
             area: 2,
-            matcher:1,
+            matcher: 1,
             rectangular_error: 25,
             picture_failed_further: true,
             // imageFeatures: _sceneFeatures,
@@ -320,13 +314,15 @@ let 唤醒 = {
             action: 5,
             area: 2,
             matcher: 2,
-            threshold:0.70,
+            threshold: 0.70,
             //上一次匹配同名小图时使用缓存图常规匹配，又没有picture_failed_further重新计算特征大图，此时再进行特征匹配并refresh设置为false使用上次缓存特征大图，会导致匹配可视化结果图区域不对
             refresh: false,
             rectangular_error: 35,
             // imageFeatures: _sceneFeatures,
         });
         //  _sceneFeatures.recycle();
+        //限制获得物资区域以免误识别
+        let obtainMaterialsRrea = [height/4,0,parseInt(height/1.5),width/2];
         if (_close) {
             while (true) {
                 //长时间持有图片.需手动释放
@@ -351,7 +347,7 @@ let 唤醒 = {
                     timing: 1000,
                     picture: images.copy(rewardimg),
                     action: 1,
-                    area: 12,
+                    area: obtainMaterialsRrea,
                     picture_failed_further: true,
                 })
                 if (!this.frequency || ITimg.matchFeatures("关闭公告", {
@@ -375,7 +371,7 @@ let 唤醒 = {
                             break
                         }
                     }
-                    
+
                 } else {
                     (ITimg.ocr("立即领取", {
                         action: 0,
@@ -408,7 +404,7 @@ let 唤醒 = {
         } else if (ITimg.matchFeatures("获得物资", {
                 timing: 1000,
                 action: 1,
-                area: 12,
+                area: obtainMaterialsRrea,
             })) {
             this.取消公告();
         }
