@@ -99,8 +99,8 @@ let cred_code_url = "https://zonai.skland.com/web/v1/user/auth/generate_cred_by_
 let logout_url = "https://as.hypergryph.com/user/info/v1/logout";
 
 var checkResults = {
-    "code":false,
-    "msg":false,
+    "code": false,
+    "msg": false,
 };
 /**
  * 使用token获得认证代码,再使用认证代码获取cred和签名sign_key即token返回
@@ -147,6 +147,7 @@ function get_cred_by_token(token) {
                 "code": 'cred,token-key请求失败',
                 "msg": _getCc.statusMessage ? _getCc.statusMessage : _getCc.body.json().msg
             }
+            return null
         } else {
             _getCc = _getCc.body.json()
             let cred = _getCc.data.cred;
@@ -416,19 +417,22 @@ function save(token) {
     let message = "您的鹰角网络通行证TOKEN已经保存";
 
     toastLog("获取角色信息中...");
-    get_cred_by_token(token)
-        .then(value => {
-            if (value.msg && value.code) {
-                throw new Error(value.msg);
-            }
-            return getBindingList(value['cred'], value['token']);
-        })
-        .then(result => {
-            console.trace(result);
-            if (!result) {
-                return false
-            }
-            let altered = processBindingList(result, token);
+    let getCT = get_cred_by_token(token)
+    if (!getCT) {
+        message = checkResults.code + ": " + checkResults.msg;
+        console.error(message);
+        snackbar(message);
+
+    } else {
+
+        let getBL = getBindingList(getCT['cred'], getCT['token']);
+        if (!getBL) {
+            message = checkResults.code + ": " + checkResults.msg;
+            console.error(message);
+            snackbar(message);
+        } else {
+
+            let altered = processBindingList(getBL, token);
             if (!altered) {
                 let firstItem = result.find(item => item.defaultUid === item['uid']);
                 roles_list.push({
@@ -447,18 +451,9 @@ function save(token) {
             ui.post(() => {
                 if (ui_add) ui_add.viewpager.setCurrentItem(1);
             }, 200);
-        })
-        .catch((error) => {
-            if (error && error.code) {
-                message = `${error.code}: ${error.msg}`;
-            } else {
-                message = error.message;
-            }
-            console.trace(error);
-            console.error(message);
-            snackbar(message);
-            return Promise.reject();
-        });
+        }
+
+    }
 }
 
 function processBindingList(result, token) {
@@ -491,54 +486,54 @@ function processBindingList(result, token) {
 function input_mode(callback) {
 
 
-    (function() {
+    (function () {
 
         util.extend(WrapContentHeightViewPager, ui.Widget);
 
         function WrapContentHeightViewPager() {
             ui.Widget.call(this);
             this.heightMeasured = 0;
-            this.render = function() {
+            this.render = function () {
                 return JavaAdapter(
                     com.stardust.autojs.core.ui.widget.JsViewPager, {
 
-                        WrapContentHeightViewPager(context, attrs) {
-                            this.super$(context, attrs);
-                        },
-                        onMeasure(widthMeasureSpec, heightMeasureSpec) {
-                            child = this.getChildAt(this.getCurrentItem()).getChildAt(0);
-                            //测量子view尺寸
-                            child.measure(widthMeasureSpec, View$MeasureSpec.makeMeasureSpec(0, View$MeasureSpec.UNSPECIFIED));
-                            //获取子view最大高度
-                            this.heightMeasured = child.getMeasuredHeight();
-                            if (this.heightMeasured) {
-                                ui_add_height = this.heightMeasured
-                                //重设viewpager高度
-                                heightMeasureSpec = View$MeasureSpec.makeMeasureSpec(this.heightMeasured, View$MeasureSpec.EXACTLY);
-                            } else {
-                                //获取上一次的高度
-                                heightMeasureSpec = View$MeasureSpec.makeMeasureSpec(ui_add_height, View$MeasureSpec.EXACTLY);
-                            }
-
-                            this.super$onMeasure(widthMeasureSpec, heightMeasureSpec);
-                        },
-
-                        resetHeight(current) {
-
-                            if (this.heightMeasured) {
-                                layoutParams = this.getLayoutParams();
-                                if (layoutParams == null) {
-                                    layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, this.heightMeasured);
-                                } else {
-                                    layoutParams.height = this.heightMeasured;
-                                }
-
-                                this.setLayoutParams(layoutParams);
-                            }
-                        },
-
-
+                    WrapContentHeightViewPager(context, attrs) {
+                        this.super$(context, attrs);
                     },
+                    onMeasure(widthMeasureSpec, heightMeasureSpec) {
+                        child = this.getChildAt(this.getCurrentItem()).getChildAt(0);
+                        //测量子view尺寸
+                        child.measure(widthMeasureSpec, View$MeasureSpec.makeMeasureSpec(0, View$MeasureSpec.UNSPECIFIED));
+                        //获取子view最大高度
+                        this.heightMeasured = child.getMeasuredHeight();
+                        if (this.heightMeasured) {
+                            ui_add_height = this.heightMeasured
+                            //重设viewpager高度
+                            heightMeasureSpec = View$MeasureSpec.makeMeasureSpec(this.heightMeasured, View$MeasureSpec.EXACTLY);
+                        } else {
+                            //获取上一次的高度
+                            heightMeasureSpec = View$MeasureSpec.makeMeasureSpec(ui_add_height, View$MeasureSpec.EXACTLY);
+                        }
+
+                        this.super$onMeasure(widthMeasureSpec, heightMeasureSpec);
+                    },
+
+                    resetHeight(current) {
+
+                        if (this.heightMeasured) {
+                            layoutParams = this.getLayoutParams();
+                            if (layoutParams == null) {
+                                layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, this.heightMeasured);
+                            } else {
+                                layoutParams.height = this.heightMeasured;
+                            }
+
+                            this.setLayoutParams(layoutParams);
+                        }
+                    },
+
+
+                },
                     context
                 );
             };
@@ -555,97 +550,97 @@ function input_mode(callback) {
         srcSize: 25,
         textSize: 10,
         data: [{
-                name: "删除",
-                icon: "ic_cancel_black_48dp",
-                function: function(view, token) {
+            name: "删除",
+            icon: "ic_cancel_black_48dp",
+            function: function (view, token) {
 
-                    roles_list.find((currentValue, index, arr) => {
-                        if (currentValue.token == token) {
-                            try {
-                                roles_list.splice(index, 1);
-                                //通知数据更新
-                                ui_add.roles_list.removeView(ui_add.roles_list.getChildAt(index));
-                                token_storage.put("arknights_binding", roles_list);
-                            } catch (e) {
-                                toastLog("删除失败,原因:" + e)
-                            }
-                            return;
+                roles_list.find((currentValue, index, arr) => {
+                    if (currentValue.token == token) {
+                        try {
+                            roles_list.splice(index, 1);
+                            //通知数据更新
+                            ui_add.roles_list.removeView(ui_add.roles_list.getChildAt(index));
+                            token_storage.put("arknights_binding", roles_list);
+                        } catch (e) {
+                            toastLog("删除失败,原因:" + e)
                         }
                         return;
-
-                    })
-                },
-            },
-            {
-                name: "签到",
-                icon: "ic_play_circle_filled_black_48dp",
-                function: function(view, token) {
-
-                    sign([token], function() {
-                        ui.run(() => {
-                            for (let i = 0; i < ui_add.roles_list.getChildCount(); i++) {
-                                ui_add.roles_list.removeView(ui_add.roles_list.getChildAt(i));
-                            };
-                            for (let _roles of roles_list) {
-                                addroles_view(_roles);
-                            };
-                        });
-                    });
-
-
-                },
-            },
-            {
-                name: "复制",
-                icon: "ic_healing_black_48dp",
-                function: function(view, token) {
-
-                    token = {
-                        "code": 0,
-                        "data": {
-                            "content": token
-                        },
-                        "msg": "接口会返回您的鹰角网络通行证账号的登录凭证，此凭证可以用于鹰角网络账号系统校验您登录的有效性。泄露登录凭证属于极度危险操作，为了您的账号安全，请勿将此凭证以任何形式告知他人！"
                     }
+                    return;
 
-                    setClip(JSON.stringify(token));
-                    console.info(JSON.stringify(token));
-                    snackbar("已复制token,请谨慎保存,切勿泄露")
-                },
-            }, {
-                name: "登出",
-                icon: "ic_shuffle_black_48dp",
-                function: function(view, token) {
-                    logOutByToken(token)
-                        .then((value) => {
-                            snackbar(value);
-                            roles_list.find((currentValue, index, arr) => {
-                                if (currentValue.token == token) {
-                                    try {
-                                        roles_list.splice(index, 1);
-                                        //删除视图
-                                        ui.run(() => {
-                                            ui_add.roles_list.removeView(ui_add.roles_list.getChildAt(index));
-                                        });
-                                        token_storage.put("arknights_binding", roles_list);
-                                    } catch (e) {
-                                        toastLog("更新视图失败,原因:" + e)
-                                    }
-                                    return;
+                })
+            },
+        },
+        {
+            name: "签到",
+            icon: "ic_play_circle_filled_black_48dp",
+            function: function (view, token) {
+
+                sign([token], function () {
+                    ui.run(() => {
+                        for (let i = 0; i < ui_add.roles_list.getChildCount(); i++) {
+                            ui_add.roles_list.removeView(ui_add.roles_list.getChildAt(i));
+                        };
+                        for (let _roles of roles_list) {
+                            addroles_view(_roles);
+                        };
+                    });
+                });
+
+
+            },
+        },
+        {
+            name: "复制",
+            icon: "ic_healing_black_48dp",
+            function: function (view, token) {
+
+                token = {
+                    "code": 0,
+                    "data": {
+                        "content": token
+                    },
+                    "msg": "接口会返回您的鹰角网络通行证账号的登录凭证，此凭证可以用于鹰角网络账号系统校验您登录的有效性。泄露登录凭证属于极度危险操作，为了您的账号安全，请勿将此凭证以任何形式告知他人！"
+                }
+
+                setClip(JSON.stringify(token));
+                console.info(JSON.stringify(token));
+                snackbar("已复制token,请谨慎保存,切勿泄露")
+            },
+        }, {
+            name: "登出",
+            icon: "ic_shuffle_black_48dp",
+            function: function (view, token) {
+                logOutByToken(token)
+                    .then((value) => {
+                        snackbar(value);
+                        roles_list.find((currentValue, index, arr) => {
+                            if (currentValue.token == token) {
+                                try {
+                                    roles_list.splice(index, 1);
+                                    //删除视图
+                                    ui.run(() => {
+                                        ui_add.roles_list.removeView(ui_add.roles_list.getChildAt(index));
+                                    });
+                                    token_storage.put("arknights_binding", roles_list);
+                                } catch (e) {
+                                    toastLog("更新视图失败,原因:" + e)
                                 }
                                 return;
+                            }
+                            return;
 
-                            })
-                        }, (error) => {
-                            snackbar(error);
                         })
+                    }, (error) => {
+                        snackbar(error);
+                    })
 
-                },
-            }
+            },
+        }
         ],
     }
 
-    let Tabs_btn_layout = function() {
+    let Tabs_btn_layout = function () {
         util.extend(Tabs_btn_layout, ui.Widget);
 
         function Tabs_btn_layout() {
@@ -678,20 +673,20 @@ function input_mode(callback) {
 
 
         }
-        Tabs_btn_layout.prototype.render = function() {
+        Tabs_btn_layout.prototype.render = function () {
             return (
                 //xml直接使用{{变量}}不生效, 而且list中传输item会导致初始设置ui的速度变慢,报错tabs_data读不到. 还是在后续动态设置吧
                 <vertical id="_bg" w="match_parent" padding="0 3" gravity="center"   > {/* bg="{{tabs_data.bg}}" */}
-                            <img id="_src" /> {/** h="{{tabs_data.srcSize}}" tint="{{tabs_data.srcColor}}" */}
-                            <text w="auto" id="_text" /> {/** textSize="{{tabs_data.textSize}}" textColor="{{tabs_data.srcColor}}" */}
-                        </vertical>
+                    <img id="_src" /> {/** h="{{tabs_data.srcSize}}" tint="{{tabs_data.srcColor}}" */}
+                    <text w="auto" id="_text" /> {/** textSize="{{tabs_data.textSize}}" textColor="{{tabs_data.srcColor}}" */}
+                </vertical>
             )
         }
         ui.registerWidget("tabs_btn_layout", Tabs_btn_layout);
         return Tabs_btn_layout;
     }()
 
-    let Tabs_layout = function() {
+    let Tabs_layout = function () {
         util.extend(Tabs_layout, ui.Widget);
 
         function Tabs_layout() {
@@ -738,24 +733,24 @@ function input_mode(callback) {
             });
 
         }
-        Tabs_layout.prototype.render = function() {
+        Tabs_layout.prototype.render = function () {
             return (
                 <card w="*" h="auto" cardElevation="10" >
-                            <horizontal id="_tabs" />
-                            
-                            <horizontal weightSum="4" h="20" layout_gravity="center_vertical">
-                                <frame layout_weight="1" >
-                                    <View bg="#e8e8e8" w="1" layout_gravity="right" />
-                                </frame>
-                                <frame layout_weight="1" >
-                                    <View bg="#e8e8e8" w="1" layout_gravity="right" />
-                                </frame>
-                                <frame layout_weight="1" >
-                                    <View bg="#e8e8e8" w="1" layout_gravity="right" />
-                                </frame>
-                                
-                            </horizontal>
-                        </card>
+                    <horizontal id="_tabs" />
+
+                    <horizontal weightSum="4" h="20" layout_gravity="center_vertical">
+                        <frame layout_weight="1" >
+                            <View bg="#e8e8e8" w="1" layout_gravity="right" />
+                        </frame>
+                        <frame layout_weight="1" >
+                            <View bg="#e8e8e8" w="1" layout_gravity="right" />
+                        </frame>
+                        <frame layout_weight="1" >
+                            <View bg="#e8e8e8" w="1" layout_gravity="right" />
+                        </frame>
+
+                    </horizontal>
+                </card>
             )
         }
         ui.registerWidget("tabs-layout", Tabs_layout);
@@ -763,105 +758,105 @@ function input_mode(callback) {
     }()
     ui_add = ui.inflate(
         <vertical id="parent" bg="#ffffff" >
-            
+
             <vertical w="*" h="auto">
                 <card gravity="center_vertical" cardElevation="0dp" margin="0" cardBackgroundColor="#ffffff">
                     <img src="file://res/icon.png" w="50" h="30" margin="0" layout_gravity="center|left" />
                     <text text="森空岛自动签到" gravity="center|left" textColor="#000000" marginLeft="50" />
-                    
+
                     <linear gravity="center||right" marginLeft="5" >
-                        
+
                         <img id="Exit" marginRight="8" src="@drawable/ic_clear_black_48dp" w="40" h="35" tint="#000000" foreground="?attr/selectableItemBackground" clickable="true" />
-                        
+
                     </linear>
-                    
+
                 </card>
             </vertical>
             <vertical layout_height="wrap_content">
                 <tabs id="tabs" TextColor="#ffffff" margin="10 0" />
-                
+
                 <WrapContentHeight-ViewPager id="viewpager" padding="15 0" w="auto"  >
                     {/** 第一屏布局*/}
-                    
+
                     <frame id="token_add"  >
                         <vertical >
                             <spinner id="login_mode" textSize="16" entries="使用用户名密码|使用手机验证码|使用已知TOKEN" />
-                            
-                            
+
+
                             <text margin="10 0" id="login_mode_tips" text="" textColor="#FF0000" enabled="true" textIsSelectable="true" focusable="true" longClickable="true" />
                             <com.google.android.material.textfield.TextInputLayout
-                            id="phone" margin="5 0"
-                            layout_height="wrap_content">
-                            <EditText layout_width="match_parent" layout_height="wrap_content" textSize="16sp"
-                            singleLine="true" inputType="phone" />
-                        </com.google.android.material.textfield.TextInputLayout>
-                        
-                        
-                        <horizontal marginTop="15">
-                            
-                            <com.google.android.material.textfield.TextInputLayout
-                            id="password" margin="5 0"
-                            
-                            layout_weight="1"
-                            layout_height="wrap_content">
-                            <EditText layout_width="match_parent" layout_height="wrap_content" textSize="16sp"
-                            />
-                        </com.google.android.material.textfield.TextInputLayout>
-                        <button id="code" text="发送验证码" style="Widget.AppCompat.Button.Borderless" w="auto" />
-                    </horizontal>
-                    {/* 等待加载的动画效果 */}
-                    <linear w="auto" id="waitFor_obtain" visibility="gone" h="60" gravity="center">
-                        <progressbar id="progressbar" indeterminateTint="#ff0000" h="25"
-                        layout_gravity="center_vertical" margin="-15 0" visibility="gone" />
-                        <text id="obtain" textColor="#000000" text="从明日计划webview获取" padding="10" w="auto" h="*" textStyle="bold" foreground="?attr/selectableItemBackground" clickable="true" />
-                    </linear>
-                    
-                    
-                </vertical>
-            </frame>
-            {/*第二屏组件*/}
-            <frame >
-                <vertical id="roles_list" bg="#FFFFFF" orientation="vertical" w="match_parent">
-                    
-                    
-                    
-                </vertical>
-            </frame>
-            
-            <frame >
-                {/*第三屏组件*/}
-                <vertical id="timk_add" marginLeft="10" marginRight="10" >
-                    <text id="login_timk_tips" text="" textColor="#FF0000" enabled="true" textIsSelectable="true" focusable="true" longClickable="true" />
-                    <radiogroup id="ll" orientation="horizontal" h="auto">
-                        <radio id="l1" text="按每天运行(定时)" checked="true" w="*" />
-                        <radio id="l2" text="按星期运行" w="*" h="auto" visibility="gone" />
-                    </radiogroup>
-                    <timepicker id="timePickerMode" margin="0 -20" timePickerMode="spinner" layout_gravity="center" />
-                    <checkbox id="autotimk" text="启动明日计划时运行本脚本执行签到(广播)" w="auto" checked="false" />
-                    <list id="timed_tasks_list" bg="#00000000" >
-                        <card w="*" h="40" margin="5 0 5 0" cardCornerRadius="2dp"
-                        cardElevation="0dp" foreground="?selectableItemBackground">
-                        <horizontal gravity="center_horizontal" >
-                            <vertical padding="5 0" h="auto" w="0" layout_weight="1">
-                                <text text="{{this.scriptPath}}" textSize="16" maxLines="1" />
-                                <text text="下次运行: {{this.date + ' ' + this.time}}" textSize="12" maxLines="1" />
-                            </vertical>
-                            <img id="done" src="@drawable/ic_close_black_48dp" layout_gravity="right|center" w="30" h="*" margin="0 0 5 0" />
-                        </horizontal>
-                        <View bg="#dcdcdc" h="1" w="auto" layout_gravity="bottom" />
-                    </card>
-                </list>
+                                id="phone" margin="5 0"
+                                layout_height="wrap_content">
+                                <EditText layout_width="match_parent" layout_height="wrap_content" textSize="16sp"
+                                    singleLine="true" inputType="phone" />
+                            </com.google.android.material.textfield.TextInputLayout>
+
+
+                            <horizontal marginTop="15">
+
+                                <com.google.android.material.textfield.TextInputLayout
+                                    id="password" margin="5 0"
+
+                                    layout_weight="1"
+                                    layout_height="wrap_content">
+                                    <EditText layout_width="match_parent" layout_height="wrap_content" textSize="16sp"
+                                    />
+                                </com.google.android.material.textfield.TextInputLayout>
+                                <button id="code" text="发送验证码" style="Widget.AppCompat.Button.Borderless" w="auto" />
+                            </horizontal>
+                            {/* 等待加载的动画效果 */}
+                            <linear w="auto" id="waitFor_obtain" visibility="gone" h="60" gravity="center">
+                                <progressbar id="progressbar" indeterminateTint="#ff0000" h="25"
+                                    layout_gravity="center_vertical" margin="-15 0" visibility="gone" />
+                                <text id="obtain" textColor="#000000" text="从明日计划webview获取" padding="10" w="auto" h="*" textStyle="bold" foreground="?attr/selectableItemBackground" clickable="true" />
+                            </linear>
+
+
+                        </vertical>
+                    </frame>
+                    {/*第二屏组件*/}
+                    <frame >
+                        <vertical id="roles_list" bg="#FFFFFF" orientation="vertical" w="match_parent">
+
+
+
+                        </vertical>
+                    </frame>
+
+                    <frame >
+                        {/*第三屏组件*/}
+                        <vertical id="timk_add" marginLeft="10" marginRight="10" >
+                            <text id="login_timk_tips" text="" textColor="#FF0000" enabled="true" textIsSelectable="true" focusable="true" longClickable="true" />
+                            <radiogroup id="ll" orientation="horizontal" h="auto">
+                                <radio id="l1" text="按每天运行(定时)" checked="true" w="*" />
+                                <radio id="l2" text="按星期运行" w="*" h="auto" visibility="gone" />
+                            </radiogroup>
+                            <timepicker id="timePickerMode" margin="0 -20" timePickerMode="spinner" layout_gravity="center" />
+                            <checkbox id="autotimk" text="启动明日计划时运行本脚本执行签到(广播)" w="auto" checked="false" />
+                            <list id="timed_tasks_list" bg="#00000000" >
+                                <card w="*" h="40" margin="5 0 5 0" cardCornerRadius="2dp"
+                                    cardElevation="0dp" foreground="?selectableItemBackground">
+                                    <horizontal gravity="center_horizontal" >
+                                        <vertical padding="5 0" h="auto" w="0" layout_weight="1">
+                                            <text text="{{this.scriptPath}}" textSize="16" maxLines="1" />
+                                            <text text="下次运行: {{this.date + ' ' + this.time}}" textSize="12" maxLines="1" />
+                                        </vertical>
+                                        <img id="done" src="@drawable/ic_close_black_48dp" layout_gravity="right|center" w="30" h="*" margin="0 0 5 0" />
+                                    </horizontal>
+                                    <View bg="#dcdcdc" h="1" w="auto" layout_gravity="bottom" />
+                                </card>
+                            </list>
+                        </vertical>
+                    </frame>
+                </WrapContentHeight-ViewPager>
+
+                <horizontal gravity="right" w="*" margin="5" >
+                    <button id="no" text="取消" style="Widget.AppCompat.Button.Borderless" w="auto" textColor="#cc423232" />
+                    <progressbar id="progressbar_sian" indeterminateTint="#ff0000"
+                        h="25" layout_gravity="center_vertical" margin="-15 0 -25 0" visibility="invisible" />
+                    <button id="ok" text="保存token" style="Widget.AppCompat.Button.Borderless" w="auto" textColor="#424242" />
+                </horizontal>
             </vertical>
-        </frame>
-        </WrapContentHeight-ViewPager>
-        
-        <horizontal gravity="right" w="*" margin="5" >
-            <button id="no" text="取消" style="Widget.AppCompat.Button.Borderless" w="auto" textColor="#cc423232" />
-            <progressbar id="progressbar_sian" indeterminateTint="#ff0000"
-            h="25" layout_gravity="center_vertical" margin="-15 0 -25 0" visibility="invisible" />
-            <button id="ok" text="保存token" style="Widget.AppCompat.Button.Borderless" w="auto" textColor="#424242" />
-        </horizontal>
-        </vertical>
         </vertical>, null, false)
     let d_add = dialogs.build({
         type: 'foreground-or-overlay',
@@ -900,10 +895,10 @@ function input_mode(callback) {
     //   ui_add.roles_list.setDataSource(roles_list)
     ui_add.viewpager.setOnPageChangeListener({
 
-        onPageScrolled: function(position) {
+        onPageScrolled: function (position) {
             //  ui_add.viewpager.onMeasure()
         },
-        onPageSelected: function(index, v) {
+        onPageSelected: function (index, v) {
             ui_add.viewpager.resetHeight(index);
             switch (index) {
                 case 0:
@@ -930,11 +925,11 @@ function input_mode(callback) {
     if (roles_list.length > 0) {
         ui_add.viewpager.currentItem = 1;
     }
-    ui_add.obtain.on("click", function(view) {
+    ui_add.obtain.on("click", function (view) {
         snackbar("暂不支持");
         return
         if (callback) {
-            threads.start(function() {
+            threads.start(function () {
                 login_uislector = callback('webview_token', 'get');
 
                 ui.run(() => {
@@ -973,7 +968,7 @@ function input_mode(callback) {
 
             currentActivity();
 
-            threads.start(function() {
+            threads.start(function () {
                 sleep(1000);
                 //设置web url 电脑模式;
                 let web_set = storages.create("configure").get("web_set")
@@ -1035,7 +1030,7 @@ function input_mode(callback) {
     })
 
     ui_add.login_mode.setOnItemSelectedListener({
-        onItemSelected: function(parent, view, position, id) {
+        onItemSelected: function (parent, view, position, id) {
             // parent.getSelectedItem();
             switch (position) {
                 case 0:
@@ -1093,8 +1088,8 @@ function input_mode(callback) {
         }
         let timk_list = [];
         if ($timers.queryIntentTasks({
-                path: source
-            }).length > 0) {
+            path: source
+        }).length > 0) {
             ui_add.autotimk.checked = true;
         };
         let queryTimedTasks = $timers.queryTimedTasks({
@@ -1134,9 +1129,9 @@ function input_mode(callback) {
             ui_add.timed_tasks_list.setDataSource(timk_list);
         }
 
-        ui_add.timed_tasks_list.on("item_bind", function(itemView, itemHolder) {
+        ui_add.timed_tasks_list.on("item_bind", function (itemView, itemHolder) {
             //绑定勾选框事件
-            itemView.done.on("click", function(view) {
+            itemView.done.on("click", function (view) {
                 let item = itemHolder.item;
 
                 snackbar("删除定时任务，id: " + item.id + " " + $timers.removeTimedTask(item.id));
@@ -1152,21 +1147,21 @@ function input_mode(callback) {
 
         ui_add.roles_list.addView(ui.inflate(
             <vertical>
-                </vertical>, ui_add.roles_list
+            </vertical>, ui_add.roles_list
         ));
 
         for (let AddItem of item.bindingList) {
             ui.run(() => {
                 let Add_rolesView = ui.inflate(
                     <horizontal gravity="center_horizontal"  >
-                                <vertical margin="10 10" h="auto" layout_weight="1">
-                                    <text text="AddItem.nickName" textSize="20" textColor="#000000" maxLines="1" />
-                                    <text text="AddItem.uid + ' - ' + AddItem.channelName" textSize="14" maxLines="1" />
-                                </vertical>
-                                
-                                <img id="img" src="@drawable/ic_check_circle_black_48dp" layout_gravity="right|center" tint="#00FF00" w="30" h="*" />
-                                <text textSize="14" layout_gravity="right|center" margin="5 0" />
-                            </horizontal>, ui_add.roles_list.getChildAt(ui_add.roles_list.getChildCount() - 1)
+                        <vertical margin="10 10" h="auto" layout_weight="1">
+                            <text text="AddItem.nickName" textSize="20" textColor="#000000" maxLines="1" />
+                            <text text="AddItem.uid + ' - ' + AddItem.channelName" textSize="14" maxLines="1" />
+                        </vertical>
+
+                        <img id="img" src="@drawable/ic_check_circle_black_48dp" layout_gravity="right|center" tint="#00FF00" w="30" h="*" />
+                        <text textSize="14" layout_gravity="right|center" margin="5 0" />
+                    </horizontal>, ui_add.roles_list.getChildAt(ui_add.roles_list.getChildCount() - 1)
                 );
                 Add_rolesView.getChildAt(0).getChildAt(0).setText(AddItem.nickName);
                 Add_rolesView.getChildAt(0).getChildAt(1).setText(AddItem.uid + ' - ' + AddItem.channelName);
@@ -1191,12 +1186,12 @@ function input_mode(callback) {
     //滑动时间选择
     //  ui_add.timePickerMode.setIs24HourView(true); //设置当前时间控件为24小时制
     ui_add.timePickerMode.setOnTimeChangedListener({
-        onTimeChanged: function(v, h, m) {
+        onTimeChanged: function (v, h, m) {
             //h 获取的值 为24小时格式
             time = h + ":" + m;
         }
     });
-    ui_add.autotimk.on('click', function(view) {
+    ui_add.autotimk.on('click', function (view) {
         // 添加一个Auto.js启动时触发的广播任务（在打包中软件也可以使用）
         if (view.checked) {
             snackbar("创建广播任务: " + $timers.addIntentTask({
@@ -1218,17 +1213,17 @@ function input_mode(callback) {
 
         }
     })
-    ui_add.no.on("click", function() {
+    ui_add.no.on("click", function () {
 
         d_add.dismiss();
         // exit();
     });
 
-    ui_add.Exit.on("click", function() {
+    ui_add.Exit.on("click", function () {
         d_add.dismiss();
         //  exit();
     })
-    ui_add.code.on('click', function(view) {
+    ui_add.code.on('click', function (view) {
         let phone = ui_add.phone.getEditText().getText().toString();
         if (phone == "") {
             ui_add.phone.setError("手机号不可为空");
@@ -1264,7 +1259,7 @@ function input_mode(callback) {
                 log("发送验证码成功:" + r['msg']);
 
                 let i_tnter = 59;
-                let id_tnter = setInterval(function() {
+                let id_tnter = setInterval(function () {
                     if (i_tnter > 0) {
                         i_tnter--;
                     }
@@ -1284,14 +1279,14 @@ function input_mode(callback) {
         });
 
     })
-    ui_add.ok.on("click", function(view) {
+    ui_add.ok.on("click", function (view) {
         switch (ui_add.viewpager.getCurrentItem()) {
             case 0:
                 addtoken();
                 break
             case 1:
 
-                sign(null, function() {
+                sign(null, function () {
                     ui.run(() => {
                         for (let i = 0; i < ui_add.roles_list.getChildCount(); i++) {
                             ui_add.roles_list.removeView(ui_add.roles_list.getChildAt(i));
@@ -1484,7 +1479,7 @@ function sign(tokens, callback) {
         }
     });
 
-    threads.start(function() {
+    threads.start(function () {
         /* while (token_global) {
             sleep(100);
         }
@@ -1509,12 +1504,12 @@ function sign(tokens, callback) {
             if (credToken) {
 
                 do_sign(credToken).then((value) => {
-                        //console.trace(value)
-                        if (value instanceof Array) {
-                            value = value[0];
-                        }
-                        updateUI(value.index, value.message);
-                    })
+                    //console.trace(value)
+                    if (value instanceof Array) {
+                        value = value[0];
+                    }
+                    updateUI(value.index, value.message);
+                })
                     .catch((error) => {
                         console.error(error);
                         updateUI(index, "签到失败", error.msg);
@@ -1522,9 +1517,9 @@ function sign(tokens, callback) {
                     .finally(() => {
                         signToken(index + 1);
                     });
-            }else{
-                    updateUI(index, "签到失败", checkResults.msg);
-                    
+            } else {
+                updateUI(index, "签到失败", checkResults.msg);
+
             }
         }
 
@@ -1893,7 +1888,7 @@ let intent = engines.myEngine().execArgv.intent;
 
 //定时任务启动的
 if (intent != null) {
-   sleep(1000);
+    sleep(1000);
     console.info('=========sign==========');
 
     sign();
@@ -1904,7 +1899,7 @@ if (intent != null) {
         module.exports.sign = sign;
         module.exports.input_mode = input_mode;
         module.exports.game_info = game_info;
-        module.exports.get_binding_info = function() {
+        module.exports.get_binding_info = function () {
 
             if (roles_list.length == 0) {
                 return "未登录";
