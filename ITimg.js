@@ -686,7 +686,7 @@ function getMatcherType(type) {
 }
 
 
-function isRectangle(A, B, C, D) {
+function isRectangle(A, B, C, D,rectangular_error) {
     //计算所有边的长度
     let AB = Math.sqrt((B.x - A.x) ** 2 + (B.y - A.y) ** 2);
     let BC = Math.sqrt((C.x - B.x) ** 2 + (C.y - B.y) ** 2);
@@ -698,7 +698,7 @@ function isRectangle(A, B, C, D) {
     let BD = Math.sqrt((D.x - B.x) ** 2 + (D.y - B.y) ** 2);
 
     //可容忍误差百分比，最高建议35
-    let errorPercentage = list.rectangular_error || ITimg.default_list.matchFeatures.rectangular_error; // 允许±5%的误差
+    let errorPercentage = rectangular_error || ITimg.default_list.matchFeatures.rectangular_error; // 允许±5%的误差
 
     //检查是否有两对相等的边和闭合的对角线
     if (approximatelyEqual(AB, CD, errorPercentage) && approximatelyEqual(BC, DA, errorPercentage) &&
@@ -918,7 +918,7 @@ function matchFeatures(picture, list) {
 
 
     //计算是否合格形状
-    if (!isRectangle(ITimg.results.topLeft, ITimg.results.topRight, ITimg.results.bottomLeft, ITimg.results.bottomRight)) {
+    if (!isRectangle(ITimg.results.topLeft, ITimg.results.topRight, ITimg.results.bottomLeft, ITimg.results.bottomRight,list.rectangular_error)) {
         sleep(list.nods);
         //   (list.log_policy || ITimg.default_list.picture.log_policy) ? "" : console.error("" + picture + " 匹配失败\n--特征找图配置：" + JSON.stringify(list));
         safeRecycle(sceneImg)
