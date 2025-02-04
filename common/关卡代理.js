@@ -187,23 +187,26 @@ let 关卡代理 = {
                 //结算
                 setting = tool.readJSON("configure");
                 sleep(100)
-                temporary_xy = ITimg.matchFeatures((setting.agent ? "代理_放弃行动" : "代理_继续结算"), {
+                temporary_xy = ITimg.matchFeatures( "代理_继续结算", {
                     action: 5,
                     timing: 500,
-                    area: "下半屏",
+                    area: 4,
+                    threshold: 0.85,
                 })
                 if (temporary_xy) {
                     toast("代理失误，" + (setting.agent ? "放弃行动，重新代理" : "继续结算，二星评价"))
                     console.warn("代理失误，" + (setting.agent ? "放弃行动，重新代理" : "继续结算，二星评价"))
                     agent++;
+                    let abandonXY = [temporary_xy.x,temporary_xy.y];
                     if (setting.agent) {
+                        abandonXY[0] = temporary_xy.x - (temporary_xy.h *4)
                         for (let i = 0; i < 10; i++) {
-                            MyAutomator.click(temporary_xy.x + random(-15, 15), temporary_xy.y + random(-10, 10))
-                            sleep(200)
+                            MyAutomator.click.apply(MyAutomator,abandonXY);
+                            sleep(200);
                         }
                         break
                     } else {
-                        MyAutomator.click(temporary_xy.x + random(-15, 15), temporary_xy.y + random(-10, 10))
+                        MyAutomator.click.apply(MyAutomator,abandonXY);
                     }
 
                 }

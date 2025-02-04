@@ -116,7 +116,7 @@ function Prepare(picture_default, ocr_default, outline_default, matchFeatures_de
         filter_w: matchFeatures_default.filter_w || 10,
         filter_h: matchFeatures_default.filter_h || 10,
         scale: matchFeatures_default.scale || 0.8,
-        rectangular_error:matchFeatures_default.rectangular_error || 35,
+        rectangular_error: matchFeatures_default.rectangular_error || 35,
         matcher: matchFeatures_default.matcher || "BRUTEFORCE_L1",
         visualization: matchFeatures_default.visualization || true,
         saveSmallImg: matchFeatures_default.saveSmallImg,
@@ -409,6 +409,19 @@ function adbSgetScreen() {
     return images.read(package_path + "/mrfz/screencap.png");
 }
 
+// 安全回收资源
+function safeRecycle(img) {
+    if (img && !img.isRecycled()) {
+        try {
+            img.recycle();
+        } catch (e) {
+            console.warn("图片资源回收失败:", e);
+            return false;
+        }
+    }
+    return true;
+}
+
 function scaleSet(splitScreen, tuku_de, value) {
     splitScreen = 2;
     //判断缩放比例
@@ -555,9 +568,8 @@ function 图像匹配(picture, list) {
 
         return false
     }
-    try {
-        !imgList.isRecycled() && imgList.recycle();
-    } catch (e) {}
+    safeRecycle(imgList);
+
     if (ITimg.results) {
         if (list.action == 6) {
             return ITimg.results;
@@ -618,7 +630,7 @@ function 图像匹配(picture, list) {
         return true;
     } else {
         if (list.picture) {
-            !list.picture.isRecycled() && list.picture.recycle()
+            safeRecycle(list.picture);
             list.picture = "隐藏"
         }
         img_small.recycle();
@@ -629,6 +641,81 @@ function 图像匹配(picture, list) {
 
     }
 }
+
+
+
+
+
+// 5. 特征匹配核心逻辑
+function processFeatureMatching(picture, sceneFeatures, smallImagePath, config) {
+    const smallImg = images.read(smallImagePath);
+    let smallFeatures;
+    try {
+        smallFeatures = $images.detectAndComputeFeatures(smallImg, {
+            grayscale: config.grayscale
+        });
+        // 将特征和匹配绘制出来，在调试时更容易看出匹配效果，但会增加耗时
+        let drawMatches;
+        //大图指定区域部分没有特征点(全黑)时会崩溃，ajp遗留bug
+        if (config.visualization) {
+            drawMatches = package_path + "/logs/matchFeatures/" + picture + "_特征" + config.matcher + "_匹配结果.jpg";
+            //  log(drawMatches)
+            //    images.save(img, drawMatches);
+        }
+        const matcherType = getMatcherType(config.matcher);
+        return $images.matchFeatures(sceneFeatures, smallFeatures, {
+            drawMatches: drawMatches,
+            threshold: config.threshold,
+            matcher: matcherType
+        });
+    } finally {
+        smallFeatures && smallFeatures.recycle();
+        safeRecycle(smallImg);
+    }
+}
+
+// 6. 匹配器类型映射
+function getMatcherType(type) {
+    const matchers = [
+        "BRUTEFORCE_L1",
+        "BRUTEFORCE_SL2",
+        "BRUTEFORCE",
+        "FLANNBASED"
+    ];
+    return matchers[type - 1] || type;
+}
+
+
+function isRectangle(A, B, C, D) {
+    //计算所有边的长度
+    let AB = Math.sqrt((B.x - A.x) ** 2 + (B.y - A.y) ** 2);
+    let BC = Math.sqrt((C.x - B.x) ** 2 + (C.y - B.y) ** 2);
+    let CD = Math.sqrt((D.x - C.x) ** 2 + (D.y - C.y) ** 2);
+    let DA = Math.sqrt((A.x - D.x) ** 2 + (A.y - D.y) ** 2);
+
+    // Calculate diagonals
+    let AC = Math.sqrt((C.x - A.x) ** 2 + (C.y - A.y) ** 2);
+    let BD = Math.sqrt((D.x - B.x) ** 2 + (D.y - B.y) ** 2);
+
+    //可容忍误差百分比，最高建议35
+    let errorPercentage = list.rectangular_error || ITimg.default_list.matchFeatures.rectangular_error; // 允许±5%的误差
+
+    //检查是否有两对相等的边和闭合的对角线
+    if (approximatelyEqual(AB, CD, errorPercentage) && approximatelyEqual(BC, DA, errorPercentage) &&
+        approximatelyEqual(AC, BD, errorPercentage)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function approximatelyEqual(a, b, errorPercentage) {
+    let maxError = (errorPercentage / 100) * a;
+    // console.warn(a, b, (Math.abs(a - b) <= maxError))
+
+    return Math.abs(a - b) <= maxError;
+}
+
 
 /**
  * 基于autojs Pro9 优化的特征图匹配
@@ -662,14 +749,16 @@ function matchFeatures(picture, list) {
         threshold: list.threshold || ITimg.default_list.matchFeatures.threshold,
         filter_w: list.filter_w || ITimg.default_list.matchFeatures.filter_w,
         filter_h: list.filter_h || ITimg.default_list.matchFeatures.filter_h,
-        grayscale: list.grayscale,
         visualization: list.visualization,
-        imageFeatures: list.imageFeatures,
         refresh: list.refresh,
+        //计算特征使用的参数,如果修改了(例scale)请不要使用refresh复用旧的特征
+        imageFeatures: list.imageFeatures,
+        grayscale: list.grayscale,
+        scale: list.scale || ITimg.default_list.matchFeatures.scale,
+        rectangular_error:list.rectangular_error,
         
         saveSmallImg: list.saveSmallImg,
         picture_failed_further: list.picture_failed_further,
-        scale: list.scale || ITimg.default_list.matchFeatures.scale,
         log_policy: list.log_policy,
         small_image_catalog: list.small_image_catalog || ITimg.default_list.matchFeatures.small_image_catalog,
     }
@@ -683,7 +772,7 @@ function matchFeatures(picture, list) {
     if (list.visualization === undefined) {
         list.visualization = ITimg.default_list.matchFeatures.visualization;
     }
-    
+
     let small_image_catalog = files.path(list.small_image_catalog + picture + ".png");
     if (list.saveSmallImg) {
 
@@ -731,118 +820,90 @@ function matchFeatures(picture, list) {
         console.error("小图不存在,无法匹配：", small_image_catalog);
         return false;
     }
-    console.time("特征找图总时长");
-if (list.refresh !== false || !ITimg.sceneFeatures||ITimg.sceneFeatures.recycled) {
-     ITimg.sceneFeatures && ITimg.sceneFeatures.recycle();
-     ITimg.sceneFeatures = null;
-    list.area = regional_division(list.area);
-    var sceneImg;
-    if (!list.imageFeatures) {
-        let img_ = list.picture || captureScreen_();
-        //长时间持有图片
-        sceneImg = images.copy(img_, true);
-        !img_.isRecycled() && img_.recycle();
 
-    }
-    if (list.visualization && !list.imageFeatures) {
-        // 指定特征点算法SIFT
-        let sift = SIFT.create();
-        //大图指定区域部分没有特征点(全黑)时会崩溃，ajp遗留bug
-        // 获取检验大图特征点，曲线救国
-        console.time("detect_test");
-        let big_keyPoints = new MatOfKeyPoint();
-        let bigTrainImage = new Mat();
-        //sceneImg和area区域，对不上会导致闪退
-        //console.info(sceneImg.mat)
-        //log(list.area)
-        //还原色彩空间，因为mat默认使用bgr, 而不是rgb
-        Imgproc.cvtColor(sceneImg.mat.submat(list.area[1], list.area[3] + list.area[1], list.area[0], list.area[2] + list.area[0]), bigTrainImage, Imgproc.COLOR_BGRA2RGBA);
-        if (list.scale != 1) {
-            //按缩放比例缩放
-            let newSize = new Size(bigTrainImage.cols() * list.scale, bigTrainImage.rows() * list.scale);
-            Imgproc.resize(bigTrainImage, bigTrainImage, newSize, 0, 0, Imgproc.INTER_AREA);
+
+    console.time("特征找图总时长");
+    if (list.refresh !== false || !ITimg.sceneFeatures || ITimg.sceneFeatures.recycled) {
+        ITimg.sceneFeatures && ITimg.sceneFeatures.recycle();
+        ITimg.sceneFeatures = null;
+        list.area = regional_division(list.area);
+        var sceneImg;
+        if (!list.imageFeatures) {
+            let img_ = list.picture || captureScreen_();
+            //长时间持有图片
+            sceneImg = images.copy(img_, true);
+            safeRecycle(img_);
+
         }
 
-        sift.detect(bigTrainImage, big_keyPoints);
 
-        bigTrainImage.release();
-        console.timeEnd("detect_test");
-        //  console.info(big_keyPoints.toArray().length)
-        if (!big_keyPoints.toArray().length) {
-            sceneImg.recycle();
+        //用于检验图片有无特征点，防止崩溃
+        if (list.visualization && !list.imageFeatures) {
+            // 指定特征点算法SIFT
+            let sift = SIFT.create();
+            //大图指定区域部分没有特征点(全黑)时会崩溃，ajp遗留bug
+            // 获取检验大图特征点，曲线救国
+            console.time("detect_test");
+            let big_keyPoints = new MatOfKeyPoint();
+            let bigTrainImage = new Mat();
+            //sceneImg和area区域，对不上会导致闪退
+            //console.info(sceneImg.mat)
+            //log(list.area)
+            //还原色彩空间，因为mat默认使用bgr, 而不是rgb
+            Imgproc.cvtColor(sceneImg.mat.submat(list.area[1], list.area[3] + list.area[1], list.area[0], list.area[2] + list.area[0]), bigTrainImage, Imgproc.COLOR_BGRA2RGBA);
+            if (list.scale != 1) {
+                //按缩放比例缩放
+                let newSize = new Size(bigTrainImage.cols() * list.scale, bigTrainImage.rows() * list.scale);
+                Imgproc.resize(bigTrainImage, bigTrainImage, newSize, 0, 0, Imgproc.INTER_AREA);
+            }
+
+            sift.detect(bigTrainImage, big_keyPoints);
+
+            bigTrainImage.release();
+            console.timeEnd("detect_test");
+            //  console.info(big_keyPoints.toArray().length)
+            if (!big_keyPoints.toArray().length) {
+                sceneImg.recycle();
+                big_keyPoints.release();
+
+                if (list.picture) {
+                    safeRecycle(list.picture);
+                    list.picture = "隐藏"
+                }
+                if (list.imageFeatures) {
+                    list.imageFeatures = "隐藏";
+                }
+                sleep(list.nods);
+                (list.log_policy || ITimg.default_list.picture.log_policy) ? "" : console.warn("" + picture + " 匹配失败，大图无特征点\n--特征找图配置：" + JSON.stringify(list));
+                safeRecycle(sceneImg);
+                return false
+            }
+
             big_keyPoints.release();
 
-            if (list.picture) {
-                !list.picture.isRecycled() && list.picture.recycle()
-                list.picture = "隐藏"
-            }
-            if (list.imageFeatures) {
-                list.imageFeatures = "隐藏";
-            }
-            sleep(list.nods);
-            (list.log_policy || ITimg.default_list.picture.log_policy) ? "" : console.warn("" + picture + " 匹配失败，大图无特征点\n--特征找图配置：" + JSON.stringify(list));
-            !sceneImg.isRecycled() && sceneImg.recycle();
-
-            return false
         }
 
-        big_keyPoints.release();
 
+        // 计算大图特征，若要提高效率，可以调整scale参数，默认为1，
+        // 越小越快，但可以放缩过度导致匹配错误。若在特征匹配时无法搜索到正确结果，可以调整这里的参数，比如\{scale: 1\}
+        // 也可以在这里指定\{region: [...]\}参数只计算这个区域的特征提高效率
+        if (!list.imageFeatures) {
+            ITimg.sceneFeatures = $images.detectAndComputeFeatures(sceneImg, {
+                region: list.area,
+                grayscale: list.grayscale,
+                scale: list.scale,
+            });
+        }
+
+        if (list.picture) {
+            safeRecycle(list.picture);
+            list.picture = "隐藏";
+        }
     }
 
-    // 若要提高效率，可以在计算大图特征时调整scale参数，默认为0.5，
-    // 越小越快，但可以放缩过度导致匹配错误。若在特征匹配时无法搜索到正确结果，可以调整这里的参数，比如\{scale: 1\}
-    // 也可以在这里指定\{region: [...]\}参数只计算这个区域的特征提高效率
-    if (!list.imageFeatures) {
-        ITimg.sceneFeatures = $images.detectAndComputeFeatures(sceneImg, {
-            region: list.area,
-            grayscale: list.grayscale,
-            scale: list.scale,
-        });
-    }
+    //特征匹配
+    ITimg.results = processFeatureMatching(picture, (list.imageFeatures ? list.imageFeatures : ITimg.sceneFeatures), small_image_catalog, list)
 
-    if (list.picture) {
-        !list.picture.isRecycled() && list.picture.recycle();
-        list.picture = "隐藏"
-    }
-}
-   
-    let img_small = images.read(small_image_catalog);
-
-    // 计算小图特征
-    let objectFeatures = $images.detectAndComputeFeatures(img_small, {
-        grayscale: list.grayscale,
-    });
-
-    img_small.recycle();
-    
-    // 将特征和匹配绘制出来，在调试时更容易看出匹配效果，但会增加耗时
-    let drawMatches;
-    //大图指定区域部分没有特征点(全黑)时会崩溃，ajp遗留bug
-    if (list.visualization) {
-        drawMatches = package_path + "/logs/matchFeatures/" + picture + "_特征"+list.matcher+"_匹配结果.jpg";
-       //  log(drawMatches)
-       //    images.save(img, drawMatches);
-    }
-
-    //其他匹配算法可能导致闪退
-    if (list.matcher == 1) {
-        list.matcher = "BRUTEFORCE_L1";
-    } else if (list.matcher == 2) {
-        list.matcher = "BRUTEFORCE_SL2";
-    } else if (list.matcher == 3) {
-        list.matcher = "BRUTEFORCE";
-    } else if (list.matcher == 4) {
-        list.matcher = "FLANNBASED";
-    }
-    ITimg.results = $images.matchFeatures((list.imageFeatures ? list.imageFeatures : ITimg.sceneFeatures), objectFeatures, {
-        drawMatches: drawMatches,
-        threshold: list.threshold,
-        matcher: list.matcher
-    });
-
-    // 回收特征对象
-    objectFeatures.recycle();
     if (!list.imageFeatures) {
         //ITimg.sceneFeatures.recycle();
     } else {
@@ -851,52 +912,20 @@ if (list.refresh !== false || !ITimg.sceneFeatures||ITimg.sceneFeatures.recycled
     if (!ITimg.results) {
         sleep(list.nods);
         (list.log_policy || ITimg.default_list.picture.log_policy) ? "" : console.warn("" + picture + " 匹配失败\n--特征找图配置：" + JSON.stringify(list));
-        if (sceneImg) {
-            !sceneImg.isRecycled() && sceneImg.recycle();
-        }
+        safeRecycle(sceneImg)
         return false;
     }
 
-    function isRectangle(A, B, C, D) {
-        //计算所有边的长度
-        let AB = Math.sqrt((B.x - A.x) ** 2 + (B.y - A.y) ** 2);
-        let BC = Math.sqrt((C.x - B.x) ** 2 + (C.y - B.y) ** 2);
-        let CD = Math.sqrt((D.x - C.x) ** 2 + (D.y - C.y) ** 2);
-        let DA = Math.sqrt((A.x - D.x) ** 2 + (A.y - D.y) ** 2);
 
-        // Calculate diagonals
-        let AC = Math.sqrt((C.x - A.x) ** 2 + (C.y - A.y) ** 2);
-        let BD = Math.sqrt((D.x - B.x) ** 2 + (D.y - B.y) ** 2);
-
-        //可容忍误差百分比，最高建议35
-        let errorPercentage = list.rectangular_error||ITimg.default_list.matchFeatures.rectangular_error; // 允许±5%的误差
-
-        //检查是否有两对相等的边和闭合的对角线
-        if (approximatelyEqual(AB, CD, errorPercentage) && approximatelyEqual(BC, DA, errorPercentage) &&
-            approximatelyEqual(AC, BD, errorPercentage)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    function approximatelyEqual(a, b, errorPercentage) {
-        let maxError = (errorPercentage / 100) * a;
-        // console.warn(a, b, (Math.abs(a - b) <= maxError))
-
-        return Math.abs(a - b) <= maxError;
-    }
-
-
+    //计算是否合格形状
     if (!isRectangle(ITimg.results.topLeft, ITimg.results.topRight, ITimg.results.bottomLeft, ITimg.results.bottomRight)) {
         sleep(list.nods);
         //   (list.log_policy || ITimg.default_list.picture.log_policy) ? "" : console.error("" + picture + " 匹配失败\n--特征找图配置：" + JSON.stringify(list));
-        if (sceneImg) {
-            !sceneImg.isRecycled() && sceneImg.recycle();
-        }
+        safeRecycle(sceneImg)
         console.error(picture + " 识别结果是非矩形形状，可能是非正确的小图。详情可" + (list.visualization ? "" : "设置匹配参数visualization为true，") + "前往 " + package_path + "/logs/matchFeatures/，查看相关可视化识别结果\n--特征找图配置：", JSON.stringify(list));
         return false
     }
+
     //console.info(ITimg.results)
     ITimg.results = {
         top: parseInt(ITimg.results.topRight.y),
@@ -911,14 +940,13 @@ if (list.refresh !== false || !ITimg.sceneFeatures||ITimg.sceneFeatures.recycled
     if (ITimg.results.w <= list.filter_w || ITimg.results.h <= list.filter_h) {
         sleep(list.nods);
         //  (list.log_policy || ITimg.default_list.picture.log_policy) ? "" : console.error("" + picture + " 匹配失败\n--特征找图配置：" + JSON.stringify(list));
-        if (sceneImg) {
-            !sceneImg.isRecycled() && sceneImg.recycle();
-        }
+        safeRecycle(sceneImg);
         console.error(picture + " wh小于滤值 " + list.filter_w + "," + list.filter_h + " 无效结果，可能是非正确的小图。详情可" + (list.visualization ? "" : "设置匹配参数visualization为true，") + "前往 " + package_path + "/logs/matchFeatures/，查看相关可视化识别结果\n--特征找图配置：", JSON.stringify(list));
         return false;
     }
 
-    if (list.saveSmallImg && !list.imageFeatures&&sceneImg) {
+
+    if (list.saveSmallImg && !list.imageFeatures && sceneImg) {
 
         console.verbose("缓存小图到：" + small_image_save_catalog);
         if (ITimg.results.x >= 0 && ITimg.results.y >= 0 && ITimg.results.x + ITimg.results.w <= sceneImg.width && ITimg.results.y + ITimg.results.h <= sceneImg.height) {
@@ -931,9 +959,7 @@ if (list.refresh !== false || !ITimg.sceneFeatures||ITimg.sceneFeatures.recycled
         }
 
     }
-    if (sceneImg) {
-        !sceneImg.isRecycled() && sceneImg.recycle();
-    }
+    safeRecycle(sceneImg)
 
     console.timeEnd("特征找图总时长");
 
@@ -980,6 +1006,7 @@ if (list.refresh !== false || !ITimg.sceneFeatures||ITimg.sceneFeatures.recycled
         return true;
     }
 }
+
 
 
 
@@ -1147,7 +1174,7 @@ function ocr文字识别(words, list) {
                 "rectify_json_path": list.correction_path,
             });
 
-            !img.isRecycled() && img.recycle();
+safeRecycle(img)
         }
         if (list.action == 6) {
             return ITimg.results;
@@ -1203,7 +1230,7 @@ function ocr文字识别(words, list) {
         })
     }
     if (list.picture) {
-        !list.picture.isRecycled() && list.picture.recycle();
+safeRecycle(list.picture);
         list.picture = "隐藏"
     }
     if (query_ != undefined) {
@@ -1337,7 +1364,8 @@ function binarized_contour(list) {
     let img_ = list.picture || ITimg.captureScreen_();
     //长时间持有图片
     let img = images.copy(img_, true);
-    !img_.isRecycled() && img_.recycle();
+    safeRecycle(img_);
+    
     let mat = new Mat();
     //裁剪，还原色彩空间，因为mat默认使用bgr, 而不是rgb
     Imgproc.cvtColor(img.mat.submat(list.area[1], list.area[3] + list.area[1], list.area[0], list.area[2] + list.area[0]), mat, Imgproc.COLOR_BGRA2RGBA);
@@ -1363,7 +1391,8 @@ function binarized_contour(list) {
             Imgproc.dilate(mat, mat, element);
         }
     }
-        function drawImg (){
+
+    function drawImg() {
         // 在原始图像上绘制直边界矩形
         let rectPaint = new Paint();
         rectPaint.setStyle(Paint.Style.STROKE);
@@ -1383,29 +1412,28 @@ function binarized_contour(list) {
 
         }
         list.canvas.img = new Canvas(img);
-        !img.isRecycled() && img.recycle();
+        safeRecycle(img);
         let roiBitmap = Bitmap.createBitmap(list.area[2], list.area[3], Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(mat, roiBitmap);
         list.canvas.img.drawBitmap(roiBitmap, list.area[0], list.area[1], rectPaint)
         roiBitmap && roiBitmap.recycle();
- 
-}
 
-    if(list.action==7){
+    }
+
+    if (list.action == 7) {
         drawImg();
         list.canvas.img = list.canvas.img.toImage();
         return list.canvas.img;
     }
-    
+
     //查找直边界矩形，多线程的情况下ITimg.results容易和ocr的冲突，所以就改名
     ITimg.results_contour = new java.util.ArrayList();
     let hierarchy = new Mat();
     Imgproc.findContours(mat, ITimg.results_contour, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-if (list.canvas) {
-    drawImg();
-} else {
-        !img.isRecycled() && img.recycle();
-
+    if (list.canvas) {
+        drawImg();
+    } else {
+        safeRecycle(img)
     }
     //roiBitmap && roiBitmap.recycle();
     let query_contour = [];
@@ -1523,7 +1551,7 @@ if (list.canvas) {
 
     list.canvas ? list.canvas = list.canvas.name : undefined;
     if (list.picture) {
-        !list.picture.isRecycled() && list.picture.recycle()
+        safeRecycle(list.picture);
         list.picture = "隐藏"
     }
 
@@ -1922,8 +1950,8 @@ try {
         savePath = '/sdcard/processed_image.jpg';
         processedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, new java.io.FileOutputStream(savePath));
     }
-   // height = 2400
-   // width = 1080;
+    // height = 2400
+    // width = 1080;
     let name = {
         picture_name: "121",
         canvas_name: "好友_访问基建"
@@ -1947,12 +1975,12 @@ try {
     let an = ITimg.matchFeatures(name.canvas_name, {
         // area: [0, 200, 1356, 920],
         // area: [height - height/4,width/4,height/4,width/4],
-        area: 2,
+        area: 24,
         action: 5,
-        threshold: 0.85,
-        rectangular_error:35,
+        threshold: 0.75,
+        rectangular_error: 35,
         matcher: 2,
-        grayscale: false,
+        grayscale: true,
         visualization: true,
         scale: 1,
         saveSmallImg: false,
