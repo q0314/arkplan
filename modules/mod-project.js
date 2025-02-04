@@ -237,14 +237,14 @@ let exp = {
             let _max = 4;
             _.urlapi = 'https://api.github.com';
             while (_max--) {
-                if (_max == 2) {
+                if (_max <= 2) {
                     _.urlapi = 'https://api.kkgithub.com';
                 }
                 try {
                     let _items = http.get(_.urlapi + '/repos/' +
                         //'SuperMonster003/Ant-Forest/releases' +
                         'q0314/arkplan/releases' +
-                        '?per_page=' + _per_page + '&page=' + _cur_page++)
+                        '?per_page=' + _per_page + '&page=' + _cur_page)
                         .body.json().filter(o => o.tag_name >= _min_ver);
                     if (global._$_get_proj_releases_interrupted) {
                         return [];
