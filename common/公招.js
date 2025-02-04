@@ -4,21 +4,38 @@ function 确认招募按钮(_action) {
     if (_action === undefined) {
         _action = 5;
     }
-    return (ITimg.matchFeatures("公招_确认", {
+    let identify = ITimg.matchFeatures("公招_确认", {
         action: _action,
         timing: 1000,
         area: 4,
         scale: 1,
-    }) || ITimg.matchFeatures("公招_确认", {
-        action: _action,
-        timing: 1000,
-        nods: 200,
-        area: 4,
-        threshold: 0.7,
-        scale: 1,
-        matcher: 2,
-        refresh: false,
-    }))
+    });
+   if (!identify) {
+       identify = ITimg.matchFeatures("公招_确认", {
+            action: _action,
+            timing: 1000,
+            area: 4,
+            threshold: 0.7,
+            scale: 1,
+            matcher: 2,
+            refresh: false,
+            log_policy:true,
+        })
+    }
+    if (!identify) {
+       identify = ITimg.matchFeatures("公招_确认", {
+            action: _action,
+            timing: 1000,
+            area: 34,
+            threshold: 0.7,
+            scale: 0.90,
+            matcher: 2,
+            refresh: true,
+            log_policy:false,
+            picture_failed_further: true,
+        })
+    }
+    return identify;
 }
 
 function 随机招募(_Refresh) {
@@ -39,36 +56,36 @@ function 随机招募(_Refresh) {
         default:
 
             if (ITimg.ocr("点击刷新标签", {
-                    action: 0,
-                    refresh: false,
-                    timing: 1000,
-                }) || ITimg.ocr("刷新标签", {
-                    action: 0,
-                    part: true,
-                    refresh: false,
-                    timing: 1000,
-                })) {
+                action: 0,
+                refresh: false,
+                timing: 1000,
+            }) || ITimg.ocr("刷新标签", {
+                action: 0,
+                part: true,
+                refresh: false,
+                timing: 1000,
+            })) {
                 while (true) {
                     if (ITimg.matchFeatures("基建_离开", {
-                            action: 0,
-                            timing: 500,
-                            nods: 500,
-                            threshold: 0.85,
-                            area: 4,
-                        }) || ITimg.matchFeatures("基建_离开", {
-                            action: 0,
-                            timing: 500,
-                            nods: 1000,
-                            threshold: 0.85,
-                            area: 4,
-                            refresh: false,
-                        }) || ITimg.matchFeatures("基建_离开", {
-                            action: 0,
-                            timing: 500,
-                            area: 24,
-                            threshold: 0.75,
+                        action: 0,
+                        timing: 500,
+                        nods: 500,
+                        threshold: 0.85,
+                        area: 4,
+                    }) || ITimg.matchFeatures("基建_离开", {
+                        action: 0,
+                        timing: 500,
+                        nods: 1000,
+                        threshold: 0.85,
+                        area: 4,
+                        refresh: false,
+                    }) || ITimg.matchFeatures("基建_离开", {
+                        action: 0,
+                        timing: 500,
+                        area: 24,
+                        threshold: 0.75,
 
-                        })) {
+                    })) {
                         toast("没有四星以上的词条组合，已为您刷新标签重新检测");
                         console.error("没有四星以上的词条组合，已为您刷新标签重新检测");
                         sleep(1000);
@@ -146,14 +163,14 @@ function 检测tag() {
 
 var 公招 = {
     recruit_tag: [],
-    main: function(Manual) {
+    main: function (Manual) {
         Manual = Manual || false;
         let position = 0;
         tool.Floaty_emit("面板", "复位");
 
         try {
             threadMain.setName("公招程序");
-        } catch (err) {}
+        } catch (err) { }
 
 
         if (ITimg.language != "简中服") {
@@ -201,28 +218,28 @@ var 公招 = {
                 if (setting.自动聘用) {
                     while (true) {
                         if (ITimg.matchFeatures("公招_聘用", {
-                                action: 0,
-                                timing: 2000,
-                                nods: 500,
-                            }) || ITimg.matchFeatures("公招_聘用", {
-                                action: 0,
-                                timing: 2000,
-                                area: 13,
-                                matcher: 2,
-                                refresh: false,
-                            })) {
+                            action: 0,
+                            timing: 2000,
+                            nods: 500,
+                        }) || ITimg.matchFeatures("公招_聘用", {
+                            action: 0,
+                            timing: 2000,
+                            area: 13,
+                            matcher: 2,
+                            refresh: false,
+                        })) {
                             while (true) {
                                 if (ITimg.matchFeatures("公招_skip", {
-                                        action: 0,
-                                        timing: 2000,
-                                        area: 2,
-                                        nods: 1000,
-                                    }) || ITimg.matchFeatures("公招_skip", {
-                                        action: 0,
-                                        timing: 2000,
-                                        matcher: 2,
-                                        refresh: false,
-                                    })) {
+                                    action: 0,
+                                    timing: 2000,
+                                    area: 2,
+                                    nods: 1000,
+                                }) || ITimg.matchFeatures("公招_skip", {
+                                    action: 0,
+                                    timing: 2000,
+                                    matcher: 2,
+                                    refresh: false,
+                                })) {
                                     let czname = ITimg.ocr("获取干员名", {
                                         action: 6,
                                         correction_path: "公招",
@@ -275,24 +292,24 @@ var 公招 = {
         tool.Floaty_emit("面板", "展开");
 
         if (ITimg.ocr("蓝色开始行动", {
-                action: 5,
-                part: true,
-                log_policy: true,
-                refresh: false,
-                threshold: 0.85,
-            })) {
+            action: 5,
+            part: true,
+            log_policy: true,
+            refresh: false,
+            threshold: 0.85,
+        })) {
             console.error("发现截取的图片中含有手动选定关卡气泡提示\n可能会挡住重要标签，请重启程序");
             toast("发现截取的图片中含有手动选定关卡气泡提示\n可能会挡住重要标签，请重启程序");
             tool.Floaty_emit("展示文本", "状态", "状态：图片内容异常");
             tool.Floaty_emit("暂停", "结束程序");
             return false;
         } else if (ITimg.ocr("超级用户", {
-                action: 5,
-                part: true,
-                log_policy: true,
-                refresh: false,
-                threshold: 0.85,
-            })) {
+            action: 5,
+            part: true,
+            log_policy: true,
+            refresh: false,
+            threshold: 0.85,
+        })) {
             console.error("发现截取的图片中含有授权超级用户气泡提示\n可能会挡住重要标签，请前往相关授权应用关闭通知");
             toast("发现截取的图片中含有请求授权超级用户气泡提示\n可能会挡住重要标签，请前往相关授权应用关闭通知");
             tool.Floaty_emit("展示文本", "状态", "状态：图片内容异常");
@@ -344,12 +361,12 @@ var 公招 = {
                     });
 
                     if (!ITimg.ocr("职业需求", {
-                            action: 5,
-                            refresh: false,
-                            log_policy: "简短",
-                            correction_path: "公招",
-                            gather: taglb,
-                        })) {
+                        action: 5,
+                        refresh: false,
+                        log_policy: "简短",
+                        correction_path: "公招",
+                        gather: taglb,
+                    })) {
                         continue;
                     }
                     bon = [];
@@ -410,7 +427,7 @@ var 公招 = {
         return true;
         // }
     },
-    选择位置: function(shu) {
+    选择位置: function (shu) {
         tool.Floaty_emit("展示文本", "状态", "状态：选择公招位置");
         sleep(300);
         console.info("---选择公招位" + shu + "---");
@@ -441,7 +458,7 @@ var 公招 = {
     /**
      * @param {Boolean} noTag - 是否无tag，7:40分招募
      */
-    确认招募: function(noTag) {
+    确认招募: function (noTag) {
         taglb = ITimg.matchFeatures("公招_小时_减", {
             action: 5,
             area: 12,
@@ -456,6 +473,19 @@ var 公招 = {
             refresh: false,
             picture_failed_further: true,
         })
+
+        if(!taglb){
+            taglb = ITimg.matchFeatures("公招_小时_减", {
+                action: 5,
+                area: 12,
+                scale: 0.95,
+                matcher: 2,
+                threshold: 0.75,
+                refresh: true,
+                picture_failed_further: true,
+            })
+        }
+
         if (!taglb) {
             return false;
         }
@@ -482,62 +512,62 @@ var 公招 = {
 
 
     },
-    tag_result_view: function(_bon) {
+    tag_result_view: function (_bon) {
         let tag_result_ui = ui.inflate(
             <vertical id="parent">
-                        <horizontal margin="0" bg="#00000000">
-                            <img src="file://res/icon.png" w="50" h="30" margin="0 5" />
-                            <text text="公招结果" layout_gravity="left|center_vertical" textColor="#000000" />
-                            <horizontal w="*" h="*" gravity="right|center_vertical" clickable="true" >
-                                
-                                <text id="tips" text="tips:记得拉满9个小时" typeface="sans" textColor="#ff7f27" textSize="12sp" gravity="right" marginRight="10" />
-                                <linear marginLeft="5">
-                                    <img id="sett" marginRight="8" src="@drawable/ic_settings_applications_black_48dp" w="35" h="35" tint="#000000" foreground="?attr/selectableItemBackground" clickable="true" />
-                                </linear>
-                            </horizontal>
-                            
-                        </horizontal>
-                        <linear gravity="center" margin="0 -2">
-                            <View bg="#f5f5f5" w="*" h="2" />
+                <horizontal margin="0" bg="#00000000">
+                    <img src="file://res/icon.png" w="50" h="30" margin="0 5" />
+                    <text text="公招结果" layout_gravity="left|center_vertical" textColor="#000000" />
+                    <horizontal w="*" h="*" gravity="right|center_vertical" clickable="true" >
+
+                        <text id="tips" text="tips:记得拉满9个小时" typeface="sans" textColor="#ff7f27" textSize="12sp" gravity="right" marginRight="10" />
+                        <linear marginLeft="5">
+                            <img id="sett" marginRight="8" src="@drawable/ic_settings_applications_black_48dp" w="35" h="35" tint="#000000" foreground="?attr/selectableItemBackground" clickable="true" />
                         </linear>
-                        <vertical id="tag_sett" padding="20 10" visibility="gone" >
-                            <text margin="15"
-                            text="声明:tag词条是由{{ITimg.default_list.ocr.ocr_type}}识别屏幕文字获得的,不一定准确,如果你遇到识别不准的情况可联系开发者进行修正"
-                            textColor="red"
-                            textSize="15sp"
-                            layout_gravity="center"
-                            w="*" />
-                            <Switch id="pop_ups" text="tag变化时弹出tag计算" padding="6 6 6 6" textSize="16sp" />
-                            <View bg="#666666" h="1" w="*" />
-                            <Switch id="guarantees" text="仅查看保底tag词条组合" padding="6 6 6 6" textSize="16sp" />
-                            
-                            <View bg="#666666" h="1" w="*" />
-                        </vertical>
-                        
-                        <text id="bon" text=""
-                        margin="10"
-                        textSize="16sp"
-                        textColor="black"
-                        layout_gravity="center"
-                        w="*" />
-                        <text id="tag_result"
-                        margin="15"
-                        text="随便选吧，反正没有四星及以上"
-                        visibility="gone"
+                    </horizontal>
+
+                </horizontal>
+                <linear gravity="center" margin="0 -2">
+                    <View bg="#f5f5f5" w="*" h="2" />
+                </linear>
+                <vertical id="tag_sett" padding="20 10" visibility="gone" >
+                    <text margin="15"
+                        text="声明:tag词条是由{{ITimg.default_list.ocr.ocr_type}}识别屏幕文字获得的,不一定准确,如果你遇到识别不准的情况可联系开发者进行修正"
+                        textColor="red"
                         textSize="15sp"
-                        textColor="#808080"
                         layout_gravity="center"
                         w="*" />
-                        
-                        <ScrollView h="auto" id="scrollView" visibility="gone">
-                            
-                            <vertical id="content" padding="3" h="auto">
-                                
-                                
-                            </vertical>
-                            
-                        </ScrollView >
-                    </vertical>);
+                    <Switch id="pop_ups" text="tag变化时弹出tag计算" padding="6 6 6 6" textSize="16sp" />
+                    <View bg="#666666" h="1" w="*" />
+                    <Switch id="guarantees" text="仅查看保底tag词条组合" padding="6 6 6 6" textSize="16sp" />
+
+                    <View bg="#666666" h="1" w="*" />
+                </vertical>
+
+                <text id="bon" text=""
+                    margin="10"
+                    textSize="16sp"
+                    textColor="black"
+                    layout_gravity="center"
+                    w="*" />
+                <text id="tag_result"
+                    margin="15"
+                    text="随便选吧，反正没有四星及以上"
+                    visibility="gone"
+                    textSize="15sp"
+                    textColor="#808080"
+                    layout_gravity="center"
+                    w="*" />
+
+                <ScrollView h="auto" id="scrollView" visibility="gone">
+
+                    <vertical id="content" padding="3" h="auto">
+
+
+                    </vertical>
+
+                </ScrollView >
+            </vertical>);
 
         this.tag_result_d = dialogs.build({
             // type: "foreground-or-overlay",
@@ -589,19 +619,19 @@ var 公招 = {
                 result[i].add_tags = result[i].add_tags.join("，")
                 let AddText = ui.inflate(
                     <horizontal w="*" h="auto" margin="20 0 0 0">
-                                
-                                <text id="name"
-                                margin="0 0"
-                                textSize="15sp"
-                                layout_gravity="center"
-                                w="{{250}}px" />
-                                <text id="add_tags"
-                                margin="0"
-                                textSize="15sp"
-                                textColor="#808080"
-                                layout_gravity="center"
-                                w="*" />
-                            </horizontal>,
+
+                        <text id="name"
+                            margin="0 0"
+                            textSize="15sp"
+                            layout_gravity="center"
+                            w="{{250}}px" />
+                        <text id="add_tags"
+                            margin="0"
+                            textSize="15sp"
+                            textColor="#808080"
+                            layout_gravity="center"
+                            w="*" />
+                    </horizontal>,
                     tag_result_ui.content
                 );
                 ui.run(() => {
