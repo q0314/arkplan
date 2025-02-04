@@ -379,6 +379,13 @@
 		"tags": ["近战位", "治疗", "费用回复"]
 	},
 	{
+		"name": "豆苗",
+		"type": "先锋",
+		"level": 4,
+		"sex": "女",
+		"tags": ["远战位", "召唤", "费用回复"]
+	},
+	{
 		"name": "红云",
 		"type": "狙击",
 		"level": 4,
@@ -921,9 +928,10 @@
 	},{
 		"name": "tag文件版本",
 		"type": "tag文件版本",
-		"versionCode":"7",
+		"versionCode":"8",
 		"update_content_7":"更新三位高级资深干员-重装的信息公招tag信息",
 		"update_content_6":"收录干员:早露，铃兰，棘刺，莱恩哈特，极境，断崖，石棉，安哲拉，贾维，蜜蜡，卡达，孑，Friston-3 的公招tag信息",
+		"update_content_8":"收录干员:豆苗 的公招tag信息",
 		"level": 0,
 		"sex": "未知",
 		"tags": ["tag"]
