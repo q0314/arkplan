@@ -434,11 +434,11 @@ function save(token) {
 
             let altered = processBindingList(getBL, token);
             if (!altered) {
-                let firstItem = result.find(item => item.defaultUid === item['uid']);
+                let firstItem = getBL.find(item => item.defaultUid === item['uid']);
                 roles_list.push({
                     token: token,
-                    bindingList: result,
-                    defaultUid: result[0].defaultUid,
+                    bindingList: getBL,
+                    defaultUid: getBL[0].defaultUid,
                     nickName: firstItem.nickName,
                     channelName: firstItem.channelName
                 });
