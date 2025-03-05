@@ -1993,7 +1993,7 @@ function update_ui() {
             ui.indx6.attr("h", "80");
             ui.inputgb.attr("visibility", "visible");
             ui.input_file.attr("visibility", "visible");
-            ui.inputgb.setHint(gbyyan.path)
+            ui.inputgb.setHint(gbyyan.path || "未知模块")
         }
 
         //基建换班
