@@ -45,7 +45,12 @@
         "介绍_用于纠正替换完整字符": {
             "correct": "correct 正确的字符, regular 是否正则匹配",
             "regular": false
+        },
+        "乐音收灵":{
+            "correct":"乐章收录",
+            "regular":false
         }
+        
     },
     "filter_partial_characters": {
         "介绍_过滤包含部分字符的句子_为了让识别结果只有有用的信息_是否正则匹配": false

@@ -98,7 +98,7 @@ let collection = {
                 _terminal--;
             }
 
-            if (_terminal == 2||!导航定位(4,true)) {
+            if (_terminal == 2 || !导航定位(4, true)) {
                 continue;
             }
 
@@ -106,18 +106,18 @@ let collection = {
             // 分辨率
 
             // 已知按钮坐标
-            let button1X = Math.floor(height / 16.4);
-            let button8X = parseInt(height / 1.068);
+            let button1X = Math.floor(height / 12);
+            let button8X = parseInt(height / 1.09);
 
             // 计算按钮间隔
-            let interval = (button8X - button1X) / (8 - 1); // 计算按钮间隔
+            let interval = (button8X - button1X) / (6 - 1); // 计算按钮间隔
 
             // 获取线上的按钮坐标
             function getButtonCoordinates(yPosition) {
                 let buttons = [];
 
                 // 循环添加按钮坐标
-                for (let i = 1; i <= 8; i++) {
+                for (let i = 1; i <= 6; i++) {
                     let buttonX = button1X + (i - 1) * interval; // 使用间隔计算按钮 X 坐标
                     let buttonY = yPosition;
                     buttons.push([buttonX, buttonY]);
@@ -134,26 +134,20 @@ let collection = {
             }
 
             switch (affairs) {
-                case displayText["主题曲"]:
+                case displayText["曲谱"]:
                     MyAutomator.click.apply(MyAutomator, buttonCoords[1]);
                     break;
-                case displayText["插曲"]:
+                case displayText["资源收集"]:
                     MyAutomator.click.apply(MyAutomator, buttonCoords[2]);
                     break;
-                case displayText["别传"]:
-                    MyAutomator.click.apply(MyAutomator, buttonCoords[3]);
-                    break
-                case displayText["资源收集"]:
-                    MyAutomator.click.apply(MyAutomator, buttonCoords[4]);
-                    break;
                 case displayText["常态事务"]:
-                    MyAutomator.click.apply(MyAutomator, buttonCoords[5]);
+                    MyAutomator.click.apply(MyAutomator, buttonCoords[3]);
                     break;
                 case displayText["长期探索"]:
-                    MyAutomator.click.apply(MyAutomator, buttonCoords[6])
+                    MyAutomator.click.apply(MyAutomator, buttonCoords[4])
                     break;
                 case displayText["周期挑战"]:
-                    MyAutomator.click.apply(MyAutomator, buttonCoords[7]);
+                    MyAutomator.click.apply(MyAutomator, buttonCoords[5]);
                     break;
             }
             if (setting.调试) {
@@ -180,54 +174,50 @@ let collection = {
         }
     },
     固源岩: function() {
-        this.终端事务(displayText["主题曲"]);
-        tool.Floaty_emit("面板", "隐藏");
+        this.终端事务(displayText["曲谱"]);
         tool.Floaty_emit("展示文本", "状态", "状态: 正在进入固源岩关卡");
-        let cumulative = 5;
-        while (cumulative) {
+        this.staging = (ITimg.ocr(displayText["乐章收录"], {
+            action: 5,
+            area: 2,
+            part: true,
+            nods: 500,
+        }) || ITimg.ocr(displayText["乐章收录"], {
+            action: 5,
+            area: 2,
+            part: true
+        }))
+        tool.Floaty_emit("面板", "隐藏");
+        if (this.staging) {
+            let _xy = [this.staging.left, this.staging.bottom]
+            MyAutomator.click.apply(MyAutomator, _xy);
             sleep(500);
-            if (this.staging = (ITimg.ocr(displayText["EPISODE"], {
-                    action: 5,
-                    area: 13,
-                    similar: 0.85,
-                })) || ITimg.ocr(displayText["残阳"], {
-                    action: 5,
-                    area: 13,
-                    log_policy: true,
-                    refresh: false,
-                })) {
-                swipe(this.staging.left, this.staging.bottom, this.staging.right, width - zoy(100), 500);
-                sleep(500);
-                swipe(this.staging.left, this.staging.bottom, this.staging.right, width - zoy(100), 500);
-                sleep(500);
-                break;
-            };
-            cumulative--;
-            if (!cumulative) {
-                console.warn("多次无法识别EPISODE，改用固定坐标滑动");
-                swipe(zox(300), zoy(350), zox(300), width - zoy(200), 500);
-                sleep(500);
-                swipe(zox(300), zoy(350), zox(300), width - zoy(200), 500);
-                sleep(500);
-            }
+            MyAutomator.click.apply(MyAutomator, _xy);
+            sleep(500);
+            MyAutomator.click.apply(MyAutomator, _xy);
+            sleep(500);
 
-        };
-        sleep(500);
-        tool.Floaty_emit("面板", "展开");
-        if (this.staging = (ITimg.ocr(displayText["黑暗时代"], {
+        } else {
+            let tips = "无法进入" + displayText["乐章收录"];
+            toast(tips)
+            console.warn(tips);
+            return
+        }
+        if (this.staging = (ITimg.ocr(displayText["为了明日"], {
                 action: 5,
-                area: 34,
+                area: 1,
                 part: true,
                 nods: 500,
-            }) || ITimg.ocr(displayText["黑暗时代"], {
+            }) || ITimg.ocr(displayText["为了明日"], {
                 action: 5,
-                area: 34,
+                area: 1,
                 part: true
             }))) {
-            MyAutomator.click(this.staging.right, this.staging.top);
+            let _y = this.staging.bottom + ((this.staging.bottom - this.staging.top) * 3)
+            MyAutomator.click(this.staging.right, _y);
             sleep(1000);
         };
-        cumulative = 5;
+        tool.Floaty_emit("面板", "展开");
+        let cumulative = 5;
         while (cumulative) {
 
             this.staging = (ITimg.ocr("集合文本", {
@@ -421,7 +411,7 @@ let collection = {
     /**
      * 进入终端,并检验上一次作战类型,选中非剿灭关卡
      * @returns 
-     */ 
+     */
     上次作战: function() {
         console.info("---上次作战---");
         while (true) {
@@ -432,7 +422,7 @@ let collection = {
                 timing: 1500,
                 area: 2
             });
-            if(!导航定位(4,true)){
+            if (!导航定位(4, true)) {
                 continue;
             }
             if (ITimg.matchFeatures("上一次作战", {
@@ -451,14 +441,14 @@ let collection = {
                 }))) {
                 log("验证通过")
                 break;
-            } else if(导航定位("终端")){
-                
-                    ITimg.matchFeatures("基建_离开", {
-                        action: 0,
-                        timing: 5000,
-                        area: "右半屏",
-                    });
-                
+            } else if (导航定位("终端")) {
+
+                ITimg.matchFeatures("基建_离开", {
+                    action: 0,
+                    timing: 5000,
+                    area: "右半屏",
+                });
+
             }
 
         }
