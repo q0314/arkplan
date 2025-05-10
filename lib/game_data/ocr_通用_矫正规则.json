@@ -39,6 +39,9 @@
         },
         "cTED": {
             "correct": "CTED"
+        },
+        "集戍": {
+            "correct": "集成"
         }
     },
     "replace_full_character": {
