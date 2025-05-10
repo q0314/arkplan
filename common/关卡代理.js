@@ -469,11 +469,29 @@ let 关卡代理 = {
                         timing: 1000,
                         area: "右半屏",
                     })) {
-                    if (ITimg.matchFeatures("代理_勾", {
-                            timing: 1000,
-                            area: "右半屏",
-                        })) {
+                let _commission=ITimg.matchFeatures("代理_全权委托", {
+                    action: 5,
+                    timing: 500,
+                    area: 4,
+                    threshold: 0.85,
+                }) || ITimg.matchFeatures("代理_全权委托", {
+                    action: 5,
+                    timing: 500,
+                    area: 4,
+                    threshold: 0.85,
+                })
+                if(_commission) {
+                    _commission = [[_commission.right,_commission.bottom-zoy(5)],[_commission.left,_commission.top]]
                         tool.Floaty_emit("展示文本", "状态", "状态：正在代理中");
+                        //使用再取消全权代理，再勾选代理指挥
+                        log(_commission)
+                        MyAutomator.click.apply(MyAutomator,_commission[0]);
+                        sleep(500);
+                        MyAutomator.click.apply(MyAutomator,_commission[0]);
+                        sleep(500);
+                        MyAutomator.click.apply(MyAutomator,[_commission[0][0] +(_commission[0][0]- _commission[1][0]),_commission[0][1]]);
+                        sleep(500);
+                        
                         if (ITimg.matchFeatures("行动_普通", {
                                 action: 0,
                                 timing: 1500,
@@ -482,18 +500,10 @@ let 关卡代理 = {
                             toastLog("代理点击成功!");
                             break;
                         };
-                    };
-
-                    if (ITimg.matchFeatures("代理_未勾", {
-                            action: 0,
-                            timing: 1000,
-                            area: "右半屏",
-                        })) { //有开始行动界面才能判断
-                        toast("自动勾选代理指挥");
-                    } else {
-                        toast("当前关卡未解锁代理指挥，请选择已勾选可代理的关卡");
+                    }else{
+                        toast("当前关卡未解锁代理指挥，或正在使用全权代理");
                         sleep(2000);
-                    };
+                    }
 
                 } else {
                     sleep(2000);
